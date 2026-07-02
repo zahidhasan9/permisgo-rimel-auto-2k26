@@ -16,7 +16,7 @@ const loginOptions = [
   },
   {
     title: "Student",
-    href: "/student-login",
+    href: "/student/dashboard",
     image: Student,
     alt: "Student login",
   },

@@ -69,6 +69,29 @@ const menu = [
     children: [{ name: "Invoice", href: "/student/accounting/invoice" }],
   },
 
+  {
+    name: "Driving Info",
+    icon: FaCar,
+    children: [
+      {
+        name: "Driving Dashboard",
+        href: "/student/driving-info/driving-dashboard",
+      },
+      {
+        name: "Planning",
+        href: "/student/driving-info/planning",
+      },
+      {
+        name: "Instructors",
+        href: "/student/driving-info/instructors",
+      },
+      {
+        name: "Location",
+        href: "/student/driving-info/book-lesson",
+      },
+    ],
+  },
+
   { name: "My History", href: "/student/my-history", icon: RiChatHistoryLine },
   { name: "Offers", href: "/student/offers", icon: FaTag },
   { name: "Driving Info", href: "/student/driving-info", icon: FaCar },
@@ -196,7 +219,7 @@ function DesktopNav({ items, pathname, collapsed, openMenu, setOpenMenu }) {
 
         const isOpen = openMenu === item.name;
 
-        // ✅ CASE 1: NO CHILDREN → LINK (FIXED DASHBOARD ISSUE)
+        // CASE 1: NO CHILDREN → LINK (FIXED DASHBOARD ISSUE)
         if (!item.children) {
           return (
             <Link
