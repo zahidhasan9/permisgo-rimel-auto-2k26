@@ -1,11 +1,7 @@
-import React from 'react'
+import React from "react";
 
-const bookLesson = () => {
-  return (
-    <>
-        
-    </>
-  )
-}
+const page = () => {
+  return <div>page</div>;
+};
 
-export default bookLesson
+export default page;
