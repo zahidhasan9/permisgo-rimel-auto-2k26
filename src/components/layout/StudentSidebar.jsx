@@ -15,6 +15,7 @@ import {
   FaTag,
   FaUser,
 } from "react-icons/fa";
+import { RiSteering2Fill } from "react-icons/ri";
 
 import { FiChevronRight, FiMenu, FiX } from "react-icons/fi";
 import { HiAcademicCap } from "react-icons/hi";
@@ -92,7 +93,7 @@ const menu = [
     ],
   },
 
-  { name: "My History", href: "/student/my-history", icon: RiChatHistoryLine },
+  { name: "Code de la", href: "/student/code", icon: RiSteering2Fill },
   { name: "Offers", href: "/student/offers", icon: FaTag },
   { name: "Driving Info", href: "/student/driving-info", icon: FaCar },
   { name: "Traffic Law", href: "/student/traffic-law", icon: MdOutlineTraffic },
