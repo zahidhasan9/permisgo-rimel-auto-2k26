@@ -8,7 +8,7 @@ import { TbClockHour4 } from "react-icons/tb";
 const questions = [
   {
     id: 1,
-    image: "/images/road-question.png",
+    image: "/image/road-question.png",
     title: "Parking is prohibited",
     options: [
       { key: "HAS", text: "before the sign only" },
@@ -20,7 +20,7 @@ const questions = [
   },
   {
     id: 2,
-    image: "/images/road-question.png",
+    image: "/image/road-question.png",
     title: "Parking is prohibited",
     options: [
       { key: "HAS", text: "before the sign only" },
