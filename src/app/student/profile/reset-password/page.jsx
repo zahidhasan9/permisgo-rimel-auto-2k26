@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import { FaChevronLeft, FaEye, FaEyeSlash } from "react-icons/fa";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 const inputClass =
   "h-11 w-full rounded-xl border border-slate-200 bg-white px-4 pr-11 text-sm font-medium text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-[#16458f] focus:ring-4 focus:ring-blue-50";
@@ -9,6 +10,12 @@ const inputClass =
 const labelClass = "mb-2 block text-sm font-bold text-slate-600";
 
 export default function ResetPassword() {
+  const router = useRouter();
+
+  function handleBack() {
+    router.back();
+  }
+
   const [showPassword, setShowPassword] = useState({
     current: false,
     new: false,
@@ -29,6 +36,7 @@ export default function ResetPassword() {
         <header className="mb-5 flex items-start gap-3">
           <button
             type="button"
+            onClick={handleBack}
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-[#16458f] shadow-sm transition hover:bg-blue-50"
           >
             <FaChevronLeft size={14} />

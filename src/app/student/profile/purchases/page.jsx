@@ -1,11 +1,24 @@
 "use client";
 
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+
 import { IoChevronBack } from "react-icons/io5";
 
 function Header() {
+  const router = useRouter();
+
+  function handleBack() {
+    router.back();
+  }
+
   return (
     <header className="flex items-center gap-[16px]">
-      <button className="flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-[12px] bg-[#EEF4FB] text-[27px] text-black">
+      <button
+        type="button"
+        className="flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-[12px] bg-[#EEF4FB] text-[27px] text-black"
+        onClick={handleBack}
+      >
         <IoChevronBack />
       </button>
 
@@ -17,6 +30,12 @@ function Header() {
 }
 
 function CreditCard() {
+  const router = useRouter();
+
+  function handleBack() {
+    router.back();
+  }
+
   return (
     <section className="h-[333px] rounded-[10px] bg-[#E8EEF8] px-[24px] pt-[28px]">
       <h2 className="text-[21px] font-[700] leading-none text-[#174A9B]">

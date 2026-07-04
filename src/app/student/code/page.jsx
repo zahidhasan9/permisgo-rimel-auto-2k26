@@ -10,7 +10,7 @@ const practiceCards = [
   {
     title: "Exam Mock Séries",
     icon: "/image/exam-mock.png",
-    link: "/student/code/exam-mock-series",
+    link: "/student/code/traffic-law",
   },
   {
     title: "Thématiques Séries",

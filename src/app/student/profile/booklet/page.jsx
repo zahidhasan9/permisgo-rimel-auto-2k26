@@ -1,4 +1,6 @@
 "use client";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { FaCaretDown } from "react-icons/fa";
 import { IoChevronBack } from "react-icons/io5";
@@ -54,9 +56,18 @@ const skills = [
 ];
 
 function Header() {
+  const router = useRouter();
+
+  function handleBack() {
+    router.back();
+  }
   return (
     <header className="flex items-start gap-[16px]">
-      <button className="flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-[12px] bg-[#EEF4FB] text-[27px] text-black">
+      <button
+        type="button"
+        className="flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-[12px] bg-[#EEF4FB] text-[27px] text-black"
+        onClick={handleBack}
+      >
         <IoChevronBack />
       </button>
 

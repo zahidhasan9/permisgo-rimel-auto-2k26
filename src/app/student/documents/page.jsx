@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { IoChevronBack } from "react-icons/io5";
 
 const requirements = [
@@ -44,115 +45,104 @@ const requirements = [
 ];
 
 const downloadableFiles = [
-  "DOWNLOAD THE FONT OF THE PERMIT *",
+  "DOWNLOAD THE FRONT OF THE PERMIT *",
   "DOWNLOAD THE BACK OF THE PERMIT *",
 ];
 
-function RequirementCard({ title, items }) {
-  return (
-    <section className="flex min-h-[126px] items-start justify-between gap-5 rounded-[12px] bg-[#E8EEF8] px-[24px] py-[25px] sm:px-[28px]">
-      <div className="min-w-0">
-        <h2 className="text-[15px] font-[700] leading-none text-[#174A9B]">
-          {title}
-        </h2>
-
-        <ul className="mt-[17px] space-y-[13px] pl-[12px]">
-          {items.map((item) => (
-            <li
-              key={item}
-              className="text-[15.5px] font-[500] leading-[18px] text-[#101010] before:mr-[10px] before:content-['•']"
-            >
-              {item}
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      <button className="mt-[1px] h-[31px] shrink-0 rounded-[8px] bg-[#DF263C] px-[13px] text-[11.5px] font-[700] text-white">
-        Upload Document
-      </button>
-    </section>
-  );
-}
-
-function DownloadCard({ title }) {
-  return (
-    <div className="flex min-h-[134px] flex-col items-center justify-center rounded-[12px] bg-white px-5 py-6">
-      <h3 className="text-center text-[15px] font-[700] leading-[20px] text-[#174A9B]">
-        {title}
-      </h3>
-
-      <button className="mt-[18px] h-[45px] w-[112px] rounded-[10px] border-[2px] border-[#DF263C] bg-white text-[14px] font-[700] text-[#111111]">
-        Download
-      </button>
-    </div>
-  );
-}
-
 export default function Page() {
+  const router = useRouter();
+
   return (
-    <>
-      <style jsx global>{`
-        @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+    <main className="min-h-screen bg-white px-4 py-5 font-sans text-[#171717] sm:px-6 lg:px-8">
+      <div className="mx-auto w-full max-w-[1040px]">
+        {/* Header */}
+        <header className="mb-7 flex items-start gap-3 sm:gap-4">
+          <button
+            type="button"
+            onClick={() => router.back()}
+            aria-label="Go back"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[11px] bg-[#EEF4FB] text-[24px] text-[#111827] transition hover:bg-[#dfe7f2]"
+          >
+            <IoChevronBack />
+          </button>
 
-        * {
-          box-sizing: border-box;
-        }
+          <div>
+            <h1 className="text-[23px] font-bold leading-tight text-[#174A9B] sm:text-[25px]">
+              Profile
+            </h1>
 
-        html,
-        body {
-          margin: 0;
-          background: #ffffff;
-          font-family: "Poppins", sans-serif;
-        }
-      `}</style>
+            <p className="mt-2 text-[13px] font-medium leading-[1.5] text-[#6F737B] sm:text-[13.5px]">
+              Update your information to ensure accurate lesson scheduling and
+              communication.
+            </p>
+          </div>
+        </header>
 
-      <main className="min-h-screen bg-white">
-        <div className="mx-auto w-full max-w-[1080px] px-[22px] pb-[22px] pt-[24px]">
-          <header className="mb-[34px] flex items-start gap-[16px]">
-            <button className="flex h-[40px] w-[40px] shrink-0 items-center justify-center rounded-[12px] bg-[#EEF4FB] text-[25px] text-[#111827]">
-              <IoChevronBack />
-            </button>
+        {/* Requirement Cards */}
+        <section className="space-y-4">
+          {requirements.map((requirement) => (
+            <div
+              key={requirement.title}
+              className="flex flex-col gap-4 rounded-[12px] bg-[#E8EEF8] p-4 sm:flex-row sm:items-start sm:justify-between sm:p-5"
+            >
+              <div className="min-w-0">
+                <h2 className="text-[14px] font-bold leading-tight text-[#174A9B] sm:text-[15px]">
+                  {requirement.title}
+                </h2>
 
-            <div>
-              <h1 className="text-[25px] font-[700] leading-[29px] text-[#174A9B]">
-                Profile
-              </h1>
+                <ul className="mt-3 space-y-2 pl-1">
+                  {requirement.items.map((item) => (
+                    <li
+                      key={item}
+                      className="text-[14px] font-medium leading-[1.45] text-[#101010] before:mr-2 before:content-['•'] sm:text-[15px]"
+                    >
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
 
-              <p className="mt-[12px] text-[13.5px] font-[500] leading-none text-[#6F737B]">
-                Update your information to ensure accurate lesson scheduling and
-                communication.
-              </p>
+              <button
+                type="button"
+                className="h-9 w-full shrink-0 rounded-[8px] bg-[#DF263C] px-4 text-[12px] font-bold text-white transition hover:bg-[#c91f33] sm:w-auto"
+              >
+                Upload Document
+              </button>
             </div>
-          </header>
+          ))}
+        </section>
 
-          <div className="space-y-[19px]">
-            {requirements.map((item) => (
-              <RequirementCard
-                key={item.title}
-                title={item.title}
-                items={item.items}
-              />
+        {/* Downloadable Files */}
+        <section className="mt-5 rounded-[12px] bg-[#E8EEF8] p-4 sm:p-5">
+          <h2 className="text-[20px] font-bold leading-tight text-[#174A9B] sm:text-[22px]">
+            Downloadable Files
+          </h2>
+
+          <p className="mt-3 text-[13px] font-medium leading-[1.5] text-[#6F737B] sm:text-[13.5px]">
+            You will find below the list of your downloadable documents
+          </p>
+
+          <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
+            {downloadableFiles.map((file) => (
+              <div
+                key={file}
+                className="flex min-h-[130px] flex-col items-center justify-center rounded-[12px] bg-white p-5"
+              >
+                <h3 className="text-center text-[14px] font-bold leading-[1.4] text-[#174A9B] sm:text-[15px]">
+                  {file}
+                </h3>
+
+                <button
+                  type="button"
+                  className="mt-4 h-11 w-[112px] rounded-[10px] border-2 border-[#DF263C] bg-white text-[14px] font-bold text-[#111111] transition hover:bg-[#DF263C] hover:text-white"
+                >
+                  Download
+                </button>
+              </div>
             ))}
           </div>
-
-          <section className="mt-[24px] rounded-[12px] bg-[#E8EEF8] px-[24px] py-[25px] sm:px-[28px]">
-            <h2 className="text-[22px] font-[700] leading-none text-[#174A9B]">
-              Downloadable Files
-            </h2>
-
-            <p className="mt-[24px] text-[13.5px] font-[500] leading-none text-[#6F737B]">
-              You will find below the list of your downloadable documents
-            </p>
-
-            <div className="mt-[27px] grid grid-cols-1 gap-[18px] md:grid-cols-2">
-              {downloadableFiles.map((file) => (
-                <DownloadCard key={file} title={file} />
-              ))}
-            </div>
-          </section>
-        </div>
-      </main>
-    </>
+        </section>
+      </div>
+    </main>
   );
 }

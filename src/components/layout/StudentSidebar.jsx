@@ -377,6 +377,7 @@ const menu = [
       { name: "Reset Password", href: "/student/profile/reset-password" },
       { name: "Purchases", href: "/student/profile/purchases" },
       { name: "Booklet", href: "/student/profile/booklet" },
+      { name: "Account", href: "/student/accounting/invoice" },
     ],
   },
 
@@ -401,30 +402,24 @@ const menu = [
   },
 
   {
-    name: "Account Info",
-    icon: MdAccountTree,
-    children: [{ name: "Invoice", href: "/student/accounting/invoice" }],
-  },
-
-  {
-    name: "Driving Info",
+    name: "Driving Operation",
     icon: FaCar,
     children: [
       {
         name: "Driving Dashboard",
-        href: "/student/driving-info/driving-dashboard",
+        href: "/student/driving-operation/driving-dashboard",
       },
       {
         name: "Planning",
-        href: "/student/driving-info/planning",
+        href: "/student/driving-operation/planning",
       },
       {
         name: "Instructors",
-        href: "/student/driving-info/instructors",
+        href: "/student/driving-operation/instructors",
       },
       {
         name: "Location",
-        href: "/student/driving-info/book-lesson",
+        href: "/student/driving-operation/book-lesson",
       },
     ],
   },
