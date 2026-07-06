@@ -3,18 +3,22 @@ import axios from "../Apiutils/axiosInstance";
 // =======================
 // Auth / User
 // =======================
-export const registerUser = (userData) => axios.post("/auth/register", userData);
+export const registerUser = (userData) =>
+  axios.post("/auth/register", userData);
 export const loginUser = (userData) => axios.post("/auth/login", userData);
 export const getLoggedInUser = () => axios.get("/auth/me");
-export const forgotPassword = (data) => axios.post("/auth/forgot-password", data);
+export const forgotPassword = (data) =>
+  axios.post("/auth/forgot-password", data);
 export const resetPassword = (data) => axios.post("/auth/reset-password", data);
+export const logoutUser = () => axios.post("/auth/logout");
 
 // =======================
 // Student
 // =======================
 export const getStudentDashboard = () => axios.get("/students/dashboard");
 export const getStudentProfile = () => axios.get("/students/profile");
-export const updateStudentProfile = (data) => axios.patch("/students/profile", data);
+export const updateStudentProfile = (data) =>
+  axios.patch("/students/profile", data);
 export const addFavoriteTeacher = (teacherId) =>
   axios.patch(`/students/favorite-teachers/${teacherId}`);
 export const removeFavoriteTeacher = (teacherId) =>
@@ -26,11 +30,14 @@ export const removeFavoriteTeacher = (teacherId) =>
 export const getPublicTeachers = () => axios.get("/teachers/public");
 export const getTeacherDashboard = () => axios.get("/teachers/dashboard");
 export const getTeacherProfile = () => axios.get("/teachers/profile");
-export const updateTeacherProfile = (data) => axios.patch("/teachers/profile", data);
+export const updateTeacherProfile = (data) =>
+  axios.patch("/teachers/profile", data);
 export const getTeacherVehicles = () => axios.get("/teachers/vehicles");
-export const addTeacherVehicle = (data) => axios.post("/teachers/vehicles", data);
+export const addTeacherVehicle = (data) =>
+  axios.post("/teachers/vehicles", data);
 export const getTeacherLocations = () => axios.get("/teachers/locations");
-export const addTeacherLocation = (data) => axios.post("/teachers/locations", data);
+export const addTeacherLocation = (data) =>
+  axios.post("/teachers/locations", data);
 
 // =======================
 // Admin
@@ -51,11 +58,12 @@ export const getOfferBySlug = (slug) => axios.get(`/offers/${slug}`);
 export const createOffer = (data) => axios.post("/offers", data);
 export const updateOffer = (id, data) => axios.patch(`/offers/${id}`, data);
 export const deleteOffer = (id) => axios.delete(`/offers/${id}`);
-export const createPackage = (data) => axios.post("/offers/packages/create", data);
+export const createPackage = (data) =>
+  axios.post("/offers/packages/create", data);
 
 // =======================
 // Bookings
-// =======================
+// ========================
 export const createBooking = (data) => axios.post("/bookings", data);
 export const getBookings = () => axios.get("/bookings");
 export const getBooking = (id) => axios.get(`/bookings/${id}`);
@@ -76,7 +84,8 @@ export const completeLesson = (id) => axios.patch(`/lessons/${id}/complete`);
 // Payments / Invoices
 // =======================
 export const createPayment = (data) => axios.post("/payments", data);
-export const verifyPayment = (id, data) => axios.patch(`/payments/${id}/verify`, data);
+export const verifyPayment = (id, data) =>
+  axios.patch(`/payments/${id}/verify`, data);
 export const getPayments = () => axios.get("/payments");
 export const getInvoices = () => axios.get("/payments/invoices");
 export const getInvoice = (id) => axios.get(`/payments/invoices/${id}`);
@@ -89,7 +98,8 @@ export const uploadDocument = (formData) =>
     headers: { "Content-Type": "multipart/form-data" },
   });
 export const getDocuments = () => axios.get("/documents");
-export const reviewDocument = (id, data) => axios.patch(`/documents/${id}/review`, data);
+export const reviewDocument = (id, data) =>
+  axios.patch(`/documents/${id}/review`, data);
 
 // =======================
 // Blogs
@@ -113,7 +123,8 @@ export const deleteFaq = (id) => axios.delete(`/faqs/${id}`);
 // =======================
 export const getTestimonials = () => axios.get("/testimonials");
 export const createTestimonial = (data) => axios.post("/testimonials", data);
-export const updateTestimonial = (id, data) => axios.patch(`/testimonials/${id}`, data);
+export const updateTestimonial = (id, data) =>
+  axios.patch(`/testimonials/${id}`, data);
 export const deleteTestimonial = (id) => axios.delete(`/testimonials/${id}`);
 
 // =======================
@@ -122,18 +133,21 @@ export const deleteTestimonial = (id) => axios.delete(`/testimonials/${id}`);
 export const createPublicTicket = (data) => axios.post("/support/public", data);
 export const createSupportTicket = (data) => axios.post("/support", data);
 export const getSupportTickets = () => axios.get("/support");
-export const replySupportTicket = (id, data) => axios.patch(`/support/${id}/reply`, data);
+export const replySupportTicket = (id, data) =>
+  axios.patch(`/support/${id}/reply`, data);
 
 // =======================
 // Notifications
 // =======================
 export const getNotifications = () => axios.get("/notifications");
-export const markNotificationAsRead = (id) => axios.patch(`/notifications/${id}/read`);
+export const markNotificationAsRead = (id) =>
+  axios.patch(`/notifications/${id}/read`);
 
 // =======================
 // Reviews
 // =======================
-export const getTeacherReviews = (teacherId) => axios.get(`/reviews/teacher/${teacherId}`);
+export const getTeacherReviews = (teacherId) =>
+  axios.get(`/reviews/teacher/${teacherId}`);
 export const createReview = (data) => axios.post("/reviews", data);
 
 // =======================
@@ -142,14 +156,81 @@ export const createReview = (data) => axios.post("/reviews", data);
 export const getMyReferral = () => axios.get("/referrals/me");
 
 // =======================
-// Quizzes / Road Signs
+// Full Quiz System
 // =======================
+
+// =======================
+// Code Quiz APIs
+// Add at the bottom of src/features/API.js
+// =======================
+
+export const getStudentCodeQuizzes = () => axios.get("/quizzes");
+
+export const startCodeQuizAttempt = (quizId) =>
+  axios.post(`/quizzes/${quizId}/attempts/start`);
+
+export const submitCodeQuizAnswer = (attemptId, data) =>
+  axios.post(`/quizzes/attempts/${attemptId}/answer`, data);
+
+export const finishCodeQuizAttempt = (attemptId) =>
+  axios.post(`/quizzes/attempts/${attemptId}/finish`);
+
+export const getMyCodeQuizAttempts = () => axios.get("/quizzes/attempts/me");
+
+export const getCodeQuizAttemptReview = (attemptId) =>
+  axios.get(`/quizzes/attempts/${attemptId}/review`);
+// --------------------------------------------
+
 export const getQuizzes = () => axios.get("/quizzes");
-export const getQuizQuestions = (quizId) => axios.get(`/quizzes/${quizId}/questions`);
+export const getQuizQuestions = (quizId) =>
+  axios.get(`/quizzes/${quizId}/questions`);
 export const getRoadSigns = () => axios.get("/quizzes/road-signs/list");
 export const createQuiz = (data) => axios.post("/quizzes", data);
-export const createQuizQuestion = (data) => axios.post("/quizzes/questions", data);
+export const createQuizQuestion = (data) =>
+  axios.post("/quizzes/questions", data);
 export const createRoadSign = (data) => axios.post("/quizzes/road-signs", data);
+
+export const getAdminQuizzes = () => axios.get("/quizzes/admin/all");
+export const getQuizById = (quizId) => axios.get(`/quizzes/${quizId}`);
+export const updateQuiz = (quizId, data) =>
+  axios.patch(`/quizzes/${quizId}`, data, {
+    headers:
+      data instanceof FormData ? { "Content-Type": "multipart/form-data" } : {},
+  });
+export const deleteQuiz = (quizId) => axios.delete(`/quizzes/${quizId}`);
+
+export const getAdminQuizQuestions = (quizId) =>
+  axios.get(`/quizzes/${quizId}/admin-questions`);
+export const getQuestionById = (questionId) =>
+  axios.get(`/quizzes/questions/${questionId}`);
+export const createQuizWithForm = (data) =>
+  axios.post("/quizzes", data, {
+    headers:
+      data instanceof FormData ? { "Content-Type": "multipart/form-data" } : {},
+  });
+export const createQuizQuestionWithForm = (quizId, data) =>
+  axios.post(`/quizzes/${quizId}/questions`, data, {
+    headers:
+      data instanceof FormData ? { "Content-Type": "multipart/form-data" } : {},
+  });
+export const updateQuizQuestion = (questionId, data) =>
+  axios.patch(`/quizzes/questions/${questionId}`, data, {
+    headers:
+      data instanceof FormData ? { "Content-Type": "multipart/form-data" } : {},
+  });
+export const deleteQuizQuestion = (questionId) =>
+  axios.delete(`/quizzes/questions/${questionId}`);
+
+export const startQuizAttempt = (quizId) =>
+  axios.post(`/quizzes/${quizId}/attempts/start`);
+export const submitQuizAnswer = (attemptId, data) =>
+  axios.post(`/quizzes/attempts/${attemptId}/answer`, data);
+export const finishQuizAttempt = (attemptId) =>
+  axios.post(`/quizzes/attempts/${attemptId}/finish`);
+export const getMyQuizAttempts = () => axios.get("/quizzes/attempts/me");
+export const getQuizAttemptReview = (attemptId) =>
+  axios.get(`/quizzes/attempts/${attemptId}/review`);
+export const getAdminQuizAttempts = () => axios.get("/quizzes/admin/attempts");
 
 // =======================
 // Exams

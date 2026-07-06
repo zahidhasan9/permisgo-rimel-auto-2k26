@@ -1,348 +1,750 @@
+// "use client";
+
+// import { useEffect, useMemo, useState } from "react";
+// import Link from "next/link";
+// import {
+//   IoChevronBack,
+//   IoAlertCircleOutline,
+//   IoRefreshOutline,
+// } from "react-icons/io5";
+// import { getMyQuizAttempts } from "@/features/API";
+
+// function formatDate(date) {
+//   if (!date) return "Date not found";
+
+//   return new Date(date).toLocaleString("en-US", {
+//     day: "2-digit",
+//     month: "short",
+//     year: "numeric",
+//     hour: "2-digit",
+//     minute: "2-digit",
+//   });
+// }
+
+// function getDuration(seconds) {
+//   if (!seconds) return "-";
+
+//   const min = Math.floor(seconds / 60);
+//   const sec = seconds % 60;
+
+//   if (min <= 0) return `${sec}s`;
+//   return `${min}m ${sec}s`;
+// }
+
+// function StatusBadge({ passed }) {
+//   return (
+//     <span
+//       className={`inline-flex h-7 items-center rounded-md px-3 text-[11px] font-black ${
+//         passed ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"
+//       }`}
+//     >
+//       {passed ? "PASSED" : "FAILED"}
+//     </span>
+//   );
+// }
+
+// function SummaryBox({ label, value, tone = "default" }) {
+//   const toneClass =
+//     tone === "green"
+//       ? "text-green-700"
+//       : tone === "red"
+//         ? "text-red-700"
+//         : "text-[#0D4598]";
+
+//   return (
+//     <div className="rounded-lg border border-[#E5EAF2] bg-white px-4 py-3">
+//       <p className="text-[10px] font-bold uppercase tracking-wide text-[#7B8190]">
+//         {label}
+//       </p>
+//       <p className={`mt-1 text-lg font-black ${toneClass}`}>{value}</p>
+//     </div>
+//   );
+// }
+
+// function LoadingRow() {
+//   return (
+//     <div className="animate-pulse rounded-xl border border-[#E5EAF2] bg-white p-4">
+//       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+//         <div className="flex-1">
+//           <div className="h-4 w-2/5 rounded bg-slate-200" />
+//           <div className="mt-3 h-3 w-1/3 rounded bg-slate-200" />
+//         </div>
+
+//         <div className="grid grid-cols-4 gap-2 md:w-[420px]">
+//           <div className="h-12 rounded bg-slate-200" />
+//           <div className="h-12 rounded bg-slate-200" />
+//           <div className="h-12 rounded bg-slate-200" />
+//           <div className="h-12 rounded bg-slate-200" />
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+// function MiniStat({ label, value, tone = "default" }) {
+//   const toneClass =
+//     tone === "green"
+//       ? "text-green-700"
+//       : tone === "red"
+//         ? "text-red-700"
+//         : "text-[#151515]";
+
+//   return (
+//     <div className="rounded-lg border border-[#E5EAF2] bg-[#F8FAFD] px-3 py-2">
+//       <p className="text-[10px] font-bold uppercase tracking-wide text-[#7B8190]">
+//         {label}
+//       </p>
+//       <p className={`mt-0.5 text-sm font-black ${toneClass}`}>{value}</p>
+//     </div>
+//   );
+// }
+
+// function AttemptRow({ attempt, index }) {
+//   const quizTitle = attempt.quiz?.title || "Code Quiz";
+//   const quizId = attempt.quiz?._id;
+//   const percentage = Number(attempt.percentage || 0);
+//   const correct = attempt.correctCount || 0;
+//   const wrong = attempt.wrongCount || 0;
+//   const total = attempt.totalQuestions || correct + wrong || 0;
+//   const duration = getDuration(attempt.durationSeconds);
+
+//   return (
+//     <div className="rounded-xl border border-[#E5EAF2] bg-white p-4 transition hover:border-[#0D4598]">
+//       <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
+//         <div className="flex min-w-0 flex-1 items-start gap-3">
+//           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[#EAF1FB] text-sm font-black text-[#0D4598]">
+//             {String(index + 1).padStart(2, "0")}
+//           </div>
+
+//           <div className="min-w-0 flex-1">
+//             <div className="flex flex-wrap items-center gap-2">
+//               <h3 className="line-clamp-1 text-[16px] font-bold text-[#151515]">
+//                 {quizTitle}
+//               </h3>
+
+//               <StatusBadge passed={attempt.passed} />
+//             </div>
+
+//             <p className="mt-1 text-sm font-medium text-[#7B8190]">
+//               {formatDate(attempt.createdAt)}
+//             </p>
+//           </div>
+//         </div>
+
+//         <div className="grid grid-cols-2 gap-2 sm:grid-cols-5 lg:w-[560px]">
+//           <MiniStat label="Score" value={`${percentage}%`} />
+//           <MiniStat label="Correct" value={correct} tone="green" />
+//           <MiniStat label="Wrong" value={wrong} tone="red" />
+//           <MiniStat label="Total" value={total} />
+//           <MiniStat label="Time" value={duration} />
+//         </div>
+
+//         {quizId ? (
+//           <Link
+//             href={`/student/code/code-challenge?quizId=${quizId}`}
+//             className="flex h-10 items-center justify-center rounded-lg bg-[#0D4598] px-4 text-xs font-black text-white transition hover:bg-[#083777] lg:w-[110px]"
+//           >
+//             Retake
+//           </Link>
+//         ) : (
+//           <button
+//             disabled
+//             className="h-10 rounded-lg bg-gray-200 px-4 text-xs font-black text-gray-500 lg:w-[110px]"
+//           >
+//             Retake
+//           </button>
+//         )}
+//       </div>
+
+//       <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-[#EDF1F7]">
+//         <div
+//           className={`h-full rounded-full ${
+//             attempt.passed ? "bg-green-600" : "bg-red-600"
+//           }`}
+//           style={{ width: `${Math.min(percentage, 100)}%` }}
+//         />
+//       </div>
+//     </div>
+//   );
+// }
+
+// export default function MyHistoryPage() {
+//   const [attempts, setAttempts] = useState([]);
+//   const [loading, setLoading] = useState(true);
+//   const [error, setError] = useState("");
+
+//   const loadHistory = async () => {
+//     try {
+//       setLoading(true);
+//       setError("");
+
+//       const res = await getMyQuizAttempts();
+//       setAttempts(res.data?.data || []);
+//     } catch (err) {
+//       setError(
+//         err.response?.data?.message ||
+//           err.message ||
+//           "Failed to load quiz history",
+//       );
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   useEffect(() => {
+//     loadHistory();
+//   }, []);
+
+//   const summary = useMemo(() => {
+//     const totalAttempts = attempts.length;
+//     const passedCount = attempts.filter((item) => item.passed).length;
+//     const failedCount = totalAttempts - passedCount;
+
+//     const averageScore =
+//       totalAttempts > 0
+//         ? Math.round(
+//             attempts.reduce(
+//               (sum, item) => sum + Number(item.percentage || 0),
+//               0,
+//             ) / totalAttempts,
+//           )
+//         : 0;
+
+//     return {
+//       totalAttempts,
+//       passedCount,
+//       failedCount,
+//       averageScore,
+//     };
+//   }, [attempts]);
+
+//   return (
+//     <main className="min-h-screen bg-[#F7F9FC] px-4 py-5 sm:px-6 lg:px-8">
+//       <div className="mx-auto max-w-6xl">
+//         <header className="mb-5 rounded-xl border border-[#E5EAF2] bg-white p-4">
+//           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+//             <div className="flex items-center gap-3">
+//               <Link
+//                 href="/student/code"
+//                 className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#EAF1FB] text-[#0D4598] transition hover:bg-[#0D4598] hover:text-white"
+//               >
+//                 <IoChevronBack size={24} />
+//               </Link>
+
+//               <div>
+//                 <h1 className="text-xl font-bold text-[#151515]">My History</h1>
+//                 <p className="mt-1 text-sm text-[#7B8190]">
+//                   Your quiz attempts, scores and pass/fail records.
+//                 </p>
+//               </div>
+//             </div>
+
+//             <div className="flex flex-wrap gap-2">
+//               <button
+//                 type="button"
+//                 onClick={loadHistory}
+//                 className="inline-flex h-10 items-center gap-2 rounded-lg border border-[#DDE6F3] bg-white px-4 text-xs font-black text-[#0D4598] transition hover:bg-[#EAF1FB]"
+//               >
+//                 <IoRefreshOutline size={17} />
+//                 Refresh
+//               </button>
+
+//               <Link
+//                 href="/student/code/simple-series-list"
+//                 className="inline-flex h-10 items-center rounded-lg bg-[#0D4598] px-4 text-xs font-black text-white transition hover:bg-[#083777]"
+//               >
+//                 Take Quiz
+//               </Link>
+//             </div>
+//           </div>
+//         </header>
+
+//         <section className="mb-4 grid grid-cols-2 gap-3 md:grid-cols-4">
+//           <SummaryBox label="Total Attempts" value={summary.totalAttempts} />
+//           <SummaryBox
+//             label="Average Score"
+//             value={`${summary.averageScore}%`}
+//           />
+//           <SummaryBox label="Passed" value={summary.passedCount} tone="green" />
+//           <SummaryBox label="Failed" value={summary.failedCount} tone="red" />
+//         </section>
+
+//         {loading ? (
+//           <div className="space-y-3">
+//             <LoadingRow />
+//             <LoadingRow />
+//             <LoadingRow />
+//           </div>
+//         ) : null}
+
+//         {error ? (
+//           <div className="flex items-center gap-3 rounded-xl border border-red-100 bg-red-50 p-4 text-sm font-semibold text-red-700">
+//             <IoAlertCircleOutline size={22} />
+//             <span>{error}</span>
+//           </div>
+//         ) : null}
+
+//         {!loading && !error && attempts.length === 0 ? (
+//           <div className="rounded-xl border border-dashed border-[#B8C7DD] bg-white p-8 text-center">
+//             <h2 className="text-lg font-bold text-[#151515]">
+//               No quiz record found
+//             </h2>
+
+//             <p className="mt-2 text-sm text-[#7B8190]">
+//               You have not participated in any quiz yet.
+//             </p>
+
+//             <Link
+//               href="/student/code/simple-series-list"
+//               className="mt-4 inline-flex h-10 items-center rounded-lg bg-[#0D4598] px-5 text-xs font-black text-white"
+//             >
+//               Start First Quiz
+//             </Link>
+//           </div>
+//         ) : null}
+
+//         {!loading && !error && attempts.length > 0 ? (
+//           <section className="space-y-3">
+//             {attempts.map((attempt, index) => (
+//               <AttemptRow key={attempt._id} attempt={attempt} index={index} />
+//             ))}
+//           </section>
+//         ) : null}
+//       </div>
+//     </main>
+//   );
+// }
+
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { IoChevronBack, IoArrowBack, IoArrowForward } from "react-icons/io5";
+import {
+  IoChevronBack,
+  IoAlertCircleOutline,
+  IoRefreshOutline,
+} from "react-icons/io5";
+import { getMyQuizAttempts } from "@/features/API";
 
-const progressLessons = [
-  {
-    id: 1,
-    title: "Legal provisions regarding road traffic",
-    date: "Monday, March 2, 2026, 10:00 AM",
-    progress: 20,
-  },
-  {
-    id: 2,
-    title: "Legal provisions regarding road traffic",
-    date: "Monday, March 2, 2026, 10:00 AM",
-    progress: 20,
-  },
-  {
-    id: 3,
-    title: "Legal provisions regarding road traffic",
-    date: "Monday, March 2, 2026, 10:00 AM",
-    progress: 20,
-  },
-];
+function formatDate(date) {
+  if (!date) return "Date not found";
 
-const completedLessons = [
-  {
-    id: 1,
-    title: "Legal provisions regarding road traffic",
-    date: "Monday, March 2, 2026, 10:00 AM",
-    vehicle: "Automatic - Toyota Corolla",
-    progress: 100,
-  },
-  {
-    id: 2,
-    title: "Legal provisions regarding road traffic",
-    date: "Monday, March 2, 2026, 10:00 AM",
-    vehicle: "Automatic - Toyota Corolla",
-    progress: 100,
-  },
-  {
-    id: 3,
-    title: "Legal provisions regarding road traffic",
-    date: "Monday, March 2, 2026, 10:00 AM",
-    vehicle: "Automatic - Toyota Corolla",
-    progress: 100,
-  },
-];
+  return new Date(date).toLocaleString("en-US", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
 
-const topicResults = [
-  { key: "L", percent: 40, color: "#69A9DF" },
-  { key: "HAS", percent: 40, color: "#EF2F2B" },
-  { key: "C", percent: 40, color: "#E6007E" },
-  { key: "P", percent: 47, color: "#555553" },
-  { key: "R", percent: 30, color: "#AAA2CC" },
-  { key: "M", percent: 21, color: "#F79500" },
-  { key: "U", percent: 47, color: "#DA4E2D" },
-  { key: "S", percent: 31, color: "#40962D" },
-  { key: "D", percent: 36, color: "#FDBA12" },
-  { key: "E", percent: 37, color: "#91A719" },
-];
+function getDuration(seconds) {
+  if (!seconds) return "-";
 
-const topicList = [
-  {
-    key: "L",
-    title: "Legal provisions regarding road traffic",
-    color: "#FDBA12",
-  },
-  {
-    key: "HAS",
-    title: "First aid",
-    color: "#E6007E",
-  },
-  {
-    key: "C",
-    title: "The Driver",
-    color: "#69A9DF",
-  },
-  {
-    key: "P",
-    title: "Precautions to take when leaving the vehicle",
-    color: "#555553",
-  },
-  {
-    key: "R",
-    title: "The Road",
-    color: "#EF2F2B",
-  },
-  {
-    key: "M",
-    title: "Mechanical components and other safety-related equipment",
-    color: "#3BB0AA",
-  },
-  {
-    key: "U",
-    title: "Other road users",
-    color: "#736AB0",
-  },
-  {
-    key: "S",
-    title: "Vehicle safety equipment",
-    color: "#40962D",
-  },
-  {
-    key: "D",
-    title: "General regulations and miscellaneous",
-    color: "#E6007E",
-  },
-  {
-    key: "E",
-    title: "Rules for using the vehicle in relation to ecology",
-    color: "#91A719",
-  },
-];
+  const min = Math.floor(seconds / 60);
+  const sec = seconds % 60;
 
-export default function Page() {
+  if (min <= 0) return `${sec}s`;
+  return `${min}m ${sec}s`;
+}
+
+function StatusBadge({ passed }) {
   return (
-    <main className="min-h-screen bg-white px-4 py-4 font-sans text-[#171717] sm:px-5">
-      <div className="mx-auto w-full max-w-[980px]">
-        <header className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <Link
-              href="#"
-              className="flex h-[38px] w-[38px] items-center justify-center rounded-[10px] bg-[#E8EEF7] text-[23px] text-black"
-            >
-              <IoChevronBack />
-            </Link>
+    <span
+      className={`inline-flex h-7 items-center rounded-md px-3 text-[11px] font-black ${
+        passed ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"
+      }`}
+    >
+      {passed ? "PASSED" : "FAILED"}
+    </span>
+  );
+}
 
-            <h1 className="text-[21px] font-bold text-[#174596] sm:text-[22px]">
-              My History
-            </h1>
+function SummaryBox({ label, value, tone = "default" }) {
+  const toneClass =
+    tone === "green"
+      ? "text-green-700"
+      : tone === "red"
+        ? "text-red-700"
+        : "text-[#0D4598]";
+
+  return (
+    <div className="rounded-lg border border-[#E5EAF2] bg-white px-4 py-3">
+      <p className="text-[10px] font-bold uppercase tracking-wide text-[#7B8190]">
+        {label}
+      </p>
+      <p className={`mt-1 text-lg font-black ${toneClass}`}>{value}</p>
+    </div>
+  );
+}
+
+function LoadingRow() {
+  return (
+    <div className="animate-pulse rounded-xl border border-[#E5EAF2] bg-white p-4">
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div className="flex-1">
+          <div className="h-4 w-2/5 rounded bg-slate-200" />
+          <div className="mt-3 h-3 w-1/3 rounded bg-slate-200" />
+        </div>
+
+        <div className="grid grid-cols-4 gap-2 md:w-[420px]">
+          <div className="h-12 rounded bg-slate-200" />
+          <div className="h-12 rounded bg-slate-200" />
+          <div className="h-12 rounded bg-slate-200" />
+          <div className="h-12 rounded bg-slate-200" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MiniStat({ label, value, tone = "default" }) {
+  const toneClass =
+    tone === "green"
+      ? "text-green-700"
+      : tone === "red"
+        ? "text-red-700"
+        : "text-[#151515]";
+
+  return (
+    <div className="rounded-lg border border-[#E5EAF2] bg-[#F8FAFD] px-3 py-2">
+      <p className="text-[10px] font-bold uppercase tracking-wide text-[#7B8190]">
+        {label}
+      </p>
+      <p className={`mt-0.5 text-sm font-black ${toneClass}`}>{value}</p>
+    </div>
+  );
+}
+
+function AttemptRow({ attempt, index }) {
+  const quizTitle = attempt.quiz?.title || "Code Quiz";
+  const quizId = attempt.quiz?._id;
+  const percentage = Number(attempt.percentage || 0);
+  const correct = attempt.correctCount || 0;
+  const wrong = attempt.wrongCount || 0;
+  const total = attempt.totalQuestions || correct + wrong || 0;
+  const duration = getDuration(attempt.durationSeconds);
+
+  return (
+    <div className="rounded-xl border border-[#E5EAF2] bg-white p-4 transition hover:border-[#0D4598]">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
+        <div className="flex min-w-0 flex-1 items-start gap-3">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[#EAF1FB] text-sm font-black text-[#0D4598]">
+            {String(index + 1).padStart(2, "0")}
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <h3 className="line-clamp-1 text-[16px] font-bold text-[#151515]">
+                {quizTitle}
+              </h3>
+
+              <StatusBadge passed={attempt.passed} />
+            </div>
+
+            <p className="mt-1 text-sm font-medium text-[#7B8190]">
+              {formatDate(attempt.createdAt)}
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-5 lg:w-[560px]">
+          <MiniStat label="Score" value={`${percentage}%`} />
+          <MiniStat label="Correct" value={correct} tone="green" />
+          <MiniStat label="Wrong" value={wrong} tone="red" />
+          <MiniStat label="Total" value={total} />
+          <MiniStat label="Time" value={duration} />
+        </div>
+
+        {quizId ? (
+          <Link
+            href={`/student/code/code-challenge?quizId=${quizId}`}
+            className="flex h-10 items-center justify-center rounded-lg bg-[#0D4598] px-4 text-xs font-black text-white transition hover:bg-[#083777] lg:w-[110px]"
+          >
+            Retake
+          </Link>
+        ) : (
+          <button
+            disabled
+            className="h-10 rounded-lg bg-gray-200 px-4 text-xs font-black text-gray-500 lg:w-[110px]"
+          >
+            Retake
+          </button>
+        )}
+      </div>
+
+      <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-[#EDF1F7]">
+        <div
+          className={`h-full rounded-full ${
+            attempt.passed ? "bg-green-600" : "bg-red-600"
+          }`}
+          style={{ width: `${Math.min(percentage, 100)}%` }}
+        />
+      </div>
+    </div>
+  );
+}
+
+function Pagination({
+  currentPage,
+  totalPages,
+  onPageChange,
+  startItem,
+  endItem,
+  totalItems,
+  perPage,
+  onPerPageChange,
+}) {
+  if (totalItems === 0) return null;
+
+  const pages = Array.from({ length: totalPages }, (_, index) => index + 1);
+
+  return (
+    <div className="mt-4 rounded-xl border border-[#E5EAF2] bg-white p-3">
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <p className="text-sm font-semibold text-[#7B8190]">
+          Showing <span className="font-black text-[#151515]">{startItem}</span>
+          -<span className="font-black text-[#151515]">{endItem}</span> of{" "}
+          <span className="font-black text-[#151515]">{totalItems}</span>{" "}
+          records
+        </p>
+
+        <div className="flex flex-wrap items-center gap-2">
+          <select
+            value={perPage}
+            onChange={(event) => onPerPageChange(Number(event.target.value))}
+            className="h-9 rounded-lg border border-[#DDE6F3] bg-white px-3 text-xs font-bold text-[#151515] outline-none focus:border-[#0D4598]"
+          >
+            <option value={5}>5 / page</option>
+            <option value={10}>10 / page</option>
+            <option value={20}>20 / page</option>
+          </select>
+
+          <button
+            type="button"
+            disabled={currentPage === 1}
+            onClick={() => onPageChange(currentPage - 1)}
+            className="h-9 rounded-lg border border-[#DDE6F3] bg-white px-3 text-xs font-black text-[#0D4598] transition hover:bg-[#EAF1FB] disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            Prev
+          </button>
+
+          <div className="flex items-center gap-1">
+            {pages.map((page) => (
+              <button
+                key={page}
+                type="button"
+                onClick={() => onPageChange(page)}
+                className={`h-9 min-w-9 rounded-lg px-3 text-xs font-black transition ${
+                  currentPage === page
+                    ? "bg-[#0D4598] text-white"
+                    : "border border-[#DDE6F3] bg-white text-[#0D4598] hover:bg-[#EAF1FB]"
+                }`}
+              >
+                {page}
+              </button>
+            ))}
           </div>
 
           <button
             type="button"
-            className="rounded-[7px] bg-[#DF2339] px-5 py-2.5 text-[11px] font-bold text-white transition hover:bg-[#c91f33]"
+            disabled={currentPage === totalPages}
+            onClick={() => onPageChange(currentPage + 1)}
+            className="h-9 rounded-lg border border-[#DDE6F3] bg-white px-3 text-xs font-black text-[#0D4598] transition hover:bg-[#EAF1FB] disabled:cursor-not-allowed disabled:opacity-40"
           >
-            Download
+            Next
           </button>
-        </header>
+        </div>
+      </div>
+    </div>
+  );
+}
 
-        <section className="mt-7 rounded-[10px] bg-[#E8EEF7] p-4 sm:p-5">
-          <SectionHeader title="Lesson Progress" />
+export default function MyHistoryPage() {
+  const [attempts, setAttempts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-          <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-3">
-            {progressLessons.map((lesson) => (
-              <LessonProgressCard key={lesson.id} lesson={lesson} />
-            ))}
-          </div>
-        </section>
+  const [currentPage, setCurrentPage] = useState(1);
+  const [perPage, setPerPage] = useState(5);
 
-        <section className="mt-7 rounded-[10px] bg-[#E8EEF7] p-4 sm:p-5">
-          <SectionHeader title="Lesson Completed" />
+  const loadHistory = async () => {
+    try {
+      setLoading(true);
+      setError("");
 
-          <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-3">
-            {completedLessons.map((lesson) => (
-              <CompletedLessonCard key={lesson.id} lesson={lesson} />
-            ))}
-          </div>
-        </section>
+      const res = await getMyQuizAttempts();
+      setAttempts(res.data?.data || []);
+      setCurrentPage(1);
+    } catch (err) {
+      setError(
+        err.response?.data?.message ||
+          err.message ||
+          "Failed to load quiz history",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
-        <section className="mt-7 rounded-[10px] bg-[#E8EEF7] p-4 sm:p-5">
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-            <PerformanceCard
-              title="Total Performance in Mock Exam"
-              description="See your overall score and track your progress in traffic rules knowledge."
-              lines={["Score: 85%", "Total Mock Test: 20", "Passed: 13"]}
-              button="Take Practice Test"
-            />
+  useEffect(() => {
+    loadHistory();
+  }, []);
 
-            <PerformanceCard
-              title="Recent Quiz Result"
-              description="See your latest score and track your progress in traffic rules knowledge."
-              lines={[
-                "Latest Score: 85%",
-                "Correct Answers: 17 / 20",
-                "Status: Passed",
-              ]}
-              button="Review Answers"
-            />
-          </div>
-        </section>
+  const sortedAttempts = useMemo(() => {
+    return [...attempts].sort((a, b) => {
+      return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+    });
+  }, [attempts]);
 
-        <section className="mt-7 rounded-[10px] bg-[#E8EEF7] p-4 sm:p-5">
-          <h2 className="text-[20px] font-bold text-[#174596]">
-            My result by topic
-          </h2>
+  const summary = useMemo(() => {
+    const totalAttempts = attempts.length;
+    const passedCount = attempts.filter((item) => item.passed).length;
+    const failedCount = totalAttempts - passedCount;
 
-          <div className="mt-5 grid grid-cols-1 gap-x-5 gap-y-3 md:grid-cols-2">
-            {topicResults.map((topic) => (
-              <TopicBar key={topic.key} topic={topic} />
-            ))}
-          </div>
+    const averageScore =
+      totalAttempts > 0
+        ? Math.round(
+            attempts.reduce(
+              (sum, item) => sum + Number(item.percentage || 0),
+              0,
+            ) / totalAttempts,
+          )
+        : 0;
 
-          <div className="mt-5 rounded-[10px] bg-white p-4 sm:p-5">
-            <h3 className="text-[15px] font-bold text-[#174596]">
-              List of topics:
-            </h3>
+    return {
+      totalAttempts,
+      passedCount,
+      failedCount,
+      averageScore,
+    };
+  }, [attempts]);
 
-            <div className="mt-5 grid grid-cols-1 gap-x-10 gap-y-4 md:grid-cols-2">
-              {topicList.map((topic) => (
-                <div
-                  key={topic.key}
-                  className="flex items-start gap-2 text-[13px] text-[#6b6b6b]"
-                >
-                  <span
-                    className="min-w-fit text-[18px] font-bold leading-none"
-                    style={{ color: topic.color }}
-                  >
-                    {topic.key} :
-                  </span>
+  const totalPages = Math.max(Math.ceil(sortedAttempts.length / perPage), 1);
+  const safeCurrentPage = Math.min(currentPage, totalPages);
+  const startIndex = (safeCurrentPage - 1) * perPage;
+  const endIndex = startIndex + perPage;
 
-                  <span className="leading-[1.35]">{topic.title}</span>
-                </div>
-              ))}
+  const paginatedAttempts = sortedAttempts.slice(startIndex, endIndex);
+
+  const startItem = sortedAttempts.length === 0 ? 0 : startIndex + 1;
+  const endItem = Math.min(endIndex, sortedAttempts.length);
+
+  const handlePerPageChange = (value) => {
+    setPerPage(value);
+    setCurrentPage(1);
+  };
+
+  return (
+    <main className="min-h-screen bg-[#F7F9FC] px-4 py-5 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-6xl">
+        <header className="mb-5 rounded-xl border border-[#E5EAF2] bg-white p-4">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-3">
+              <Link
+                href="/student/code"
+                className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#EAF1FB] text-[#0D4598] transition hover:bg-[#0D4598] hover:text-white"
+              >
+                <IoChevronBack size={24} />
+              </Link>
+
+              <div>
+                <h1 className="text-xl font-bold text-[#151515]">My History</h1>
+                <p className="mt-1 text-sm text-[#7B8190]">
+                  Your quiz attempts, scores and pass/fail records.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={loadHistory}
+                className="inline-flex h-10 items-center gap-2 rounded-lg border border-[#DDE6F3] bg-white px-4 text-xs font-black text-[#0D4598] transition hover:bg-[#EAF1FB]"
+              >
+                <IoRefreshOutline size={17} />
+                Refresh
+              </button>
+
+              <Link
+                href="/student/code/simple-series-list"
+                className="inline-flex h-10 items-center rounded-lg bg-[#0D4598] px-4 text-xs font-black text-white transition hover:bg-[#083777]"
+              >
+                Take Quiz
+              </Link>
             </div>
           </div>
+        </header>
+
+        <section className="mb-4 grid grid-cols-2 gap-3 md:grid-cols-4">
+          <SummaryBox label="Total Attempts" value={summary.totalAttempts} />
+          <SummaryBox
+            label="Average Score"
+            value={`${summary.averageScore}%`}
+          />
+          <SummaryBox label="Passed" value={summary.passedCount} tone="green" />
+          <SummaryBox label="Failed" value={summary.failedCount} tone="red" />
         </section>
+
+        {loading ? (
+          <div className="space-y-3">
+            <LoadingRow />
+            <LoadingRow />
+            <LoadingRow />
+          </div>
+        ) : null}
+
+        {error ? (
+          <div className="flex items-center gap-3 rounded-xl border border-red-100 bg-red-50 p-4 text-sm font-semibold text-red-700">
+            <IoAlertCircleOutline size={22} />
+            <span>{error}</span>
+          </div>
+        ) : null}
+
+        {!loading && !error && attempts.length === 0 ? (
+          <div className="rounded-xl border border-dashed border-[#B8C7DD] bg-white p-8 text-center">
+            <h2 className="text-lg font-bold text-[#151515]">
+              No quiz record found
+            </h2>
+
+            <p className="mt-2 text-sm text-[#7B8190]">
+              You have not participated in any quiz yet.
+            </p>
+
+            <Link
+              href="/student/code/simple-series-list"
+              className="mt-4 inline-flex h-10 items-center rounded-lg bg-[#0D4598] px-5 text-xs font-black text-white"
+            >
+              Start First Quiz
+            </Link>
+          </div>
+        ) : null}
+
+        {!loading && !error && attempts.length > 0 ? (
+          <>
+            <section className="space-y-3">
+              {paginatedAttempts.map((attempt, index) => (
+                <AttemptRow
+                  key={attempt._id}
+                  attempt={attempt}
+                  index={startIndex + index}
+                />
+              ))}
+            </section>
+
+            <Pagination
+              currentPage={safeCurrentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+              startItem={startItem}
+              endItem={endItem}
+              totalItems={sortedAttempts.length}
+              perPage={perPage}
+              onPerPageChange={handlePerPageChange}
+            />
+          </>
+        ) : null}
       </div>
     </main>
-  );
-}
-
-function SectionHeader({ title }) {
-  return (
-    <div className="flex items-center justify-between gap-4">
-      <h2 className="text-[19px] font-bold text-[#174596] sm:text-[20px]">
-        {title}
-      </h2>
-
-      <div className="flex items-center gap-3">
-        <button
-          type="button"
-          className="flex h-[35px] w-[35px] items-center justify-center rounded-[9px] bg-[#DDE6F2] text-[18px] text-[#DF2339]"
-        >
-          <IoArrowBack />
-        </button>
-
-        <button
-          type="button"
-          className="flex h-[35px] w-[35px] items-center justify-center rounded-[9px] bg-[#DF2339] text-[18px] text-white"
-        >
-          <IoArrowForward />
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function LessonProgressCard({ lesson }) {
-  return (
-    <div className="rounded-[10px] bg-white p-4">
-      <h3 className="text-[14px] font-bold leading-[1.25] text-[#174596] underline">
-        {lesson.title}
-      </h3>
-
-      <p className="mt-3 text-[11px] text-[#555]">
-        Start Date{" "}
-        <span className="font-bold text-[#171717]">{lesson.date}</span>
-      </p>
-
-      <div className="mt-4 h-[13px] overflow-hidden rounded-full bg-[#D7E1EF]">
-        <div
-          className="h-full rounded-full bg-[#174596]"
-          style={{ width: `${lesson.progress}%` }}
-        />
-      </div>
-
-      <p className="mt-2 text-[11.5px] font-bold text-[#20BF3A]">
-        {lesson.progress}% Progress
-      </p>
-    </div>
-  );
-}
-
-function CompletedLessonCard({ lesson }) {
-  return (
-    <div className="rounded-[10px] bg-white p-4">
-      <h3 className="text-[14px] font-bold leading-[1.25] text-[#174596] underline">
-        {lesson.title}
-      </h3>
-
-      <p className="mt-3 text-[11px] text-[#555]">
-        Start Date{" "}
-        <span className="font-bold text-[#171717]">{lesson.date}</span>
-      </p>
-
-      <p className="mt-2 text-[11px] text-[#555]">
-        Vehicle Type:{" "}
-        <span className="font-bold text-[#171717]">{lesson.vehicle}</span>
-      </p>
-
-      <div className="mt-4 h-[13px] overflow-hidden rounded-full bg-[#D7E1EF]">
-        <div
-          className="h-full rounded-full bg-[#174596]"
-          style={{ width: `${lesson.progress}%` }}
-        />
-      </div>
-
-      <p className="mt-2 text-[11.5px] font-bold text-[#20BF3A]">
-        {lesson.progress}% Completed
-      </p>
-    </div>
-  );
-}
-
-function PerformanceCard({ title, description, lines, button }) {
-  return (
-    <div className="rounded-[10px] bg-white p-5">
-      <h2 className="text-[19px] font-bold text-black">{title}</h2>
-
-      <p className="mt-4 max-w-[390px] text-[13px] leading-[1.45] text-black">
-        {description}
-      </p>
-
-      <div className="mt-3 space-y-1 text-[13px] text-black">
-        {lines.map((line) => (
-          <p key={line}>{line}</p>
-        ))}
-      </div>
-
-      <button
-        type="button"
-        className="mt-4 rounded-[7px] bg-[#DF2339] px-4 py-2 text-[11px] font-bold text-white transition hover:bg-[#c91f33]"
-      >
-        {button}
-      </button>
-    </div>
-  );
-}
-
-function TopicBar({ topic }) {
-  return (
-    <div className="h-[40px] overflow-hidden rounded-[4px] bg-white">
-      <div
-        className="flex h-full items-center justify-between rounded-[4px] px-4 text-white"
-        style={{
-          width: `${Math.max(topic.percent, 28)}%`,
-          backgroundColor: topic.color,
-        }}
-      >
-        <span className="text-[16px] font-bold">{topic.key}</span>
-        <span className="text-[18px] font-bold">{topic.percent}%</span>
-      </div>
-    </div>
   );
 }

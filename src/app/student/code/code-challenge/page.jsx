@@ -1,71 +1,145 @@
 "use client";
-import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { IoChevronBack, IoVolumeHigh, IoVolumeMute } from "react-icons/io5";
-import { FaExpandArrowsAlt } from "react-icons/fa";
+
+import {
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import {
+  IoChevronBack,
+  IoVolumeHigh,
+  IoVolumeMute,
+  IoAlertCircleOutline,
+} from "react-icons/io5";
+import { FaExpandArrowsAlt, FaCheckCircle } from "react-icons/fa";
 import { TbClockHour4 } from "react-icons/tb";
+import {
+  finishQuizAttempt,
+  startQuizAttempt,
+  submitQuizAnswer,
+} from "@/features/API";
+import { mediaUrl } from "@/utils/mediaUrl";
 
-const questions = [
-  {
-    id: 1,
-    image: "/image/road-question.png",
-    title: "Parking is prohibited",
-    options: [
-      { key: "HAS", text: "before the sign only" },
-      { key: "B", text: "only after the sign" },
-      { key: "C", text: "before and after the sign" },
-    ],
-    answer: "HAS",
-    timeLimit: 40,
-  },
-  {
-    id: 2,
-    image: "/image/road-question.png",
-    title: "Parking is prohibited",
-    options: [
-      { key: "HAS", text: "before the sign only" },
-      { key: "B", text: "only after the sign" },
-      { key: "C", text: "before and after the sign" },
-    ],
-    answer: "B",
-    timeLimit: 35,
-  },
-];
+const optionLetter = (index) => String.fromCharCode(65 + index);
 
-export default function CodeChallenge() {
-  const panelRef = useRef(null);
+function StatBox({ label, value }) {
+  return (
+    <div className="rounded-lg border border-[#DDE6F3] bg-white px-3 py-2">
+      <p className="text-[10px] font-bold uppercase tracking-wide text-[#7B8190]">
+        {label}
+      </p>
+      <p className="mt-0.5 text-sm font-black text-[#151515]">{value}</p>
+    </div>
+  );
+}
+
+function CodeChallengeContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const quizId = searchParams.get("quizId");
 
-  function handleBack() {
-    router.back();
-  }
+  const panelRef = useRef(null);
+  const hasStarted = useRef(false);
+  const hasFinished = useRef(false);
+
+  const [quiz, setQuiz] = useState(null);
+  const [attempt, setAttempt] = useState(null);
+  const [questions, setQuestions] = useState([]);
 
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState("");
-  const [isValidated, setIsValidated] = useState(false);
-  const [soundOn, setSoundOn] = useState(true);
-  const [secondsLeft, setSecondsLeft] = useState(questions[0].timeLimit);
+  const [selectedIndex, setSelectedIndex] = useState(null);
+  const [feedback, setFeedback] = useState(null);
+
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
+
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(0);
+  const [questionStartTime, setQuestionStartTime] = useState(Date.now());
 
   const currentQuestion = questions[currentIndex];
 
-  const isCorrect = useMemo(() => {
-    return selectedAnswer === currentQuestion.answer;
-  }, [selectedAnswer, currentQuestion.answer]);
+  const progress = questions.length
+    ? Math.round(((currentIndex + 1) / questions.length) * 100)
+    : 0;
+
+  const formattedTime = useMemo(() => {
+    const minutes = Math.floor(timeLeft / 60)
+      .toString()
+      .padStart(2, "0");
+    const seconds = Math.floor(timeLeft % 60)
+      .toString()
+      .padStart(2, "0");
+
+    return `${minutes}:${seconds}`;
+  }, [timeLeft]);
 
   useEffect(() => {
-    setSelectedAnswer("");
-    setIsValidated(false);
-    setSecondsLeft(currentQuestion.timeLimit);
-  }, [currentIndex, currentQuestion.timeLimit]);
+    const startQuiz = async () => {
+      if (!quizId || hasStarted.current) return;
+
+      try {
+        hasStarted.current = true;
+        setLoading(true);
+        setError("");
+
+        const res = await startQuizAttempt(quizId);
+        const data = res.data?.data;
+
+        setQuiz(data?.quiz || null);
+        setAttempt(data?.attempt || null);
+        setQuestions(data?.questions || []);
+        setTimeLeft((data?.quiz?.durationMinutes || 30) * 60);
+        setQuestionStartTime(Date.now());
+      } catch (err) {
+        setError(
+          err.response?.data?.message || err.message || "Failed to start quiz",
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    startQuiz();
+  }, [quizId]);
+
+  const finishAttempt = useCallback(async () => {
+    if (!attempt?._id || hasFinished.current) return;
+
+    try {
+      hasFinished.current = true;
+
+      if (typeof window !== "undefined" && window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
+
+      const res = await finishQuizAttempt(attempt._id);
+      const finishedAttempt = res.data?.data;
+
+      router.push(
+        `/student/code/my-history?latest=${finishedAttempt?._id || ""}`,
+      );
+    } catch (err) {
+      setError(
+        err.response?.data?.message || err.message || "Failed to finish quiz",
+      );
+    }
+  }, [attempt?._id, router]);
 
   useEffect(() => {
-    if (isValidated) return;
+    if (!attempt?._id || hasFinished.current || loading || timeLeft <= 0)
+      return;
 
     const timer = setInterval(() => {
-      setSecondsLeft((prev) => {
+      setTimeLeft((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
-          setIsValidated(true);
+          finishAttempt();
           return 0;
         }
 
@@ -74,17 +148,29 @@ export default function CodeChallenge() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [isValidated, currentIndex]);
+  }, [attempt?._id, finishAttempt, loading, timeLeft]);
 
-  function handleValidate() {
-    if (!selectedAnswer) return;
-    setIsValidated(true);
-  }
+  useEffect(() => {
+    setSelectedIndex(null);
+    setFeedback(null);
+    setQuestionStartTime(Date.now());
 
-  function handleNext() {
-    if (currentIndex < questions.length - 1) {
-      setCurrentIndex((prev) => prev + 1);
+    if (typeof window !== "undefined" && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
     }
+  }, [currentIndex]);
+
+  useEffect(() => {
+    return () => {
+      if (typeof window !== "undefined" && window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, []);
+
+  function handleBack() {
+    router.back();
   }
 
   function handleFullscreen() {
@@ -97,172 +183,359 @@ export default function CodeChallenge() {
     }
   }
 
-  function getButtonClass(optionKey) {
-    if (!isValidated) {
-      return selectedAnswer === optionKey
-        ? "bg-[#0D4598] text-white"
-        : "bg-white text-[#151515]";
+  function speakQuestion() {
+    if (!currentQuestion || typeof window === "undefined") return;
+    if (!window.speechSynthesis) return;
+
+    window.speechSynthesis.cancel();
+
+    const text = currentQuestion.voiceText || currentQuestion.questionText;
+    const utterance = new SpeechSynthesisUtterance(text);
+
+    utterance.lang = "fr-FR";
+    utterance.rate = 0.9;
+
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
+
+    setIsSpeaking(true);
+    window.speechSynthesis.speak(utterance);
+  }
+
+  function stopVoice() {
+    if (typeof window !== "undefined" && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
     }
 
-    if (optionKey === currentQuestion.answer) {
-      return "bg-[#26C13A] text-white";
+    setIsSpeaking(false);
+  }
+
+  async function selectAnswer(index) {
+    if (!attempt?._id || !currentQuestion?._id) return;
+    if (feedback || submitting) return;
+
+    try {
+      setSubmitting(true);
+      setSelectedIndex(index);
+
+      const timeSpentSeconds = Math.max(
+        Math.round((Date.now() - questionStartTime) / 1000),
+        0,
+      );
+
+      const res = await submitQuizAnswer(attempt._id, {
+        questionId: currentQuestion._id,
+        selectedOptionIndex: index,
+        timeSpentSeconds,
+      });
+
+      setFeedback(res.data?.data);
+    } catch (err) {
+      setError(
+        err.response?.data?.message || err.message || "Failed to submit answer",
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  function handleNext() {
+    if (currentIndex + 1 >= questions.length) {
+      finishAttempt();
+      return;
     }
 
-    if (
-      selectedAnswer === optionKey &&
-      selectedAnswer !== currentQuestion.answer
-    ) {
-      return "bg-[#E7233D] text-white";
+    setCurrentIndex((prev) => prev + 1);
+  }
+
+  function getOptionClass(index) {
+    if (!feedback) {
+      if (selectedIndex === index) {
+        return "border-[#0D4598] bg-[#0D4598] text-white";
+      }
+
+      return "border-[#DDE6F3] bg-white text-[#151515] hover:border-[#0D4598] hover:bg-[#F3F7FC]";
     }
 
-    return "bg-white text-[#151515]";
+    if (index === feedback.correctOptionIndex) {
+      return "border-[#26C13A] bg-[#26C13A] text-white";
+    }
+
+    if (index === selectedIndex && !feedback.isCorrect) {
+      return "border-[#E7233D] bg-[#E7233D] text-white";
+    }
+
+    return "border-[#DDE6F3] bg-white text-[#7B8190] opacity-70";
+  }
+
+  if (!quizId) {
+    return (
+      <div className="min-h-screen bg-[#F7F9FC] px-4 py-6">
+        <div className="mx-auto max-w-4xl rounded-xl border border-red-100 bg-red-50 p-5 text-center text-sm font-semibold text-red-700">
+          Quiz ID missing. Please go back and select a series.
+        </div>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#F7F9FC] px-4 py-6">
+        <div className="mx-auto max-w-4xl rounded-xl border border-[#DDE6F3] bg-white p-5 text-center text-sm font-semibold text-[#0D4598]">
+          Starting quiz...
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#F7F9FC] px-4 py-6">
+        <div className="mx-auto flex max-w-4xl items-center justify-center gap-2 rounded-xl border border-red-100 bg-red-50 p-5 text-center text-sm font-semibold text-red-700">
+          <IoAlertCircleOutline size={22} />
+          {error}
+        </div>
+      </div>
+    );
+  }
+
+  if (!currentQuestion) {
+    return (
+      <div className="min-h-screen bg-[#F7F9FC] px-4 py-6">
+        <div className="mx-auto max-w-4xl rounded-xl border border-[#DDE6F3] bg-white p-5 text-center text-sm font-semibold text-[#7B8190]">
+          No question found. Admin থেকে আগে question add করুন।
+        </div>
+      </div>
+    );
   }
 
   return (
-    <main className="min-h-screen bg-white px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
-      <div className="mx-auto w-full max-w-[1000px]">
-        <header className="mb-5 flex items-center gap-3 sm:mb-7 sm:gap-4">
-          <button
-            type="button"
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#E8EEF7] text-black sm:h-[38px] sm:w-[38px]"
-            onClick={handleBack}
-          >
-            <IoChevronBack className="text-[22px] sm:text-[24px]" />
-          </button>
+    <main className="min-h-screen bg-[#F7F9FC] px-4 py-4 sm:px-6 lg:px-8">
+      <div ref={panelRef} className="mx-auto max-w-[1120px]">
+        <header className="mb-4 rounded-xl border border-[#DDE6F3] bg-white p-4">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={handleBack}
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#EAF1FB] text-[#0D4598] transition hover:bg-[#0D4598] hover:text-white"
+              >
+                <IoChevronBack size={24} />
+              </button>
 
-          <h1 className="text-xl font-bold leading-none text-[#0D4598] sm:text-[23px]">
-            Code Challenge
-          </h1>
-        </header>
-
-        <section
-          ref={panelRef}
-          className="max-h-full overflow-y-auto rounded-[9px] bg-[#E8EEF7] p-4 sm:p-5 lg:px-5 lg:pb-5 lg:pt-[22px]"
-        >
-          <div className="mb-5 flex flex-col gap-4 sm:mb-[26px] sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex flex-wrap items-center gap-3 sm:gap-[14px]">
-              <h2 className="text-sm font-bold text-[#0D4598] sm:text-[15px]">
-                Question {currentIndex + 1}/40
-              </h2>
-
-              <div className="flex h-7 min-w-[72px] items-center justify-center gap-[5px] rounded-md bg-white px-2 text-xs font-bold text-[#0D4598]">
-                <TbClockHour4 className="text-[17px]" />
-                <span>{secondsLeft}s</span>
+              <div className="min-w-0">
+                <h1 className="line-clamp-1 text-lg font-black text-[#151515]">
+                  {quiz?.title || "Code Challenge"}
+                </h1>
+                <p className="mt-0.5 text-sm font-medium text-[#7B8190]">
+                  Question {currentIndex + 1} of {questions.length}
+                </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-4 text-[#061B3D]">
-              <button type="button" onClick={handleFullscreen}>
-                <FaExpandArrowsAlt className="text-[18px] sm:text-[20px]" />
-              </button>
+            <div className="grid grid-cols-3 gap-2 sm:flex sm:items-center">
+              <StatBox label="Timer" value={formattedTime} />
+              <StatBox label="Progress" value={`${progress}%`} />
+              <StatBox
+                label="Answered"
+                value={`${currentIndex}/${questions.length}`}
+              />
 
-              <button type="button" onClick={() => setSoundOn((prev) => !prev)}>
-                {soundOn ? (
-                  <IoVolumeHigh className="text-[25px] sm:text-[27px]" />
-                ) : (
-                  <IoVolumeMute className="text-[25px] sm:text-[27px]" />
-                )}
+              <button
+                type="button"
+                onClick={handleFullscreen}
+                className="hidden h-10 w-10 items-center justify-center rounded-lg border border-[#DDE6F3] bg-white text-[#0D4598] transition hover:bg-[#EAF1FB] sm:flex"
+                title="Fullscreen"
+              >
+                <FaExpandArrowsAlt size={15} />
               </button>
             </div>
           </div>
 
-          <div className="overflow-hidden rounded-[9px] bg-white">
-            <img
-              src={currentQuestion.image}
-              alt="Road question"
-              className="aspect-[16/9] h-auto w-full object-cover sm:max-h-[335px]"
+          <div className="mt-4 h-2 overflow-hidden rounded-full bg-[#E8EEF7]">
+            <div
+              className="h-full rounded-full bg-[#0D4598] transition-all duration-300"
+              style={{ width: `${progress}%` }}
             />
           </div>
+        </header>
 
-          <div className="mt-6 grid grid-cols-1 gap-7 lg:mt-[30px] lg:grid-cols-[minmax(0,1fr)_minmax(280px,390px)] lg:gap-6">
-            <div className="min-w-0">
-              <h3 className="mb-4 text-sm font-bold text-[#171717] sm:text-[15px]">
-                {currentQuestion.title}
-              </h3>
-
-              <div className="space-y-3 sm:space-y-[15px]">
-                {currentQuestion.options.map((option) => (
-                  <button
-                    key={option.key}
-                    type="button"
-                    disabled={isValidated}
-                    onClick={() => setSelectedAnswer(option.key)}
-                    className="flex w-full items-center gap-2 rounded-md px-1 py-1 text-left text-sm font-medium text-[#0D4598] transition hover:bg-white/60 disabled:cursor-not-allowed sm:text-[15px]"
-                  >
-                    <span className="min-w-0 flex-1 break-words">
-                      - {option.text}
-                    </span>
-
-                    <span className="hidden flex-1 border-b border-dashed border-[#171717]/60 sm:block" />
-
-                    <span className="shrink-0 font-semibold text-[#171717]">
-                      {option.key}
-                    </span>
-                  </button>
-                ))}
+        <section className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_380px]">
+          <div className="rounded-xl border border-[#DDE6F3] bg-white p-4">
+            <div className="flex items-start justify-between gap-3 border-b border-[#EEF2F7] pb-3">
+              <div>
+                <p className="text-xs font-black uppercase tracking-wide text-[#0D4598]">
+                  Question
+                </p>
+                <h2 className="mt-1 text-[17px] font-bold leading-relaxed text-[#151515]">
+                  {currentQuestion.questionText}
+                </h2>
               </div>
+
+              <button
+                type="button"
+                onClick={isSpeaking ? stopVoice : speakQuestion}
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#EAF1FB] text-[#0D4598] transition hover:bg-[#0D4598] hover:text-white"
+                title="Read question"
+              >
+                {isSpeaking ? (
+                  <IoVolumeMute size={22} />
+                ) : (
+                  <IoVolumeHigh size={22} />
+                )}
+              </button>
             </div>
 
-            <div className="min-w-0">
-              <h3 className="mb-3 text-sm font-bold text-[#171717] sm:mb-[14px] sm:text-[15px]">
-                An answer
-              </h3>
-
-              <div className="mb-4 ml-1 sm:mb-[18px]">
-                <TbClockHour4 className="text-[44px] text-[#202020] sm:text-[54px]" />
+            {currentQuestion.questionImage ? (
+              <div className="mt-4 overflow-hidden rounded-xl border border-[#DDE6F3] bg-[#F8FAFD]">
+                <img
+                  src={mediaUrl(currentQuestion.questionImage)}
+                  alt="Question"
+                  className="max-h-[360px] w-full object-contain"
+                />
               </div>
+            ) : (
+              <div className="mt-4 rounded-xl border border-dashed border-[#B8C7DD] bg-[#F8FAFD] p-8 text-center text-sm font-semibold text-[#7B8190]">
+                No question image available.
+              </div>
+            )}
 
-              {isValidated && (
-                <p
-                  className={`mb-3 text-sm font-bold ${
-                    isCorrect ? "text-[#26C13A]" : "text-[#E7233D]"
-                  }`}
-                >
-                  {isCorrect
-                    ? "Correct answer"
-                    : `Wrong answer. Correct: ${currentQuestion.answer}`}
-                </p>
-              )}
+            {feedback ? (
+              <div
+                className={`mt-4 rounded-xl border p-4 ${
+                  feedback.isCorrect
+                    ? "border-green-100 bg-green-50 text-green-800"
+                    : "border-red-100 bg-red-50 text-red-800"
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <FaCheckCircle />
+                  <h3 className="text-sm font-black">
+                    {feedback.isCorrect
+                      ? "Correct answer"
+                      : `Wrong answer. Correct: ${optionLetter(
+                          feedback.correctOptionIndex,
+                        )}`}
+                  </h3>
+                </div>
 
-              <div className="grid grid-cols-2 gap-3 xs:grid-cols-3 sm:flex sm:flex-wrap sm:items-center sm:gap-3">
-                {["HAS", "B", "C", "D"].map((optionKey) => (
-                  <button
-                    key={optionKey}
-                    type="button"
-                    disabled={isValidated}
-                    onClick={() => setSelectedAnswer(optionKey)}
-                    className={`h-9 w-full rounded-md text-sm font-bold transition sm:w-[58px] ${getButtonClass(
-                      optionKey,
-                    )}`}
-                  >
-                    {optionKey}
-                  </button>
-                ))}
+                {feedback.explanationText ? (
+                  <p className="mt-2 text-sm font-medium leading-relaxed">
+                    {feedback.explanationText}
+                  </p>
+                ) : null}
 
-                {!isValidated ? (
-                  <button
-                    type="button"
-                    onClick={handleValidate}
-                    disabled={!selectedAnswer}
-                    className="col-span-2 h-9 w-full rounded-md bg-[#26C13A] text-[11px] font-bold text-white disabled:cursor-not-allowed disabled:opacity-50 xs:col-span-1 sm:w-[112px]"
-                  >
-                    TO VALIDATE
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={handleNext}
-                    disabled={currentIndex === questions.length - 1}
-                    className="col-span-2 h-9 w-full rounded-md bg-[#0D4598] text-[11px] font-bold text-white disabled:cursor-not-allowed disabled:opacity-50 xs:col-span-1 sm:w-[112px]"
-                  >
-                    NEXT
-                  </button>
+                {(feedback.markedAnswerImage || feedback.explanationImage) && (
+                  <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2">
+                    {feedback.markedAnswerImage ? (
+                      <div>
+                        <p className="mb-1 text-xs font-black">Marked Answer</p>
+                        <img
+                          src={mediaUrl(feedback.markedAnswerImage)}
+                          alt="Marked answer"
+                          className="max-h-56 w-full rounded-lg border border-white bg-white object-contain"
+                        />
+                      </div>
+                    ) : null}
+
+                    {feedback.explanationImage ? (
+                      <div>
+                        <p className="mb-1 text-xs font-black">Explanation</p>
+                        <img
+                          src={mediaUrl(feedback.explanationImage)}
+                          alt="Explanation"
+                          className="max-h-56 w-full rounded-lg border border-white bg-white object-contain"
+                        />
+                      </div>
+                    ) : null}
+                  </div>
                 )}
               </div>
-            </div>
+            ) : null}
           </div>
+
+          <aside className="rounded-xl border border-[#DDE6F3] bg-white p-4">
+            <div className="mb-3 flex items-center justify-between">
+              <h3 className="text-base font-black text-[#151515]">
+                Choose Answer
+              </h3>
+
+              <div className="flex items-center gap-1 rounded-md bg-[#EAF1FB] px-2 py-1 text-xs font-black text-[#0D4598]">
+                <TbClockHour4 size={16} />
+                {formattedTime}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              {currentQuestion.options?.map((option, index) => (
+                <button
+                  key={index}
+                  type="button"
+                  disabled={Boolean(feedback) || submitting}
+                  onClick={() => selectAnswer(index)}
+                  className={`w-full rounded-lg border px-3 py-3 text-left text-sm font-semibold transition disabled:cursor-not-allowed ${getOptionClass(
+                    index,
+                  )}`}
+                >
+                  <div className="flex items-start gap-3">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-black/10 text-xs font-black">
+                      {optionLetter(index)}
+                    </span>
+
+                    <div className="min-w-0 flex-1">
+                      <p className="leading-relaxed">{option.text}</p>
+
+                      {option.image ? (
+                        <img
+                          src={mediaUrl(option.image)}
+                          alt={`Option ${optionLetter(index)}`}
+                          className="mt-2 max-h-24 w-full rounded-md border border-white/70 object-contain"
+                        />
+                      ) : null}
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            <div className="mt-4 rounded-lg bg-[#F8FAFD] p-3 text-xs font-semibold leading-relaxed text-[#7B8190]">
+              {feedback
+                ? "Answer submitted. Review the feedback and continue."
+                : submitting
+                  ? "Submitting your answer..."
+                  : "Click an option to submit your answer. Correct will show green, wrong will show red."}
+            </div>
+
+            {feedback ? (
+              <button
+                type="button"
+                onClick={handleNext}
+                className="mt-4 w-full rounded-lg bg-[#0D4598] px-4 py-3 text-sm font-black text-white transition hover:bg-[#083777]"
+              >
+                {currentIndex + 1 >= questions.length
+                  ? "FINISH QUIZ"
+                  : "NEXT QUESTION"}
+              </button>
+            ) : null}
+          </aside>
         </section>
       </div>
     </main>
+  );
+}
+
+export default function CodeChallengePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#F7F9FC] px-4 py-6">
+          <div className="mx-auto max-w-4xl rounded-xl border border-[#DDE6F3] bg-white p-5 text-center text-sm font-semibold text-[#0D4598]">
+            Loading...
+          </div>
+        </div>
+      }
+    >
+      <CodeChallengeContent />
+    </Suspense>
   );
 }
