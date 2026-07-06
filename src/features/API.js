@@ -186,11 +186,17 @@ export const getQuizQuestions = (quizId) =>
   axios.get(`/quizzes/${quizId}/questions`);
 export const getRoadSigns = () => axios.get("/quizzes/road-signs/list");
 export const createQuiz = (data) => axios.post("/quizzes", data);
-export const createQuizQuestion = (data) =>
-  axios.post("/quizzes/questions", data);
+
+export const createQuizQuestion = (quizId, data) =>
+  axios.post(`/quizzes/${quizId}/questions`, data);
+
 export const createRoadSign = (data) => axios.post("/quizzes/road-signs", data);
 
-export const getAdminQuizzes = () => axios.get("/quizzes/admin/all");
+export const getAdminQuizzes = (params = {}) =>
+  axios.get("/quizzes/admin/all", { params });
+
+export const getAdminQuizStats = () => axios.get("/quizzes/admin/stats");
+
 export const getQuizById = (quizId) => axios.get(`/quizzes/${quizId}`);
 export const updateQuiz = (quizId, data) =>
   axios.patch(`/quizzes/${quizId}`, data, {

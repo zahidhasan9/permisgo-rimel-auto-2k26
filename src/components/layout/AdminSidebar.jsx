@@ -38,7 +38,7 @@ import { FiChevronRight, FiMenu, FiX } from "react-icons/fi";
 const menu = [
   {
     name: "Dashboard",
-    href: "/admin/dashboard",
+    href: "/admin",
     icon: MdDashboard,
   },
 
@@ -82,12 +82,8 @@ const menu = [
         href: "/admin/quizzes/create",
       },
       {
-        name: "All Questions",
-        href: "/admin/questions",
-      },
-      {
         name: "Quiz Attempts",
-        href: "/admin/quiz-attempts",
+        href: "/admin/quizzes/quiz-attempts",
       },
       {
         name: "Exams",
