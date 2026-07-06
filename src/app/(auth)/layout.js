@@ -3,12 +3,7 @@ import Head from "next/head";
 
 // Components
 import Navbar from "../../components/student-auth-navbar";
-
-// export const metadata = {
-//   title: "Home | One of the best Driving School",
-//   description: "Driving School",
-// };
-
+import PublicOnlyRoute from "@/components/auth/PublicOnlyRoute";
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning={true}>
@@ -18,7 +13,7 @@ export default function RootLayout({ children }) {
       </Head>
       <body suppressHydrationWarning={true}>
         <Navbar />
-        {children}
+        <PublicOnlyRoute>{children}</PublicOnlyRoute>
         {/* <Footer /> */}
       </body>
     </html>
