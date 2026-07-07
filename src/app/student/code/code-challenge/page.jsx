@@ -1,3 +1,545 @@
+// "use client";
+
+// import {
+//   Suspense,
+//   useCallback,
+//   useEffect,
+//   useMemo,
+//   useRef,
+//   useState,
+// } from "react";
+// import { useRouter, useSearchParams } from "next/navigation";
+// import {
+//   IoChevronBack,
+//   IoVolumeHigh,
+//   IoVolumeMute,
+//   IoAlertCircleOutline,
+// } from "react-icons/io5";
+// import { FaExpandArrowsAlt, FaCheckCircle } from "react-icons/fa";
+// import { TbClockHour4 } from "react-icons/tb";
+// import {
+//   finishQuizAttempt,
+//   startQuizAttempt,
+//   submitQuizAnswer,
+// } from "@/features/API";
+// import { mediaUrl } from "@/utils/mediaUrl";
+
+// const optionLetter = (index) => String.fromCharCode(65 + index);
+
+// function StatBox({ label, value }) {
+//   return (
+//     <div className="rounded-lg border border-[#DDE6F3] bg-white px-3 py-2">
+//       <p className="text-[10px] font-bold uppercase tracking-wide text-[#7B8190]">
+//         {label}
+//       </p>
+//       <p className="mt-0.5 text-sm font-black text-[#151515]">{value}</p>
+//     </div>
+//   );
+// }
+
+// function CodeChallengeContent() {
+//   const router = useRouter();
+//   const searchParams = useSearchParams();
+//   const quizId = searchParams.get("quizId");
+
+//   const panelRef = useRef(null);
+//   const hasStarted = useRef(false);
+//   const hasFinished = useRef(false);
+
+//   const [quiz, setQuiz] = useState(null);
+//   const [attempt, setAttempt] = useState(null);
+//   const [questions, setQuestions] = useState([]);
+
+//   const [currentIndex, setCurrentIndex] = useState(0);
+//   const [selectedIndex, setSelectedIndex] = useState(null);
+//   const [feedback, setFeedback] = useState(null);
+
+//   const [loading, setLoading] = useState(true);
+//   const [submitting, setSubmitting] = useState(false);
+//   const [error, setError] = useState("");
+
+//   const [isSpeaking, setIsSpeaking] = useState(false);
+//   const [timeLeft, setTimeLeft] = useState(0);
+//   const [questionStartTime, setQuestionStartTime] = useState(Date.now());
+
+//   const currentQuestion = questions[currentIndex];
+
+//   const progress = questions.length
+//     ? Math.round(((currentIndex + 1) / questions.length) * 100)
+//     : 0;
+
+//   const formattedTime = useMemo(() => {
+//     const minutes = Math.floor(timeLeft / 60)
+//       .toString()
+//       .padStart(2, "0");
+//     const seconds = Math.floor(timeLeft % 60)
+//       .toString()
+//       .padStart(2, "0");
+
+//     return `${minutes}:${seconds}`;
+//   }, [timeLeft]);
+
+//   useEffect(() => {
+//     const startQuiz = async () => {
+//       if (!quizId || hasStarted.current) return;
+
+//       try {
+//         hasStarted.current = true;
+//         setLoading(true);
+//         setError("");
+
+//         const res = await startQuizAttempt(quizId);
+//         const data = res.data?.data;
+
+//         setQuiz(data?.quiz || null);
+//         setAttempt(data?.attempt || null);
+//         setQuestions(data?.questions || []);
+//         setTimeLeft((data?.quiz?.durationMinutes || 30) * 60);
+//         setQuestionStartTime(Date.now());
+//       } catch (err) {
+//         setError(
+//           err.response?.data?.message || err.message || "Failed to start quiz",
+//         );
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+
+//     startQuiz();
+//   }, [quizId]);
+
+//   const finishAttempt = useCallback(async () => {
+//     if (!attempt?._id || hasFinished.current) return;
+
+//     try {
+//       hasFinished.current = true;
+
+//       if (typeof window !== "undefined" && window.speechSynthesis) {
+//         window.speechSynthesis.cancel();
+//       }
+
+//       const res = await finishQuizAttempt(attempt._id);
+//       const finishedAttempt = res.data?.data;
+
+//       router.push(
+//         `/student/code/my-history?latest=${finishedAttempt?._id || ""}`,
+//       );
+//     } catch (err) {
+//       setError(
+//         err.response?.data?.message || err.message || "Failed to finish quiz",
+//       );
+//     }
+//   }, [attempt?._id, router]);
+
+//   useEffect(() => {
+//     if (!attempt?._id || hasFinished.current || loading || timeLeft <= 0)
+//       return;
+
+//     const timer = setInterval(() => {
+//       setTimeLeft((prev) => {
+//         if (prev <= 1) {
+//           clearInterval(timer);
+//           finishAttempt();
+//           return 0;
+//         }
+
+//         return prev - 1;
+//       });
+//     }, 1000);
+
+//     return () => clearInterval(timer);
+//   }, [attempt?._id, finishAttempt, loading, timeLeft]);
+
+//   useEffect(() => {
+//     setSelectedIndex(null);
+//     setFeedback(null);
+//     setQuestionStartTime(Date.now());
+
+//     if (typeof window !== "undefined" && window.speechSynthesis) {
+//       window.speechSynthesis.cancel();
+//       setIsSpeaking(false);
+//     }
+//   }, [currentIndex]);
+
+//   useEffect(() => {
+//     return () => {
+//       if (typeof window !== "undefined" && window.speechSynthesis) {
+//         window.speechSynthesis.cancel();
+//       }
+//     };
+//   }, []);
+
+//   function handleBack() {
+//     router.back();
+//   }
+
+//   function handleFullscreen() {
+//     if (!panelRef.current) return;
+
+//     if (!document.fullscreenElement) {
+//       panelRef.current.requestFullscreen?.();
+//     } else {
+//       document.exitFullscreen?.();
+//     }
+//   }
+
+//   function speakQuestion() {
+//     if (!currentQuestion || typeof window === "undefined") return;
+//     if (!window.speechSynthesis) return;
+
+//     window.speechSynthesis.cancel();
+
+//     const text = currentQuestion.voiceText || currentQuestion.questionText;
+//     const utterance = new SpeechSynthesisUtterance(text);
+
+//     utterance.lang = "fr-FR";
+//     utterance.rate = 0.9;
+
+//     utterance.onend = () => setIsSpeaking(false);
+//     utterance.onerror = () => setIsSpeaking(false);
+
+//     setIsSpeaking(true);
+//     window.speechSynthesis.speak(utterance);
+//   }
+
+//   function stopVoice() {
+//     if (typeof window !== "undefined" && window.speechSynthesis) {
+//       window.speechSynthesis.cancel();
+//     }
+
+//     setIsSpeaking(false);
+//   }
+
+//   async function selectAnswer(index) {
+//     if (!attempt?._id || !currentQuestion?._id) return;
+//     if (feedback || submitting) return;
+
+//     try {
+//       setSubmitting(true);
+//       setSelectedIndex(index);
+
+//       const timeSpentSeconds = Math.max(
+//         Math.round((Date.now() - questionStartTime) / 1000),
+//         0,
+//       );
+
+//       const res = await submitQuizAnswer(attempt._id, {
+//         questionId: currentQuestion._id,
+//         selectedOptionIndex: index,
+//         timeSpentSeconds,
+//       });
+
+//       setFeedback(res.data?.data);
+//     } catch (err) {
+//       setError(
+//         err.response?.data?.message || err.message || "Failed to submit answer",
+//       );
+//     } finally {
+//       setSubmitting(false);
+//     }
+//   }
+
+//   function handleNext() {
+//     if (currentIndex + 1 >= questions.length) {
+//       finishAttempt();
+//       return;
+//     }
+
+//     setCurrentIndex((prev) => prev + 1);
+//   }
+
+//   function getOptionClass(index) {
+//     if (!feedback) {
+//       if (selectedIndex === index) {
+//         return "border-[#0D4598] bg-[#0D4598] text-white";
+//       }
+
+//       return "border-[#DDE6F3] bg-white text-[#151515] hover:border-[#0D4598] hover:bg-[#F3F7FC]";
+//     }
+
+//     if (index === feedback.correctOptionIndex) {
+//       return "border-[#26C13A] bg-[#26C13A] text-white";
+//     }
+
+//     if (index === selectedIndex && !feedback.isCorrect) {
+//       return "border-[#E7233D] bg-[#E7233D] text-white";
+//     }
+
+//     return "border-[#DDE6F3] bg-white text-[#7B8190] opacity-70";
+//   }
+
+//   if (!quizId) {
+//     return (
+//       <div className="min-h-screen bg-[#F7F9FC] px-4 py-6">
+//         <div className="mx-auto max-w-4xl rounded-xl border border-red-100 bg-red-50 p-5 text-center text-sm font-semibold text-red-700">
+//           Quiz ID missing. Please go back and select a series.
+//         </div>
+//       </div>
+//     );
+//   }
+
+//   if (loading) {
+//     return (
+//       <div className="min-h-screen bg-[#F7F9FC] px-4 py-6">
+//         <div className="mx-auto max-w-4xl rounded-xl border border-[#DDE6F3] bg-white p-5 text-center text-sm font-semibold text-[#0D4598]">
+//           Starting quiz...
+//         </div>
+//       </div>
+//     );
+//   }
+
+//   if (error) {
+//     return (
+//       <div className="min-h-screen bg-[#F7F9FC] px-4 py-6">
+//         <div className="mx-auto flex max-w-4xl items-center justify-center gap-2 rounded-xl border border-red-100 bg-red-50 p-5 text-center text-sm font-semibold text-red-700">
+//           <IoAlertCircleOutline size={22} />
+//           {error}
+//         </div>
+//       </div>
+//     );
+//   }
+
+//   if (!currentQuestion) {
+//     return (
+//       <div className="min-h-screen bg-[#F7F9FC] px-4 py-6">
+//         <div className="mx-auto max-w-4xl rounded-xl border border-[#DDE6F3] bg-white p-5 text-center text-sm font-semibold text-[#7B8190]">
+//           No question found. Admin থেকে আগে question add করুন।
+//         </div>
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <main className="min-h-screen bg-[#F7F9FC] px-4 py-4 sm:px-6 lg:px-8">
+//       <div ref={panelRef} className="mx-auto max-w-[1120px]">
+//         <header className="mb-4 rounded-xl border border-[#DDE6F3] bg-white p-4">
+//           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+//             <div className="flex items-center gap-3">
+//               <button
+//                 type="button"
+//                 onClick={handleBack}
+//                 className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#EAF1FB] text-[#0D4598] transition hover:bg-[#0D4598] hover:text-white"
+//               >
+//                 <IoChevronBack size={24} />
+//               </button>
+
+//               <div className="min-w-0">
+//                 <h1 className="line-clamp-1 text-lg font-black text-[#151515]">
+//                   {quiz?.title || "Code Challenge"}
+//                 </h1>
+//                 <p className="mt-0.5 text-sm font-medium text-[#7B8190]">
+//                   Question {currentIndex + 1} of {questions.length}
+//                 </p>
+//               </div>
+//             </div>
+
+//             <div className="grid grid-cols-3 gap-2 sm:flex sm:items-center">
+//               <StatBox label="Timer" value={formattedTime} />
+//               <StatBox label="Progress" value={`${progress}%`} />
+//               <StatBox
+//                 label="Answered"
+//                 value={`${currentIndex}/${questions.length}`}
+//               />
+
+//               <button
+//                 type="button"
+//                 onClick={handleFullscreen}
+//                 className="hidden h-10 w-10 items-center justify-center rounded-lg border border-[#DDE6F3] bg-white text-[#0D4598] transition hover:bg-[#EAF1FB] sm:flex"
+//                 title="Fullscreen"
+//               >
+//                 <FaExpandArrowsAlt size={15} />
+//               </button>
+//             </div>
+//           </div>
+
+//           <div className="mt-4 h-2 overflow-hidden rounded-full bg-[#E8EEF7]">
+//             <div
+//               className="h-full rounded-full bg-[#0D4598] transition-all duration-300"
+//               style={{ width: `${progress}%` }}
+//             />
+//           </div>
+//         </header>
+
+//         <section className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_380px]">
+//           <div className="rounded-xl border border-[#DDE6F3] bg-white p-4">
+//             <div className="flex items-start justify-between gap-3 border-b border-[#EEF2F7] pb-3">
+//               <div>
+//                 <p className="text-xs font-black uppercase tracking-wide text-[#0D4598]">
+//                   Question
+//                 </p>
+//                 <h2 className="mt-1 text-[17px] font-bold leading-relaxed text-[#151515]">
+//                   {currentQuestion.questionText}
+//                 </h2>
+//               </div>
+
+//               <button
+//                 type="button"
+//                 onClick={isSpeaking ? stopVoice : speakQuestion}
+//                 className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#EAF1FB] text-[#0D4598] transition hover:bg-[#0D4598] hover:text-white"
+//                 title="Read question"
+//               >
+//                 {isSpeaking ? (
+//                   <IoVolumeMute size={22} />
+//                 ) : (
+//                   <IoVolumeHigh size={22} />
+//                 )}
+//               </button>
+//             </div>
+
+//             {currentQuestion.questionImage ? (
+//               <div className="mt-4 overflow-hidden rounded-xl border border-[#DDE6F3] bg-[#F8FAFD]">
+//                 <img
+//                   src={mediaUrl(currentQuestion.questionImage)}
+//                   alt="Question"
+//                   className="max-h-[360px] w-full object-contain"
+//                 />
+//               </div>
+//             ) : (
+//               <div className="mt-4 rounded-xl border border-dashed border-[#B8C7DD] bg-[#F8FAFD] p-8 text-center text-sm font-semibold text-[#7B8190]">
+//                 No question image available.
+//               </div>
+//             )}
+
+//             {feedback ? (
+//               <div
+//                 className={`mt-4 rounded-xl border p-4 ${
+//                   feedback.isCorrect
+//                     ? "border-green-100 bg-green-50 text-green-800"
+//                     : "border-red-100 bg-red-50 text-red-800"
+//                 }`}
+//               >
+//                 <div className="flex items-center gap-2">
+//                   <FaCheckCircle />
+//                   <h3 className="text-sm font-black">
+//                     {feedback.isCorrect
+//                       ? "Correct answer"
+//                       : `Wrong answer. Correct: ${optionLetter(
+//                           feedback.correctOptionIndex,
+//                         )}`}
+//                   </h3>
+//                 </div>
+
+//                 {feedback.explanationText ? (
+//                   <p className="mt-2 text-sm font-medium leading-relaxed">
+//                     {feedback.explanationText}
+//                   </p>
+//                 ) : null}
+
+//                 {(feedback.markedAnswerImage || feedback.explanationImage) && (
+//                   <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2">
+//                     {feedback.markedAnswerImage ? (
+//                       <div>
+//                         <p className="mb-1 text-xs font-black">Marked Answer</p>
+//                         <img
+//                           src={mediaUrl(feedback.markedAnswerImage)}
+//                           alt="Marked answer"
+//                           className="max-h-56 w-full rounded-lg border border-white bg-white object-contain"
+//                         />
+//                       </div>
+//                     ) : null}
+
+//                     {feedback.explanationImage ? (
+//                       <div>
+//                         <p className="mb-1 text-xs font-black">Explanation</p>
+//                         <img
+//                           src={mediaUrl(feedback.explanationImage)}
+//                           alt="Explanation"
+//                           className="max-h-56 w-full rounded-lg border border-white bg-white object-contain"
+//                         />
+//                       </div>
+//                     ) : null}
+//                   </div>
+//                 )}
+//               </div>
+//             ) : null}
+//           </div>
+
+//           <aside className="rounded-xl border border-[#DDE6F3] bg-white p-4">
+//             <div className="mb-3 flex items-center justify-between">
+//               <h3 className="text-base font-black text-[#151515]">
+//                 Choose Answer
+//               </h3>
+
+//               <div className="flex items-center gap-1 rounded-md bg-[#EAF1FB] px-2 py-1 text-xs font-black text-[#0D4598]">
+//                 <TbClockHour4 size={16} />
+//                 {formattedTime}
+//               </div>
+//             </div>
+
+//             <div className="space-y-2">
+//               {currentQuestion.options?.map((option, index) => (
+//                 <button
+//                   key={index}
+//                   type="button"
+//                   disabled={Boolean(feedback) || submitting}
+//                   onClick={() => selectAnswer(index)}
+//                   className={`w-full rounded-lg border px-3 py-3 text-left text-sm font-semibold transition disabled:cursor-not-allowed ${getOptionClass(
+//                     index,
+//                   )}`}
+//                 >
+//                   <div className="flex items-start gap-3">
+//                     <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-black/10 text-xs font-black">
+//                       {optionLetter(index)}
+//                     </span>
+
+//                     <div className="min-w-0 flex-1">
+//                       <p className="leading-relaxed">{option.text}</p>
+
+//                       {option.image ? (
+//                         <img
+//                           src={mediaUrl(option.image)}
+//                           alt={`Option ${optionLetter(index)}`}
+//                           className="mt-2 max-h-24 w-full rounded-md border border-white/70 object-contain"
+//                         />
+//                       ) : null}
+//                     </div>
+//                   </div>
+//                 </button>
+//               ))}
+//             </div>
+
+//             <div className="mt-4 rounded-lg bg-[#F8FAFD] p-3 text-xs font-semibold leading-relaxed text-[#7B8190]">
+//               {feedback
+//                 ? "Answer submitted. Review the feedback and continue."
+//                 : submitting
+//                   ? "Submitting your answer..."
+//                   : "Click an option to submit your answer. Correct will show green, wrong will show red."}
+//             </div>
+
+//             {feedback ? (
+//               <button
+//                 type="button"
+//                 onClick={handleNext}
+//                 className="mt-4 w-full rounded-lg bg-[#0D4598] px-4 py-3 text-sm font-black text-white transition hover:bg-[#083777]"
+//               >
+//                 {currentIndex + 1 >= questions.length
+//                   ? "FINISH QUIZ"
+//                   : "NEXT QUESTION"}
+//               </button>
+//             ) : null}
+//           </aside>
+//         </section>
+//       </div>
+//     </main>
+//   );
+// }
+
+// export default function CodeChallengePage() {
+//   return (
+//     <Suspense
+//       fallback={
+//         <div className="min-h-screen bg-[#F7F9FC] px-4 py-6">
+//           <div className="mx-auto max-w-4xl rounded-xl border border-[#DDE6F3] bg-white p-5 text-center text-sm font-semibold text-[#0D4598]">
+//             Loading...
+//           </div>
+//         </div>
+//       }
+//     >
+//       <CodeChallengeContent />
+//     </Suspense>
+//   );
+// }
+
 "use client";
 
 import {
@@ -10,12 +552,13 @@ import {
 } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
+  IoAlertCircleOutline,
   IoChevronBack,
   IoVolumeHigh,
   IoVolumeMute,
-  IoAlertCircleOutline,
 } from "react-icons/io5";
-import { FaExpandArrowsAlt, FaCheckCircle } from "react-icons/fa";
+import { FaCheckCircle, FaExpandArrowsAlt } from "react-icons/fa";
+import { FaArrowRight } from "react-icons/fa6";
 import { TbClockHour4 } from "react-icons/tb";
 import {
   finishQuizAttempt,
@@ -28,11 +571,32 @@ const optionLetter = (index) => String.fromCharCode(65 + index);
 
 function StatBox({ label, value }) {
   return (
-    <div className="rounded-lg border border-[#DDE6F3] bg-white px-3 py-2">
-      <p className="text-[10px] font-bold uppercase tracking-wide text-[#7B8190]">
+    <div className="rounded-xl border border-slate-200 bg-[#f8f8fb] px-2.5 py-2">
+      <p className="text-[9px] font-bold uppercase leading-none text-slate-400">
         {label}
       </p>
-      <p className="mt-0.5 text-sm font-black text-[#151515]">{value}</p>
+
+      <p className="mt-1 text-xs font-black leading-none text-slate-900">
+        {value}
+      </p>
+    </div>
+  );
+}
+
+function CenterMessage({ type = "info", children }) {
+  const toneClass =
+    type === "error"
+      ? "border-rose-200 bg-rose-50 text-rose-700"
+      : "border-slate-200 bg-white text-[#0D4598]";
+
+  return (
+    <div className="min-h-screen bg-[#f8f8fb] px-3 py-3 md:px-4 lg:px-5">
+      <div
+        className={`mx-auto flex max-w-xl items-center justify-center gap-2 rounded-[16px] border px-4 py-4 text-center text-xs font-bold shadow-[0_8px_22px_rgba(15,23,42,0.04)] ${toneClass}`}
+      >
+        {type === "error" && <IoAlertCircleOutline size={18} />}
+        {children}
+      </div>
     </div>
   );
 }
@@ -132,8 +696,9 @@ function CodeChallengeContent() {
   }, [attempt?._id, router]);
 
   useEffect(() => {
-    if (!attempt?._id || hasFinished.current || loading || timeLeft <= 0)
+    if (!attempt?._id || hasFinished.current || loading || timeLeft <= 0) {
       return;
+    }
 
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
@@ -254,86 +819,78 @@ function CodeChallengeContent() {
         return "border-[#0D4598] bg-[#0D4598] text-white";
       }
 
-      return "border-[#DDE6F3] bg-white text-[#151515] hover:border-[#0D4598] hover:bg-[#F3F7FC]";
+      return "border-slate-200 bg-white text-slate-900 hover:border-[#0D4598] hover:bg-[#f7faff]";
     }
 
     if (index === feedback.correctOptionIndex) {
-      return "border-[#26C13A] bg-[#26C13A] text-white";
+      return "border-emerald-500 bg-emerald-500 text-white";
     }
 
     if (index === selectedIndex && !feedback.isCorrect) {
-      return "border-[#E7233D] bg-[#E7233D] text-white";
+      return "border-rose-500 bg-rose-500 text-white";
     }
 
-    return "border-[#DDE6F3] bg-white text-[#7B8190] opacity-70";
+    return "border-slate-200 bg-white text-slate-400 opacity-70";
   }
 
   if (!quizId) {
     return (
-      <div className="min-h-screen bg-[#F7F9FC] px-4 py-6">
-        <div className="mx-auto max-w-4xl rounded-xl border border-red-100 bg-red-50 p-5 text-center text-sm font-semibold text-red-700">
-          Quiz ID missing. Please go back and select a series.
-        </div>
-      </div>
+      <CenterMessage type="error">
+        Quiz ID missing. Please go back and select a series.
+      </CenterMessage>
     );
   }
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-[#F7F9FC] px-4 py-6">
-        <div className="mx-auto max-w-4xl rounded-xl border border-[#DDE6F3] bg-white p-5 text-center text-sm font-semibold text-[#0D4598]">
-          Starting quiz...
-        </div>
-      </div>
-    );
+    return <CenterMessage>Starting quiz...</CenterMessage>;
   }
 
   if (error) {
-    return (
-      <div className="min-h-screen bg-[#F7F9FC] px-4 py-6">
-        <div className="mx-auto flex max-w-4xl items-center justify-center gap-2 rounded-xl border border-red-100 bg-red-50 p-5 text-center text-sm font-semibold text-red-700">
-          <IoAlertCircleOutline size={22} />
-          {error}
-        </div>
-      </div>
-    );
+    return <CenterMessage type="error">{error}</CenterMessage>;
   }
 
   if (!currentQuestion) {
     return (
-      <div className="min-h-screen bg-[#F7F9FC] px-4 py-6">
-        <div className="mx-auto max-w-4xl rounded-xl border border-[#DDE6F3] bg-white p-5 text-center text-sm font-semibold text-[#7B8190]">
-          No question found. Admin থেকে আগে question add করুন।
-        </div>
-      </div>
+      <CenterMessage>
+        No question found. Admin থেকে আগে question add করুন।
+      </CenterMessage>
     );
   }
 
   return (
-    <main className="min-h-screen bg-[#F7F9FC] px-4 py-4 sm:px-6 lg:px-8">
-      <div ref={panelRef} className="mx-auto max-w-[1120px]">
-        <header className="mb-4 rounded-xl border border-[#DDE6F3] bg-white p-4">
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-            <div className="flex items-center gap-3">
+    <main className="min-h-screen overflow-x-hidden bg-[#f8f8fb] px-3 py-3 md:px-4 lg:px-5">
+      <div ref={panelRef} className="mx-auto w-full max-w-[1320px]">
+        <header className="mb-3 rounded-[16px] border border-slate-200 bg-white p-3 shadow-[0_8px_22px_rgba(15,23,42,0.04)]">
+          <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex min-w-0 items-center gap-2.5">
               <button
                 type="button"
                 onClick={handleBack}
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#EAF1FB] text-[#0D4598] transition hover:bg-[#0D4598] hover:text-white"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-[#f8f8fb] text-[#0D4598] transition hover:bg-[#0D4598] hover:text-white"
               >
-                <IoChevronBack size={24} />
+                <IoChevronBack size={19} />
               </button>
 
               <div className="min-w-0">
-                <h1 className="line-clamp-1 text-lg font-black text-[#151515]">
+                <div className="mb-0.5 flex flex-wrap items-center gap-1 text-[10px] font-semibold text-slate-400">
+                  <span>Student</span>
+                  <span>/</span>
+                  <span>Code Practice</span>
+                  <span>/</span>
+                  <span className="text-slate-600">Challenge</span>
+                </div>
+
+                <h1 className="line-clamp-1 text-lg font-black leading-5 text-slate-900 md:text-xl">
                   {quiz?.title || "Code Challenge"}
                 </h1>
-                <p className="mt-0.5 text-sm font-medium text-[#7B8190]">
+
+                <p className="mt-0.5 text-[11px] font-medium leading-4 text-slate-500">
                   Question {currentIndex + 1} of {questions.length}
                 </p>
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-2 sm:flex sm:items-center">
+            <div className="grid grid-cols-3 gap-1.5 sm:grid-cols-[repeat(3,88px)_36px]">
               <StatBox label="Timer" value={formattedTime} />
               <StatBox label="Progress" value={`${progress}%`} />
               <StatBox
@@ -344,15 +901,15 @@ function CodeChallengeContent() {
               <button
                 type="button"
                 onClick={handleFullscreen}
-                className="hidden h-10 w-10 items-center justify-center rounded-lg border border-[#DDE6F3] bg-white text-[#0D4598] transition hover:bg-[#EAF1FB] sm:flex"
+                className="hidden h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-[#0D4598] transition hover:bg-[#EAF1FB] sm:flex"
                 title="Fullscreen"
               >
-                <FaExpandArrowsAlt size={15} />
+                <FaExpandArrowsAlt size={13} />
               </button>
             </div>
           </div>
 
-          <div className="mt-4 h-2 overflow-hidden rounded-full bg-[#E8EEF7]">
+          <div className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-[#E8EEF7]">
             <div
               className="h-full rounded-full bg-[#0D4598] transition-all duration-300"
               style={{ width: `${progress}%` }}
@@ -360,14 +917,15 @@ function CodeChallengeContent() {
           </div>
         </header>
 
-        <section className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_380px]">
-          <div className="rounded-xl border border-[#DDE6F3] bg-white p-4">
-            <div className="flex items-start justify-between gap-3 border-b border-[#EEF2F7] pb-3">
-              <div>
-                <p className="text-xs font-black uppercase tracking-wide text-[#0D4598]">
+        <section className="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1fr)_350px]">
+          <div className="rounded-[16px] border border-slate-200 bg-white p-3 shadow-[0_8px_22px_rgba(15,23,42,0.04)]">
+            <div className="flex items-start justify-between gap-3 border-b border-slate-100 pb-2.5">
+              <div className="min-w-0">
+                <p className="text-[10px] font-black uppercase tracking-wide text-[#0D4598]">
                   Question
                 </p>
-                <h2 className="mt-1 text-[17px] font-bold leading-relaxed text-[#151515]">
+
+                <h2 className="mt-1 text-[15px] font-bold leading-6 text-slate-900">
                   {currentQuestion.questionText}
                 </h2>
               </div>
@@ -375,42 +933,43 @@ function CodeChallengeContent() {
               <button
                 type="button"
                 onClick={isSpeaking ? stopVoice : speakQuestion}
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#EAF1FB] text-[#0D4598] transition hover:bg-[#0D4598] hover:text-white"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#EAF1FB] text-[#0D4598] transition hover:bg-[#0D4598] hover:text-white"
                 title="Read question"
               >
                 {isSpeaking ? (
-                  <IoVolumeMute size={22} />
+                  <IoVolumeMute size={20} />
                 ) : (
-                  <IoVolumeHigh size={22} />
+                  <IoVolumeHigh size={20} />
                 )}
               </button>
             </div>
 
             {currentQuestion.questionImage ? (
-              <div className="mt-4 overflow-hidden rounded-xl border border-[#DDE6F3] bg-[#F8FAFD]">
+              <div className="mt-3 overflow-hidden rounded-[14px] border border-slate-200 bg-[#f8f8fb]">
                 <img
                   src={mediaUrl(currentQuestion.questionImage)}
                   alt="Question"
-                  className="max-h-[360px] w-full object-contain"
+                  className="max-h-[260px] w-full object-contain"
                 />
               </div>
             ) : (
-              <div className="mt-4 rounded-xl border border-dashed border-[#B8C7DD] bg-[#F8FAFD] p-8 text-center text-sm font-semibold text-[#7B8190]">
+              <div className="mt-3 rounded-[14px] border border-dashed border-slate-300 bg-[#f8f8fb] p-5 text-center text-xs font-semibold text-slate-500">
                 No question image available.
               </div>
             )}
 
-            {feedback ? (
+            {feedback && (
               <div
-                className={`mt-4 rounded-xl border p-4 ${
+                className={`mt-3 rounded-[14px] border p-3 ${
                   feedback.isCorrect
-                    ? "border-green-100 bg-green-50 text-green-800"
-                    : "border-red-100 bg-red-50 text-red-800"
+                    ? "border-emerald-200 bg-emerald-50 text-emerald-800"
+                    : "border-rose-200 bg-rose-50 text-rose-800"
                 }`}
               >
                 <div className="flex items-center gap-2">
-                  <FaCheckCircle />
-                  <h3 className="text-sm font-black">
+                  <FaCheckCircle className="text-sm" />
+
+                  <h3 className="text-xs font-black">
                     {feedback.isCorrect
                       ? "Correct answer"
                       : `Wrong answer. Correct: ${optionLetter(
@@ -419,104 +978,111 @@ function CodeChallengeContent() {
                   </h3>
                 </div>
 
-                {feedback.explanationText ? (
-                  <p className="mt-2 text-sm font-medium leading-relaxed">
+                {feedback.explanationText && (
+                  <p className="mt-1.5 text-xs font-medium leading-5">
                     {feedback.explanationText}
                   </p>
-                ) : null}
+                )}
 
                 {(feedback.markedAnswerImage || feedback.explanationImage) && (
-                  <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2">
-                    {feedback.markedAnswerImage ? (
+                  <div className="mt-2.5 grid grid-cols-1 gap-2 md:grid-cols-2">
+                    {feedback.markedAnswerImage && (
                       <div>
-                        <p className="mb-1 text-xs font-black">Marked Answer</p>
+                        <p className="mb-1 text-[10px] font-black">
+                          Marked Answer
+                        </p>
+
                         <img
                           src={mediaUrl(feedback.markedAnswerImage)}
                           alt="Marked answer"
-                          className="max-h-56 w-full rounded-lg border border-white bg-white object-contain"
+                          className="max-h-36 w-full rounded-xl border border-white bg-white object-contain"
                         />
                       </div>
-                    ) : null}
+                    )}
 
-                    {feedback.explanationImage ? (
+                    {feedback.explanationImage && (
                       <div>
-                        <p className="mb-1 text-xs font-black">Explanation</p>
+                        <p className="mb-1 text-[10px] font-black">
+                          Explanation
+                        </p>
+
                         <img
                           src={mediaUrl(feedback.explanationImage)}
                           alt="Explanation"
-                          className="max-h-56 w-full rounded-lg border border-white bg-white object-contain"
+                          className="max-h-36 w-full rounded-xl border border-white bg-white object-contain"
                         />
                       </div>
-                    ) : null}
+                    )}
                   </div>
                 )}
               </div>
-            ) : null}
+            )}
           </div>
 
-          <aside className="rounded-xl border border-[#DDE6F3] bg-white p-4">
-            <div className="mb-3 flex items-center justify-between">
-              <h3 className="text-base font-black text-[#151515]">
+          <aside className="rounded-[16px] border border-slate-200 bg-white p-3 shadow-[0_8px_22px_rgba(15,23,42,0.04)] lg:max-h-[calc(100vh-105px)] lg:overflow-y-auto">
+            <div className="mb-2.5 flex items-center justify-between gap-2">
+              <h3 className="text-sm font-black text-slate-900">
                 Choose Answer
               </h3>
 
-              <div className="flex items-center gap-1 rounded-md bg-[#EAF1FB] px-2 py-1 text-xs font-black text-[#0D4598]">
-                <TbClockHour4 size={16} />
+              <div className="flex items-center gap-1 rounded-lg bg-[#EAF1FB] px-2 py-1 text-[11px] font-black text-[#0D4598]">
+                <TbClockHour4 size={14} />
                 {formattedTime}
               </div>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               {currentQuestion.options?.map((option, index) => (
                 <button
                   key={index}
                   type="button"
                   disabled={Boolean(feedback) || submitting}
                   onClick={() => selectAnswer(index)}
-                  className={`w-full rounded-lg border px-3 py-3 text-left text-sm font-semibold transition disabled:cursor-not-allowed ${getOptionClass(
+                  className={`w-full rounded-xl border px-2.5 py-2 text-left text-xs font-semibold transition disabled:cursor-not-allowed ${getOptionClass(
                     index,
                   )}`}
                 >
-                  <div className="flex items-start gap-3">
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-black/10 text-xs font-black">
+                  <div className="flex items-start gap-2">
+                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-black/10 text-[10px] font-black">
                       {optionLetter(index)}
                     </span>
 
                     <div className="min-w-0 flex-1">
-                      <p className="leading-relaxed">{option.text}</p>
+                      <p className="leading-5">{option.text}</p>
 
-                      {option.image ? (
+                      {option.image && (
                         <img
                           src={mediaUrl(option.image)}
                           alt={`Option ${optionLetter(index)}`}
-                          className="mt-2 max-h-24 w-full rounded-md border border-white/70 object-contain"
+                          className="mt-1.5 max-h-16 w-full rounded-lg border border-white/70 object-contain"
                         />
-                      ) : null}
+                      )}
                     </div>
                   </div>
                 </button>
               ))}
             </div>
 
-            <div className="mt-4 rounded-lg bg-[#F8FAFD] p-3 text-xs font-semibold leading-relaxed text-[#7B8190]">
+            <div className="mt-2.5 rounded-xl bg-[#f8f8fb] p-2.5 text-[11px] font-semibold leading-5 text-slate-500">
               {feedback
                 ? "Answer submitted. Review the feedback and continue."
                 : submitting
                   ? "Submitting your answer..."
-                  : "Click an option to submit your answer. Correct will show green, wrong will show red."}
+                  : "Click an option to submit your answer."}
             </div>
 
-            {feedback ? (
+            {feedback && (
               <button
                 type="button"
                 onClick={handleNext}
-                className="mt-4 w-full rounded-lg bg-[#0D4598] px-4 py-3 text-sm font-black text-white transition hover:bg-[#083777]"
+                className="mt-2.5 flex w-full items-center justify-center gap-2 rounded-xl bg-[#0D4598] px-3 py-2.5 text-xs font-black text-white transition hover:bg-[#083777]"
               >
                 {currentIndex + 1 >= questions.length
                   ? "FINISH QUIZ"
                   : "NEXT QUESTION"}
+                <FaArrowRight size={11} />
               </button>
-            ) : null}
+            )}
           </aside>
         </section>
       </div>
@@ -526,15 +1092,7 @@ function CodeChallengeContent() {
 
 export default function CodeChallengePage() {
   return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen bg-[#F7F9FC] px-4 py-6">
-          <div className="mx-auto max-w-4xl rounded-xl border border-[#DDE6F3] bg-white p-5 text-center text-sm font-semibold text-[#0D4598]">
-            Loading...
-          </div>
-        </div>
-      }
-    >
+    <Suspense fallback={<CenterMessage>Loading...</CenterMessage>}>
       <CodeChallengeContent />
     </Suspense>
   );

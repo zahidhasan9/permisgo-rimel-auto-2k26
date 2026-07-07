@@ -42,12 +42,42 @@ export const addTeacherLocation = (data) =>
 // =======================
 // Admin
 // =======================
-export const getAdminDashboard = () => axios.get("/admin/dashboard");
-export const getAdminUsers = () => axios.get("/admin/users");
-export const updateUserStatus = (id, status) =>
-  axios.patch(`/admin/users/${id}/status`, { status });
-export const verifyTeacher = (teacherId) =>
-  axios.patch(`/admin/teachers/${teacherId}/verify`);
+// ================= ADMIN API =================
+
+export const getAdminDashboard = () => {
+  return axios.get("/admin/dashboard");
+};
+
+export const getAdminUsers = (params = {}) => {
+  return axios.get("/admin/users", { params });
+};
+
+export const getAdminUserById = (id) => {
+  return axios.get(`/admin/users/${id}`);
+};
+
+export const updateUserStatus = (id, status) => {
+  return axios.patch(`/admin/users/${id}/status`, { status });
+};
+
+export const updateUserRole = (id, role) => {
+  return axios.patch(`/admin/users/${id}/role`, { role });
+};
+
+export const deleteAdminUser = (id) => {
+  return axios.delete(`/admin/users/${id}`);
+};
+
+export const verifyTeacher = (
+  teacherId,
+  verificationStatus,
+  rejectionReason = "",
+) => {
+  return axiosInstance.patch(`/admin/teachers/${teacherId}/verify`, {
+    verificationStatus,
+    rejectionReason,
+  });
+};
 
 // =======================
 // Offers / Packages

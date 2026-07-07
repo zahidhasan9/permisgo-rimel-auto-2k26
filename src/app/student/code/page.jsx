@@ -416,12 +416,6 @@ const practiceCards = [
     icon: "/image/crash-test.png",
     link: "/student/code/crash-test",
   },
-  // {
-  //   title: "My mistakes",
-  //   count: "09",
-  //   icon: "/image/mistakes.png",
-  //   link: "/student/code/my-mistakes",
-  // },
   {
     title: "My History",
     icon: "/image/history.png",
@@ -563,7 +557,7 @@ const topicListRight = [
   {
     code: "M",
     color: "#FC9700",
-    text: "Mechanical components and other safety-related equipment",
+    text: "Mechanical components and safety equipment",
   },
   {
     code: "S",
@@ -579,7 +573,7 @@ const topicListRight = [
 
 function ArrowRight() {
   return (
-    <svg width="10" height="18" viewBox="0 0 10 18" fill="none">
+    <svg width="7" height="13" viewBox="0 0 10 18" fill="none">
       <path
         d="M1.5 2L8 9L1.5 16"
         stroke="#0D4598"
@@ -593,7 +587,7 @@ function ArrowRight() {
 
 function BackArrow() {
   return (
-    <svg width="13" height="22" viewBox="0 0 13 22" fill="none">
+    <svg width="9" height="15" viewBox="0 0 13 22" fill="none">
       <path
         d="M10.5 2L2.5 11L10.5 20"
         stroke="#1F2937"
@@ -607,44 +601,53 @@ function BackArrow() {
 
 function MenuCard({ title, icon, count, link }) {
   return (
-    <Link href={link}>
-      <button className="h-[94px] w-full rounded-[10px] border-[1.5px] border-[#0D55A7] bg-[#E8EEF7] px-[28px]">
-        <div className="flex h-full items-center justify-between">
-          <div className="flex items-center gap-[18px]">
-            <img
-              src={icon}
-              alt=""
-              className="h-[45px] w-[45px] object-contain"
-            />
-
-            <p className="text-left text-[16px] font-semibold text-[#272A31]">
-              {title}
-              {count ? (
-                <span className="ml-1 text-[#E71936]">({count})</span>
-              ) : null}
-            </p>
+    <Link
+      href={link}
+      className="group block rounded-[14px] border border-[#d7e2f2] bg-white p-2.5 shadow-[0_8px_22px_rgba(15,23,42,0.04)] transition hover:-translate-y-0.5 hover:border-[#0D55A7]/40 hover:bg-[#f7faff]"
+    >
+      <div className="flex min-h-[58px] items-center justify-between gap-2">
+        <div className="flex min-w-0 flex-1 items-center gap-2.5">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#E8EEF7]">
+            <img src={icon} alt="" className="h-7 w-7 object-contain" />
           </div>
 
+          <p className="whitespace-normal break-words text-left text-[12.5px] font-bold leading-[16px] text-[#272A31]">
+            {title}
+            {count ? (
+              <span className="ml-1 text-[#E71936]">({count})</span>
+            ) : null}
+          </p>
+        </div>
+
+        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#E8EEF7] transition group-hover:bg-white">
           <ArrowRight />
         </div>
-      </button>
+      </div>
     </Link>
   );
 }
 
-function SectionTitle({ title }) {
+function SectionBlock({ title, children }) {
   return (
-    <h2 className="mb-[22px] mt-[34px] text-[22px] font-bold text-[#0D4598]">
-      {title}
-    </h2>
+    <section className="rounded-[16px] border border-slate-200 bg-white p-3 shadow-[0_8px_22px_rgba(15,23,42,0.04)]">
+      <div className="mb-2 flex items-center justify-between">
+        <h2 className="text-[15px] font-bold text-[#0D4598]">{title}</h2>
+
+        <span className="rounded-full bg-[#E8EEF7] px-2.5 py-1 text-[10px] font-bold text-[#0D4598]">
+          Menu
+        </span>
+      </div>
+
+      {children}
+    </section>
   );
 }
 
 function TopicBar({ code, value, width, color }) {
   return (
-    <div className="relative h-[45px] overflow-hidden rounded-[4px] bg-white">
+    <div className="relative h-[24px] overflow-hidden rounded-lg bg-white">
       <div
-        className="absolute left-0 top-0 flex h-full min-w-[132px] items-center justify-between rounded-[4px] px-[18px] text-[20px] font-bold text-white"
+        className="absolute left-0 top-0 flex h-full min-w-[76px] items-center justify-between rounded-lg px-2.5 text-[11px] font-bold text-white"
         style={{
           width,
           backgroundColor: color,
@@ -659,9 +662,9 @@ function TopicBar({ code, value, width, color }) {
 
 function TopicText({ code, color, text }) {
   return (
-    <p className="text-[13px] font-medium text-[#7B7F89]">
-      <span className="mr-1 text-[18px] font-bold" style={{ color }}>
-        {code} :
+    <p className="text-[10.5px] font-medium leading-4 text-[#7B7F89]">
+      <span className="mr-1 text-[12px] font-bold" style={{ color }}>
+        {code}:
       </span>
       {text}
     </p>
@@ -670,119 +673,153 @@ function TopicText({ code, color, text }) {
 
 export default function CodePracticePage() {
   return (
-    <main className="min-h-screen bg-white px-[24px] py-[31px]">
-      <div className="mx-auto max-w-[1030px]">
-        <header className="mb-[34px] flex items-center gap-[18px]">
-          <Link
-            href="/student"
-            className="flex h-[48px] w-[48px] items-center justify-center rounded-[12px] bg-[#EEF2F8]"
-          >
-            <BackArrow />
-          </Link>
+    <main className="min-h-screen overflow-x-hidden bg-[#f8f8fb] px-3 py-3 md:px-4 lg:px-5">
+      <div className="mx-auto w-full max-w-[1320px]">
+        <header className="mb-3 flex items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-2.5">
+            <Link
+              href="/student"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white shadow-sm transition hover:bg-slate-50"
+            >
+              <BackArrow />
+            </Link>
 
-          <h1 className="text-[25px] font-bold text-[#0D4598]">
-            Code Practice
-          </h1>
+            <div className="min-w-0">
+              <div className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold text-slate-400">
+                <span>Student</span>
+                <span>/</span>
+                <span className="text-slate-600">Code Practice</span>
+              </div>
+
+              <h1 className="text-xl font-bold tracking-tight text-[#0D4598] md:text-2xl">
+                Code Practice
+              </h1>
+            </div>
+          </div>
+
+          <div className="hidden rounded-full border border-[#d7e2f2] bg-white px-3 py-1.5 text-[11px] font-bold text-[#0D4598] shadow-sm sm:block">
+            Practice Dashboard
+          </div>
         </header>
 
-        <section className="grid grid-cols-1 gap-[20px] md:grid-cols-2 xl:grid-cols-3">
-          {practiceCards.map((item) => (
-            <MenuCard key={item.title} {...item} />
-          ))}
-        </section>
+        <div className="grid gap-3 xl:grid-cols-[1.2fr_0.8fr]">
+          <div className="space-y-3">
+            <SectionBlock title="Practice">
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                {practiceCards.map((item) => (
+                  <MenuCard key={item.title} {...item} />
+                ))}
+              </div>
+            </SectionBlock>
 
-        <SectionTitle title="Code Revisions" />
+            <SectionBlock title="Code Revisions">
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                {revisionCards.map((item) => (
+                  <MenuCard key={item.title} {...item} />
+                ))}
+              </div>
+            </SectionBlock>
 
-        <section className="grid grid-cols-1 gap-[20px] md:grid-cols-2 xl:grid-cols-3">
-          {revisionCards.map((item) => (
-            <MenuCard key={item.title} {...item} />
-          ))}
-        </section>
+            <SectionBlock title="Exam">
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                {examCards.map((item) => (
+                  <MenuCard key={item.title} {...item} />
+                ))}
+              </div>
+            </SectionBlock>
+          </div>
 
-        <SectionTitle title="Exam" />
+          <div className="space-y-3">
+            <section className="rounded-[16px] border border-slate-200 bg-white p-3 shadow-[0_8px_22px_rgba(15,23,42,0.04)]">
+              <div className="mb-2 flex items-center justify-between">
+                <h2 className="text-[15px] font-bold text-[#0D4598]">
+                  My Latest Series
+                </h2>
 
-        <section className="grid grid-cols-1 gap-[20px] md:grid-cols-2 xl:grid-cols-3">
-          {examCards.map((item) => (
-            <MenuCard key={item.title} {...item} />
-          ))}
-        </section>
+                <span className="rounded-full bg-[#E8EEF7] px-2.5 py-1 text-[10px] font-bold text-[#0D4598]">
+                  Recent
+                </span>
+              </div>
 
-        <section className="mt-[32px] rounded-[10px] bg-[#E8EEF7] px-[22px] pb-[24px] pt-[22px]">
-          <h2 className="text-[22px] font-bold text-[#0D4598]">
-            My Latest Series
-          </h2>
+              <div className="overflow-hidden rounded-[12px] border border-slate-100">
+                {latestSeries.map((item, index) => (
+                  <div
+                    key={`${item.type}-${index}`}
+                    className="grid min-h-[48px] grid-cols-[92px_minmax(0,1fr)_92px] items-center gap-2 border-b border-[#E3E7EE] bg-[#fbfbfd] px-2.5 py-2 last:border-b-0"
+                  >
+                    <span className="inline-flex min-h-6 items-center justify-center rounded-lg bg-[#E8EEF7] px-2 text-center text-[9.5px] font-bold leading-[12px] text-[#0D4598]">
+                      {item.date}
+                    </span>
 
-          <div className="mt-[20px] overflow-hidden rounded-[8px] bg-white px-[24px]">
-            {latestSeries.map((item, index) => (
-              <div
-                key={`${item.type}-${index}`}
-                className="grid min-h-[62px] grid-cols-1 items-center gap-3 border-b border-[#E3E7EE] py-3 last:border-b-0 md:grid-cols-[190px_1fr_170px_140px]"
-              >
-                <div>
-                  <span className="inline-flex h-[31px] w-[120px] items-center justify-center rounded-[4px] bg-[#BFCBE2] text-[12px] font-bold text-[#0D4598]">
-                    {item.date}
-                  </span>
+                    <div className="min-w-0">
+                      <p className="whitespace-normal break-words text-[11px] font-bold leading-4 text-[#24262B]">
+                        {item.type}
+                      </p>
+
+                      <p className="text-[10px] font-medium text-[#878B94]">
+                        Score: {item.score}
+                      </p>
+                    </div>
+
+                    <button
+                      className={`min-h-7 rounded-lg px-2 text-[10px] font-bold leading-[12px] text-white ${
+                        item.variant === "red" ? "bg-[#E9223D]" : "bg-[#0C3B78]"
+                      }`}
+                    >
+                      {item.action}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section className="rounded-[16px] border border-slate-200 bg-white p-3 shadow-[0_8px_22px_rgba(15,23,42,0.04)]">
+              <div className="mb-2 flex items-center justify-between">
+                <h2 className="text-[15px] font-bold text-[#0D4598]">
+                  My result by topic
+                </h2>
+
+                <span className="rounded-full bg-[#E8EEF7] px-2.5 py-1 text-[10px] font-bold text-[#0D4598]">
+                  Result
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
+                <div className="space-y-1.5">
+                  {leftTopics.map((topic) => (
+                    <TopicBar key={topic.code} {...topic} />
+                  ))}
                 </div>
 
-                <p className="text-[12px] font-semibold text-[#24262B]">
-                  {item.type}
-                </p>
-
-                <p className="text-[12px] font-medium text-[#878B94]">
-                  Last Score: {item.score}
-                </p>
-
-                <button
-                  className={`h-[36px] w-[120px] justify-self-start rounded-[8px] text-[12px] font-bold text-white md:justify-self-end ${
-                    item.variant === "red" ? "bg-[#E9223D]" : "bg-[#0C3B78]"
-                  }`}
-                >
-                  {item.action}
-                </button>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="mt-[18px] rounded-[7px] bg-[#E8EEF7] px-[12px] pb-[14px] pt-[12px]">
-          <h2 className="text-[14px] font-bold text-[#0D4598]">
-            My result by topic
-          </h2>
-
-          <div className="mt-[10px] grid grid-cols-1 gap-x-[12px] gap-y-[8px] lg:grid-cols-2">
-            <div className="space-y-[8px]">
-              {leftTopics.map((topic) => (
-                <TopicBar key={topic.code} {...topic} />
-              ))}
-            </div>
-
-            <div className="space-y-[8px]">
-              {rightTopics.map((topic) => (
-                <TopicBar key={topic.code} {...topic} />
-              ))}
-            </div>
-          </div>
-
-          <div className="mt-[10px] rounded-[6px] bg-white px-[12px] py-[12px]">
-            <h3 className="mb-[10px] text-[11px] font-bold text-[#0D4598]">
-              List of topics:
-            </h3>
-
-            <div className="grid grid-cols-1 gap-x-[35px] gap-y-[8px] lg:grid-cols-2">
-              <div className="space-y-[8px]">
-                {topicListLeft.map((topic) => (
-                  <TopicText key={topic.code} {...topic} />
-                ))}
+                <div className="space-y-1.5">
+                  {rightTopics.map((topic) => (
+                    <TopicBar key={topic.code} {...topic} />
+                  ))}
+                </div>
               </div>
 
-              <div className="space-y-[8px]">
-                {topicListRight.map((topic) => (
-                  <TopicText key={topic.code} {...topic} />
-                ))}
+              <div className="mt-2 rounded-[12px] border border-slate-100 bg-[#fbfbfd] p-2.5">
+                <h3 className="mb-1.5 text-[11px] font-bold text-[#0D4598]">
+                  List of topics
+                </h3>
+
+                <div className="grid grid-cols-1 gap-x-4 gap-y-1 lg:grid-cols-2">
+                  <div className="space-y-1">
+                    {topicListLeft.map((topic) => (
+                      <TopicText key={topic.code} {...topic} />
+                    ))}
+                  </div>
+
+                  <div className="space-y-1">
+                    {topicListRight.map((topic) => (
+                      <TopicText key={topic.code} {...topic} />
+                    ))}
+                  </div>
+                </div>
               </div>
-            </div>
+            </section>
           </div>
-        </section>
+        </div>
       </div>
     </main>
   );

@@ -5,20 +5,13 @@ import { usePathname } from "next/navigation";
 import { useMemo, useState } from "react";
 
 import {
-  FaBell,
   FaBlog,
   FaCar,
   FaCog,
   FaFileAlt,
   FaGift,
-  FaHome,
-  FaQuestionCircle,
   FaSignOutAlt,
-  FaStar,
-  FaTags,
   FaUsers,
-  FaUserGraduate,
-  FaUserTie,
 } from "react-icons/fa";
 
 import {
@@ -27,12 +20,7 @@ import {
   MdOutlineQuiz,
   MdOutlineSupportAgent,
   MdOutlineTraffic,
-  MdReviews,
 } from "react-icons/md";
-
-import { BsBook } from "react-icons/bs";
-import { IoIosChatboxes } from "react-icons/io";
-import { RiSteering2Fill } from "react-icons/ri";
 import { FiChevronRight, FiMenu, FiX } from "react-icons/fi";
 
 const menu = [
@@ -243,11 +231,9 @@ export default function AdminSidebar({ variant = "desktop", onClose }) {
   if (variant === "mobile") {
     return (
       <aside className="flex h-full w-72 flex-col bg-white">
+        {/* MOBILE HEADER */}
         <div className="flex shrink-0 items-center justify-between border-b p-4">
-          <div>
-            <h2 className="font-bold text-gray-800"> PermisGo Panel</h2>
-            {/* <p className="text-xs text-gray-500">PermisGo Management</p> */}
-          </div>
+          <h2 className="font-bold text-gray-800">Admin Panel</h2>
 
           <button
             type="button"
@@ -259,6 +245,7 @@ export default function AdminSidebar({ variant = "desktop", onClose }) {
           </button>
         </div>
 
+        {/* MOBILE MENU */}
         <div className="min-h-0 flex-1 overflow-y-auto p-3">
           <MobileNav items={navItems} pathname={pathname} onClose={onClose} />
         </div>
@@ -272,13 +259,9 @@ export default function AdminSidebar({ variant = "desktop", onClose }) {
         collapsed ? "w-20" : "w-72"
       }`}
     >
+      {/* DESKTOP HEADER */}
       <div className="flex shrink-0 items-center justify-between border-b p-4">
-        {!collapsed && (
-          <div>
-            <h2 className="font-bold text-gray-800">PermisGo Panel</h2>
-            {/* <p className="text-xs text-gray-500">PermisGo Management</p> */}
-          </div>
-        )}
+        {!collapsed && <h2 className="font-bold text-gray-800">Admin Panel</h2>}
 
         <button
           type="button"
@@ -290,6 +273,7 @@ export default function AdminSidebar({ variant = "desktop", onClose }) {
         </button>
       </div>
 
+      {/* DESKTOP SCROLLABLE MENU */}
       <div className="min-h-0 flex-1 overflow-y-auto px-2 py-3">
         <DesktopNav
           items={navItems}
@@ -300,20 +284,21 @@ export default function AdminSidebar({ variant = "desktop", onClose }) {
         />
       </div>
 
+      {/* DESKTOP BOTTOM SUBSCRIPTION CARD */}
       {!collapsed && (
         <div className="shrink-0 border-t bg-white p-4">
           <div className="rounded-2xl bg-blue-900 p-4 text-center text-white">
-            <p className="mb-1 text-xs font-semibold">Admin Control</p>
+            <p className="mb-1 text-xs">Subscription</p>
             <p className="mb-3 text-[11px] text-blue-100">
-              Manage users, quizzes, lessons and payments
+              Explore Premium Features
             </p>
 
-            <Link
-              href="/admin/settings"
-              className="block w-full rounded-lg bg-red-500 py-2 text-sm font-semibold transition hover:bg-red-600"
+            <button
+              type="button"
+              className="w-full rounded-lg bg-red-500 py-2 text-sm"
             >
-              Settings
-            </Link>
+              Upgrade Now
+            </button>
           </div>
         </div>
       )}
@@ -329,19 +314,15 @@ function DesktopNav({ items, pathname, collapsed, openMenu, setOpenMenu }) {
 
         const isActive =
           pathname === item.href ||
-          item.children?.some(
-            (child) =>
-              pathname === child.href || pathname.startsWith(`${child.href}/`),
-          );
+          item.children?.some((child) => pathname === child.href);
 
-        const isOpen = openMenu === item.name || isActive;
+        const isOpen = openMenu === item.name;
 
         if (!item.children) {
           return (
             <Link
               key={item.name}
               href={item.href}
-              title={collapsed ? item.name : undefined}
               className={`flex w-full items-center gap-3 rounded-xl px-3 py-3 transition ${
                 isActive
                   ? "bg-blue-900 text-white"
@@ -361,7 +342,6 @@ function DesktopNav({ items, pathname, collapsed, openMenu, setOpenMenu }) {
           <div key={item.name}>
             <button
               type="button"
-              title={collapsed ? item.name : undefined}
               onClick={() => setOpenMenu(isOpen ? null : item.name)}
               className={`flex w-full items-center gap-3 rounded-xl px-3 py-3 transition ${
                 isActive
@@ -388,25 +368,19 @@ function DesktopNav({ items, pathname, collapsed, openMenu, setOpenMenu }) {
 
             {isOpen && !collapsed && (
               <div className="ml-6 mt-1 space-y-1 border-l pl-3">
-                {item.children.map((child) => {
-                  const childActive =
-                    pathname === child.href ||
-                    pathname.startsWith(`${child.href}/`);
-
-                  return (
-                    <Link
-                      key={child.href}
-                      href={child.href}
-                      className={`block rounded-lg px-3 py-2 text-sm ${
-                        childActive
-                          ? "bg-blue-100 font-medium text-blue-900"
-                          : "text-gray-600 hover:bg-gray-100"
-                      }`}
-                    >
-                      {child.name}
-                    </Link>
-                  );
-                })}
+                {item.children.map((child) => (
+                  <Link
+                    key={child.href}
+                    href={child.href}
+                    className={`block rounded-lg px-3 py-2 text-sm ${
+                      pathname === child.href
+                        ? "bg-blue-100 font-medium text-blue-900"
+                        : "text-gray-600 hover:bg-gray-100"
+                    }`}
+                  >
+                    {child.name}
+                  </Link>
+                ))}
               </div>
             )}
           </div>
@@ -427,10 +401,7 @@ function MobileNav({ items, pathname, onClose }) {
 
         const isActive =
           pathname === item.href ||
-          item.children?.some(
-            (child) =>
-              pathname === child.href || pathname.startsWith(`${child.href}/`),
-          );
+          item.children?.some((child) => pathname === child.href);
 
         if (!item.children) {
           return (
@@ -471,26 +442,20 @@ function MobileNav({ items, pathname, onClose }) {
 
             {isOpen && (
               <div className="ml-6 mt-1 space-y-1 border-l pl-3">
-                {item.children.map((child) => {
-                  const childActive =
-                    pathname === child.href ||
-                    pathname.startsWith(`${child.href}/`);
-
-                  return (
-                    <Link
-                      key={child.href}
-                      href={child.href}
-                      onClick={onClose}
-                      className={`block rounded-lg px-3 py-2 text-sm ${
-                        childActive
-                          ? "bg-blue-900 text-white"
-                          : "text-gray-600 hover:bg-gray-100"
-                      }`}
-                    >
-                      {child.name}
-                    </Link>
-                  );
-                })}
+                {item.children.map((child) => (
+                  <Link
+                    key={child.href}
+                    href={child.href}
+                    onClick={onClose}
+                    className={`block rounded-lg px-3 py-2 text-sm ${
+                      pathname === child.href
+                        ? "bg-blue-900 text-white"
+                        : "text-gray-600 hover:bg-gray-100"
+                    }`}
+                  >
+                    {child.name}
+                  </Link>
+                ))}
               </div>
             )}
           </div>
