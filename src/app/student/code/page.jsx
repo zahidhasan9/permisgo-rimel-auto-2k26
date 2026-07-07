@@ -440,6 +440,11 @@ const revisionCards = [
     link: "/student/code/knowledge-sheets",
   },
   {
+    title: "My Mistakes",
+    icon: "/image/knowledge-sheets.png",
+    link: "/student/code/my-mistakes",
+  },
+  {
     title: "Our Live Coding Replays",
     icon: "/image/live-replays.png",
     link: "/student/code/live-replays",

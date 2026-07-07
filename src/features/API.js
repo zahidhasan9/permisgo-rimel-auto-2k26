@@ -274,3 +274,38 @@ export const getAdminQuizAttempts = () => axios.get("/quizzes/admin/attempts");
 export const createExamRequest = (data) => axios.post("/exams", data);
 export const getMyExams = () => axios.get("/exams/me");
 export const updateExam = (id, data) => axios.patch(`/exams/${id}`, data);
+
+// ===============================
+// Learning Content API
+// ===============================
+
+export const getAdminLearningContents = (params = {}) =>
+  axios.get("/learning/admin/contents", { params });
+
+export const createLearningContent = (data) =>
+  axios.post("/learning/admin/contents", data, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+export const updateLearningContent = (id, data) =>
+  axios.patch(`/learning/admin/contents/${id}`, data, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+export const deleteLearningContent = (id) =>
+  axios.delete(`/learning/admin/contents/${id}`);
+
+export const getLearningContents = (params = {}) =>
+  axios.get("/learning/contents", { params });
+
+export const getLearningSummary = () => axios.get("/learning/summary");
+
+export const updateLearningProgress = (id, data) =>
+  axios.post(`/learning/contents/${id}/progress`, data);
+
+export const toggleLearningFavorite = (id) =>
+  axios.patch(`/learning/contents/${id}/favorite`);
