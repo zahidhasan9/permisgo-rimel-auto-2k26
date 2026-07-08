@@ -5,7 +5,7 @@ import {
   FaCamera,
   FaCheckCircle,
   FaEnvelope,
-  FaChalkboardTeacher,
+  FaGraduationCap,
   FaKey,
   FaMapMarkerAlt,
   FaPhoneAlt,
@@ -78,7 +78,7 @@ function Field({
           disabled={disabled}
           onChange={onChange}
           placeholder={placeholder}
-          className={`h-11 w-full rounded-xl border border-slate-200 bg-[#F7F9FC] px-3 text-sm font-semibold text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-50 ${
+          className={`h-11 w-full rounded-xl border border-slate-200 bg-[#F7F9FC] px-3 text-sm font-semibold text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-emerald-600 focus:bg-white focus:ring-4 focus:ring-emerald-50 ${
             Icon ? "pl-9" : ""
           } ${disabled ? "cursor-not-allowed opacity-70" : ""}`}
         />
@@ -98,7 +98,7 @@ function SelectField({ label, name, value, onChange, children }) {
         name={name}
         value={value || ""}
         onChange={onChange}
-        className="h-11 w-full rounded-xl border border-slate-200 bg-[#F7F9FC] px-3 text-sm font-bold text-slate-800 outline-none transition focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-50"
+        className="h-11 w-full rounded-xl border border-slate-200 bg-[#F7F9FC] px-3 text-sm font-bold text-slate-800 outline-none transition focus:border-emerald-600 focus:bg-white focus:ring-4 focus:ring-emerald-50"
       >
         {children}
       </select>
@@ -121,7 +121,7 @@ function Alert({ type = "success", children }) {
   );
 }
 
-export default function TeacherProfilePage() {
+export default function StudentProfilePage() {
   const [profile, setProfile] = useState(emptyProfile);
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState("");
@@ -143,7 +143,7 @@ export default function TeacherProfilePage() {
   }, [avatarPreview, profile.avatar]);
 
   const initial = useMemo(() => {
-    return String(profile.name || profile.email || "T")
+    return String(profile.name || profile.email || "S")
       .trim()
       .charAt(0)
       .toUpperCase();
@@ -288,7 +288,7 @@ export default function TeacherProfilePage() {
         new CustomEvent("profile-updated", { detail: updatedUser }),
       );
 
-      setSuccess("Teacher profile updated successfully.");
+      setSuccess("Student profile updated successfully.");
     } catch (err) {
       setError(
         err.response?.data?.message ||
@@ -346,9 +346,9 @@ export default function TeacherProfilePage() {
     return (
       <main className="min-h-screen bg-[#F7F9FC] p-4">
         <div className="flex min-h-[420px] items-center justify-center rounded-2xl border border-slate-200 bg-white">
-          <div className="flex items-center gap-3 text-sm font-black text-purple-700">
+          <div className="flex items-center gap-3 text-sm font-black text-emerald-700">
             <FaSpinner className="animate-spin" />
-            Loading teacher profile...
+            Loading student profile...
           </div>
         </div>
       </main>
@@ -361,21 +361,21 @@ export default function TeacherProfilePage() {
         <div className="mb-4 flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm md:flex-row md:items-center md:justify-between">
           <div>
             <div className="mb-1 flex flex-wrap items-center gap-1 text-xs font-bold text-slate-400">
-              <span>Teacher</span>
+              <span>Student</span>
               <span>/</span>
               <span className="text-slate-600">Edit Profile</span>
             </div>
 
             <h1 className="text-2xl font-black text-slate-900">
-              Edit Teacher Profile
+              Edit Student Profile
             </h1>
 
             <p className="mt-1 text-sm font-medium text-slate-500">
-              Update teacher information, profile image and password.
+              Update student information, profile image and password.
             </p>
           </div>
 
-          <div className="rounded-2xl bg-purple-50 px-4 py-3 text-sm font-black text-purple-700">
+          <div className="rounded-2xl bg-emerald-50 px-4 py-3 text-sm font-black text-emerald-700">
             {profile.email}
           </div>
         </div>
@@ -387,16 +387,16 @@ export default function TeacherProfilePage() {
                 {displayImage ? (
                   <img
                     src={displayImage}
-                    alt="Teacher profile"
+                    alt="Student profile"
                     className="h-36 w-36 rounded-3xl border border-slate-200 object-cover"
                   />
                 ) : (
-                  <div className="flex h-36 w-36 items-center justify-center rounded-3xl bg-purple-600 text-5xl font-black text-white">
+                  <div className="flex h-36 w-36 items-center justify-center rounded-3xl bg-emerald-600 text-5xl font-black text-white">
                     {initial}
                   </div>
                 )}
 
-                <label className="absolute -bottom-2 -right-2 flex h-11 w-11 cursor-pointer items-center justify-center rounded-2xl border-4 border-white bg-purple-600 text-white shadow-lg transition hover:bg-purple-700">
+                <label className="absolute -bottom-2 -right-2 flex h-11 w-11 cursor-pointer items-center justify-center rounded-2xl border-4 border-white bg-emerald-600 text-white shadow-lg transition hover:bg-emerald-700">
                   <FaCamera size={16} />
                   <input
                     type="file"
@@ -408,26 +408,26 @@ export default function TeacherProfilePage() {
               </div>
 
               <h2 className="mt-4 text-xl font-black text-slate-900">
-                {profile.name || "Teacher User"}
+                {profile.name || "Student User"}
               </h2>
 
               <p className="mt-1 text-sm font-semibold text-slate-500">
-                {profile.designation || "Teacher"}
+                {profile.designation || "Student"}
               </p>
 
               <div className="mt-4 w-full rounded-2xl bg-[#F7F9FC] p-3 text-left">
                 <div className="mb-3 flex items-center gap-3 text-sm font-bold text-slate-600">
-                  <FaEnvelope className="text-purple-600" />
+                  <FaEnvelope className="text-emerald-600" />
                   <span className="truncate">{profile.email || "-"}</span>
                 </div>
 
                 <div className="mb-3 flex items-center gap-3 text-sm font-bold text-slate-600">
-                  <FaPhoneAlt className="text-purple-600" />
+                  <FaPhoneAlt className="text-emerald-600" />
                   <span>{profile.phone || "-"}</span>
                 </div>
 
                 <div className="flex items-center gap-3 text-sm font-bold text-slate-600">
-                  <FaMapMarkerAlt className="text-purple-600" />
+                  <FaMapMarkerAlt className="text-emerald-600" />
                   <span>
                     {[profile.city, profile.country]
                       .filter(Boolean)
@@ -448,16 +448,16 @@ export default function TeacherProfilePage() {
               className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
             >
               <div className="mb-4 flex items-center gap-3 border-b border-slate-100 pb-4">
-                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-purple-50 text-purple-700">
-                  <FaChalkboardTeacher />
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700">
+                  <FaGraduationCap />
                 </div>
 
                 <div>
                   <h2 className="text-lg font-black text-slate-900">
-                    Teacher Information
+                    Student Information
                   </h2>
                   <p className="text-sm font-medium text-slate-500">
-                    Basic teacher account details.
+                    Basic student account details.
                   </p>
                 </div>
               </div>
@@ -502,12 +502,12 @@ export default function TeacherProfilePage() {
                 />
 
                 <Field
-                  label="Instructor Title"
+                  label="Student Type / Batch"
                   name="designation"
                   value={profile.designation}
                   onChange={handleProfileChange}
-                  placeholder="Driving Instructor / Senior Teacher"
-                  icon={FaChalkboardTeacher}
+                  placeholder="Beginner / Driving Student / HSC Batch"
+                  icon={FaGraduationCap}
                 />
 
                 <SelectField
@@ -575,8 +575,8 @@ export default function TeacherProfilePage() {
                   onChange={handleProfileChange}
                   rows={4}
                   maxLength={500}
-                  placeholder="Write short teacher profile bio..."
-                  className="w-full resize-none rounded-xl border border-slate-200 bg-[#F7F9FC] px-3 py-3 text-sm font-semibold text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-50"
+                  placeholder="Write short student profile bio..."
+                  className="w-full resize-none rounded-xl border border-slate-200 bg-[#F7F9FC] px-3 py-3 text-sm font-semibold text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-emerald-600 focus:bg-white focus:ring-4 focus:ring-emerald-50"
                 />
 
                 <span className="mt-1 block text-right text-xs font-semibold text-slate-400">
@@ -588,10 +588,10 @@ export default function TeacherProfilePage() {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-purple-600 px-5 py-3 text-sm font-black text-white transition hover:bg-purple-700 disabled:cursor-not-allowed disabled:opacity-70"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 text-sm font-black text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-70"
                 >
                   {saving ? <FaSpinner className="animate-spin" /> : <FaSave />}
-                  {saving ? "Saving..." : "Save Teacher Profile"}
+                  {saving ? "Saving..." : "Save Student Profile"}
                 </button>
               </div>
             </form>
@@ -610,7 +610,7 @@ export default function TeacherProfilePage() {
                     Change Password
                   </h2>
                   <p className="text-sm font-medium text-slate-500">
-                    Keep teacher account secure.
+                    Keep student account secure.
                   </p>
                 </div>
               </div>

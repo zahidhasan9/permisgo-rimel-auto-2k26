@@ -11,6 +11,18 @@ export const forgotPassword = (data) =>
   axios.post("/auth/forgot-password", data);
 export const resetPassword = (data) => axios.post("/auth/reset-password", data);
 export const logoutUser = () => axios.post("/auth/logout");
+export const updateProfile = (data) =>
+  axios.patch("/auth/profile", data, {
+    headers:
+      data instanceof FormData
+        ? {
+            "Content-Type": "multipart/form-data",
+          }
+        : {},
+  });
+
+export const changePassword = (data) =>
+  axios.patch("/auth/change-password", data);
 
 // =======================
 // Student
@@ -189,84 +201,90 @@ export const getMyReferral = () => axios.get("/referrals/me");
 // Full Quiz System
 // =======================
 
-// =======================
-// Code Quiz APIs
-// Add at the bottom of src/features/API.js
-// =======================
-
-export const getStudentCodeQuizzes = () => axios.get("/quizzes");
-
-export const startCodeQuizAttempt = (quizId) =>
-  axios.post(`/quizzes/${quizId}/attempts/start`);
-
-export const submitCodeQuizAnswer = (attemptId, data) =>
-  axios.post(`/quizzes/attempts/${attemptId}/answer`, data);
-
-export const finishCodeQuizAttempt = (attemptId) =>
-  axios.post(`/quizzes/attempts/${attemptId}/finish`);
-
-export const getMyCodeQuizAttempts = () => axios.get("/quizzes/attempts/me");
-
-export const getCodeQuizAttemptReview = (attemptId) =>
-  axios.get(`/quizzes/attempts/${attemptId}/review`);
-// --------------------------------------------
-
 export const getQuizzes = () => axios.get("/quizzes");
+
+export const getStudentCodeQuizzes = getQuizzes;
+
 export const getQuizQuestions = (quizId) =>
   axios.get(`/quizzes/${quizId}/questions`);
+
 export const getRoadSigns = () => axios.get("/quizzes/road-signs/list");
+
+export const getQuizById = (quizId) => axios.get(`/quizzes/${quizId}`);
+
+export const startQuizAttempt = (quizId) =>
+  axios.post(`/quizzes/${quizId}/attempts/start`);
+
+export const startCodeQuizAttempt = startQuizAttempt;
+
+export const submitQuizAnswer = (attemptId, data) =>
+  axios.post(`/quizzes/attempts/${attemptId}/answer`, data);
+
+export const submitCodeQuizAnswer = submitQuizAnswer;
+
+export const finishQuizAttempt = (attemptId) =>
+  axios.post(`/quizzes/attempts/${attemptId}/finish`);
+
+export const finishCodeQuizAttempt = finishQuizAttempt;
+
+export const getMyQuizAttempts = () => axios.get("/quizzes/attempts/me");
+
+export const getMyCodeQuizAttempts = getMyQuizAttempts;
+
+export const getQuizAttemptReview = (attemptId) =>
+  axios.get(`/quizzes/attempts/${attemptId}/review`);
+
+export const getCodeQuizAttemptReview = getQuizAttemptReview;
+
+export const getAdminQuizAttempts = () => axios.get("/quizzes/admin/attempts");
+
+// Admin quiz management
 export const createQuiz = (data) => axios.post("/quizzes", data);
 
-export const createQuizQuestion = (quizId, data) =>
-  axios.post(`/quizzes/${quizId}/questions`, data);
+export const createQuizWithForm = (data) =>
+  axios.post("/quizzes", data, {
+    headers:
+      data instanceof FormData ? { "Content-Type": "multipart/form-data" } : {},
+  });
 
-export const createRoadSign = (data) => axios.post("/quizzes/road-signs", data);
+export const updateQuiz = (quizId, data) =>
+  axios.patch(`/quizzes/${quizId}`, data, {
+    headers:
+      data instanceof FormData ? { "Content-Type": "multipart/form-data" } : {},
+  });
+
+export const deleteQuiz = (quizId) => axios.delete(`/quizzes/${quizId}`);
 
 export const getAdminQuizzes = (params = {}) =>
   axios.get("/quizzes/admin/all", { params });
 
 export const getAdminQuizStats = () => axios.get("/quizzes/admin/stats");
 
-export const getQuizById = (quizId) => axios.get(`/quizzes/${quizId}`);
-export const updateQuiz = (quizId, data) =>
-  axios.patch(`/quizzes/${quizId}`, data, {
-    headers:
-      data instanceof FormData ? { "Content-Type": "multipart/form-data" } : {},
-  });
-export const deleteQuiz = (quizId) => axios.delete(`/quizzes/${quizId}`);
-
 export const getAdminQuizQuestions = (quizId) =>
   axios.get(`/quizzes/${quizId}/admin-questions`);
+
 export const getQuestionById = (questionId) =>
   axios.get(`/quizzes/questions/${questionId}`);
-export const createQuizWithForm = (data) =>
-  axios.post("/quizzes", data, {
-    headers:
-      data instanceof FormData ? { "Content-Type": "multipart/form-data" } : {},
-  });
+
+export const createQuizQuestion = (quizId, data) =>
+  axios.post(`/quizzes/${quizId}/questions`, data);
+
 export const createQuizQuestionWithForm = (quizId, data) =>
   axios.post(`/quizzes/${quizId}/questions`, data, {
     headers:
       data instanceof FormData ? { "Content-Type": "multipart/form-data" } : {},
   });
+
 export const updateQuizQuestion = (questionId, data) =>
   axios.patch(`/quizzes/questions/${questionId}`, data, {
     headers:
       data instanceof FormData ? { "Content-Type": "multipart/form-data" } : {},
   });
+
 export const deleteQuizQuestion = (questionId) =>
   axios.delete(`/quizzes/questions/${questionId}`);
 
-export const startQuizAttempt = (quizId) =>
-  axios.post(`/quizzes/${quizId}/attempts/start`);
-export const submitQuizAnswer = (attemptId, data) =>
-  axios.post(`/quizzes/attempts/${attemptId}/answer`, data);
-export const finishQuizAttempt = (attemptId) =>
-  axios.post(`/quizzes/attempts/${attemptId}/finish`);
-export const getMyQuizAttempts = () => axios.get("/quizzes/attempts/me");
-export const getQuizAttemptReview = (attemptId) =>
-  axios.get(`/quizzes/attempts/${attemptId}/review`);
-export const getAdminQuizAttempts = () => axios.get("/quizzes/admin/attempts");
+export const createRoadSign = (data) => axios.post("/quizzes/road-signs", data);
 
 // =======================
 // Exams
@@ -309,3 +327,19 @@ export const updateLearningProgress = (id, data) =>
 
 export const toggleLearningFavorite = (id) =>
   axios.patch(`/learning/contents/${id}/favorite`);
+
+// =======================
+// Admin Controlled Quiz Retake
+// =======================
+
+export const getAdminRetakePermissions = (params = {}) =>
+  axios.get("/quizzes/admin/retake-permissions", { params });
+
+export const grantQuizRetakePermission = (data) =>
+  axios.post("/quizzes/admin/retake-permissions", data);
+
+export const revokeQuizRetakePermission = (permissionId) =>
+  axios.patch(`/quizzes/admin/retake-permissions/${permissionId}/revoke`);
+
+export const getMyRetakePermissions = () =>
+  axios.get("/quizzes/retake-permissions/me");

@@ -77,6 +77,11 @@ const menu = [
         name: "learning-content",
         href: "/admin/learning-content",
       },
+
+      {
+        name: "Quiz Retakes",
+        href: "/admin/quiz-retakes",
+      },
       {
         name: "Exams",
         href: "/admin/exams",

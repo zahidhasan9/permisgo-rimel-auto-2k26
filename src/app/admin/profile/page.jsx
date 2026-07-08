@@ -5,7 +5,7 @@ import {
   FaCamera,
   FaCheckCircle,
   FaEnvelope,
-  FaChalkboardTeacher,
+  FaIdBadge,
   FaKey,
   FaMapMarkerAlt,
   FaPhoneAlt,
@@ -43,8 +43,11 @@ function getPayloadUser(res) {
 
 function formatDateInput(value) {
   if (!value) return "";
+
   const date = new Date(value);
+
   if (Number.isNaN(date.getTime())) return "";
+
   return date.toISOString().slice(0, 10);
 }
 
@@ -78,7 +81,7 @@ function Field({
           disabled={disabled}
           onChange={onChange}
           placeholder={placeholder}
-          className={`h-11 w-full rounded-xl border border-slate-200 bg-[#F7F9FC] px-3 text-sm font-semibold text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-50 ${
+          className={`h-11 w-full rounded-xl border border-slate-200 bg-[#F7F9FC] px-3 text-sm font-semibold text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-[#0D4598] focus:bg-white focus:ring-4 focus:ring-blue-50 ${
             Icon ? "pl-9" : ""
           } ${disabled ? "cursor-not-allowed opacity-70" : ""}`}
         />
@@ -98,7 +101,7 @@ function SelectField({ label, name, value, onChange, children }) {
         name={name}
         value={value || ""}
         onChange={onChange}
-        className="h-11 w-full rounded-xl border border-slate-200 bg-[#F7F9FC] px-3 text-sm font-bold text-slate-800 outline-none transition focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-50"
+        className="h-11 w-full rounded-xl border border-slate-200 bg-[#F7F9FC] px-3 text-sm font-bold text-slate-800 outline-none transition focus:border-[#0D4598] focus:bg-white focus:ring-4 focus:ring-blue-50"
       >
         {children}
       </select>
@@ -121,7 +124,7 @@ function Alert({ type = "success", children }) {
   );
 }
 
-export default function TeacherProfilePage() {
+export default function AdminProfilePage() {
   const [profile, setProfile] = useState(emptyProfile);
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState("");
@@ -143,13 +146,13 @@ export default function TeacherProfilePage() {
   }, [avatarPreview, profile.avatar]);
 
   const initial = useMemo(() => {
-    return String(profile.name || profile.email || "T")
+    return String(profile.name || profile.email || "A")
       .trim()
       .charAt(0)
       .toUpperCase();
   }, [profile.name, profile.email]);
 
-  async function loadProfile() {
+  const loadProfile = async () => {
     try {
       setLoading(true);
       setError("");
@@ -157,7 +160,9 @@ export default function TeacherProfilePage() {
       const res = await getLoggedInUser();
       const user = getPayloadUser(res);
 
-      if (!user) throw new Error("Profile data not found.");
+      if (!user) {
+        throw new Error("Profile data not found.");
+      }
 
       setProfile({
         name: user.name || "",
@@ -174,7 +179,9 @@ export default function TeacherProfilePage() {
         avatar: user.avatar || "",
       });
 
-      localStorage.setItem("user", JSON.stringify(user));
+      if (typeof window !== "undefined") {
+        localStorage.setItem("user", JSON.stringify(user));
+      }
     } catch (err) {
       setError(
         err.response?.data?.message || err.message || "Failed to load profile.",
@@ -182,7 +189,7 @@ export default function TeacherProfilePage() {
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
     loadProfile();
@@ -263,7 +270,9 @@ export default function TeacherProfilePage() {
       const res = await updateProfile(formData);
       const updatedUser = getPayloadUser(res);
 
-      if (!updatedUser) throw new Error("Profile update response not found.");
+      if (!updatedUser) {
+        throw new Error("Profile update response not found.");
+      }
 
       setProfile({
         name: updatedUser.name || "",
@@ -283,12 +292,14 @@ export default function TeacherProfilePage() {
       setAvatarFile(null);
       setAvatarPreview("");
 
-      localStorage.setItem("user", JSON.stringify(updatedUser));
-      window.dispatchEvent(
-        new CustomEvent("profile-updated", { detail: updatedUser }),
-      );
+      if (typeof window !== "undefined") {
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+        window.dispatchEvent(
+          new CustomEvent("profile-updated", { detail: updatedUser }),
+        );
+      }
 
-      setSuccess("Teacher profile updated successfully.");
+      setSuccess("Profile updated successfully.");
     } catch (err) {
       setError(
         err.response?.data?.message ||
@@ -346,9 +357,9 @@ export default function TeacherProfilePage() {
     return (
       <main className="min-h-screen bg-[#F7F9FC] p-4">
         <div className="flex min-h-[420px] items-center justify-center rounded-2xl border border-slate-200 bg-white">
-          <div className="flex items-center gap-3 text-sm font-black text-purple-700">
+          <div className="flex items-center gap-3 text-sm font-black text-[#0D4598]">
             <FaSpinner className="animate-spin" />
-            Loading teacher profile...
+            Loading profile...
           </div>
         </div>
       </main>
@@ -361,21 +372,21 @@ export default function TeacherProfilePage() {
         <div className="mb-4 flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm md:flex-row md:items-center md:justify-between">
           <div>
             <div className="mb-1 flex flex-wrap items-center gap-1 text-xs font-bold text-slate-400">
-              <span>Teacher</span>
+              <span>Admin</span>
               <span>/</span>
               <span className="text-slate-600">Edit Profile</span>
             </div>
 
             <h1 className="text-2xl font-black text-slate-900">
-              Edit Teacher Profile
+              Edit Admin Profile
             </h1>
 
             <p className="mt-1 text-sm font-medium text-slate-500">
-              Update teacher information, profile image and password.
+              Update your admin information, profile image and password.
             </p>
           </div>
 
-          <div className="rounded-2xl bg-purple-50 px-4 py-3 text-sm font-black text-purple-700">
+          <div className="rounded-2xl bg-[#EAF1FB] px-4 py-3 text-sm font-black text-[#0D4598]">
             {profile.email}
           </div>
         </div>
@@ -387,16 +398,16 @@ export default function TeacherProfilePage() {
                 {displayImage ? (
                   <img
                     src={displayImage}
-                    alt="Teacher profile"
+                    alt="Admin profile"
                     className="h-36 w-36 rounded-3xl border border-slate-200 object-cover"
                   />
                 ) : (
-                  <div className="flex h-36 w-36 items-center justify-center rounded-3xl bg-purple-600 text-5xl font-black text-white">
+                  <div className="flex h-36 w-36 items-center justify-center rounded-3xl bg-[#0D4598] text-5xl font-black text-white">
                     {initial}
                   </div>
                 )}
 
-                <label className="absolute -bottom-2 -right-2 flex h-11 w-11 cursor-pointer items-center justify-center rounded-2xl border-4 border-white bg-purple-600 text-white shadow-lg transition hover:bg-purple-700">
+                <label className="absolute -bottom-2 -right-2 flex h-11 w-11 cursor-pointer items-center justify-center rounded-2xl border-4 border-white bg-[#0D4598] text-white shadow-lg transition hover:bg-[#083777]">
                   <FaCamera size={16} />
                   <input
                     type="file"
@@ -408,26 +419,26 @@ export default function TeacherProfilePage() {
               </div>
 
               <h2 className="mt-4 text-xl font-black text-slate-900">
-                {profile.name || "Teacher User"}
+                {profile.name || "Admin User"}
               </h2>
 
               <p className="mt-1 text-sm font-semibold text-slate-500">
-                {profile.designation || "Teacher"}
+                {profile.designation || "Administrator"}
               </p>
 
               <div className="mt-4 w-full rounded-2xl bg-[#F7F9FC] p-3 text-left">
                 <div className="mb-3 flex items-center gap-3 text-sm font-bold text-slate-600">
-                  <FaEnvelope className="text-purple-600" />
+                  <FaEnvelope className="text-[#0D4598]" />
                   <span className="truncate">{profile.email || "-"}</span>
                 </div>
 
                 <div className="mb-3 flex items-center gap-3 text-sm font-bold text-slate-600">
-                  <FaPhoneAlt className="text-purple-600" />
+                  <FaPhoneAlt className="text-[#0D4598]" />
                   <span>{profile.phone || "-"}</span>
                 </div>
 
                 <div className="flex items-center gap-3 text-sm font-bold text-slate-600">
-                  <FaMapMarkerAlt className="text-purple-600" />
+                  <FaMapMarkerAlt className="text-[#0D4598]" />
                   <span>
                     {[profile.city, profile.country]
                       .filter(Boolean)
@@ -448,22 +459,21 @@ export default function TeacherProfilePage() {
               className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
             >
               <div className="mb-4 flex items-center gap-3 border-b border-slate-100 pb-4">
-                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-purple-50 text-purple-700">
-                  <FaChalkboardTeacher />
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#EAF1FB] text-[#0D4598]">
+                  <FaIdBadge />
                 </div>
 
                 <div>
                   <h2 className="text-lg font-black text-slate-900">
-                    Teacher Information
+                    Profile Information
                   </h2>
                   <p className="text-sm font-medium text-slate-500">
-                    Basic teacher account details.
+                    Basic admin account details.
                   </p>
                 </div>
               </div>
 
               {error ? <Alert type="error">{error}</Alert> : null}
-
               {success ? (
                 <Alert>
                   <span className="inline-flex items-center gap-2">
@@ -502,12 +512,12 @@ export default function TeacherProfilePage() {
                 />
 
                 <Field
-                  label="Instructor Title"
+                  label="Designation"
                   name="designation"
                   value={profile.designation}
                   onChange={handleProfileChange}
-                  placeholder="Driving Instructor / Senior Teacher"
-                  icon={FaChalkboardTeacher}
+                  placeholder="Admin / Manager / Founder"
+                  icon={FaIdBadge}
                 />
 
                 <SelectField
@@ -575,8 +585,8 @@ export default function TeacherProfilePage() {
                   onChange={handleProfileChange}
                   rows={4}
                   maxLength={500}
-                  placeholder="Write short teacher profile bio..."
-                  className="w-full resize-none rounded-xl border border-slate-200 bg-[#F7F9FC] px-3 py-3 text-sm font-semibold text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-50"
+                  placeholder="Write short admin profile bio..."
+                  className="w-full resize-none rounded-xl border border-slate-200 bg-[#F7F9FC] px-3 py-3 text-sm font-semibold text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-[#0D4598] focus:bg-white focus:ring-4 focus:ring-blue-50"
                 />
 
                 <span className="mt-1 block text-right text-xs font-semibold text-slate-400">
@@ -588,10 +598,10 @@ export default function TeacherProfilePage() {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-purple-600 px-5 py-3 text-sm font-black text-white transition hover:bg-purple-700 disabled:cursor-not-allowed disabled:opacity-70"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#0D4598] px-5 py-3 text-sm font-black text-white transition hover:bg-[#083777] disabled:cursor-not-allowed disabled:opacity-70"
                 >
                   {saving ? <FaSpinner className="animate-spin" /> : <FaSave />}
-                  {saving ? "Saving..." : "Save Teacher Profile"}
+                  {saving ? "Saving..." : "Save Profile"}
                 </button>
               </div>
             </form>
@@ -610,7 +620,7 @@ export default function TeacherProfilePage() {
                     Change Password
                   </h2>
                   <p className="text-sm font-medium text-slate-500">
-                    Keep teacher account secure.
+                    Keep your admin account secure.
                   </p>
                 </div>
               </div>
