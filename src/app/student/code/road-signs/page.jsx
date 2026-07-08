@@ -652,6 +652,7 @@
 
 // apply backend
 
+import { MdOutlineTraffic } from "react-icons/md";
 import LearningContentPage from "../_components/LearningContentPage";
 
 export default function RoadSignsPage() {
@@ -660,7 +661,7 @@ export default function RoadSignsPage() {
       type="road-sign"
       title="Road Signs"
       subtitle="Learn road signs, meanings, categories and then take related tests."
-      heroIcon="🚧"
+      heroIcon={<MdOutlineTraffic size={28} />}
       emptyText="No road signs added yet. Admin panel theke Road Signs add koren."
     />
   );

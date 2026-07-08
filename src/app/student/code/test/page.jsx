@@ -1,8 +1,19 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import {
+  IoAlertCircleOutline,
+  IoCheckmarkCircleOutline,
+  IoChevronBack,
+  IoChevronForward,
+  IoCloseCircleOutline,
+  IoFlagOutline,
+  IoHelpCircleOutline,
+  IoRefreshOutline,
+  IoSendOutline,
+} from "react-icons/io5";
 import {
   finishQuizAttempt,
   startQuizAttempt,
@@ -19,6 +30,63 @@ const getFullFileUrl = (path) => {
   return `${rootUrl}${path}`;
 };
 
+function MiniBox({ label, value }) {
+  return (
+    <div className="rounded-lg border border-[#E5EAF2] bg-[#F8FAFD] px-3 py-2">
+      <p className="text-[10px] font-black uppercase tracking-wide text-[#7B8190]">
+        {label}
+      </p>
+      <p className="mt-0.5 text-sm font-black text-[#0D4598]">{value}</p>
+    </div>
+  );
+}
+
+function PageMessage({ title, text, icon: Icon = IoAlertCircleOutline }) {
+  return (
+    <main className="min-h-screen bg-[#F7F9FC] px-4 py-4">
+      <div className="mx-auto max-w-2xl rounded-xl border border-[#E5EAF2] bg-white p-6 text-center shadow-sm">
+        <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-xl bg-[#EAF1FB] text-[#0D4598]">
+          <Icon size={22} />
+        </div>
+
+        <h1 className="mt-3 text-lg font-black text-[#151515]">{title}</h1>
+
+        <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[#7B8190]">
+          {text}
+        </p>
+
+        <Link
+          href="/student/code"
+          className="mt-4 inline-flex h-9 items-center justify-center rounded-lg bg-[#0D4598] px-4 text-xs font-black text-white transition hover:bg-[#083777]"
+        >
+          Back to Code
+        </Link>
+      </div>
+    </main>
+  );
+}
+
+function LoadingState() {
+  return (
+    <main className="min-h-screen bg-[#F7F9FC] px-4 py-4">
+      <div className="mx-auto max-w-4xl">
+        <div className="animate-pulse rounded-xl border border-[#E5EAF2] bg-white p-4 shadow-sm">
+          <div className="h-4 w-40 rounded bg-slate-200" />
+          <div className="mt-3 h-5 w-72 rounded bg-slate-200" />
+          <div className="mt-4 h-1.5 rounded-full bg-slate-200" />
+
+          <div className="mt-5 grid gap-2 md:grid-cols-2">
+            <div className="h-14 rounded-xl bg-slate-200" />
+            <div className="h-14 rounded-xl bg-slate-200" />
+            <div className="h-14 rounded-xl bg-slate-200" />
+            <div className="h-14 rounded-xl bg-slate-200" />
+          </div>
+        </div>
+      </div>
+    </main>
+  );
+}
+
 export default function StudentCodeTestPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -34,6 +102,7 @@ export default function StudentCodeTestPage() {
   const [answerMap, setAnswerMap] = useState({});
   const [checking, setChecking] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const currentQuestion = questions[currentIndex];
 
@@ -41,14 +110,25 @@ export default function StudentCodeTestPage() {
     return Object.keys(answerMap).length;
   }, [answerMap]);
 
-  const startTest = async () => {
+  const progressPercent = useMemo(() => {
+    if (!questions.length) return 0;
+    return Math.round(((currentIndex + 1) / questions.length) * 100);
+  }, [currentIndex, questions.length]);
+
+  const answeredPercent = useMemo(() => {
+    if (!questions.length) return 0;
+    return Math.round((answeredCount / questions.length) * 100);
+  }, [answeredCount, questions.length]);
+
+  const startTest = useCallback(async () => {
     if (!quizId) {
-      alert("Quiz ID missing.");
+      setError("Quiz ID missing.");
       return;
     }
 
     try {
       setLoading(true);
+      setError("");
 
       const res = await startQuizAttempt(quizId);
       const data = res?.data?.data;
@@ -60,26 +140,31 @@ export default function StudentCodeTestPage() {
       setSelectedOptionIndex(null);
       setAnswerMap({});
     } catch (error) {
-      alert(error?.response?.data?.message || "Failed to start test");
+      setError(
+        error?.response?.data?.message ||
+          error.message ||
+          "Failed to start test",
+      );
     } finally {
       setLoading(false);
     }
-  };
+  }, [quizId]);
 
   useEffect(() => {
     startTest();
-  }, [quizId]);
+  }, [startTest]);
 
   const submitCurrentAnswer = async () => {
     if (!attempt?._id || !currentQuestion?._id) return;
 
     if (selectedOptionIndex === null) {
-      alert("Please select one option.");
+      setError("Please select one option.");
       return;
     }
 
     try {
       setChecking(true);
+      setError("");
 
       const res = await submitQuizAnswer(attempt._id, {
         questionId: currentQuestion._id,
@@ -94,7 +179,11 @@ export default function StudentCodeTestPage() {
         [currentQuestion._id]: answerResult,
       }));
     } catch (error) {
-      alert(error?.response?.data?.message || "Answer submit failed");
+      setError(
+        error?.response?.data?.message ||
+          error.message ||
+          "Answer submit failed",
+      );
     } finally {
       setChecking(false);
     }
@@ -136,7 +225,7 @@ export default function StudentCodeTestPage() {
     if (!attempt?._id) return;
 
     if (answeredCount < questions.length) {
-      const ok = confirm(
+      const ok = window.confirm(
         `You answered ${answeredCount}/${questions.length}. Finish anyway?`,
       );
       if (!ok) return;
@@ -144,6 +233,7 @@ export default function StudentCodeTestPage() {
 
     try {
       setLoading(true);
+      setError("");
 
       const res = await finishQuizAttempt(attempt._id);
       const finishedAttempt = res?.data?.data;
@@ -154,7 +244,11 @@ export default function StudentCodeTestPage() {
         }${contentId ? `&contentId=${contentId}` : ""}`,
       );
     } catch (error) {
-      alert(error?.response?.data?.message || "Failed to finish test");
+      setError(
+        error?.response?.data?.message ||
+          error.message ||
+          "Failed to finish test",
+      );
     } finally {
       setLoading(false);
     }
@@ -166,137 +260,203 @@ export default function StudentCodeTestPage() {
 
   if (!quizId) {
     return (
-      <div className="min-h-screen bg-slate-50 p-6">
-        <div className="mx-auto max-w-3xl rounded-3xl bg-white p-8 text-center shadow-sm">
-          <h1 className="text-2xl font-black text-slate-900">Quiz Missing</h1>
-          <p className="mt-2 text-sm text-slate-500">
-            Ei content-er sathe kono quiz connect kora hoy nai.
-          </p>
-          <Link
-            href="/student/code"
-            className="mt-5 inline-block rounded-2xl bg-red-500 px-5 py-3 text-sm font-bold text-white"
-          >
-            Back to Code
-          </Link>
-        </div>
-      </div>
+      <PageMessage
+        title="Quiz Missing"
+        text="Ei content-er sathe kono quiz connect kora hoy nai."
+      />
     );
   }
 
   if (loading && !currentQuestion) {
-    return (
-      <div className="min-h-screen bg-slate-50 p-6">
-        <div className="mx-auto max-w-3xl rounded-3xl bg-white p-8 text-center text-sm text-slate-500 shadow-sm">
-          Starting test...
-        </div>
-      </div>
-    );
+    return <LoadingState />;
   }
 
   if (!currentQuestion) {
     return (
-      <div className="min-h-screen bg-slate-50 p-6">
-        <div className="mx-auto max-w-3xl rounded-3xl bg-white p-8 text-center shadow-sm">
-          <h1 className="text-2xl font-black text-slate-900">
-            No Question Found
-          </h1>
-          <p className="mt-2 text-sm text-slate-500">
-            Admin panel theke ei quiz-er question add korte hobe.
-          </p>
-          <Link
-            href="/student/code"
-            className="mt-5 inline-block rounded-2xl bg-red-500 px-5 py-3 text-sm font-bold text-white"
-          >
-            Back to Code
-          </Link>
-        </div>
-      </div>
+      <PageMessage
+        title="No Question Found"
+        text="Admin panel theke ei quiz-er question add korte hobe."
+        icon={IoHelpCircleOutline}
+      />
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 p-4 md:p-6">
-      <div className="mx-auto max-w-5xl space-y-6">
-        <div className="rounded-3xl bg-white p-6 shadow-sm">
-          <Link href="/student/code" className="text-sm font-bold text-red-500">
-            ← Back to Code
-          </Link>
+    <main className="min-h-screen bg-[#F7F9FC] px-4 py-3">
+      <div className="mx-auto max-w-4xl">
+        {/* Header */}
+        <header className="mb-3 rounded-xl border border-[#E5EAF2] bg-white p-3 shadow-sm">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div className="flex items-center gap-3">
+              <Link
+                href="/student/code"
+                className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#EAF1FB] text-[#0D4598] transition hover:bg-[#0D4598] hover:text-white"
+              >
+                <IoChevronBack size={22} />
+              </Link>
 
-          <div className="mt-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div>
-              <h1 className="text-2xl font-black text-slate-900">
-                {quiz?.title || "Code Test"}
-              </h1>
-              <p className="mt-1 text-sm text-slate-500">
-                Question {currentIndex + 1} of {questions.length}
-              </p>
+              <div>
+                <div className="mb-1 inline-flex rounded-md bg-[#EAF1FB] px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-[#0D4598]">
+                  Student Panel / Code Test
+                </div>
+
+                <h1 className="line-clamp-1 text-lg font-black text-[#151515]">
+                  {quiz?.title || "Code Test"}
+                </h1>
+
+                <p className="mt-0.5 text-xs font-semibold text-[#7B8190]">
+                  Question {currentIndex + 1} of {questions.length}
+                </p>
+              </div>
             </div>
 
-            <div className="rounded-2xl bg-slate-50 px-5 py-3 text-sm font-bold text-slate-700">
-              Answered: {answeredCount}/{questions.length}
+            <button
+              type="button"
+              onClick={startTest}
+              className="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-[#DDE6F3] bg-white px-3 text-xs font-black text-[#0D4598] transition hover:bg-[#EAF1FB]"
+            >
+              <IoRefreshOutline size={16} />
+              Restart
+            </button>
+          </div>
+
+          <div className="mt-3 grid grid-cols-2 gap-2 md:grid-cols-4">
+            <MiniBox
+              label="Current"
+              value={`${currentIndex + 1}/${questions.length}`}
+            />
+            <MiniBox label="Answered" value={answeredCount} />
+            <MiniBox
+              label="Remaining"
+              value={questions.length - answeredCount}
+            />
+            <MiniBox label="Progress" value={`${answeredPercent}%`} />
+          </div>
+
+          <div className="mt-3">
+            <div className="mb-1 flex items-center justify-between text-[11px] font-bold text-[#7B8190]">
+              <span>Test Progress</span>
+              <span>{progressPercent}%</span>
+            </div>
+
+            <div className="h-1.5 overflow-hidden rounded-full bg-[#EDF1F7]">
+              <div
+                className="h-full rounded-full bg-[#0D4598]"
+                style={{ width: `${progressPercent}%` }}
+              />
             </div>
           </div>
+        </header>
 
-          <div className="mt-5 h-2 overflow-hidden rounded-full bg-slate-100">
-            <div
-              className="h-full rounded-full bg-red-500"
-              style={{
-                width: `${((currentIndex + 1) / questions.length) * 100}%`,
-              }}
-            ></div>
+        {/* Error */}
+        {error && (
+          <div className="mb-3 flex items-center gap-2 rounded-lg border border-red-100 bg-red-50 p-3 text-sm font-semibold text-red-700">
+            <IoAlertCircleOutline size={20} />
+            <span>{error}</span>
           </div>
-        </div>
+        )}
 
-        <div className="rounded-3xl bg-white p-6 shadow-sm">
-          <h2 className="text-xl font-black text-slate-900">
+        {/* Question Card */}
+        <section className="rounded-xl border border-[#E5EAF2] bg-white p-4 shadow-sm">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+            <div className="inline-flex h-7 items-center rounded-md bg-[#EAF1FB] px-3 text-[10px] font-black uppercase tracking-wide text-[#0D4598]">
+              Question {String(currentIndex + 1).padStart(2, "0")}
+            </div>
+
+            {alreadyAnswered ? (
+              <span
+                className={`inline-flex h-7 items-center gap-1 rounded-md px-3 text-[10px] font-black ${
+                  alreadyAnswered.isCorrect
+                    ? "bg-green-50 text-green-700"
+                    : "bg-red-50 text-red-700"
+                }`}
+              >
+                {alreadyAnswered.isCorrect ? (
+                  <IoCheckmarkCircleOutline size={15} />
+                ) : (
+                  <IoCloseCircleOutline size={15} />
+                )}
+                {alreadyAnswered.isCorrect ? "Correct" : "Wrong"}
+              </span>
+            ) : (
+              <span className="inline-flex h-7 items-center rounded-md bg-[#F1F4F8] px-3 text-[10px] font-black text-[#667085]">
+                Select one answer
+              </span>
+            )}
+          </div>
+
+          <h2 className="text-base font-black leading-6 text-[#151515]">
             {currentQuestion.questionText}
           </h2>
 
           {currentQuestion.questionImage && (
-            <img
-              src={getFullFileUrl(currentQuestion.questionImage)}
-              alt="Question"
-              className="mt-5 max-h-[320px] w-full rounded-3xl object-contain"
-            />
+            <div className="mt-3 rounded-xl border border-[#E5EAF2] bg-[#F8FAFD] p-2">
+              <img
+                src={getFullFileUrl(currentQuestion.questionImage)}
+                alt="Question"
+                className="max-h-[220px] w-full rounded-lg object-contain"
+              />
+            </div>
           )}
 
-          <div className="mt-6 grid gap-3">
+          <div className="mt-4 grid gap-2 md:grid-cols-2">
             {currentQuestion.options?.map((option, index) => {
               const isSelected = selectedOptionIndex === index;
+
               const isCorrect =
                 alreadyAnswered?.correctOptionIndex === index &&
                 alreadyAnswered?.isCorrect !== undefined;
+
               const isWrongSelected =
                 alreadyAnswered?.selectedOptionIndex === index &&
                 alreadyAnswered?.isCorrect === false;
 
+              const optionClass = isCorrect
+                ? "border-green-500 bg-green-50 text-green-700"
+                : isWrongSelected
+                  ? "border-red-500 bg-red-50 text-red-700"
+                  : isSelected
+                    ? "border-[#0D4598] bg-[#EAF1FB] text-[#0D4598]"
+                    : "border-[#E5EAF2] bg-white text-[#151515] hover:border-[#0D4598] hover:bg-[#F8FAFD]";
+
               return (
                 <button
                   key={index}
+                  type="button"
                   disabled={Boolean(alreadyAnswered)}
-                  onClick={() => setSelectedOptionIndex(index)}
-                  className={`rounded-2xl border p-4 text-left text-sm font-semibold transition ${
-                    isCorrect
-                      ? "border-green-500 bg-green-50 text-green-700"
-                      : isWrongSelected
-                        ? "border-red-500 bg-red-50 text-red-700"
-                        : isSelected
-                          ? "border-red-500 bg-red-50 text-red-600"
-                          : "border-slate-200 bg-white text-slate-700 hover:border-red-300"
-                  }`}
+                  onClick={() => {
+                    setSelectedOptionIndex(index);
+                    setError("");
+                  }}
+                  className={`rounded-lg border p-3 text-left text-sm font-semibold transition disabled:cursor-not-allowed ${optionClass}`}
                 >
-                  <span className="mr-2 font-black">
-                    {String.fromCharCode(65 + index)}.
-                  </span>
-                  {option.text}
+                  <div className="flex items-start gap-2">
+                    <span
+                      className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-xs font-black ${
+                        isCorrect
+                          ? "bg-green-600 text-white"
+                          : isWrongSelected
+                            ? "bg-red-600 text-white"
+                            : isSelected
+                              ? "bg-[#0D4598] text-white"
+                              : "bg-[#EAF1FB] text-[#0D4598]"
+                      }`}
+                    >
+                      {String.fromCharCode(65 + index)}
+                    </span>
 
-                  {option.image && (
-                    <img
-                      src={getFullFileUrl(option.image)}
-                      alt={option.text}
-                      className="mt-3 max-h-32 rounded-xl object-contain"
-                    />
-                  )}
+                    <div className="min-w-0 flex-1">
+                      <p className="leading-5">{option.text}</p>
+
+                      {option.image && (
+                        <img
+                          src={getFullFileUrl(option.image)}
+                          alt={option.text}
+                          className="mt-2 max-h-24 rounded-md border border-[#E5EAF2] object-contain"
+                        />
+                      )}
+                    </div>
+                  </div>
                 </button>
               );
             })}
@@ -304,72 +464,88 @@ export default function StudentCodeTestPage() {
 
           {alreadyAnswered && (
             <div
-              className={`mt-5 rounded-2xl p-4 text-sm ${
+              className={`mt-3 rounded-lg border p-3 text-sm ${
                 alreadyAnswered.isCorrect
-                  ? "bg-green-50 text-green-700"
-                  : "bg-red-50 text-red-700"
+                  ? "border-green-100 bg-green-50 text-green-700"
+                  : "border-red-100 bg-red-50 text-red-700"
               }`}
             >
-              <p className="font-black">
+              <p className="flex items-center gap-2 font-black">
+                {alreadyAnswered.isCorrect ? (
+                  <IoCheckmarkCircleOutline size={17} />
+                ) : (
+                  <IoCloseCircleOutline size={17} />
+                )}
                 {alreadyAnswered.isCorrect ? "Correct Answer!" : "Wrong Answer"}
               </p>
 
               {alreadyAnswered.explanationText && (
-                <p className="mt-2 leading-6">
+                <p className="mt-1.5 leading-6">
                   {alreadyAnswered.explanationText}
                 </p>
               )}
             </div>
           )}
 
-          <div className="mt-6 flex flex-wrap justify-between gap-3">
+          {/* Bottom Actions */}
+          <div className="mt-4 flex flex-wrap justify-between gap-2 border-t border-[#E5EAF2] pt-3">
             <button
+              type="button"
               onClick={goPrevious}
               disabled={currentIndex === 0}
-              className="rounded-2xl bg-slate-100 px-5 py-3 text-sm font-bold text-slate-700 disabled:opacity-50"
+              className="inline-flex h-9 items-center gap-1 rounded-lg border border-[#DDE6F3] bg-white px-3 text-xs font-black text-[#0D4598] transition hover:bg-[#EAF1FB] disabled:cursor-not-allowed disabled:opacity-40"
             >
+              <IoChevronBack size={16} />
               Previous
             </button>
 
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-2">
               {!alreadyAnswered ? (
                 <button
+                  type="button"
                   onClick={submitCurrentAnswer}
                   disabled={checking}
-                  className="rounded-2xl bg-red-500 px-5 py-3 text-sm font-bold text-white disabled:opacity-60"
+                  className="inline-flex h-9 items-center gap-2 rounded-lg bg-[#0D4598] px-4 text-xs font-black text-white transition hover:bg-[#083777] disabled:cursor-not-allowed disabled:opacity-60"
                 >
+                  <IoSendOutline size={15} />
                   {checking ? "Checking..." : "Submit Answer"}
                 </button>
               ) : currentIndex < questions.length - 1 ? (
                 <button
+                  type="button"
                   onClick={goNext}
-                  className="rounded-2xl bg-slate-900 px-5 py-3 text-sm font-bold text-white"
+                  className="inline-flex h-9 items-center gap-1 rounded-lg bg-[#0D4598] px-4 text-xs font-black text-white transition hover:bg-[#083777]"
                 >
                   Next
+                  <IoChevronForward size={16} />
                 </button>
               ) : (
                 <button
+                  type="button"
                   onClick={finishTest}
                   disabled={loading}
-                  className="rounded-2xl bg-green-600 px-5 py-3 text-sm font-bold text-white disabled:opacity-60"
+                  className="inline-flex h-9 items-center gap-1 rounded-lg bg-green-600 px-4 text-xs font-black text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  {loading ? "Finishing..." : "Finish & See Result"}
+                  <IoFlagOutline size={16} />
+                  {loading ? "Finishing..." : "Finish & Result"}
                 </button>
               )}
 
               {currentIndex < questions.length - 1 && alreadyAnswered && (
                 <button
+                  type="button"
                   onClick={finishTest}
                   disabled={loading}
-                  className="rounded-2xl bg-green-600 px-5 py-3 text-sm font-bold text-white disabled:opacity-60"
+                  className="inline-flex h-9 items-center gap-1 rounded-lg border border-green-100 bg-green-50 px-4 text-xs font-black text-green-700 transition hover:bg-green-100 disabled:cursor-not-allowed disabled:opacity-60"
                 >
+                  <IoFlagOutline size={16} />
                   Finish Test
                 </button>
               )}
             </div>
           </div>
-        </div>
+        </section>
       </div>
-    </div>
+    </main>
   );
 }
