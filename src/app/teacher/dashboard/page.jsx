@@ -57,7 +57,7 @@ export default function TeacherDashboardPage() {
 
   return (
     <div className="flex min-h-screen w-full max-w-full bg-white max-md:flex-col">
-      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+      {/* <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} /> */}
 
       <main className="min-w-0 flex-1 overflow-x-hidden bg-white px-3 py-4 sm:px-5 lg:px-6">
         {tabComponents[activeTab] || <Dashboard />}
