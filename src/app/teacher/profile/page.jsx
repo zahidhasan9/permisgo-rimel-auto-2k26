@@ -1,701 +1,290 @@
 // "use client";
 
-// import { useEffect, useMemo, useState } from "react";
+// import { useState } from "react";
 // import {
+//   FaCalendarAlt,
 //   FaCamera,
-//   FaCheckCircle,
-//   FaEnvelope,
-//   FaChalkboardTeacher,
-//   FaKey,
-//   FaMapMarkerAlt,
-//   FaPhoneAlt,
-//   FaSave,
-//   FaSpinner,
-//   FaUser,
+//   FaChevronDown,
+//   FaChevronLeft,
+//   FaChevronUp,
 // } from "react-icons/fa";
-// import { getLoggedInUser, updateProfile, changePassword } from "@/features/API";
-// import { mediaUrl } from "@/utils/mediaUrl";
+// import { SiGmail } from "react-icons/si";
+// import { useRouter } from "next/navigation";
+// const statusOptions = [
+//   "Independent Driving Instructor",
+//   "Salaried Driving Instructor",
+//   "Driving Instructor Job Seeker",
+//   "ESCR Student",
+//   "Driving School Manager",
+//   "Others",
+// ];
 
-// const emptyProfile = {
-//   name: "",
-//   email: "",
-//   phone: "",
-//   designation: "",
-//   gender: "",
-//   dateOfBirth: "",
-//   address: "",
-//   city: "",
-//   country: "",
-//   language: "",
-//   bio: "",
-//   avatar: "",
-// };
+// const inputClass =
+//   "h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm font-medium text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-[#103f8f] focus:ring-4 focus:ring-blue-50";
 
-// const emptyPassword = {
-//   currentPassword: "",
-//   newPassword: "",
-//   confirmPassword: "",
-// };
+// const labelClass = "mb-2 block text-sm font-semibold text-slate-700";
 
-// function getPayloadUser(res) {
-//   return res?.data?.data?.user || res?.data?.user || res?.data?.data || null;
-// }
-
-// function formatDateInput(value) {
-//   if (!value) return "";
-//   const date = new Date(value);
-//   if (Number.isNaN(date.getTime())) return "";
-//   return date.toISOString().slice(0, 10);
-// }
-
-// function Field({
-//   label,
-//   name,
-//   value,
-//   onChange,
-//   placeholder,
-//   type = "text",
-//   icon: Icon,
-//   disabled = false,
-// }) {
+// export default function Profile() {
+//   const [statusOpen, setStatusOpen] = useState(false);
+//   const [status, setStatus] = useState("ESCR Student");
+//   const [vehicleType, setVehicleType] = useState("Manual Car");
+//   const router = useRouter();
 //   return (
-//     <label className="block">
-//       <span className="mb-1.5 block text-xs font-black uppercase tracking-wide text-slate-500">
-//         {label}
-//       </span>
+//     <main className="min-h-screen bg-[#f7f9fc] px-4 py-6 sm:px-6 lg:px-8">
+//       <section className="mx-auto ">
+//         {/* Header */}
+//         <div className="mb-6 flex items-start gap-4">
+//           <button
+//             onClick={() => router.back()}
+//             type="button"
+//             className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-[#103f8f] shadow-sm transition hover:bg-blue-50"
+//           >
+//             <FaChevronLeft size={16} />
+//           </button>
 
-//       <div className="relative">
-//         {Icon ? (
-//           <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
-//             <Icon size={14} />
-//           </span>
-//         ) : null}
-
-//         <input
-//           type={type}
-//           name={name}
-//           value={value || ""}
-//           disabled={disabled}
-//           onChange={onChange}
-//           placeholder={placeholder}
-//           className={`h-11 w-full rounded-xl border border-slate-200 bg-[#F7F9FC] px-3 text-sm font-semibold text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-50 ${
-//             Icon ? "pl-9" : ""
-//           } ${disabled ? "cursor-not-allowed opacity-70" : ""}`}
-//         />
-//       </div>
-//     </label>
-//   );
-// }
-
-// function SelectField({ label, name, value, onChange, children }) {
-//   return (
-//     <label className="block">
-//       <span className="mb-1.5 block text-xs font-black uppercase tracking-wide text-slate-500">
-//         {label}
-//       </span>
-
-//       <select
-//         name={name}
-//         value={value || ""}
-//         onChange={onChange}
-//         className="h-11 w-full rounded-xl border border-slate-200 bg-[#F7F9FC] px-3 text-sm font-bold text-slate-800 outline-none transition focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-50"
-//       >
-//         {children}
-//       </select>
-//     </label>
-//   );
-// }
-
-// function Alert({ type = "success", children }) {
-//   const className =
-//     type === "error"
-//       ? "border-rose-200 bg-rose-50 text-rose-700"
-//       : "border-emerald-200 bg-emerald-50 text-emerald-700";
-
-//   return (
-//     <div
-//       className={`mb-4 rounded-2xl border px-4 py-3 text-sm font-bold ${className}`}
-//     >
-//       {children}
-//     </div>
-//   );
-// }
-
-// export default function TeacherProfilePage() {
-//   const [profile, setProfile] = useState(emptyProfile);
-//   const [avatarFile, setAvatarFile] = useState(null);
-//   const [avatarPreview, setAvatarPreview] = useState("");
-//   const [passwordForm, setPasswordForm] = useState(emptyPassword);
-
-//   const [loading, setLoading] = useState(true);
-//   const [saving, setSaving] = useState(false);
-//   const [passwordSaving, setPasswordSaving] = useState(false);
-
-//   const [error, setError] = useState("");
-//   const [success, setSuccess] = useState("");
-//   const [passwordError, setPasswordError] = useState("");
-//   const [passwordSuccess, setPasswordSuccess] = useState("");
-
-//   const displayImage = useMemo(() => {
-//     if (avatarPreview) return avatarPreview;
-//     if (profile.avatar) return mediaUrl(profile.avatar);
-//     return "";
-//   }, [avatarPreview, profile.avatar]);
-
-//   const initial = useMemo(() => {
-//     return String(profile.name || profile.email || "T")
-//       .trim()
-//       .charAt(0)
-//       .toUpperCase();
-//   }, [profile.name, profile.email]);
-
-//   async function loadProfile() {
-//     try {
-//       setLoading(true);
-//       setError("");
-
-//       const res = await getLoggedInUser();
-//       const user = getPayloadUser(res);
-
-//       if (!user) throw new Error("Profile data not found.");
-
-//       setProfile({
-//         name: user.name || "",
-//         email: user.email || "",
-//         phone: user.phone || "",
-//         designation: user.designation || "",
-//         gender: user.gender || "",
-//         dateOfBirth: formatDateInput(user.dateOfBirth),
-//         address: user.address || "",
-//         city: user.city || "",
-//         country: user.country || "",
-//         language: user.language || "",
-//         bio: user.bio || "",
-//         avatar: user.avatar || "",
-//       });
-
-//       localStorage.setItem("user", JSON.stringify(user));
-//     } catch (err) {
-//       setError(
-//         err.response?.data?.message || err.message || "Failed to load profile.",
-//       );
-//     } finally {
-//       setLoading(false);
-//     }
-//   }
-
-//   useEffect(() => {
-//     loadProfile();
-//   }, []);
-
-//   function handleProfileChange(e) {
-//     const { name, value } = e.target;
-
-//     setProfile((prev) => ({
-//       ...prev,
-//       [name]: value,
-//     }));
-//   }
-
-//   function handlePasswordChange(e) {
-//     const { name, value } = e.target;
-
-//     setPasswordForm((prev) => ({
-//       ...prev,
-//       [name]: value,
-//     }));
-//   }
-
-//   function handleAvatarChange(e) {
-//     const file = e.target.files?.[0];
-
-//     setError("");
-//     setSuccess("");
-
-//     if (!file) return;
-
-//     const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
-
-//     if (!allowedTypes.includes(file.type)) {
-//       setError("Only JPG, PNG and WEBP image files are allowed.");
-//       return;
-//     }
-
-//     if (file.size > 3 * 1024 * 1024) {
-//       setError("Image size must be less than 3MB.");
-//       return;
-//     }
-
-//     setAvatarFile(file);
-//     setAvatarPreview(URL.createObjectURL(file));
-//   }
-
-//   async function handleSubmit(e) {
-//     e.preventDefault();
-
-//     try {
-//       setSaving(true);
-//       setError("");
-//       setSuccess("");
-
-//       if (!profile.name.trim()) {
-//         setError("Name is required.");
-//         return;
-//       }
-
-//       const formData = new FormData();
-
-//       formData.append("name", profile.name);
-//       formData.append("phone", profile.phone || "");
-//       formData.append("designation", profile.designation || "");
-//       formData.append("gender", profile.gender || "");
-//       formData.append("dateOfBirth", profile.dateOfBirth || "");
-//       formData.append("address", profile.address || "");
-//       formData.append("city", profile.city || "");
-//       formData.append("country", profile.country || "");
-//       formData.append("language", profile.language || "");
-//       formData.append("bio", profile.bio || "");
-
-//       if (avatarFile) {
-//         formData.append("avatar", avatarFile);
-//       }
-
-//       const res = await updateProfile(formData);
-//       const updatedUser = getPayloadUser(res);
-
-//       if (!updatedUser) throw new Error("Profile update response not found.");
-
-//       setProfile({
-//         name: updatedUser.name || "",
-//         email: updatedUser.email || "",
-//         phone: updatedUser.phone || "",
-//         designation: updatedUser.designation || "",
-//         gender: updatedUser.gender || "",
-//         dateOfBirth: formatDateInput(updatedUser.dateOfBirth),
-//         address: updatedUser.address || "",
-//         city: updatedUser.city || "",
-//         country: updatedUser.country || "",
-//         language: updatedUser.language || "",
-//         bio: updatedUser.bio || "",
-//         avatar: updatedUser.avatar || "",
-//       });
-
-//       setAvatarFile(null);
-//       setAvatarPreview("");
-
-//       localStorage.setItem("user", JSON.stringify(updatedUser));
-//       window.dispatchEvent(
-//         new CustomEvent("profile-updated", { detail: updatedUser }),
-//       );
-
-//       setSuccess("Teacher profile updated successfully.");
-//     } catch (err) {
-//       setError(
-//         err.response?.data?.message ||
-//           err.message ||
-//           "Failed to update profile.",
-//       );
-//     } finally {
-//       setSaving(false);
-//     }
-//   }
-
-//   async function handlePasswordSubmit(e) {
-//     e.preventDefault();
-
-//     try {
-//       setPasswordSaving(true);
-//       setPasswordError("");
-//       setPasswordSuccess("");
-
-//       if (
-//         !passwordForm.currentPassword ||
-//         !passwordForm.newPassword ||
-//         !passwordForm.confirmPassword
-//       ) {
-//         setPasswordError("All password fields are required.");
-//         return;
-//       }
-
-//       if (passwordForm.newPassword.length < 6) {
-//         setPasswordError("New password must be at least 6 characters.");
-//         return;
-//       }
-
-//       if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-//         setPasswordError("New password and confirm password do not match.");
-//         return;
-//       }
-
-//       await changePassword(passwordForm);
-
-//       setPasswordForm(emptyPassword);
-//       setPasswordSuccess("Password changed successfully.");
-//     } catch (err) {
-//       setPasswordError(
-//         err.response?.data?.message ||
-//           err.message ||
-//           "Failed to change password.",
-//       );
-//     } finally {
-//       setPasswordSaving(false);
-//     }
-//   }
-
-//   if (loading) {
-//     return (
-//       <main className="min-h-screen bg-[#F7F9FC] p-4">
-//         <div className="flex min-h-[420px] items-center justify-center rounded-2xl border border-slate-200 bg-white">
-//           <div className="flex items-center gap-3 text-sm font-black text-purple-700">
-//             <FaSpinner className="animate-spin" />
-//             Loading teacher profile...
-//           </div>
-//         </div>
-//       </main>
-//     );
-//   }
-
-//   return (
-//     <main className="min-h-screen bg-[#F7F9FC] p-3 md:p-4 lg:p-5">
-//       <div className="mx-auto max-w-[1320px]">
-//         <div className="mb-4 flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm md:flex-row md:items-center md:justify-between">
 //           <div>
-//             <div className="mb-1 flex flex-wrap items-center gap-1 text-xs font-bold text-slate-400">
-//               <span>Teacher</span>
-//               <span>/</span>
-//               <span className="text-slate-600">Edit Profile</span>
-//             </div>
-
-//             <h1 className="text-2xl font-black text-slate-900">
-//               Edit Teacher Profile
-//             </h1>
-
-//             <p className="mt-1 text-sm font-medium text-slate-500">
-//               Update teacher information, profile image and password.
+//             <h1 className="text-2xl font-bold text-[#103f8f]">Profile</h1>
+//             <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-500">
+//               Update your information to ensure accurate lesson scheduling and
+//               communication.
 //             </p>
 //           </div>
-
-//           <div className="rounded-2xl bg-purple-50 px-4 py-3 text-sm font-black text-purple-700">
-//             {profile.email}
-//           </div>
 //         </div>
 
-//         <div className="grid grid-cols-1 gap-4 lg:grid-cols-[360px_minmax(0,1fr)]">
-//           <aside className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-//             <div className="flex flex-col items-center text-center">
-//               <div className="relative">
-//                 {displayImage ? (
-//                   <img
-//                     src={displayImage}
-//                     alt="Teacher profile"
-//                     className="h-36 w-36 rounded-3xl border border-slate-200 object-cover"
-//                   />
-//                 ) : (
-//                   <div className="flex h-36 w-36 items-center justify-center rounded-3xl bg-purple-600 text-5xl font-black text-white">
-//                     {initial}
-//                   </div>
-//                 )}
+//         {/* Main Card */}
+//         <div className="rounded-3xl bg-white p-4 shadow-sm ring-1 ring-slate-100 sm:p-6">
+//           {/* User Info */}
+//           <div className="mb-6 flex flex-col gap-4 rounded-2xl bg-[#eef4fb] p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+//             <div className="flex items-center gap-4">
+//               <div className="relative h-[78px] w-[78px] shrink-0">
+//                 <img
+//                   src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0dW491TS8p25zqH1JdG1fj-NRldx_t-MfzWk68jQEBw&s=10"
+//                   alt="Profile"
+//                   className="h-full w-full rounded-full border-4 border-white object-cover shadow-sm"
+//                 />
 
-//                 <label className="absolute -bottom-2 -right-2 flex h-11 w-11 cursor-pointer items-center justify-center rounded-2xl border-4 border-white bg-purple-600 text-white shadow-lg transition hover:bg-purple-700">
-//                   <FaCamera size={16} />
-//                   <input
-//                     type="file"
-//                     accept="image/jpeg,image/jpg,image/png,image/webp"
-//                     onChange={handleAvatarChange}
-//                     className="hidden"
-//                   />
-//                 </label>
+//                 <button
+//                   type="button"
+//                   className="absolute bottom-0 right-0 flex h-8 w-8 items-center justify-center rounded-full bg-[#103f8f] text-white shadow-md transition hover:bg-[#0b3272]"
+//                 >
+//                   <FaCamera size={13} />
+//                 </button>
 //               </div>
 
-//               <h2 className="mt-4 text-xl font-black text-slate-900">
-//                 {profile.name || "Teacher User"}
-//               </h2>
-
-//               <p className="mt-1 text-sm font-semibold text-slate-500">
-//                 {profile.designation || "Teacher"}
-//               </p>
-
-//               <div className="mt-4 w-full rounded-2xl bg-[#F7F9FC] p-3 text-left">
-//                 <div className="mb-3 flex items-center gap-3 text-sm font-bold text-slate-600">
-//                   <FaEnvelope className="text-purple-600" />
-//                   <span className="truncate">{profile.email || "-"}</span>
-//                 </div>
-
-//                 <div className="mb-3 flex items-center gap-3 text-sm font-bold text-slate-600">
-//                   <FaPhoneAlt className="text-purple-600" />
-//                   <span>{profile.phone || "-"}</span>
-//                 </div>
-
-//                 <div className="flex items-center gap-3 text-sm font-bold text-slate-600">
-//                   <FaMapMarkerAlt className="text-purple-600" />
-//                   <span>
-//                     {[profile.city, profile.country]
-//                       .filter(Boolean)
-//                       .join(", ") || "-"}
-//                   </span>
-//                 </div>
+//               <div>
+//                 <h2 className="text-xl font-bold text-slate-900">
+//                   Jenny Smith
+//                 </h2>
+//                 <p className="mt-1 flex items-center gap-2 text-sm text-slate-500">
+//                   <SiGmail className="text-[#e63946]" />
+//                   yourmail@mail.com
+//                 </p>
 //               </div>
+//             </div>
 
-//               <p className="mt-3 text-xs font-semibold leading-5 text-slate-400">
-//                 Image limit: JPG, PNG or WEBP. Maximum size 3MB.
+//             <button
+//               type="button"
+//               className="h-11 rounded-xl bg-[#103f8f] px-7 text-sm font-semibold text-white transition hover:bg-[#0b3272]"
+//             >
+//               Edit
+//             </button>
+//           </div>
+
+//           {/* Form */}
+//           <div>
+//             <div className="mb-5">
+//               <h3 className="text-xl font-bold text-slate-900">
+//                 Personal Details
+//               </h3>
+//               <p className="mt-1 text-sm text-slate-500">
+//                 Manage your personal and driving profile information.
 //               </p>
 //             </div>
-//           </aside>
 
-//           <section className="space-y-4">
-//             <form
-//               onSubmit={handleSubmit}
-//               className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
-//             >
-//               <div className="mb-4 flex items-center gap-3 border-b border-slate-100 pb-4">
-//                 <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-purple-50 text-purple-700">
-//                   <FaChalkboardTeacher />
-//                 </div>
+//             <form className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+//               <Field label="First Name" defaultValue="Jenny" />
+//               <Field label="Last Name" defaultValue="Smith" />
 
-//                 <div>
-//                   <h2 className="text-lg font-black text-slate-900">
-//                     Teacher Information
-//                   </h2>
-//                   <p className="text-sm font-medium text-slate-500">
-//                     Basic teacher account details.
-//                   </p>
+//               <div>
+//                 <label className={labelClass}>Date of birth</label>
+//                 <div className="relative">
+//                   <input
+//                     type="text"
+//                     defaultValue="Date"
+//                     className={`${inputClass} pr-11`}
+//                   />
+//                   <FaCalendarAlt className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" />
 //                 </div>
 //               </div>
 
-//               {error ? <Alert type="error">{error}</Alert> : null}
+//               <Field label="Address" defaultValue="House no : 100, Dhaka" />
 
-//               {success ? (
-//                 <Alert>
-//                   <span className="inline-flex items-center gap-2">
-//                     <FaCheckCircle /> {success}
-//                   </span>
-//                 </Alert>
-//               ) : null}
-
-//               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-//                 <Field
-//                   label="Full Name"
-//                   name="name"
-//                   value={profile.name}
-//                   onChange={handleProfileChange}
-//                   placeholder="Enter full name"
-//                   icon={FaUser}
-//                 />
-
-//                 <Field
-//                   label="Email"
-//                   name="email"
-//                   value={profile.email}
-//                   onChange={handleProfileChange}
-//                   placeholder="Email"
-//                   icon={FaEnvelope}
-//                   disabled
-//                 />
-
-//                 <Field
-//                   label="Phone"
-//                   name="phone"
-//                   value={profile.phone}
-//                   onChange={handleProfileChange}
-//                   placeholder="Enter phone number"
-//                   icon={FaPhoneAlt}
-//                 />
-
-//                 <Field
-//                   label="Instructor Title"
-//                   name="designation"
-//                   value={profile.designation}
-//                   onChange={handleProfileChange}
-//                   placeholder="Driving Instructor / Senior Teacher"
-//                   icon={FaChalkboardTeacher}
-//                 />
-
-//                 <SelectField
-//                   label="Gender"
-//                   name="gender"
-//                   value={profile.gender}
-//                   onChange={handleProfileChange}
-//                 >
-//                   <option value="">Select Gender</option>
-//                   <option value="male">Male</option>
-//                   <option value="female">Female</option>
-//                   <option value="other">Other</option>
-//                 </SelectField>
-
-//                 <Field
-//                   label="Date of Birth"
-//                   name="dateOfBirth"
-//                   type="date"
-//                   value={profile.dateOfBirth}
-//                   onChange={handleProfileChange}
-//                 />
-
-//                 <Field
-//                   label="City"
-//                   name="city"
-//                   value={profile.city}
-//                   onChange={handleProfileChange}
-//                   placeholder="Enter city"
-//                 />
-
-//                 <Field
-//                   label="Country"
-//                   name="country"
-//                   value={profile.country}
-//                   onChange={handleProfileChange}
-//                   placeholder="Enter country"
-//                 />
-
-//                 <Field
-//                   label="Language"
-//                   name="language"
-//                   value={profile.language}
-//                   onChange={handleProfileChange}
-//                   placeholder="English / Bangla / French"
-//                 />
-
-//                 <Field
-//                   label="Address"
-//                   name="address"
-//                   value={profile.address}
-//                   onChange={handleProfileChange}
-//                   placeholder="Enter address"
-//                   icon={FaMapMarkerAlt}
-//                 />
+//               <div>
+//                 <label className={labelClass}>Phone Number</label>
+//                 <div className="flex h-12 items-center rounded-xl border border-slate-200 bg-white px-4 transition focus-within:border-[#103f8f] focus-within:ring-4 focus-within:ring-blue-50">
+//                   <span className="mr-3 text-lg">🇧🇩</span>
+//                   <input
+//                     type="text"
+//                     defaultValue="+880988900"
+//                     className="w-full bg-transparent text-sm font-medium text-slate-800 outline-none"
+//                   />
+//                 </div>
 //               </div>
 
-//               <label className="mt-4 block">
-//                 <span className="mb-1.5 block text-xs font-black uppercase tracking-wide text-slate-500">
-//                   Bio
-//                 </span>
+//               <div>
+//                 <label className={labelClass}>Vehicle type</label>
+//                 <div className="relative">
+//                   <select
+//                     value={vehicleType}
+//                     onChange={(e) => setVehicleType(e.target.value)}
+//                     className={`${inputClass} appearance-none pr-11`}
+//                   >
+//                     <option>Manual Car</option>
+//                     <option>Automatic Car</option>
+//                     <option>Motorcycle</option>
+//                   </select>
+//                   <FaChevronDown className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" />
+//                 </div>
+//               </div>
 
-//                 <textarea
-//                   name="bio"
-//                   value={profile.bio || ""}
-//                   onChange={handleProfileChange}
-//                   rows={4}
-//                   maxLength={500}
-//                   placeholder="Write short teacher profile bio..."
-//                   className="w-full resize-none rounded-xl border border-slate-200 bg-[#F7F9FC] px-3 py-3 text-sm font-semibold text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-50"
-//                 />
+//               <div className="relative">
+//                 <label className={labelClass}>Select your current status</label>
 
-//                 <span className="mt-1 block text-right text-xs font-semibold text-slate-400">
-//                   {(profile.bio || "").length}/500
-//                 </span>
-//               </label>
-
-//               <div className="mt-5 flex justify-end">
 //                 <button
-//                   type="submit"
-//                   disabled={saving}
-//                   className="inline-flex items-center justify-center gap-2 rounded-xl bg-purple-600 px-5 py-3 text-sm font-black text-white transition hover:bg-purple-700 disabled:cursor-not-allowed disabled:opacity-70"
+//                   type="button"
+//                   onClick={() => setStatusOpen(!statusOpen)}
+//                   className="flex h-12 w-full items-center justify-between rounded-xl border border-slate-200 bg-white px-4 text-left text-sm font-medium text-slate-800 transition hover:bg-slate-50 focus:border-[#103f8f] focus:outline-none focus:ring-4 focus:ring-blue-50"
 //                 >
-//                   {saving ? <FaSpinner className="animate-spin" /> : <FaSave />}
-//                   {saving ? "Saving..." : "Save Teacher Profile"}
-//                 </button>
-//               </div>
-//             </form>
-
-//             <form
-//               onSubmit={handlePasswordSubmit}
-//               className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
-//             >
-//               <div className="mb-4 flex items-center gap-3 border-b border-slate-100 pb-4">
-//                 <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-amber-50 text-amber-600">
-//                   <FaKey />
-//                 </div>
-
-//                 <div>
-//                   <h2 className="text-lg font-black text-slate-900">
-//                     Change Password
-//                   </h2>
-//                   <p className="text-sm font-medium text-slate-500">
-//                     Keep teacher account secure.
-//                   </p>
-//                 </div>
-//               </div>
-
-//               {passwordError ? (
-//                 <Alert type="error">{passwordError}</Alert>
-//               ) : null}
-
-//               {passwordSuccess ? <Alert>{passwordSuccess}</Alert> : null}
-
-//               <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-//                 <Field
-//                   label="Current Password"
-//                   name="currentPassword"
-//                   type="password"
-//                   value={passwordForm.currentPassword}
-//                   onChange={handlePasswordChange}
-//                   placeholder="Current password"
-//                   icon={FaKey}
-//                 />
-
-//                 <Field
-//                   label="New Password"
-//                   name="newPassword"
-//                   type="password"
-//                   value={passwordForm.newPassword}
-//                   onChange={handlePasswordChange}
-//                   placeholder="New password"
-//                   icon={FaKey}
-//                 />
-
-//                 <Field
-//                   label="Confirm Password"
-//                   name="confirmPassword"
-//                   type="password"
-//                   value={passwordForm.confirmPassword}
-//                   onChange={handlePasswordChange}
-//                   placeholder="Confirm password"
-//                   icon={FaKey}
-//                 />
-//               </div>
-
-//               <div className="mt-5 flex justify-end">
-//                 <button
-//                   type="submit"
-//                   disabled={passwordSaving}
-//                   className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-black text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-70"
-//                 >
-//                   {passwordSaving ? (
-//                     <FaSpinner className="animate-spin" />
+//                   <span>{status}</span>
+//                   {statusOpen ? (
+//                     <FaChevronUp className="text-slate-400" />
 //                   ) : (
-//                     <FaKey />
+//                     <FaChevronDown className="text-slate-400" />
 //                   )}
-//                   {passwordSaving ? "Updating..." : "Update Password"}
+//                 </button>
+
+//                 {statusOpen && (
+//                   <div className="absolute z-30 mt-2 w-full overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-xl">
+//                     {statusOptions.map((item) => (
+//                       <button
+//                         key={item}
+//                         type="button"
+//                         onClick={() => {
+//                           setStatus(item);
+//                           setStatusOpen(false);
+//                         }}
+//                         className={`block w-full px-4 py-3 text-left text-sm transition ${
+//                           status === item
+//                             ? "bg-blue-50 font-semibold text-[#103f8f]"
+//                             : "text-slate-700 hover:bg-slate-50"
+//                         }`}
+//                       >
+//                         {item}
+//                       </button>
+//                     ))}
+//                   </div>
+//                 )}
+//               </div>
+
+//               <Field label="Department" defaultValue="Write phone number" />
+//               <Field label="Your City" defaultValue="Dhaka" />
+
+//               <div className="flex justify-end pt-2 lg:col-span-2">
+//                 <button
+//                   type="button"
+//                   className="h-12 rounded-xl bg-[#103f8f] px-8 text-sm font-bold text-white shadow-sm transition hover:bg-[#0b3272]"
+//                 >
+//                   To update
 //                 </button>
 //               </div>
 //             </form>
-//           </section>
+//           </div>
 //         </div>
-//       </div>
+//       </section>
 //     </main>
 //   );
 // }
 
-
+// function Field({ label, defaultValue }) {
+//   return (
+//     <div>
+//       <label className={labelClass}>{label}</label>
+//       <input type="text" defaultValue={defaultValue} className={inputClass} />
+//     </div>
+//   );
+// }
 
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   FaCalendarAlt,
   FaCamera,
+  FaCheckCircle,
   FaChevronDown,
   FaChevronLeft,
-  FaChevronUp,
+  FaExclamationCircle,
+  FaSpinner,
 } from "react-icons/fa";
 import { SiGmail } from "react-icons/si";
 import { useRouter } from "next/navigation";
-const statusOptions = [
-  "Independent Driving Instructor",
-  "Salaried Driving Instructor",
-  "Driving Instructor Job Seeker",
-  "ESCR Student",
-  "Driving School Manager",
-  "Others",
+
+import {
+  getTeacherProfile,
+  updateProfile,
+  updateTeacherProfile,
+} from "@/features/API";
+import { mediaUrl } from "@/utils/mediaUrl";
+
+const initialForm = {
+  firstName: "",
+  lastName: "",
+  email: "",
+  phone: "",
+  dateOfBirth: "",
+  address: "",
+  city: "",
+  qualification: "",
+  lessonType: "manual",
+  availabilityStatus: "available",
+  experienceYears: "0",
+  hourlyRate: "0",
+  bio: "",
+  avatar: "",
+};
+
+const lessonTypeOptions = [
+  {
+    value: "manual",
+    label: "Manual Car",
+  },
+  {
+    value: "automatic",
+    label: "Automatic Car",
+  },
+  {
+    value: "code",
+    label: "Code Lesson",
+  },
+  {
+    value: "accompanied",
+    label: "Accompanied Driving",
+  },
+  {
+    value: "accelerated",
+    label: "Accelerated Course",
+  },
+];
+
+const availabilityOptions = [
+  {
+    value: "available",
+    label: "Available",
+  },
+  {
+    value: "unavailable",
+    label: "Unavailable",
+  },
 ];
 
 const inputClass =
@@ -703,19 +292,349 @@ const inputClass =
 
 const labelClass = "mb-2 block text-sm font-semibold text-slate-700";
 
-export default function Profile() {
-  const [statusOpen, setStatusOpen] = useState(false);
-  const [status, setStatus] = useState("ESCR Student");
-  const [vehicleType, setVehicleType] = useState("Manual Car");
+function formatDateForInput(value) {
+  if (!value) {
+    return "";
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+
+  return date.toISOString().slice(0, 10);
+}
+
+function splitFullName(fullName = "") {
+  const nameParts = String(fullName).trim().split(/\s+/).filter(Boolean);
+
+  if (nameParts.length === 0) {
+    return {
+      firstName: "",
+      lastName: "",
+    };
+  }
+
+  return {
+    firstName: nameParts[0],
+    lastName: nameParts.slice(1).join(" "),
+  };
+}
+
+function getTeacherProfileData(response) {
+  return response?.data?.data || response?.data?.profile || null;
+}
+
+function getUpdatedUser(response) {
+  return response?.data?.data?.user || response?.data?.user || null;
+}
+
+function getErrorMessage(error, fallbackMessage) {
+  return error?.response?.data?.message || error?.message || fallbackMessage;
+}
+
+export default function TeacherProfilePage() {
   const router = useRouter();
+  const fileInputRef = useRef(null);
+
+  const [form, setForm] = useState(initialForm);
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [avatarPreview, setAvatarPreview] = useState("");
+
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  const fullName = useMemo(() => {
+    return `${form.firstName} ${form.lastName}`.trim();
+  }, [form.firstName, form.lastName]);
+
+  const avatarSource = useMemo(() => {
+    if (avatarPreview) {
+      return avatarPreview;
+    }
+
+    if (form.avatar) {
+      return mediaUrl(form.avatar);
+    }
+
+    return "";
+  }, [avatarPreview, form.avatar]);
+
+  const nameInitial = useMemo(() => {
+    return String(fullName || form.email || "T")
+      .trim()
+      .charAt(0)
+      .toUpperCase();
+  }, [fullName, form.email]);
+
+  useEffect(() => {
+    loadTeacherProfile();
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (avatarPreview) {
+        URL.revokeObjectURL(avatarPreview);
+      }
+    };
+  }, [avatarPreview]);
+
+  async function loadTeacherProfile() {
+    try {
+      setLoading(true);
+      setError("");
+      setSuccess("");
+
+      const response = await getTeacherProfile();
+      const teacherProfile = getTeacherProfileData(response);
+
+      if (!teacherProfile) {
+        throw new Error("Teacher profile data not found.");
+      }
+
+      const user = teacherProfile.user || {};
+      const { firstName, lastName } = splitFullName(user.name);
+
+      setForm({
+        firstName,
+        lastName,
+        email: user.email || "",
+        phone: user.phone || "",
+        dateOfBirth: formatDateForInput(user.dateOfBirth),
+        address: user.address || "",
+        city: user.city || "",
+        qualification: teacherProfile.qualification || "",
+        lessonType: teacherProfile.lessonTypes?.[0] || "manual",
+        availabilityStatus: teacherProfile.availabilityStatus || "available",
+        experienceYears: String(teacherProfile.experienceYears ?? 0),
+        hourlyRate: String(teacherProfile.hourlyRate ?? 0),
+        bio: teacherProfile.bio || user.bio || "",
+        avatar: user.avatar || "",
+      });
+    } catch (loadError) {
+      setError(
+        getErrorMessage(loadError, "Failed to load the teacher profile."),
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function handleChange(event) {
+    const { name, value } = event.target;
+
+    setForm((currentForm) => ({
+      ...currentForm,
+      [name]: value,
+    }));
+
+    if (error) {
+      setError("");
+    }
+
+    if (success) {
+      setSuccess("");
+    }
+  }
+
+  function handleAvatarButtonClick() {
+    fileInputRef.current?.click();
+  }
+
+  function handleAvatarChange(event) {
+    const selectedFile = event.target.files?.[0];
+
+    setError("");
+    setSuccess("");
+
+    if (!selectedFile) {
+      return;
+    }
+
+    const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+
+    if (!allowedTypes.includes(selectedFile.type)) {
+      setError("Only JPG, PNG and WEBP images are allowed.");
+      event.target.value = "";
+      return;
+    }
+
+    if (selectedFile.size > 3 * 1024 * 1024) {
+      setError("Profile image size must be less than 3MB.");
+      event.target.value = "";
+      return;
+    }
+
+    if (avatarPreview) {
+      URL.revokeObjectURL(avatarPreview);
+    }
+
+    const previewUrl = URL.createObjectURL(selectedFile);
+
+    setAvatarFile(selectedFile);
+    setAvatarPreview(previewUrl);
+  }
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+
+    if (saving) {
+      return;
+    }
+
+    const name = `${form.firstName} ${form.lastName}`.trim();
+
+    if (!name) {
+      setError("Teacher name is required.");
+      return;
+    }
+
+    const experienceYears = Number(form.experienceYears || 0);
+    const hourlyRate = Number(form.hourlyRate || 0);
+
+    if (Number.isNaN(experienceYears) || experienceYears < 0) {
+      setError("Experience years must be a valid positive number.");
+      return;
+    }
+
+    if (Number.isNaN(hourlyRate) || hourlyRate < 0) {
+      setError("Hourly rate must be a valid positive number.");
+      return;
+    }
+
+    try {
+      setSaving(true);
+      setError("");
+      setSuccess("");
+
+      /*
+       * User collection update:
+       * name, phone, date of birth, address, city, bio and avatar
+       */
+      const userFormData = new FormData();
+
+      userFormData.append("name", name);
+      userFormData.append("phone", form.phone || "");
+      userFormData.append("dateOfBirth", form.dateOfBirth || "");
+      userFormData.append("address", form.address || "");
+      userFormData.append("city", form.city || "");
+      userFormData.append("bio", form.bio || "");
+
+      if (avatarFile) {
+        userFormData.append("avatar", avatarFile);
+      }
+
+      const userResponse = await updateProfile(userFormData);
+      const updatedUser = getUpdatedUser(userResponse);
+
+      /*
+       * TeacherProfile collection update:
+       * qualification, lesson type, availability,
+       * experience years, hourly rate and bio
+       */
+      const teacherResponse = await updateTeacherProfile({
+        qualification: form.qualification.trim(),
+        lessonTypes: [form.lessonType],
+        availabilityStatus: form.availabilityStatus,
+        experienceYears,
+        hourlyRate,
+        bio: form.bio.trim(),
+      });
+
+      const updatedTeacherProfile = getTeacherProfileData(teacherResponse);
+
+      if (updatedUser) {
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+
+        window.dispatchEvent(
+          new CustomEvent("profile-updated", {
+            detail: updatedUser,
+          }),
+        );
+      }
+
+      const updatedName = splitFullName(updatedUser?.name || name);
+
+      setForm((currentForm) => ({
+        ...currentForm,
+
+        firstName: updatedName.firstName,
+        lastName: updatedName.lastName,
+
+        email: updatedUser?.email || currentForm.email,
+
+        phone: updatedUser?.phone ?? currentForm.phone,
+
+        dateOfBirth: formatDateForInput(
+          updatedUser?.dateOfBirth || currentForm.dateOfBirth,
+        ),
+
+        address: updatedUser?.address ?? currentForm.address,
+
+        city: updatedUser?.city ?? currentForm.city,
+
+        avatar: updatedUser?.avatar ?? currentForm.avatar,
+
+        qualification:
+          updatedTeacherProfile?.qualification ?? currentForm.qualification,
+
+        lessonType:
+          updatedTeacherProfile?.lessonTypes?.[0] ?? currentForm.lessonType,
+
+        availabilityStatus:
+          updatedTeacherProfile?.availabilityStatus ??
+          currentForm.availabilityStatus,
+
+        experienceYears: String(
+          updatedTeacherProfile?.experienceYears ?? currentForm.experienceYears,
+        ),
+
+        hourlyRate: String(
+          updatedTeacherProfile?.hourlyRate ?? currentForm.hourlyRate,
+        ),
+
+        bio: updatedTeacherProfile?.bio ?? updatedUser?.bio ?? currentForm.bio,
+      }));
+
+      setAvatarFile(null);
+      setAvatarPreview("");
+      setSuccess("Teacher profile updated successfully.");
+    } catch (saveError) {
+      setError(
+        getErrorMessage(saveError, "Failed to update the teacher profile."),
+      );
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  if (loading) {
+    return (
+      <main className="flex min-h-[70vh] items-center justify-center bg-[#f7f9fc]">
+        <div className="flex items-center gap-3 rounded-2xl bg-white px-6 py-4 text-[#103f8f] shadow-sm">
+          <FaSpinner className="animate-spin" />
+
+          <span className="text-sm font-semibold">
+            Loading teacher profile...
+          </span>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="min-h-screen bg-[#f7f9fc] px-4 py-6 sm:px-6 lg:px-8">
-      <section className="mx-auto ">
-        {/* Header */}
+      <section className="mx-auto max-w-7xl">
+        {/* Page header */}
         <div className="mb-6 flex items-start gap-4">
           <button
-            onClick={() => router.back()}
             type="button"
+            onClick={() => router.back()}
+            aria-label="Go back"
             className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-[#103f8f] shadow-sm transition hover:bg-blue-50"
           >
             <FaChevronLeft size={16} />
@@ -723,6 +642,7 @@ export default function Profile() {
 
           <div>
             <h1 className="text-2xl font-bold text-[#103f8f]">Profile</h1>
+
             <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-500">
               Update your information to ensure accurate lesson scheduling and
               communication.
@@ -730,20 +650,37 @@ export default function Profile() {
           </div>
         </div>
 
-        {/* Main Card */}
+        {/* Profile card */}
         <div className="rounded-3xl bg-white p-4 shadow-sm ring-1 ring-slate-100 sm:p-6">
-          {/* User Info */}
+          {/* Teacher summary */}
           <div className="mb-6 flex flex-col gap-4 rounded-2xl bg-[#eef4fb] p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
             <div className="flex items-center gap-4">
               <div className="relative h-[78px] w-[78px] shrink-0">
-                <img
-                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0dW491TS8p25zqH1JdG1fj-NRldx_t-MfzWk68jQEBw&s=10"
-                  alt="Profile"
-                  className="h-full w-full rounded-full border-4 border-white object-cover shadow-sm"
+                {avatarSource ? (
+                  <img
+                    src={avatarSource}
+                    alt={fullName || "Teacher profile"}
+                    className="h-full w-full rounded-full border-4 border-white object-cover shadow-sm"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center rounded-full border-4 border-white bg-[#103f8f] text-2xl font-bold text-white shadow-sm">
+                    {nameInitial}
+                  </div>
+                )}
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".jpg,.jpeg,.png,.webp"
+                  onChange={handleAvatarChange}
+                  className="hidden"
                 />
 
                 <button
                   type="button"
+                  onClick={handleAvatarButtonClick}
+                  title="Change profile image"
+                  aria-label="Change profile image"
                   className="absolute bottom-0 right-0 flex h-8 w-8 items-center justify-center rounded-full bg-[#103f8f] text-white shadow-md transition hover:bg-[#0b3272]"
                 >
                   <FaCamera size={13} />
@@ -752,128 +689,187 @@ export default function Profile() {
 
               <div>
                 <h2 className="text-xl font-bold text-slate-900">
-                  Jenny Smith
+                  {fullName || "Teacher User"}
                 </h2>
+
                 <p className="mt-1 flex items-center gap-2 text-sm text-slate-500">
                   <SiGmail className="text-[#e63946]" />
-                  yourmail@mail.com
+
+                  {form.email || "No email found"}
+                </p>
+
+                <p className="mt-1 text-xs font-semibold capitalize text-[#103f8f]">
+                  {form.availabilityStatus}
                 </p>
               </div>
             </div>
-
-            <button
-              type="button"
-              className="h-11 rounded-xl bg-[#103f8f] px-7 text-sm font-semibold text-white transition hover:bg-[#0b3272]"
-            >
-              Edit
-            </button>
           </div>
 
-          {/* Form */}
+          {/* Form section */}
           <div>
             <div className="mb-5">
               <h3 className="text-xl font-bold text-slate-900">
                 Personal Details
               </h3>
+
               <p className="mt-1 text-sm text-slate-500">
-                Manage your personal and driving profile information.
+                Manage your personal and driving instructor information.
               </p>
             </div>
 
-            <form className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-              <Field label="First Name" defaultValue="Jenny" />
-              <Field label="Last Name" defaultValue="Smith" />
+            {error ? (
+              <div className="mb-5 flex items-start gap-3 rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm font-medium text-rose-700">
+                <FaExclamationCircle className="mt-0.5 shrink-0" />
+
+                <span>{error}</span>
+              </div>
+            ) : null}
+
+            {success ? (
+              <div className="mb-5 flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-medium text-emerald-700">
+                <FaCheckCircle className="mt-0.5 shrink-0" />
+
+                <span>{success}</span>
+              </div>
+            ) : null}
+
+            <form
+              onSubmit={handleSubmit}
+              className="grid grid-cols-1 gap-5 lg:grid-cols-2"
+            >
+              <Field
+                label="First Name"
+                name="firstName"
+                value={form.firstName}
+                onChange={handleChange}
+                placeholder="Enter first name"
+              />
+
+              <Field
+                label="Last Name"
+                name="lastName"
+                value={form.lastName}
+                onChange={handleChange}
+                placeholder="Enter last name"
+              />
 
               <div>
                 <label className={labelClass}>Date of birth</label>
+
                 <div className="relative">
                   <input
-                    type="text"
-                    defaultValue="Date"
+                    type="date"
+                    name="dateOfBirth"
+                    value={form.dateOfBirth}
+                    onChange={handleChange}
                     className={`${inputClass} pr-11`}
                   />
-                  <FaCalendarAlt className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" />
+
+                  <FaCalendarAlt className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" />
                 </div>
               </div>
 
-              <Field label="Address" defaultValue="House no : 100, Dhaka" />
+              <Field
+                label="Address"
+                name="address"
+                value={form.address}
+                onChange={handleChange}
+                placeholder="Enter address"
+              />
 
-              <div>
-                <label className={labelClass}>Phone Number</label>
-                <div className="flex h-12 items-center rounded-xl border border-slate-200 bg-white px-4 transition focus-within:border-[#103f8f] focus-within:ring-4 focus-within:ring-blue-50">
-                  <span className="mr-3 text-lg">🇧🇩</span>
-                  <input
-                    type="text"
-                    defaultValue="+880988900"
-                    className="w-full bg-transparent text-sm font-medium text-slate-800 outline-none"
-                  />
-                </div>
+              <Field
+                label="Phone Number"
+                name="phone"
+                value={form.phone}
+                onChange={handleChange}
+                placeholder="Enter phone number"
+              />
+
+              <SelectField
+                label="Vehicle / Lesson Type"
+                name="lessonType"
+                value={form.lessonType}
+                onChange={handleChange}
+                options={lessonTypeOptions}
+              />
+
+              <SelectField
+                label="Availability Status"
+                name="availabilityStatus"
+                value={form.availabilityStatus}
+                onChange={handleChange}
+                options={availabilityOptions}
+              />
+
+              <Field
+                label="Qualification / Department"
+                name="qualification"
+                value={form.qualification}
+                onChange={handleChange}
+                placeholder="Example: Certified driving instructor"
+              />
+
+              <Field
+                label="Your City"
+                name="city"
+                value={form.city}
+                onChange={handleChange}
+                placeholder="Enter city"
+              />
+
+              <Field
+                label="Experience Years"
+                name="experienceYears"
+                value={form.experienceYears}
+                onChange={handleChange}
+                type="number"
+                min="0"
+                placeholder="0"
+              />
+
+              <Field
+                label="Hourly Rate"
+                name="hourlyRate"
+                value={form.hourlyRate}
+                onChange={handleChange}
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="0"
+              />
+
+              <div className="lg:col-span-2">
+                <label className={labelClass}>About Teacher</label>
+
+                <textarea
+                  name="bio"
+                  value={form.bio}
+                  onChange={handleChange}
+                  maxLength={500}
+                  rows={5}
+                  placeholder="Write a short description about the teacher..."
+                  className="w-full resize-none rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-[#103f8f] focus:ring-4 focus:ring-blue-50"
+                />
+
+                <span className="mt-1 block text-right text-xs font-semibold text-slate-400">
+                  {form.bio.length}/500
+                </span>
               </div>
-
-              <div>
-                <label className={labelClass}>Vehicle type</label>
-                <div className="relative">
-                  <select
-                    value={vehicleType}
-                    onChange={(e) => setVehicleType(e.target.value)}
-                    className={`${inputClass} appearance-none pr-11`}
-                  >
-                    <option>Manual Car</option>
-                    <option>Automatic Car</option>
-                    <option>Motorcycle</option>
-                  </select>
-                  <FaChevronDown className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                </div>
-              </div>
-
-              <div className="relative">
-                <label className={labelClass}>Select your current status</label>
-
-                <button
-                  type="button"
-                  onClick={() => setStatusOpen(!statusOpen)}
-                  className="flex h-12 w-full items-center justify-between rounded-xl border border-slate-200 bg-white px-4 text-left text-sm font-medium text-slate-800 transition hover:bg-slate-50 focus:border-[#103f8f] focus:outline-none focus:ring-4 focus:ring-blue-50"
-                >
-                  <span>{status}</span>
-                  {statusOpen ? (
-                    <FaChevronUp className="text-slate-400" />
-                  ) : (
-                    <FaChevronDown className="text-slate-400" />
-                  )}
-                </button>
-
-                {statusOpen && (
-                  <div className="absolute z-30 mt-2 w-full overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-xl">
-                    {statusOptions.map((item) => (
-                      <button
-                        key={item}
-                        type="button"
-                        onClick={() => {
-                          setStatus(item);
-                          setStatusOpen(false);
-                        }}
-                        className={`block w-full px-4 py-3 text-left text-sm transition ${
-                          status === item
-                            ? "bg-blue-50 font-semibold text-[#103f8f]"
-                            : "text-slate-700 hover:bg-slate-50"
-                        }`}
-                      >
-                        {item}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <Field label="Department" defaultValue="Write phone number" />
-              <Field label="Your City" defaultValue="Dhaka" />
 
               <div className="flex justify-end pt-2 lg:col-span-2">
                 <button
-                  type="button"
-                  className="h-12 rounded-xl bg-[#103f8f] px-8 text-sm font-bold text-white shadow-sm transition hover:bg-[#0b3272]"
+                  type="submit"
+                  disabled={saving}
+                  className="flex h-12 min-w-40 items-center justify-center gap-2 rounded-xl bg-[#103f8f] px-8 text-sm font-bold text-white shadow-sm transition hover:bg-[#0b3272] disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  To update
+                  {saving ? (
+                    <>
+                      <FaSpinner className="animate-spin" />
+                      Updating...
+                    </>
+                  ) : (
+                    "Update Profile"
+                  )}
                 </button>
               </div>
             </form>
@@ -884,12 +880,55 @@ export default function Profile() {
   );
 }
 
-function Field({ label, defaultValue }) {
+function Field({
+  label,
+  name,
+  value,
+  onChange,
+  placeholder,
+  type = "text",
+  min,
+  step,
+}) {
   return (
     <div>
       <label className={labelClass}>{label}</label>
-      <input type="text" defaultValue={defaultValue} className={inputClass} />
+
+      <input
+        type={type}
+        name={name}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        min={min}
+        step={step}
+        className={inputClass}
+      />
     </div>
   );
 }
 
+function SelectField({ label, name, value, onChange, options }) {
+  return (
+    <div>
+      <label className={labelClass}>{label}</label>
+
+      <div className="relative">
+        <select
+          name={name}
+          value={value}
+          onChange={onChange}
+          className={`${inputClass} appearance-none pr-11`}
+        >
+          {options.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+
+        <FaChevronDown className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" />
+      </div>
+    </div>
+  );
+}
