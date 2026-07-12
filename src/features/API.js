@@ -105,22 +105,73 @@ export const createPackage = (data) =>
 
 // =======================
 // Bookings
-// ========================
-export const createBooking = (data) => axios.post("/bookings", data);
-export const getBookings = () => axios.get("/bookings");
-export const getBooking = (id) => axios.get(`/bookings/${id}`);
-export const confirmBooking = (id) => axios.patch(`/bookings/${id}/confirm`);
-export const cancelBooking = (id) => axios.patch(`/bookings/${id}/cancel`);
+// =======================
+
+export const createBooking = (data) => {
+  return axios.post("/bookings", data);
+};
+
+export const getBookings = (params = {}) => {
+  return axios.get("/bookings", {
+    params,
+  });
+};
+
+export const getBooking = (id) => {
+  return axios.get(`/bookings/${id}`);
+};
+
+export const getTeacherBookingAvailability = (params) => {
+  return axios.get("/bookings/availability", {
+    params,
+  });
+};
+
+export const confirmBooking = (id) => {
+  return axios.patch(`/bookings/${id}/confirm`);
+};
+
+export const cancelBooking = (id, data) => {
+  return axios.patch(`/bookings/${id}/cancel`, data);
+};
 
 // =======================
 // Lessons
 // =======================
-export const getLessons = () => axios.get("/lessons");
-export const getLesson = (id) => axios.get(`/lessons/${id}`);
-export const startLesson = (id) => axios.patch(`/lessons/${id}/start`);
-export const confirmAttendance = (id, data) =>
-  axios.patch(`/lessons/${id}/attendance`, data);
-export const completeLesson = (id) => axios.patch(`/lessons/${id}/complete`);
+
+export const getLessons = (params = {}) => {
+  return axios.get("/lessons", {
+    params,
+  });
+};
+
+export const getLesson = (id) => {
+  return axios.get(`/lessons/${id}`);
+};
+
+export const createLesson = (data) => {
+  return axios.post("/lessons", data);
+};
+
+export const updateLesson = (id, data) => {
+  return axios.patch(`/lessons/${id}`, data);
+};
+
+export const startLesson = (id) => {
+  return axios.patch(`/lessons/${id}/start`);
+};
+
+export const confirmAttendance = (id, data) => {
+  return axios.patch(`/lessons/${id}/attendance`, data);
+};
+
+export const completeLesson = (id, data = {}) => {
+  return axios.patch(`/lessons/${id}/complete`, data);
+};
+
+export const cancelLesson = (id, data) => {
+  return axios.patch(`/lessons/${id}/cancel`, data);
+};
 
 // =======================
 // Payments / Invoices
