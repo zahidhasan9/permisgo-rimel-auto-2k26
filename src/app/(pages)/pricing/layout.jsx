@@ -1,12 +1,16 @@
-export const metadata = {
-    title: "Pricing",
-    description: "Driving School",
-};
+// src/app/(pages)/pricing/layout.jsx
 
-export default function RootLayout({ children }) {
-    return (
-        <>
-            {children}
-        </>
-    )
+import { createMetadata } from "@/lib/seo";
+
+export const metadata = createMetadata({
+  title: "Driving Lesson Prices",
+
+  description:
+    "Explore PermisGo driving lesson prices, flexible packages and professional training options.",
+
+  path: "/pricing",
+});
+
+export default function PricingLayout({ children }) {
+  return children;
 }
