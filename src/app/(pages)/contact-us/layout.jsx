@@ -1,5 +1,3 @@
-// src/app/(pages)/contact-us/layout.jsx
-
 import { createMetadata } from "@/lib/seo";
 
 export const metadata = createMetadata({

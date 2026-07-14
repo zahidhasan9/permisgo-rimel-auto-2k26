@@ -1,16 +1,16 @@
 import { createMetadata } from "@/lib/seo";
 
 export const metadata = createMetadata({
-  title: "Appontment",
+  title: "Dashboard",
 
   description:
     "Learn about PermisGo, our professional driving instructors, teaching approach and commitment to safer driving.",
 
-  path: "/appontment",
+  path: "/student/dashboard",
 
   image: "/image/permisgo-og.jp",
 });
 
-export default function RootLayout({ children }) {
-  return <>{children}</>;
+export default function dashboardLayout({ children }) {
+  return children;
 }
