@@ -343,7 +343,6 @@
 //     </main>
 //   );
 // }
-
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -351,27 +350,23 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import {
-  IoArrowBack,
-  IoBusinessOutline,
-  IoCheckmarkCircle,
-  IoCheckmarkCircleOutline,
-  IoClose,
-  IoCloudUploadOutline,
-  IoDocumentTextOutline,
-  IoDownloadOutline,
-  IoEyeOutline,
-  IoIdCardOutline,
-  IoRefreshOutline,
-  IoShieldCheckmarkOutline,
-  IoTimeOutline,
-  IoTrashOutline,
-  IoWarningOutline,
-} from "react-icons/io5";
+  FaCheckCircle,
+  FaChevronLeft,
+  FaDownload,
+  FaExclamationTriangle,
+  FaEye,
+  FaFileAlt,
+  FaRedo,
+  FaSyncAlt,
+  FaTimes,
+  FaTrashAlt,
+  FaUpload,
+} from "react-icons/fa";
 
 import axios from "@/Apiutils/axiosInstance";
 
 /* =====================================================
-   Upload settings
+   Upload configuration
 ===================================================== */
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
@@ -385,113 +380,116 @@ const ALLOWED_FILE_TYPES = [
 ];
 
 /* =====================================================
-   Teacher required documents
+   Teacher document requirements
 ===================================================== */
 
 const TEACHER_DOCUMENT_REQUIREMENTS = [
   {
     key: "teacher_identity_front",
-    title: "Identity Document - Front",
-    description:
-      "Upload the front side of your passport or national identity document.",
+    title: "Identity & Legal Status - Front",
+    items: [
+      "Valid passport or national identity card.",
+      "Upload a clear copy of the front side.",
+    ],
     type: "identity",
     documentSide: "front",
     required: true,
-    icon: IoIdCardOutline,
   },
   {
     key: "teacher_identity_back",
-    title: "Identity Document - Back",
-    description: "Upload the back side of your national identity document.",
+    title: "Identity & Legal Status - Back",
+    items: [
+      "Back side of your national identity document.",
+      "All text and numbers must be clearly visible.",
+    ],
     type: "identity",
     documentSide: "back",
     required: true,
-    icon: IoIdCardOutline,
   },
   {
     key: "teacher_license_front",
-    title: "Driving Licence - Front",
-    description:
-      "Upload a clear copy of the front side of your valid driving licence.",
+    title: "Driving License - Front",
+    items: [
+      "Valid Category B driving license.",
+      "Upload a clear copy of the front side.",
+    ],
     type: "license",
     documentSide: "front",
     required: true,
-    icon: IoDocumentTextOutline,
   },
   {
     key: "teacher_license_back",
-    title: "Driving Licence - Back",
-    description:
-      "Upload a clear copy of the back side of your valid driving licence.",
+    title: "Driving License - Back",
+    items: [
+      "Upload the back side of your driving license.",
+      "Expiry date and license details must be readable.",
+    ],
     type: "license",
     documentSide: "back",
     required: true,
-    icon: IoDocumentTextOutline,
   },
   {
     key: "teacher_qualification",
     title: "Instructor Qualification",
-    description:
-      "Upload your driving instructor qualification, accreditation or teaching certificate.",
+    items: [
+      "Driving instructor qualification or teaching certificate.",
+      "The certificate holder name must match your profile.",
+    ],
     type: "certificate",
     documentSide: "single",
     required: true,
-    icon: IoCheckmarkCircleOutline,
   },
   {
     key: "teacher_insurance",
     title: "Professional Insurance",
-    description:
-      "Upload proof of your current professional or instructor insurance.",
+    items: [
+      "Current professional or instructor insurance.",
+      "The insurance validity period must be visible.",
+    ],
     type: "insurance",
     documentSide: "single",
     required: true,
-    icon: IoShieldCheckmarkOutline,
   },
   {
     key: "teacher_business_registration",
     title: "Business Registration",
-    description:
-      "Upload your business registration or self-employment document, when applicable.",
+    items: [
+      "Auto-entrepreneur or company registration, when applicable.",
+      "Upload the document containing your registration details.",
+    ],
     type: "other",
     documentSide: "single",
     required: false,
-    icon: IoBusinessOutline,
   },
   {
     key: "teacher_proof_address",
     title: "Proof of Address",
-    description:
-      "Upload a recent utility bill, bank statement or official residence certificate.",
+    items: [
+      "Recent utility bill, bank statement or residence certificate.",
+      "The document should show your current address.",
+    ],
     type: "proof_address",
     documentSide: "single",
     required: false,
-    icon: IoDocumentTextOutline,
   },
 ];
 
 /* =====================================================
-   Document API
+   API
 ===================================================== */
 
 const documentApi = {
-  getDocuments: (params = {}) => {
-    return axios.get("/documents", {
+  getDocuments: (params = {}) =>
+    axios.get("/documents", {
       params,
-    });
-  },
+    }),
 
-  uploadDocument: (formData) => {
-    return axios.post("/documents", formData);
-  },
+  uploadDocument: (formData) => axios.post("/documents", formData),
 
-  resubmitDocument: (documentId, formData) => {
-    return axios.patch(`/documents/${documentId}/resubmit`, formData);
-  },
+  resubmitDocument: (documentId, formData) =>
+    axios.patch(`/documents/${documentId}/resubmit`, formData),
 
-  deleteDocument: (documentId) => {
-    return axios.delete(`/documents/${documentId}`);
-  },
+  deleteDocument: (documentId) => axios.delete(`/documents/${documentId}`),
 };
 
 /* =====================================================
@@ -525,25 +523,7 @@ function extractDocuments(response) {
   return [];
 }
 
-function formatDate(value) {
-  if (!value) {
-    return "-";
-  }
-
-  const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) {
-    return "-";
-  }
-
-  return date.toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
-}
-
-function formatDateTime(value) {
+function formatDate(value, includeTime = false) {
   if (!value) {
     return "-";
   }
@@ -558,8 +538,13 @@ function formatDateTime(value) {
     day: "2-digit",
     month: "short",
     year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
+
+    ...(includeTime
+      ? {
+          hour: "2-digit",
+          minute: "2-digit",
+        }
+      : {}),
   });
 }
 
@@ -574,13 +559,7 @@ function formatFileSize(value = 0) {
     return `${(bytes / 1024).toFixed(1)} KB`;
   }
 
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
-
-function formatText(value = "") {
-  return String(value || "-")
-    .replaceAll("_", " ")
-    .replace(/\b\w/g, (character) => character.toUpperCase());
+  return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
 }
 
 function isPdfDocument(document) {
@@ -603,67 +582,337 @@ function isPdfDocument(document) {
 
 function StatusBadge({ status = "not_uploaded" }) {
   const styles = {
-    not_uploaded: "border-slate-200 bg-slate-50 text-slate-600",
+    not_uploaded: "bg-slate-100 text-slate-600",
 
-    pending: "border-amber-200 bg-amber-50 text-amber-700",
+    selected: "bg-blue-50 text-[#16458f]",
 
-    approved: "border-emerald-200 bg-emerald-50 text-emerald-700",
+    pending: "bg-amber-50 text-amber-700",
 
-    rejected: "border-rose-200 bg-rose-50 text-rose-700",
+    approved: "bg-emerald-50 text-emerald-700",
+
+    rejected: "bg-rose-50 text-rose-700",
   };
 
   const labels = {
-    not_uploaded: "Not uploaded",
-    pending: "Pending review",
+    not_uploaded: "Not Uploaded",
+
+    selected: "Added",
+
+    pending: "Pending Review",
+
     approved: "Approved",
+
     rejected: "Rejected",
   };
 
   return (
     <span
-      className={`inline-flex rounded-full border px-3 py-1 text-xs font-black ${
+      className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold ${
         styles[status] || styles.not_uploaded
       }`}
     >
+      {status === "approved" || status === "selected" ? (
+        <FaCheckCircle size={10} />
+      ) : null}
+
+      {status === "rejected" ? <FaExclamationTriangle size={10} /> : null}
+
       {labels[status] || status}
     </span>
   );
 }
 
 /* =====================================================
-   Statistics card
+   Required document card
 ===================================================== */
 
-function StatisticsCard({ title, value, icon: Icon, iconClassName }) {
+function RequiredDocumentCard({
+  requirement,
+  currentDocument,
+  selectedFile,
+  uploading,
+  deleting,
+  onFileChange,
+  onRemoveSelectedFile,
+  onPreview,
+  onDownload,
+  onDelete,
+}) {
+  const status = selectedFile
+    ? "selected"
+    : currentDocument?.status || "not_uploaded";
+
+  const canSelect = !currentDocument || currentDocument.status === "rejected";
+
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <p className="text-xs font-black uppercase tracking-[0.12em] text-slate-400">
-            {title}
-          </p>
+    <article className="group rounded-2xl border border-slate-200 bg-white p-4 transition duration-200 hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md sm:p-5">
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <h3 className="min-w-0 text-sm font-extrabold uppercase leading-5 tracking-wide text-[#16458f]">
+              {requirement.title}
+            </h3>
 
-          <p className="mt-2 text-2xl font-black text-slate-900">{value}</p>
+            {requirement.required ? (
+              <span className="text-xs font-extrabold text-[#e2233d]">*</span>
+            ) : (
+              <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-slate-500">
+                Optional
+              </span>
+            )}
+
+            <StatusBadge status={status} />
+          </div>
         </div>
 
-        <div
-          className={`flex h-11 w-11 items-center justify-center rounded-xl ${iconClassName}`}
+        <label
+          className={`flex h-11 shrink-0 items-center justify-center gap-2 rounded-xl px-4 text-xs font-bold text-white shadow-sm transition active:scale-[0.99late-500">
+                Optional
+              </span>
+            )}
+
+            <StatusBadge
+              status={status}
+            />
+          </div>
+] ${
+            canSelect && !uploading
+              ? "cursor-pointer bg-[#e2233d] hover:bg-[#c91f35]"
+              : "cursor-not-allowed bg-slate-300"
+          }`}
         >
-          <Icon className="text-xl" />
-        </div>
+          {currentDocument?.status === "rejected" ? (
+            <FaRedo size={12} />
+          ) : (
+            <FaUpload size={12} />
+          )}
+
+          <span>
+            {currentDocument?.status === "rejected"
+              ? "Select Replacement"
+              : currentDocument
+                ? currentDocument.status === "approved"
+                  ? "Verified"
+                  : "Under Review"
+                : "Select Document"}
+          </span>
+
+          <input
+            type="file"
+            accept=".pdf,.jpg,.jpeg,.png,.webp"
+            className="hidden"
+            disabled={!canSelect || uploading}
+            onChange={(event) => onFileChange(requirement.key, event)}
+          />
+        </label>
       </div>
-    </div>
+
+      <ul className="mb-5 ml-2 space-y-1">
+        {requirement.items.map((item) => (
+          <li
+            key={item}
+            className="flex items-start gap-2 text-[13px] font-medium leading-5 text-slate-600"
+          >
+            <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#16458f]" />
+
+            <span>{item}</span>
+          </li>
+        ))}
+      </ul>
+
+      {selectedFile ? (
+        <div className="flex flex-col gap-3 rounded-xl border border-emerald-100 bg-emerald-50/70 p-3 sm:flex-row sm:items-center">
+          <div className="flex min-w-0 flex-1 items-center gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-emerald-600 shadow-sm">
+              <FaFileAlt size={14} />
+            </div>
+
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-xs font-bold text-slate-800">
+                {selectedFile.name}
+              </p>
+
+              <p className="mt-0.5 text-[11px] text-slate-500">
+                {formatFileSize(selectedFile.size)} · Ready to upload
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => onRemoveSelectedFile(requirement.key)}
+            disabled={uploading}
+            className="flex h-8 w-8 shrink-0 items-center justify-center self-end rounded-lg bg-white text-slate-400 shadow-sm transition hover:bg-red-50 hover:text-red-600 disabled:opacity-50 sm:self-auto"
+            aria-label={`Remove ${requirement.title} file`}
+          >
+            <FaTimes size={12} />
+          </button>
+        </div>
+      ) : currentDocument ? (
+        <div
+          className={`rounded-xl border p-3 ${
+            currentDocument.status === "rejected"
+              ? "border-rose-200 bg-rose-50/70"
+              : currentDocument.status === "approved"
+                ? "border-emerald-100 bg-emerald-50/60"
+                : "border-amber-100 bg-amber-50/60"
+          }`}
+        >
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="flex min-w-0 flex-1 items-center gap-3">
+              <div
+                className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white shadow-sm ${
+                  currentDocument.status === "rejected"
+                    ? "text-rose-600"
+                    : currentDocument.status === "approved"
+                      ? "text-emerald-600"
+                      : "text-amber-600"
+                }`}
+              >
+                <FaFileAlt size={14} />
+              </div>
+
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-xs font-bold text-slate-800">
+                  {currentDocument.originalFileName || currentDocument.title}
+                </p>
+
+                <p className="mt-0.5 text-[11px] text-slate-500">
+                  {formatFileSize(currentDocument.fileSize)} · Uploaded{" "}
+                  {formatDate(
+                    currentDocument.uploadedAt || currentDocument.createdAt,
+                  )}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex shrink-0 items-center gap-2">
+              <button
+                type="button"
+                onClick={() => onPreview(currentDocument)}
+                className="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-[11px] font-bold text-[#16458f] transition hover:border-blue-200 hover:bg-blue-50"
+              >
+                <FaEye size={11} />
+                Preview
+              </button>
+
+              <button
+                type="button"
+                onClick={() => onDownload(currentDocument)}
+                className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-[#16458f] transition hover:border-blue-200 hover:bg-blue-50"
+                title="Open or download"
+              >
+                <FaDownload size={11} />
+              </button>
+
+              {currentDocument.status !== "approved" ? (
+                <button
+                  type="button"
+                  onClick={() => onDelete(currentDocument)}
+                  disabled={deleting || uploading}
+                  className="flex h-9 w-9 items-center justify-center rounded-lg border border-rose-200 bg-white text-rose-600 transition hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-50"
+                  title="Delete document"
+                >
+                  {deleting ? (
+                    <FaSyncAlt className="animate-spin" size={11} />
+                  ) : (
+                    <FaTrashAlt size={11} />
+                  )}
+                </button>
+              ) : null}
+            </div>
+          </div>
+
+          {currentDocument.status === "rejected" &&
+          currentDocument.rejectionReason ? (
+            <div className="mt-3 rounded-lg border border-rose-200 bg-white/80 p-3">
+              <p className="flex items-center gap-2 text-xs font-extrabold text-rose-700">
+                <FaExclamationTriangle size={11} />
+                Admin rejection reason
+              </p>
+
+              <p className="mt-1 text-xs font-medium leading-5 text-rose-700">
+                {currentDocument.rejectionReason}
+              </p>
+
+              <p className="mt-2 text-[11px] font-semibold text-rose-500">
+                Select a corrected document and upload it again.
+              </p>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+    </article>
   );
 }
 
 /* =====================================================
-   Main page
+   Downloadable document card
+===================================================== */
+
+function DownloadDocumentCard({ document, onPreview, onDownload }) {
+  return (
+    <article className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-4 transition duration-200 hover:border-blue-200 hover:shadow-md sm:flex-row sm:items-center sm:justify-between sm:p-5">
+      <div className="flex min-w-0 items-center gap-3">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-[#16458f]">
+          <FaFileAlt size={17} />
+        </div>
+
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <h3 className="truncate text-sm font-extrabold uppercase tracking-wide text-[#16458f]">
+              {document.title || "Submitted Document"}
+            </h3>
+
+            <StatusBadge status={document.status} />
+          </div>
+
+          <p className="mt-1 truncate text-xs leading-5 text-slate-500">
+            {document.originalFileName || "Uploaded document"}
+          </p>
+
+          <p className="mt-1 text-[11px] text-slate-400">
+            {formatFileSize(document.fileSize)} ·{" "}
+            {formatDate(document.uploadedAt || document.createdAt)}
+          </p>
+        </div>
+      </div>
+
+      <div className="flex shrink-0 gap-2">
+        <button
+          type="button"
+          onClick={() => onPreview(document)}
+          className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-[#16458f] bg-white px-4 text-xs font-bold text-[#16458f] transition hover:bg-blue-50"
+        >
+          <FaEye size={12} />
+          Preview
+        </button>
+
+        <button
+          type="button"
+          onClick={() => onDownload(document)}
+          className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-[#e2233d] bg-white px-4 text-xs font-bold text-[#e2233d] transition hover:bg-[#e2233d] hover:text-white"
+        >
+          <FaDownload size={12} />
+          Download
+        </button>
+      </div>
+    </article>
+  );
+}
+
+/* =====================================================
+   Main component
 ===================================================== */
 
 export default function TeacherDocumentPage() {
   const router = useRouter();
 
   const [documents, setDocuments] = useState([]);
+
+  const [selectedFiles, setSelectedFiles] = useState({});
+
+  const [previewDocument, setPreviewDocument] = useState(null);
 
   const [loading, setLoading] = useState(true);
 
@@ -675,14 +924,8 @@ export default function TeacherDocumentPage() {
 
   const [successMessage, setSuccessMessage] = useState("");
 
-  const [uploadModal, setUploadModal] = useState(null);
-
-  const [selectedFile, setSelectedFile] = useState(null);
-
-  const [previewDocument, setPreviewDocument] = useState(null);
-
   /* ===================================================
-     Load teacher documents
+     Load documents
   =================================================== */
 
   const loadDocuments = useCallback(async () => {
@@ -697,21 +940,11 @@ export default function TeacherDocumentPage() {
 
       const allDocuments = extractDocuments(response);
 
-      /*
-       * শুধু teacher requirement documents দেখাবে।
-       * পুরোনো teacher documents-ও type অনুযায়ী table-এ থাকতে পারে।
-       */
-      const teacherDocuments = allDocuments.filter((document) => {
-        if (document.requirementKey?.startsWith("teacher_")) {
-          return true;
-        }
-
-        /*
-         * পুরোনো record-এ requirementKey না থাকলে
-         * teacher-এর নিজের document table-এ দেখাবে।
-         */
-        return !document.requirementKey;
-      });
+      const teacherDocuments = allDocuments.filter(
+        (document) =>
+          document.requirementKey?.startsWith("teacher_") ||
+          !document.requirementKey,
+      );
 
       setDocuments(teacherDocuments);
     } catch (requestError) {
@@ -726,7 +959,7 @@ export default function TeacherDocumentPage() {
   }, [loadDocuments]);
 
   /* ===================================================
-     Success notification timeout
+     Success message timeout
   =================================================== */
 
   useEffect(() => {
@@ -736,7 +969,7 @@ export default function TeacherDocumentPage() {
 
     const timeoutId = window.setTimeout(() => {
       setSuccessMessage("");
-    }, 3000);
+    }, 3500);
 
     return () => {
       window.clearTimeout(timeoutId);
@@ -744,7 +977,7 @@ export default function TeacherDocumentPage() {
   }, [successMessage]);
 
   /* ===================================================
-     Latest document for every requirement
+     Latest document by requirement
   =================================================== */
 
   const latestDocumentByRequirement = useMemo(() => {
@@ -757,23 +990,23 @@ export default function TeacherDocumentPage() {
         return;
       }
 
-      const existingDocument = result.get(requirementKey);
+      const previousDocument = result.get(requirementKey);
 
-      if (!existingDocument) {
+      if (!previousDocument) {
         result.set(requirementKey, document);
 
         return;
       }
 
-      const existingDate = new Date(
-        existingDocument.updatedAt || existingDocument.createdAt || 0,
+      const previousTime = new Date(
+        previousDocument.updatedAt || previousDocument.createdAt || 0,
       ).getTime();
 
-      const currentDate = new Date(
+      const currentTime = new Date(
         document.updatedAt || document.createdAt || 0,
       ).getTime();
 
-      if (currentDate > existingDate) {
+      if (currentTime > previousTime) {
         result.set(requirementKey, document);
       }
     });
@@ -782,85 +1015,52 @@ export default function TeacherDocumentPage() {
   }, [documents]);
 
   /* ===================================================
-     Verification progress
+     Progress calculation
   =================================================== */
 
   const requiredRequirements = TEACHER_DOCUMENT_REQUIREMENTS.filter(
     (requirement) => requirement.required,
   );
 
-  const approvedRequiredCount = requiredRequirements.filter((requirement) => {
-    return (
-      latestDocumentByRequirement.get(requirement.key)?.status === "approved"
-    );
-  }).length;
+  const approvedRequiredCount = requiredRequirements.filter(
+    (requirement) =>
+      latestDocumentByRequirement.get(requirement.key)?.status === "approved",
+  ).length;
 
-  const progress =
+  const submittedRequiredCount = requiredRequirements.filter((requirement) =>
+    Boolean(latestDocumentByRequirement.get(requirement.key)),
+  ).length;
+
+  const verificationProgress =
     requiredRequirements.length > 0
       ? Math.round((approvedRequiredCount / requiredRequirements.length) * 100)
       : 0;
 
-  const statistics = useMemo(
-    () => ({
-      total: documents.length,
+  const remainingRequiredCount = requiredRequirements.filter((requirement) => {
+    const currentDocument = latestDocumentByRequirement.get(requirement.key);
 
-      pending: documents.filter((document) => document.status === "pending")
-        .length,
+    return !currentDocument && !selectedFiles[requirement.key];
+  }).length;
 
-      approved: documents.filter((document) => document.status === "approved")
-        .length,
-
-      rejected: documents.filter((document) => document.status === "rejected")
-        .length,
-    }),
-    [documents],
-  );
+  const selectedCount = Object.keys(selectedFiles).length;
 
   /* ===================================================
-     Upload modal
+     File selection
   =================================================== */
 
-  function openUploadModal(requirement) {
-    const currentDocument =
-      latestDocumentByRequirement.get(requirement.key) || null;
+  function handleFileChange(requirementKey, event) {
+    const file = event.target.files?.[0];
 
-    setError("");
-    setSelectedFile(null);
-
-    setUploadModal({
-      requirement,
-      currentDocument,
-    });
-  }
-
-  function closeUploadModal() {
-    if (uploading) {
-      return;
-    }
-
-    setUploadModal(null);
-    setSelectedFile(null);
-  }
-
-  /* ===================================================
-     File selection validation
-  =================================================== */
-
-  function handleFileSelection(event) {
-    const file = event.target.files?.[0] || null;
+    event.target.value = "";
 
     setError("");
 
     if (!file) {
-      setSelectedFile(null);
       return;
     }
 
     if (!ALLOWED_FILE_TYPES.includes(file.type)) {
-      setError("Only JPG, PNG, WEBP and PDF files are allowed.");
-
-      setSelectedFile(null);
-      event.target.value = "";
+      setError("Only PDF, JPG, JPEG, PNG and WEBP files are allowed.");
 
       return;
     }
@@ -868,78 +1068,141 @@ export default function TeacherDocumentPage() {
     if (file.size > MAX_FILE_SIZE) {
       setError("The selected file cannot be larger than 5 MB.");
 
-      setSelectedFile(null);
-      event.target.value = "";
-
       return;
     }
 
-    setSelectedFile(file);
+    setSelectedFiles((previousFiles) => ({
+      ...previousFiles,
+
+      [requirementKey]: file,
+    }));
+  }
+
+  function handleRemoveSelectedFile(requirementKey) {
+    setSelectedFiles((previousFiles) => {
+      const updatedFiles = {
+        ...previousFiles,
+      };
+
+      delete updatedFiles[requirementKey];
+
+      return updatedFiles;
+    });
   }
 
   /* ===================================================
-     Upload/resubmit
+     Upload selected documents
   =================================================== */
 
-  async function handleUpload(event) {
-    event.preventDefault();
+  async function handleUploadSelectedDocuments() {
+    const selectedEntries = Object.entries(selectedFiles);
 
-    const requirement = uploadModal?.requirement;
-
-    const currentDocument = uploadModal?.currentDocument;
-
-    if (!requirement) {
-      return;
-    }
-
-    if (!selectedFile) {
-      setError("Please select a document file.");
+    if (selectedEntries.length === 0) {
+      setError("Please select at least one document.");
 
       return;
     }
 
-    const formData = new FormData();
-
-    formData.append("file", selectedFile);
-
-    formData.append("title", requirement.title);
-
-    formData.append("type", requirement.type);
-
-    formData.append("documentSide", requirement.documentSide);
-
-    formData.append("requirementKey", requirement.key);
+    const successfulKeys = [];
+    const failedUploads = [];
 
     try {
       setUploading(true);
       setError("");
 
-      if (currentDocument && currentDocument.status === "rejected") {
-        await documentApi.resubmitDocument(
-          getDocumentId(currentDocument),
-          formData,
+      for (const [requirementKey, file] of selectedEntries) {
+        const requirement = TEACHER_DOCUMENT_REQUIREMENTS.find(
+          (item) => item.key === requirementKey,
         );
 
-        setSuccessMessage("Document resubmitted successfully.");
-      } else {
-        await documentApi.uploadDocument(formData);
+        if (!requirement) {
+          failedUploads.push(requirementKey);
 
-        setSuccessMessage("Document uploaded successfully.");
+          continue;
+        }
+
+        const currentDocument = latestDocumentByRequirement.get(requirementKey);
+
+        const formData = new FormData();
+
+        formData.append("file", file);
+
+        formData.append("title", requirement.title);
+
+        formData.append("type", requirement.type);
+
+        formData.append("documentSide", requirement.documentSide);
+
+        formData.append("requirementKey", requirement.key);
+
+        try {
+          if (currentDocument?.status === "rejected") {
+            await documentApi.resubmitDocument(
+              getDocumentId(currentDocument),
+              formData,
+            );
+          } else {
+            await documentApi.uploadDocument(formData);
+          }
+
+          successfulKeys.push(requirementKey);
+        } catch (uploadError) {
+          failedUploads.push({
+            requirementKey,
+            message: getErrorMessage(
+              uploadError,
+              `Failed to upload ${requirement.title}.`,
+            ),
+          });
+        }
       }
 
-      setUploadModal(null);
-      setSelectedFile(null);
+      if (successfulKeys.length > 0) {
+        setSelectedFiles((previousFiles) => {
+          const updatedFiles = {
+            ...previousFiles,
+          };
 
-      await loadDocuments();
-    } catch (requestError) {
-      setError(getErrorMessage(requestError, "Failed to upload the document."));
+          successfulKeys.forEach((key) => {
+            delete updatedFiles[key];
+          });
+
+          return updatedFiles;
+        });
+
+        await loadDocuments();
+      }
+
+      if (failedUploads.length > 0) {
+        const firstError = failedUploads[0];
+
+        setError(
+          typeof firstError === "object"
+            ? firstError.message
+            : "Some documents could not be uploaded.",
+        );
+
+        if (successfulKeys.length > 0) {
+          setSuccessMessage(
+            `${successfulKeys.length} document${
+              successfulKeys.length === 1 ? "" : "s"
+            } uploaded successfully. Please retry the failed document.`,
+          );
+        }
+      } else {
+        setSuccessMessage(
+          `${successfulKeys.length} document${
+            successfulKeys.length === 1 ? "" : "s"
+          } uploaded successfully.`,
+        );
+      }
     } finally {
       setUploading(false);
     }
   }
 
   /* ===================================================
-     Preview/open file
+     Preview and download
   =================================================== */
 
   function handlePreview(document) {
@@ -1002,43 +1265,38 @@ export default function TeacherDocumentPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#F4F7FB] px-4 py-5 sm:px-6 lg:px-8">
-      {/* Success message */}
+    <main className="min-h-screen bg-[#f8fafc] px-4 py-6 sm:px-6 lg:px-8">
+      {/* Success notification */}
 
       {successMessage ? (
-        <div className="fixed right-5 top-5 z-[200] flex items-center gap-2 rounded-xl bg-slate-900 px-5 py-3 text-sm font-bold text-white shadow-2xl">
-          <IoCheckmarkCircle className="text-xl text-emerald-400" />
+        <div className="fixed right-5 top-5 z-[200] flex max-w-md items-center gap-2 rounded-xl bg-slate-900 px-5 py-3 text-sm font-bold text-white shadow-2xl">
+          <FaCheckCircle className="shrink-0 text-emerald-400" />
 
-          {successMessage}
+          <span>{successMessage}</span>
         </div>
       ) : null}
 
-      <div className="mx-auto max-w-7xl">
-        {/* Page header */}
+      <section className="mx-auto w-full">
+        {/* Header */}
 
-        <header className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-          <div className="flex items-start gap-3">
+        <header className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-3 sm:items-center">
             <button
               type="button"
               onClick={() => router.back()}
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-[#16458f] shadow-sm transition hover:border-blue-200 hover:bg-blue-50"
               aria-label="Go back"
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-xl text-[#0D4598] shadow-sm transition hover:bg-[#0D4598] hover:text-white"
             >
-              <IoArrowBack />
+              <FaChevronLeft size={14} />
             </button>
 
-            <div>
-              <p className="text-xs font-black uppercase tracking-[0.16em] text-[#0D4598]">
-                Teacher Panel / Documents
-              </p>
-
-              <h1 className="mt-1 text-2xl font-black text-slate-900 sm:text-3xl">
-                Instructor Document Verification
+            <div className="min-w-0">
+              <h1 className="text-2xl font-extrabold leading-tight text-[#16458f] sm:text-[28px]">
+                My Documents
               </h1>
 
-              <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-500">
-                Upload your identity, driving licence, qualification and
-                professional documents for admin verification.
+              <p className="mt-1 text-sm leading-5 text-slate-500">
+                Upload and manage the documents required for verification.
               </p>
             </div>
           </div>
@@ -1046,12 +1304,10 @@ export default function TeacherDocumentPage() {
           <button
             type="button"
             onClick={loadDocuments}
-            disabled={loading}
-            className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-black text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+            disabled={loading || uploading}
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-xs font-bold text-[#16458f] shadow-sm transition hover:border-blue-200 hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <IoRefreshOutline
-              className={`text-lg ${loading ? "animate-spin" : ""}`}
-            />
+            <FaSyncAlt className={loading ? "animate-spin" : ""} size={12} />
             Refresh
           </button>
         </header>
@@ -1060,522 +1316,194 @@ export default function TeacherDocumentPage() {
 
         {error ? (
           <div className="mb-5 flex items-start gap-3 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700">
-            <IoWarningOutline className="mt-0.5 shrink-0 text-xl" />
+            <FaExclamationTriangle className="mt-0.5 shrink-0" />
 
             <span>{error}</span>
 
             <button
               type="button"
               onClick={() => setError("")}
-              className="ml-auto shrink-0 rounded-full p-1 hover:bg-rose-100"
+              className="ml-auto flex h-7 w-7 shrink-0 items-center justify-center rounded-lg transition hover:bg-rose-100"
               aria-label="Close error"
             >
-              <IoClose />
+              <FaTimes size={11} />
             </button>
           </div>
         ) : null}
 
         {/* Verification progress */}
 
-        <section className="mb-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <div className="flex flex-wrap items-center justify-between gap-4">
+        <section className="mb-5 overflow-hidden rounded-2xl border border-blue-100 bg-gradient-to-r from-[#16458f] to-[#2763b7] p-5 text-white shadow-sm sm:p-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h2 className="font-black text-slate-900">
+              <p className="text-xs font-bold uppercase tracking-[0.14em] text-blue-100">
                 Verification progress
-              </h2>
+              </p>
 
-              <p className="mt-1 text-sm text-slate-500">
+              <h2 className="mt-1 text-xl font-extrabold">
                 {approvedRequiredCount} of {requiredRequirements.length}{" "}
                 required documents approved
+              </h2>
+
+              <p className="mt-1 text-xs leading-5 text-blue-100">
+                {submittedRequiredCount} required documents submitted. Admin
+                will verify each document separately.
               </p>
             </div>
 
-            <div className="text-right">
-              <p className="text-2xl font-black text-[#0D4598]">{progress}%</p>
-
-              {progress === 100 ? (
-                <p className="mt-1 text-xs font-black text-emerald-600">
-                  Verification completed
-                </p>
-              ) : (
-                <p className="mt-1 text-xs font-bold text-slate-400">
-                  Verification in progress
-                </p>
-              )}
+            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-4 border-white/30 bg-white/10 text-lg font-extrabold">
+              {verificationProgress}%
             </div>
           </div>
 
-          <div className="mt-4 h-3 overflow-hidden rounded-full bg-slate-100">
+          <div className="mt-5 h-2.5 overflow-hidden rounded-full bg-white/20">
             <div
-              className="h-full rounded-full bg-[#0D4598] transition-all duration-500"
+              className="h-full rounded-full bg-white transition-all duration-500"
               style={{
-                width: `${progress}%`,
+                width: `${verificationProgress}%`,
               }}
             />
           </div>
         </section>
 
-        {/* Statistics */}
-
-        <section className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <StatisticsCard
-            title="Uploaded"
-            value={statistics.total}
-            icon={IoDocumentTextOutline}
-            iconClassName="bg-blue-50 text-blue-700"
-          />
-
-          <StatisticsCard
-            title="Pending"
-            value={statistics.pending}
-            icon={IoTimeOutline}
-            iconClassName="bg-amber-50 text-amber-600"
-          />
-
-          <StatisticsCard
-            title="Approved"
-            value={statistics.approved}
-            icon={IoCheckmarkCircleOutline}
-            iconClassName="bg-emerald-50 text-emerald-600"
-          />
-
-          <StatisticsCard
-            title="Rejected"
-            value={statistics.rejected}
-            icon={IoWarningOutline}
-            iconClassName="bg-rose-50 text-rose-600"
-          />
-        </section>
-
         {/* Required documents */}
 
-        <section className="mb-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <section className="rounded-3xl border border-slate-200 bg-slate-50/80 p-4 shadow-sm sm:p-5 lg:p-6">
+          <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h2 className="text-lg font-black text-slate-900">
-                Instructor documents
+              <h2 className="text-lg font-extrabold text-slate-900">
+                Required Documents
               </h2>
 
-              <p className="mt-1 text-sm text-slate-500">
-                Accepted formats: JPG, PNG, WEBP and PDF. Maximum size: 5 MB.
+              <p className="mt-1 text-xs leading-5 text-slate-500">
+                Accepted formats are PDF, JPG, JPEG, PNG and WEBP. Maximum file
+                size is 5 MB.
               </p>
             </div>
 
-            <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-black text-[#0D4598]">
-              {TEACHER_DOCUMENT_REQUIREMENTS.length} documents
+            <span className="inline-flex w-fit items-center rounded-full bg-blue-100 px-3 py-1.5 text-xs font-extrabold text-[#16458f]">
+              {TEACHER_DOCUMENT_REQUIREMENTS.length} requirements
             </span>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {TEACHER_DOCUMENT_REQUIREMENTS.map((requirement, index) => {
-              const currentDocument = latestDocumentByRequirement.get(
-                requirement.key,
-              );
+          {loading ? (
+            <div className="flex min-h-[250px] flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white">
+              <FaSyncAlt className="animate-spin text-2xl text-[#16458f]" />
 
-              const status = currentDocument?.status || "not_uploaded";
+              <p className="mt-3 text-sm font-bold text-slate-500">
+                Loading documents...
+              </p>
+            </div>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-1">
+              {TEACHER_DOCUMENT_REQUIREMENTS.map((requirement) => {
+                const currentDocument = latestDocumentByRequirement.get(
+                  requirement.key,
+                );
 
-              const canUpload =
-                !currentDocument || currentDocument.status === "rejected";
-
-              const RequirementIcon = requirement.icon;
-
-              return (
-                <article
-                  key={requirement.key}
-                  className="flex min-h-[285px] flex-col rounded-2xl border border-slate-200 bg-[#FBFCFE] p-5 transition hover:border-blue-200 hover:shadow-sm"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-[#0D4598]">
-                      <RequirementIcon className="text-xl" />
-                    </div>
-
-                    <StatusBadge status={status} />
-                  </div>
-
-                  <div className="mt-4 flex-1">
-                    <div className="flex items-start gap-2">
-                      <span className="mt-0.5 text-xs font-black text-slate-400">
-                        {String(index + 1).padStart(2, "0")}
-                      </span>
-
-                      <h3 className="font-black text-slate-900">
-                        {requirement.title}
-
-                        {requirement.required ? (
-                          <span className="ml-1 text-rose-600">*</span>
-                        ) : (
-                          <span className="ml-2 text-xs font-semibold text-slate-400">
-                            Optional
-                          </span>
-                        )}
-                      </h3>
-                    </div>
-
-                    <p className="mt-2 text-sm leading-6 text-slate-500">
-                      {requirement.description}
-                    </p>
-
-                    {currentDocument ? (
-                      <div className="mt-3 rounded-xl border border-slate-200 bg-white px-3 py-2">
-                        <p className="truncate text-xs font-black text-slate-700">
-                          {currentDocument.originalFileName ||
-                            currentDocument.title}
-                        </p>
-
-                        <p className="mt-1 text-xs text-slate-400">
-                          Uploaded{" "}
-                          {formatDate(
-                            currentDocument.uploadedAt ||
-                              currentDocument.createdAt,
-                          )}
-                        </p>
-                      </div>
-                    ) : null}
-
-                    {currentDocument?.status === "rejected" &&
-                    currentDocument.rejectionReason ? (
-                      <div className="mt-3 rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs font-semibold leading-5 text-rose-700">
-                        <strong>Admin reason:</strong>{" "}
-                        {currentDocument.rejectionReason}
-                      </div>
-                    ) : null}
-                  </div>
-
-                  <div className="mt-5 flex flex-wrap gap-2">
-                    {currentDocument ? (
-                      <button
-                        type="button"
-                        onClick={() => handlePreview(currentDocument)}
-                        className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-black text-slate-700 transition hover:bg-slate-50"
-                      >
-                        <IoEyeOutline className="text-base" />
-                        View
-                      </button>
-                    ) : null}
-
-                    {canUpload ? (
-                      <button
-                        type="button"
-                        onClick={() => openUploadModal(requirement)}
-                        className="inline-flex items-center gap-2 rounded-xl bg-[#0D4598] px-3 py-2 text-xs font-black text-white transition hover:bg-[#083777]"
-                      >
-                        <IoCloudUploadOutline className="text-base" />
-
-                        {currentDocument?.status === "rejected"
-                          ? "Resubmit"
-                          : "Upload"}
-                      </button>
-                    ) : (
-                      <button
-                        type="button"
-                        disabled
-                        className="cursor-not-allowed rounded-xl bg-slate-100 px-3 py-2 text-xs font-black text-slate-400"
-                      >
-                        {currentDocument?.status === "approved"
-                          ? "Verified"
-                          : "Under review"}
-                      </button>
-                    )}
-                  </div>
-                </article>
-              );
-            })}
-          </div>
+                return (
+                  <RequiredDocumentCard
+                    key={requirement.key}
+                    requirement={requirement}
+                    currentDocument={currentDocument}
+                    selectedFile={selectedFiles[requirement.key]}
+                    uploading={uploading}
+                    deleting={
+                      Boolean(currentDocument) &&
+                      deletingId === getDocumentId(currentDocument)
+                    }
+                    onFileChange={handleFileChange}
+                    onRemoveSelectedFile={handleRemoveSelectedFile}
+                    onPreview={handlePreview}
+                    onDownload={handleDownload}
+                    onDelete={handleDelete}
+                  />
+                );
+              })}
+            </div>
+          )}
         </section>
 
-        {/* Uploaded document table */}
+        {/* Downloadable documents */}
 
-        <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-          <div className="border-b border-slate-200 px-5 py-4">
-            <h2 className="text-lg font-black text-slate-900">
-              My uploaded documents
-            </h2>
+        {documents.length > 0 ? (
+          <section className="mt-5 rounded-3xl border border-slate-200 bg-slate-50/80 p-4 shadow-sm sm:p-5 lg:p-6">
+            <div className="mb-5">
+              <h2 className="text-lg font-extrabold text-slate-900">
+                Downloadable Documents
+              </h2>
 
-            <p className="mt-1 text-sm text-slate-500">
-              View your uploaded documents and current verification status.
-            </p>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[1000px] divide-y divide-slate-200">
-              <thead className="bg-slate-50">
-                <tr className="text-left text-xs font-black uppercase tracking-[0.08em] text-slate-500">
-                  <th className="px-5 py-3">Document</th>
-
-                  <th className="px-5 py-3">Type</th>
-
-                  <th className="px-5 py-3">Uploaded</th>
-
-                  <th className="px-5 py-3">Version</th>
-
-                  <th className="px-5 py-3">Size</th>
-
-                  <th className="px-5 py-3">Status</th>
-
-                  <th className="px-5 py-3 text-right">Actions</th>
-                </tr>
-              </thead>
-
-              <tbody className="divide-y divide-slate-100">
-                {loading ? (
-                  <tr>
-                    <td
-                      colSpan={7}
-                      className="px-5 py-14 text-center text-sm font-black text-slate-500"
-                    >
-                      <IoRefreshOutline className="mx-auto mb-2 animate-spin text-2xl text-[#0D4598]" />
-                      Loading documents...
-                    </td>
-                  </tr>
-                ) : documents.length === 0 ? (
-                  <tr>
-                    <td colSpan={7} className="px-5 py-14 text-center">
-                      <IoDocumentTextOutline className="mx-auto text-4xl text-slate-300" />
-
-                      <p className="mt-3 text-sm font-black text-slate-600">
-                        No document uploaded yet.
-                      </p>
-
-                      <p className="mt-1 text-xs text-slate-400">
-                        Upload your first instructor document above.
-                      </p>
-                    </td>
-                  </tr>
-                ) : (
-                  documents.map((document) => {
-                    const documentId = getDocumentId(document);
-
-                    return (
-                      <tr
-                        key={documentId}
-                        className="text-sm text-slate-600 transition hover:bg-slate-50/60"
-                      >
-                        <td className="px-5 py-4">
-                          <p className="font-black text-slate-900">
-                            {document.title || "Untitled document"}
-                          </p>
-
-                          <p className="mt-1 max-w-[280px] truncate text-xs text-slate-400">
-                            {document.originalFileName || "-"}
-                          </p>
-                        </td>
-
-                        <td className="px-5 py-4">
-                          <p className="font-bold text-slate-700">
-                            {formatText(document.type)}
-                          </p>
-
-                          <p className="mt-1 text-xs text-slate-400">
-                            {formatText(document.documentSide)}
-                          </p>
-                        </td>
-
-                        <td className="px-5 py-4">
-                          {formatDateTime(
-                            document.uploadedAt || document.createdAt,
-                          )}
-                        </td>
-
-                        <td className="px-5 py-4 font-black text-slate-700">
-                          v{document.version || 1}
-                        </td>
-
-                        <td className="px-5 py-4">
-                          {formatFileSize(document.fileSize)}
-                        </td>
-
-                        <td className="px-5 py-4">
-                          <StatusBadge status={document.status} />
-
-                          {document.reviewedAt ? (
-                            <p className="mt-2 text-xs text-slate-400">
-                              Reviewed {formatDate(document.reviewedAt)}
-                            </p>
-                          ) : null}
-                        </td>
-
-                        <td className="px-5 py-4">
-                          <div className="flex justify-end gap-2">
-                            <button
-                              type="button"
-                              onClick={() => handlePreview(document)}
-                              className="rounded-xl border border-slate-200 p-2 text-slate-600 transition hover:bg-slate-100"
-                              title="Preview document"
-                            >
-                              <IoEyeOutline className="text-lg" />
-                            </button>
-
-                            <button
-                              type="button"
-                              onClick={() => handleDownload(document)}
-                              className="rounded-xl border border-blue-200 bg-blue-50 p-2 text-blue-700 transition hover:bg-blue-100"
-                              title="Open document"
-                            >
-                              <IoDownloadOutline className="text-lg" />
-                            </button>
-
-                            {document.status !== "approved" ? (
-                              <button
-                                type="button"
-                                onClick={() => handleDelete(document)}
-                                disabled={deletingId === documentId}
-                                className="rounded-xl border border-rose-200 bg-rose-50 p-2 text-rose-700 transition hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-50"
-                                title="Delete document"
-                              >
-                                {deletingId === documentId ? (
-                                  <IoRefreshOutline className="animate-spin text-lg" />
-                                ) : (
-                                  <IoTrashOutline className="text-lg" />
-                                )}
-                              </button>
-                            ) : null}
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
-          </div>
-        </section>
-      </div>
-
-      {/* =================================================
-          Upload modal
-      ================================================= */}
-
-      {uploadModal ? (
-        <div className="fixed inset-0 z-[150] flex items-center justify-center bg-slate-950/65 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-lg overflow-hidden rounded-3xl bg-white shadow-2xl">
-            <div className="flex items-start justify-between border-b border-slate-200 px-6 py-5">
-              <div>
-                <p className="text-xs font-black uppercase tracking-[0.15em] text-[#0D4598]">
-                  {uploadModal.currentDocument?.status === "rejected"
-                    ? "Resubmit document"
-                    : "Upload document"}
-                </p>
-
-                <h2 className="mt-1 text-xl font-black text-slate-900">
-                  {uploadModal.requirement.title}
-                </h2>
-              </div>
-
-              <button
-                type="button"
-                onClick={closeUploadModal}
-                disabled={uploading}
-                className="rounded-full p-2 text-slate-400 transition hover:bg-slate-100 disabled:opacity-50"
-                aria-label="Close upload modal"
-              >
-                <IoClose className="text-xl" />
-              </button>
+              <p className="mt-1 text-xs leading-5 text-slate-500">
+                Preview or download the available copies of your submitted
+                documents.
+              </p>
             </div>
 
-            <form onSubmit={handleUpload} className="p-6">
-              {uploadModal.currentDocument?.status === "rejected" &&
-              uploadModal.currentDocument.rejectionReason ? (
-                <div className="mb-5 rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
-                  <p className="font-black">Rejection reason</p>
-
-                  <p className="mt-1 leading-6">
-                    {uploadModal.currentDocument.rejectionReason}
-                  </p>
-                </div>
-              ) : null}
-
-              <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                <p className="text-sm font-black text-slate-800">
-                  {uploadModal.requirement.title}
-                </p>
-
-                <p className="mt-1 text-xs leading-5 text-slate-500">
-                  {uploadModal.requirement.description}
-                </p>
-              </div>
-
-              <label className="mt-5 block text-sm font-black text-slate-800">
-                Select document
-              </label>
-
-              <label className="mt-2 flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 px-5 py-8 text-center transition hover:border-[#0D4598] hover:bg-blue-50/30">
-                <IoCloudUploadOutline className="text-4xl text-[#0D4598]" />
-
-                <span className="mt-3 text-sm font-black text-slate-800">
-                  Click to select a file
-                </span>
-
-                <span className="mt-1 text-xs text-slate-500">
-                  JPG, PNG, WEBP or PDF up to 5 MB
-                </span>
-
-                <input
-                  type="file"
-                  accept=".jpg,.jpeg,.png,.webp,.pdf"
-                  onChange={handleFileSelection}
-                  className="hidden"
+            <div className="flex flex-col gap-4 md:grid md:grid-cols-2">
+              {documents.map((document) => (
+                <DownloadDocumentCard
+                  key={getDocumentId(document)}
+                  document={document}
+                  onPreview={handlePreview}
+                  onDownload={handleDownload}
                 />
-              </label>
+              ))}
+            </div>
+          </section>
+        ) : null}
 
-              {selectedFile ? (
-                <div className="mt-4 flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3">
-                  <IoCheckmarkCircle className="shrink-0 text-xl text-emerald-600" />
+        {/* Bottom upload action */}
 
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-black text-slate-800">
-                      {selectedFile.name}
-                    </p>
+        <div className="mt-5 flex flex-col items-stretch justify-between gap-3 sm:flex-row sm:items-center">
+          <p className="text-xs font-semibold text-slate-500">
+            {selectedCount > 0
+              ? `${selectedCount} document${
+                  selectedCount === 1 ? "" : "s"
+                } ready to upload.`
+              : remainingRequiredCount > 0
+                ? `${remainingRequiredCount} required document${
+                    remainingRequiredCount === 1 ? "" : "s"
+                  } still need to be submitted.`
+                : verificationProgress === 100
+                  ? "All required documents have been approved."
+                  : "All required documents have been submitted for verification."}
+          </p>
 
-                    <p className="mt-1 text-xs text-slate-500">
-                      {formatFileSize(selectedFile.size)}
-                    </p>
-                  </div>
-                </div>
-              ) : null}
+          <button
+            type="button"
+            onClick={handleUploadSelectedDocuments}
+            disabled={selectedCount === 0 || uploading}
+            className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#16458f] px-7 text-sm font-extrabold text-white shadow-sm transition hover:bg-[#123a78] disabled:cursor-not-allowed disabled:bg-slate-300 sm:w-auto"
+          >
+            {uploading ? (
+              <FaSyncAlt className="animate-spin" size={12} />
+            ) : (
+              <FaUpload size={12} />
+            )}
 
-              <div className="mt-6 flex justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={closeUploadModal}
-                  disabled={uploading}
-                  className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-black text-slate-600 transition hover:bg-slate-50 disabled:opacity-50"
-                >
-                  Cancel
-                </button>
-
-                <button
-                  type="submit"
-                  disabled={!selectedFile || uploading}
-                  className="inline-flex items-center gap-2 rounded-xl bg-[#0D4598] px-5 py-2.5 text-sm font-black text-white transition hover:bg-[#083777] disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {uploading ? (
-                    <IoRefreshOutline className="animate-spin text-lg" />
-                  ) : (
-                    <IoCloudUploadOutline className="text-lg" />
-                  )}
-
-                  {uploading
-                    ? "Uploading..."
-                    : uploadModal.currentDocument?.status === "rejected"
-                      ? "Resubmit"
-                      : "Upload"}
-                </button>
-              </div>
-            </form>
-          </div>
+            {uploading
+              ? "Uploading Documents..."
+              : selectedCount > 0
+                ? `Upload ${selectedCount} Selected Document${
+                    selectedCount === 1 ? "" : "s"
+                  }`
+                : remainingRequiredCount > 0
+                  ? `${remainingRequiredCount} Documents Remaining`
+                  : verificationProgress === 100
+                    ? "Verification Completed"
+                    : "Documents Under Review"}
+          </button>
         </div>
-      ) : null}
+      </section>
 
-      {/* =================================================
-          Preview modal
-      ================================================= */}
+      {/* Preview modal */}
 
       {previewDocument ? (
         <div className="fixed inset-0 z-[160] flex items-center justify-center bg-slate-950/75 p-3 backdrop-blur-sm sm:p-5">
           <div className="flex h-[92vh] w-full max-w-5xl flex-col overflow-hidden rounded-3xl bg-white shadow-2xl">
             <div className="flex items-center justify-between gap-4 border-b border-slate-200 px-5 py-4">
               <div className="min-w-0">
-                <h2 className="truncate font-black text-slate-900">
+                <h2 className="truncate font-extrabold text-[#16458f]">
                   {previewDocument.title || "Document preview"}
                 </h2>
 
@@ -1588,19 +1516,19 @@ export default function TeacherDocumentPage() {
                 <button
                   type="button"
                   onClick={() => handleDownload(previewDocument)}
-                  className="rounded-xl border border-blue-200 bg-blue-50 p-2 text-blue-700 transition hover:bg-blue-100"
-                  title="Open document"
+                  className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-[#e2233d] bg-white px-4 text-xs font-bold text-[#e2233d] transition hover:bg-[#e2233d] hover:text-white"
                 >
-                  <IoDownloadOutline className="text-xl" />
+                  <FaDownload size={12} />
+                  Download
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setPreviewDocument(null)}
-                  className="rounded-xl border border-slate-200 p-2 text-slate-500 transition hover:bg-slate-100"
+                  className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 text-slate-500 transition hover:bg-slate-100"
                   aria-label="Close preview"
                 >
-                  <IoClose className="text-xl" />
+                  <FaTimes size={13} />
                 </button>
               </div>
             </div>
