@@ -186,13 +186,44 @@ export const getInvoice = (id) => axios.get(`/payments/invoices/${id}`);
 // =======================
 // Documents
 // =======================
-export const uploadDocument = (formData) =>
-  axios.post("/documents", formData, {
-    headers: { "Content-Type": "multipart/form-data" },
+
+export const uploadDocument = (formData) => {
+  return axios.post("/documents", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
   });
-export const getDocuments = () => axios.get("/documents");
-export const reviewDocument = (id, data) =>
-  axios.patch(`/documents/${id}/review`, data);
+};
+
+export const getDocuments = (params = {}) => {
+  return axios.get("/documents", {
+    params,
+  });
+};
+
+export const getDocumentStats = () => {
+  return axios.get("/documents/stats");
+};
+
+export const getDocumentById = (documentId) => {
+  return axios.get(`/documents/${documentId}`);
+};
+
+export const resubmitDocument = (documentId, formData) => {
+  return axios.patch(`/documents/${documentId}/resubmit`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+};
+
+export const reviewDocument = (documentId, data) => {
+  return axios.patch(`/documents/${documentId}/review`, data);
+};
+
+export const deleteDocument = (documentId) => {
+  return axios.delete(`/documents/${documentId}`);
+};
 
 // =======================
 // Blogs
