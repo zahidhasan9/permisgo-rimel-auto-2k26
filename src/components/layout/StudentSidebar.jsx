@@ -381,25 +381,19 @@ const menu = [
     ],
   },
 
-  {
-    name: "Take Test",
-    icon: CiMemoPad,
-    children: [{ name: "Take Test", href: "/student/test" }],
-  },
-
-  {
-    name: "Academic Info",
-    icon: HiAcademicCap,
-    children: [
-      { name: "Live Coding", href: "/student/academic-Info/live-coding" },
-      { name: "Exam Topic", href: "/student/academic-Info/exam-topic" },
-      {
-        name: "Knowledge Sheets",
-        href: "/student/academic-Info/knowledge-sheets",
-      },
-      { name: "Road Signs", href: "/student/academic-Info/road-signs" },
-    ],
-  },
+  // {
+  //   name: "Academic Info",
+  //   icon: HiAcademicCap,
+  //   children: [
+  //     { name: "Live Coding", href: "/student/academic-Info/live-coding" },
+  //     { name: "Exam Topic", href: "/student/academic-Info/exam-topic" },
+  //     {
+  //       name: "Knowledge Sheets",
+  //       href: "/student/academic-Info/knowledge-sheets",
+  //     },
+  //     { name: "Road Signs", href: "/student/academic-Info/road-signs" },
+  //   ],
+  // },
 
   {
     name: "Driving Operation",

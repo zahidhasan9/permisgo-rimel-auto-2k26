@@ -85,7 +85,7 @@ export const verifyTeacher = (
   verificationStatus,
   rejectionReason = "",
 ) => {
-  return axiosInstance.patch(`/admin/teachers/${teacherId}/verify`, {
+  return axios.patch(`/admin/teachers/${teacherId}/verify`, {
     verificationStatus,
     rejectionReason,
   });
@@ -199,6 +199,16 @@ export const getDocuments = (params = {}) => {
   return axios.get("/documents", {
     params,
   });
+};
+
+export const getDocumentUsers = (params = {}) => {
+  return axios.get("/documents/users", {
+    params,
+  });
+};
+
+export const getUserDocuments = (userId) => {
+  return axios.get(`/documents/user/${userId}`);
 };
 
 export const getDocumentStats = () => {
