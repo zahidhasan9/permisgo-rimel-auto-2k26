@@ -83,11 +83,11 @@ const menu = [
     href: "/teacher/offers",
     icon: FaFileInvoiceDollar,
   },
-  {
-    name: "Logout",
-    href: "/logout",
-    icon: FaSignOutAlt,
-  },
+  // {
+  //   name: "Logout",
+  //   href: "/logout",
+  //   icon: FaSignOutAlt,
+  // },
 ];
 
 export default function TeacherSidebar({ variant = "desktop", onClose }) {

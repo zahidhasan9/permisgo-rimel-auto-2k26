@@ -425,7 +425,7 @@ const menu = [
   { name: "Referral", href: "/student/referral", icon: BsBook },
   { name: "Support", href: "/student/support", icon: MdSupportAgent },
   { name: "Chat", href: "/chat", icon: IoIosChatboxes },
-  { name: "Logout", href: "/logout", icon: FaSignOutAlt },
+  // { name: "Logout", href: "/logout", icon: FaSignOutAlt },
 ];
 
 export default function StudentSidebar({ variant = "desktop", onClose }) {
