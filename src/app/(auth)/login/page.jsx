@@ -80,21 +80,29 @@ import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 
 import { FaApple, FaGoogle } from "react-icons/fa";
+import { FiEye, FiEyeOff } from "react-icons/fi";
+
 import { clearUserState, login } from "@/features/userSlice";
 import Logo from "../../../../public/image/logo2.png";
 
 const getDashboardPath = (role) => {
   if (role === "admin") return "/admin";
   if (role === "teacher") return "/teacher/dashboard";
+
   return "/student/dashboard";
 };
 
-const getAuthPayload = (payload) => payload?.data || payload || {};
+const getAuthPayload = (payload) => {
+  return payload?.data || payload || {};
+};
 
 const StudentLogin = () => {
   const dispatch = useDispatch();
   const router = useRouter();
+
   const { loading } = useSelector((state) => state.user);
+
+  const [showPassword, setShowPassword] = useState(false);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -103,11 +111,20 @@ const StudentLogin = () => {
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-    setFormData((current) => ({ ...current, [name]: value }));
+
+    setFormData((currentData) => ({
+      ...currentData,
+      [name]: value,
+    }));
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword((currentState) => !currentState);
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
     dispatch(clearUserState());
 
     const email = formData.email.trim().toLowerCase();
@@ -119,11 +136,18 @@ const StudentLogin = () => {
     }
 
     try {
-      const result = await dispatch(login({ email, password })).unwrap();
+      const result = await dispatch(
+        login({
+          email,
+          password,
+        }),
+      ).unwrap();
+
       const authData = getAuthPayload(result);
       const user = authData?.user;
 
       toast.success(result?.message || "Login successful.");
+
       router.replace(getDashboardPath(user?.role));
     } catch (errorMessage) {
       toast.error(errorMessage || "Login failed. Please try again.");
@@ -134,8 +158,10 @@ const StudentLogin = () => {
     <section className="min-h-screen bg-[#f4f8ff] px-4 py-4 sm:px-6">
       <div className="mx-auto flex min-h-[calc(100vh-32px)] max-w-[880px] items-center justify-center">
         <div className="grid w-full overflow-hidden rounded-[18px] border border-white/70 bg-white shadow-[0_18px_45px_rgba(16,54,119,0.12)] lg:grid-cols-[0.95fr_0.9fr]">
+          {/* LEFT SIDE */}
           <div className="relative hidden overflow-hidden bg-[#103677] p-5 text-white lg:block">
             <div className="absolute -left-14 -top-14 h-44 w-44 rounded-full bg-white/10 blur-2xl" />
+
             <div className="absolute -bottom-16 -right-14 h-48 w-48 rounded-full bg-[#2563eb]/50 blur-3xl" />
 
             <div className="relative z-10 flex h-full flex-col justify-between">
@@ -168,8 +194,10 @@ const StudentLogin = () => {
             </div>
           </div>
 
+          {/* RIGHT SIDE */}
           <div className="flex items-center justify-center px-5 py-5 sm:px-6 lg:px-7">
             <div className="w-full max-w-[340px]">
+              {/* MOBILE LOGO */}
               <div className="mb-4 text-center lg:hidden">
                 <div className="mx-auto mb-3 w-[110px]">
                   <Image
@@ -182,6 +210,7 @@ const StudentLogin = () => {
                 </div>
               </div>
 
+              {/* LOGIN HEADER */}
               <div className="mb-4 text-center lg:text-left">
                 <span className="mb-2 inline-flex rounded-full bg-[#eef4ff] px-3 py-1 text-[10.5px] font-bold text-[#103677]">
                   Account Access
@@ -196,7 +225,9 @@ const StudentLogin = () => {
                 </p>
               </div>
 
+              {/* LOGIN FORM */}
               <form onSubmit={handleSubmit} className="space-y-3">
+                {/* EMAIL */}
                 <div>
                   <label
                     htmlFor="email"
@@ -218,6 +249,7 @@ const StudentLogin = () => {
                   />
                 </div>
 
+                {/* PASSWORD */}
                 <div>
                   <label
                     htmlFor="password"
@@ -226,19 +258,33 @@ const StudentLogin = () => {
                     Password
                   </label>
 
-                  <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    placeholder="Password"
-                    autoComplete="current-password"
-                    required
-                    className="block w-full rounded-lg border border-slate-200 bg-slate-50 px-3.5 py-2 text-[13px] font-medium text-slate-900 outline-none transition-all duration-300 placeholder:text-slate-400 focus:border-[#2563eb] focus:bg-white focus:ring-4 focus:ring-[#2563eb]/10"
-                  />
+                  <div className="relative">
+                    <input
+                      id="password"
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      value={formData.password}
+                      onChange={handleChange}
+                      placeholder="Password"
+                      autoComplete="current-password"
+                      required
+                      className="block w-full rounded-lg border border-slate-200 bg-slate-50 px-3.5 py-2 pr-11 text-[13px] font-medium text-slate-900 outline-none transition-all duration-300 placeholder:text-slate-400 focus:border-[#2563eb] focus:bg-white focus:ring-4 focus:ring-[#2563eb]/10"
+                    />
+
+                    <button
+                      type="button"
+                      onClick={togglePasswordVisibility}
+                      aria-label={
+                        showPassword ? "Hide password" : "Show password"
+                      }
+                      className="absolute right-3 top-1/2 flex -translate-y-1/2 items-center justify-center text-[18px] text-slate-500 transition hover:text-[#103677]"
+                    >
+                      {showPassword ? <FiEye /> : <FiEyeOff />}
+                    </button>
+                  </div>
                 </div>
 
+                {/* FORGOT PASSWORD */}
                 <div className="flex justify-end">
                   <Link
                     href="/forget-password"
@@ -248,6 +294,7 @@ const StudentLogin = () => {
                   </Link>
                 </div>
 
+                {/* LOGIN BUTTON */}
                 <button
                   type="submit"
                   disabled={loading}
@@ -257,14 +304,18 @@ const StudentLogin = () => {
                 </button>
               </form>
 
+              {/* DIVIDER */}
               <div className="my-3.5 flex items-center gap-3">
                 <div className="h-px flex-1 bg-slate-200" />
+
                 <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">
                   OR
                 </span>
+
                 <div className="h-px flex-1 bg-slate-200" />
               </div>
 
+              {/* SOCIAL LOGIN */}
               <div className="grid grid-cols-2 gap-2.5">
                 <button
                   type="button"
@@ -285,6 +336,7 @@ const StudentLogin = () => {
                 </button>
               </div>
 
+              {/* REGISTER */}
               <p className="mt-4 text-center text-[12.5px] text-slate-600">
                 Don&apos;t have an account?{" "}
                 <Link
