@@ -936,7 +936,7 @@ export default function TeacherDocumentPage() {
 
         {/* Verification progress */}
 
-        <section className="mb-5 overflow-hidden rounded-2xl border border-blue-100 bg-gradient-to-r from-[#16458f] to-[#2763b7] p-5 text-white shadow-sm sm:p-6">
+        {/* <section className="mb-5 overflow-hidden rounded-2xl border border-blue-100 bg-gradient-to-r from-[#16458f] to-[#2763b7] p-5 text-white shadow-sm sm:p-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.14em] text-blue-100">
@@ -967,7 +967,7 @@ export default function TeacherDocumentPage() {
               }}
             />
           </div>
-        </section>
+        </section> */}
 
         {/* Required documents */}
 

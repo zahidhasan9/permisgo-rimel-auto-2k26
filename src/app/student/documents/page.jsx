@@ -851,7 +851,7 @@ export default function StudentDocumentsPage() {
           </div>
         ) : null}
 
-        <section className="mb-5 overflow-hidden rounded-2xl border border-blue-100 bg-gradient-to-r from-[#16458f] to-[#2763b7] p-5 text-white shadow-sm sm:p-6">
+        {/* <section className="mb-5 overflow-hidden rounded-2xl border border-blue-100 bg-gradient-to-r from-[#16458f] to-[#2763b7] p-5 text-white shadow-sm sm:p-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.14em] text-blue-100">
@@ -882,7 +882,7 @@ export default function StudentDocumentsPage() {
               }}
             />
           </div>
-        </section>
+        </section> */}
 
         <section className="rounded-3xl border border-slate-200 bg-slate-50/80 p-4 shadow-sm sm:p-5 lg:p-6">
           <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
