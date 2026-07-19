@@ -516,14 +516,14 @@ const menu = [
         name: "All Users",
         href: "/admin/users",
       },
-      {
-        name: "Students",
-        href: "/admin/students",
-      },
-      {
-        name: "Teachers",
-        href: "/admin/teachers",
-      },
+      // {
+      //   name: "Students",
+      //   href: "/admin/students",
+      // },
+      // {
+      //   name: "Teachers",
+      //   href: "/admin/teachers",
+      // },
       {
         name: "Teacher Locations",
         href: "/admin/teacher-locations",
@@ -573,12 +573,16 @@ const menu = [
     icon: FaCar,
     children: [
       {
-        name: "Bookings",
-        href: "/admin/bookings",
-      },
-      {
         name: "Lessons",
         href: "/admin/lessons",
+      },
+      // {
+      //   name: "Vehicle",
+      //   href: "/admin/teacher-vehicles",
+      // },
+      {
+        name: "Bookings",
+        href: "/admin/bookings",
       },
       {
         name: "Driving Planning",
@@ -620,18 +624,18 @@ const menu = [
         name: "All Documents",
         href: "/admin/documents",
       },
-      {
-        name: "Pending Documents",
-        href: "/admin/documents/pending",
-      },
-      {
-        name: "Approved Documents",
-        href: "/admin/documents/approved",
-      },
-      {
-        name: "Rejected Documents",
-        href: "/admin/documents/rejected",
-      },
+      // {
+      //   name: "Pending Documents",
+      //   href: "/admin/documents/pending",
+      // },
+      // {
+      //   name: "Approved Documents",
+      //   href: "/admin/documents/approved",
+      // },
+      // {
+      //   name: "Rejected Documents",
+      //   href: "/admin/documents/rejected",
+      // },
     ],
   },
   {
@@ -674,11 +678,11 @@ const menu = [
       },
     ],
   },
-  {
-    name: "Referral",
-    href: "/admin/referrals",
-    icon: FaGift,
-  },
+  // {
+  //   name: "Referral",
+  //   href: "/admin/referrals",
+  //   icon: FaGift,
+  // },
   {
     name: "Traffic Law",
     href: "/admin/traffic-law",

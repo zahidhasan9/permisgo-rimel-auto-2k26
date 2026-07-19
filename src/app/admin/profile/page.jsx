@@ -4,16 +4,11 @@ import { useEffect, useMemo, useState } from "react";
 import {
   FaCamera,
   FaCheckCircle,
-  FaEnvelope,
-  FaIdBadge,
   FaKey,
-  FaMapMarkerAlt,
-  FaPhoneAlt,
   FaSave,
   FaSpinner,
-  FaUser,
 } from "react-icons/fa";
-import { getLoggedInUser, updateProfile, changePassword } from "@/features/API";
+import { changePassword, getLoggedInUser, updateProfile } from "@/features/API";
 import { mediaUrl } from "@/utils/mediaUrl";
 
 const emptyProfile = {
@@ -37,128 +32,78 @@ const emptyPassword = {
   confirmPassword: "",
 };
 
-function getPayloadUser(res) {
-  return res?.data?.data?.user || res?.data?.user || res?.data?.data || null;
+function getPayloadUser(response) {
+  return (
+    response?.data?.data?.user ||
+    response?.data?.user ||
+    response?.data?.data ||
+    null
+  );
 }
 
 function formatDateInput(value) {
   if (!value) return "";
 
   const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) return "";
-
-  return date.toISOString().slice(0, 10);
+  return Number.isNaN(date.getTime()) ? "" : date.toISOString().slice(0, 10);
 }
 
-function Field({
-  label,
-  name,
-  value,
-  onChange,
-  placeholder,
-  type = "text",
-  icon: Icon,
-  disabled = false,
-}) {
-  return (
-    <label className="block">
-      <span className="mb-1.5 block text-xs font-black uppercase tracking-wide text-slate-500">
-        {label}
-      </span>
-
-      <div className="relative">
-        {Icon ? (
-          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
-            <Icon size={14} />
-          </span>
-        ) : null}
-
-        <input
-          type={type}
-          name={name}
-          value={value || ""}
-          disabled={disabled}
-          onChange={onChange}
-          placeholder={placeholder}
-          className={`h-11 w-full rounded-xl border border-slate-200 bg-[#F7F9FC] px-3 text-sm font-semibold text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-[#0D4598] focus:bg-white focus:ring-4 focus:ring-blue-50 ${
-            Icon ? "pl-9" : ""
-          } ${disabled ? "cursor-not-allowed opacity-70" : ""}`}
-        />
-      </div>
-    </label>
-  );
-}
-
-function SelectField({ label, name, value, onChange, children }) {
-  return (
-    <label className="block">
-      <span className="mb-1.5 block text-xs font-black uppercase tracking-wide text-slate-500">
-        {label}
-      </span>
-
-      <select
-        name={name}
-        value={value || ""}
-        onChange={onChange}
-        className="h-11 w-full rounded-xl border border-slate-200 bg-[#F7F9FC] px-3 text-sm font-bold text-slate-800 outline-none transition focus:border-[#0D4598] focus:bg-white focus:ring-4 focus:ring-blue-50"
-      >
-        {children}
-      </select>
-    </label>
-  );
-}
-
-function Alert({ type = "success", children }) {
-  const className =
-    type === "error"
-      ? "border-rose-200 bg-rose-50 text-rose-700"
-      : "border-emerald-200 bg-emerald-50 text-emerald-700";
-
-  return (
-    <div
-      className={`mb-4 rounded-2xl border px-4 py-3 text-sm font-bold ${className}`}
-    >
-      {children}
-    </div>
-  );
+function getErrorMessage(error, fallback) {
+  return error?.response?.data?.message || error?.message || fallback;
 }
 
 export default function AdminProfilePage() {
   const [profile, setProfile] = useState(emptyProfile);
+  const [passwordForm, setPasswordForm] = useState(emptyPassword);
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState("");
-  const [passwordForm, setPasswordForm] = useState(emptyPassword);
 
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [passwordSaving, setPasswordSaving] = useState(false);
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [savingPassword, setSavingPassword] = useState(false);
 
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-  const [passwordError, setPasswordError] = useState("");
-  const [passwordSuccess, setPasswordSuccess] = useState("");
+  const [profileMessage, setProfileMessage] = useState({
+    type: "",
+    text: "",
+  });
+  const [passwordMessage, setPasswordMessage] = useState({
+    type: "",
+    text: "",
+  });
 
   const displayImage = useMemo(() => {
     if (avatarPreview) return avatarPreview;
-    if (profile.avatar) return mediaUrl(profile.avatar);
-    return "";
+    return profile.avatar ? mediaUrl(profile.avatar) : "";
   }, [avatarPreview, profile.avatar]);
 
-  const initial = useMemo(() => {
+  const initials = useMemo(() => {
     return String(profile.name || profile.email || "A")
       .trim()
-      .charAt(0)
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((part) => part[0])
+      .join("")
+      .slice(0, 2)
       .toUpperCase();
   }, [profile.name, profile.email]);
 
-  const loadProfile = async () => {
+  useEffect(() => {
+    loadProfile();
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (avatarPreview) URL.revokeObjectURL(avatarPreview);
+    };
+  }, [avatarPreview]);
+
+  async function loadProfile() {
     try {
       setLoading(true);
-      setError("");
+      setProfileMessage({ type: "", text: "" });
 
-      const res = await getLoggedInUser();
-      const user = getPayloadUser(res);
+      const response = await getLoggedInUser();
+      const user = getPayloadUser(response);
 
       if (!user) {
         throw new Error("Profile data not found.");
@@ -179,96 +124,103 @@ export default function AdminProfilePage() {
         avatar: user.avatar || "",
       });
 
-      if (typeof window !== "undefined") {
-        localStorage.setItem("user", JSON.stringify(user));
-      }
-    } catch (err) {
-      setError(
-        err.response?.data?.message || err.message || "Failed to load profile.",
-      );
+      localStorage.setItem("user", JSON.stringify(user));
+    } catch (error) {
+      setProfileMessage({
+        type: "error",
+        text: getErrorMessage(error, "Failed to load profile."),
+      });
     } finally {
       setLoading(false);
     }
-  };
+  }
 
-  useEffect(() => {
-    loadProfile();
-  }, []);
+  function handleProfileChange(event) {
+    const { name, value } = event.target;
 
-  function handleProfileChange(e) {
-    const { name, value } = e.target;
-
-    setProfile((prev) => ({
-      ...prev,
+    setProfile((current) => ({
+      ...current,
       [name]: value,
     }));
   }
 
-  function handlePasswordChange(e) {
-    const { name, value } = e.target;
+  function handlePasswordChange(event) {
+    const { name, value } = event.target;
 
-    setPasswordForm((prev) => ({
-      ...prev,
+    setPasswordForm((current) => ({
+      ...current,
       [name]: value,
     }));
   }
 
-  function handleAvatarChange(e) {
-    const file = e.target.files?.[0];
-
-    setError("");
-    setSuccess("");
+  function handleAvatarChange(event) {
+    const file = event.target.files?.[0];
+    setProfileMessage({ type: "", text: "" });
 
     if (!file) return;
 
     const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 
     if (!allowedTypes.includes(file.type)) {
-      setError("Only JPG, PNG and WEBP image files are allowed.");
+      setProfileMessage({
+        type: "error",
+        text: "Only JPG, PNG and WEBP images are allowed.",
+      });
       return;
     }
 
     if (file.size > 3 * 1024 * 1024) {
-      setError("Image size must be less than 3MB.");
+      setProfileMessage({
+        type: "error",
+        text: "Image size must be less than 3MB.",
+      });
       return;
     }
+
+    if (avatarPreview) URL.revokeObjectURL(avatarPreview);
 
     setAvatarFile(file);
     setAvatarPreview(URL.createObjectURL(file));
   }
 
-  async function handleSubmit(e) {
-    e.preventDefault();
+  async function handleProfileSubmit(event) {
+    event.preventDefault();
+
+    if (!profile.name.trim()) {
+      setProfileMessage({
+        type: "error",
+        text: "Name is required.",
+      });
+      return;
+    }
 
     try {
-      setSaving(true);
-      setError("");
-      setSuccess("");
-
-      if (!profile.name.trim()) {
-        setError("Name is required.");
-        return;
-      }
+      setSavingProfile(true);
+      setProfileMessage({ type: "", text: "" });
 
       const formData = new FormData();
 
-      formData.append("name", profile.name);
-      formData.append("phone", profile.phone || "");
-      formData.append("designation", profile.designation || "");
-      formData.append("gender", profile.gender || "");
-      formData.append("dateOfBirth", profile.dateOfBirth || "");
-      formData.append("address", profile.address || "");
-      formData.append("city", profile.city || "");
-      formData.append("country", profile.country || "");
-      formData.append("language", profile.language || "");
-      formData.append("bio", profile.bio || "");
+      [
+        "name",
+        "phone",
+        "designation",
+        "gender",
+        "dateOfBirth",
+        "address",
+        "city",
+        "country",
+        "language",
+        "bio",
+      ].forEach((field) => {
+        formData.append(field, profile[field] || "");
+      });
 
       if (avatarFile) {
         formData.append("avatar", avatarFile);
       }
 
-      const res = await updateProfile(formData);
-      const updatedUser = getPayloadUser(res);
+      const response = await updateProfile(formData);
+      const updatedUser = getPayloadUser(response);
 
       if (!updatedUser) {
         throw new Error("Profile update response not found.");
@@ -289,398 +241,404 @@ export default function AdminProfilePage() {
         avatar: updatedUser.avatar || "",
       });
 
+      if (avatarPreview) URL.revokeObjectURL(avatarPreview);
       setAvatarFile(null);
       setAvatarPreview("");
 
-      if (typeof window !== "undefined") {
-        localStorage.setItem("user", JSON.stringify(updatedUser));
-        window.dispatchEvent(
-          new CustomEvent("profile-updated", { detail: updatedUser }),
-        );
-      }
-
-      setSuccess("Profile updated successfully.");
-    } catch (err) {
-      setError(
-        err.response?.data?.message ||
-          err.message ||
-          "Failed to update profile.",
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+      window.dispatchEvent(
+        new CustomEvent("profile-updated", {
+          detail: updatedUser,
+        }),
       );
+
+      setProfileMessage({
+        type: "success",
+        text: "Profile updated successfully.",
+      });
+    } catch (error) {
+      setProfileMessage({
+        type: "error",
+        text: getErrorMessage(error, "Failed to update profile."),
+      });
     } finally {
-      setSaving(false);
+      setSavingProfile(false);
     }
   }
 
-  async function handlePasswordSubmit(e) {
-    e.preventDefault();
+  async function handlePasswordSubmit(event) {
+    event.preventDefault();
+    setPasswordMessage({ type: "", text: "" });
+
+    const { currentPassword, newPassword, confirmPassword } = passwordForm;
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      setPasswordMessage({
+        type: "error",
+        text: "All password fields are required.",
+      });
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      setPasswordMessage({
+        type: "error",
+        text: "New password must be at least 6 characters.",
+      });
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setPasswordMessage({
+        type: "error",
+        text: "New password and confirmation do not match.",
+      });
+      return;
+    }
 
     try {
-      setPasswordSaving(true);
-      setPasswordError("");
-      setPasswordSuccess("");
-
-      if (
-        !passwordForm.currentPassword ||
-        !passwordForm.newPassword ||
-        !passwordForm.confirmPassword
-      ) {
-        setPasswordError("All password fields are required.");
-        return;
-      }
-
-      if (passwordForm.newPassword.length < 6) {
-        setPasswordError("New password must be at least 6 characters.");
-        return;
-      }
-
-      if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-        setPasswordError("New password and confirm password do not match.");
-        return;
-      }
-
+      setSavingPassword(true);
       await changePassword(passwordForm);
 
       setPasswordForm(emptyPassword);
-      setPasswordSuccess("Password changed successfully.");
-    } catch (err) {
-      setPasswordError(
-        err.response?.data?.message ||
-          err.message ||
-          "Failed to change password.",
-      );
+      setPasswordMessage({
+        type: "success",
+        text: "Password changed successfully.",
+      });
+    } catch (error) {
+      setPasswordMessage({
+        type: "error",
+        text: getErrorMessage(error, "Failed to change password."),
+      });
     } finally {
-      setPasswordSaving(false);
+      setSavingPassword(false);
     }
   }
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-[#F7F9FC] p-4">
-        <div className="flex min-h-[420px] items-center justify-center rounded-2xl border border-slate-200 bg-white">
-          <div className="flex items-center gap-3 text-sm font-black text-[#0D4598]">
-            <FaSpinner className="animate-spin" />
-            Loading profile...
-          </div>
+      <main className="flex min-h-[70vh] items-center justify-center bg-slate-50">
+        <div className="flex items-center gap-3 text-sm font-semibold text-slate-600">
+          <FaSpinner className="animate-spin" />
+          Loading profile...
         </div>
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-[#F7F9FC] p-3 md:p-4 lg:p-5">
-      <div className="mx-auto max-w-[1320px]">
-        <div className="mb-4 flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm md:flex-row md:items-center md:justify-between">
-          <div>
-            <div className="mb-1 flex flex-wrap items-center gap-1 text-xs font-bold text-slate-400">
-              <span>Admin</span>
-              <span>/</span>
-              <span className="text-slate-600">Edit Profile</span>
+    <main className="min-h-screen bg-slate-50 px-4 py-5 md:px-6">
+      <div className="mx-auto max-w-5xl">
+        <header className="mb-5">
+          <h1 className="text-2xl font-bold text-slate-900">Admin Profile</h1>
+          <p className="mt-1 text-sm text-slate-500">
+            Update your personal information and account password.
+          </p>
+        </header>
+
+        <section className="mb-5 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+            <div className="relative w-fit">
+              {displayImage ? (
+                <img
+                  src={displayImage}
+                  alt={profile.name || "Admin profile"}
+                  className="h-24 w-24 rounded-2xl border border-slate-200 object-cover"
+                />
+              ) : (
+                <div className="flex h-24 w-24 items-center justify-center rounded-2xl bg-slate-900 text-2xl font-bold text-white">
+                  {initials}
+                </div>
+              )}
+
+              <label className="absolute -bottom-2 -right-2 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border-4 border-white bg-slate-900 text-white shadow-sm transition hover:bg-slate-700">
+                <FaCamera size={13} />
+                <input
+                  type="file"
+                  accept="image/jpeg,image/jpg,image/png,image/webp"
+                  onChange={handleAvatarChange}
+                  className="hidden"
+                />
+              </label>
             </div>
 
-            <h1 className="text-2xl font-black text-slate-900">
-              Edit Admin Profile
-            </h1>
-
-            <p className="mt-1 text-sm font-medium text-slate-500">
-              Update your admin information, profile image and password.
-            </p>
-          </div>
-
-          <div className="rounded-2xl bg-[#EAF1FB] px-4 py-3 text-sm font-black text-[#0D4598]">
-            {profile.email}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-[360px_minmax(0,1fr)]">
-          <aside className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-            <div className="flex flex-col items-center text-center">
-              <div className="relative">
-                {displayImage ? (
-                  <img
-                    src={displayImage}
-                    alt="Admin profile"
-                    className="h-36 w-36 rounded-3xl border border-slate-200 object-cover"
-                  />
-                ) : (
-                  <div className="flex h-36 w-36 items-center justify-center rounded-3xl bg-[#0D4598] text-5xl font-black text-white">
-                    {initial}
-                  </div>
-                )}
-
-                <label className="absolute -bottom-2 -right-2 flex h-11 w-11 cursor-pointer items-center justify-center rounded-2xl border-4 border-white bg-[#0D4598] text-white shadow-lg transition hover:bg-[#083777]">
-                  <FaCamera size={16} />
-                  <input
-                    type="file"
-                    accept="image/jpeg,image/jpg,image/png,image/webp"
-                    onChange={handleAvatarChange}
-                    className="hidden"
-                  />
-                </label>
-              </div>
-
-              <h2 className="mt-4 text-xl font-black text-slate-900">
+            <div className="min-w-0">
+              <h2 className="truncate text-xl font-bold text-slate-900">
                 {profile.name || "Admin User"}
               </h2>
-
-              <p className="mt-1 text-sm font-semibold text-slate-500">
+              <p className="mt-1 truncate text-sm text-slate-500">
+                {profile.email}
+              </p>
+              <p className="mt-1 text-sm text-slate-500">
                 {profile.designation || "Administrator"}
               </p>
-
-              <div className="mt-4 w-full rounded-2xl bg-[#F7F9FC] p-3 text-left">
-                <div className="mb-3 flex items-center gap-3 text-sm font-bold text-slate-600">
-                  <FaEnvelope className="text-[#0D4598]" />
-                  <span className="truncate">{profile.email || "-"}</span>
-                </div>
-
-                <div className="mb-3 flex items-center gap-3 text-sm font-bold text-slate-600">
-                  <FaPhoneAlt className="text-[#0D4598]" />
-                  <span>{profile.phone || "-"}</span>
-                </div>
-
-                <div className="flex items-center gap-3 text-sm font-bold text-slate-600">
-                  <FaMapMarkerAlt className="text-[#0D4598]" />
-                  <span>
-                    {[profile.city, profile.country]
-                      .filter(Boolean)
-                      .join(", ") || "-"}
-                  </span>
-                </div>
-              </div>
-
-              <p className="mt-3 text-xs font-semibold leading-5 text-slate-400">
-                Image limit: JPG, PNG or WEBP. Maximum size 3MB.
+              <p className="mt-2 text-xs text-slate-400">
+                JPG, PNG or WEBP · Maximum 3MB
               </p>
             </div>
-          </aside>
+          </div>
+        </section>
 
-          <section className="space-y-4">
-            <form
-              onSubmit={handleSubmit}
-              className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
-            >
-              <div className="mb-4 flex items-center gap-3 border-b border-slate-100 pb-4">
-                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#EAF1FB] text-[#0D4598]">
-                  <FaIdBadge />
-                </div>
+        <div className="space-y-5">
+          <form
+            onSubmit={handleProfileSubmit}
+            className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+          >
+            <div className="mb-5">
+              <h2 className="text-lg font-bold text-slate-900">
+                Profile information
+              </h2>
+              <p className="mt-1 text-sm text-slate-500">
+                Basic account and contact details.
+              </p>
+            </div>
 
-                <div>
-                  <h2 className="text-lg font-black text-slate-900">
-                    Profile Information
-                  </h2>
-                  <p className="text-sm font-medium text-slate-500">
-                    Basic admin account details.
-                  </p>
-                </div>
-              </div>
+            <Message message={profileMessage} />
 
-              {error ? <Alert type="error">{error}</Alert> : null}
-              {success ? (
-                <Alert>
-                  <span className="inline-flex items-center gap-2">
-                    <FaCheckCircle /> {success}
-                  </span>
-                </Alert>
-              ) : null}
+            <div className="grid gap-4 md:grid-cols-2">
+              <InputField
+                label="Full name"
+                name="name"
+                value={profile.name}
+                onChange={handleProfileChange}
+                placeholder="Enter full name"
+              />
 
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <Field
-                  label="Full Name"
-                  name="name"
-                  value={profile.name}
-                  onChange={handleProfileChange}
-                  placeholder="Enter full name"
-                  icon={FaUser}
-                />
+              <InputField
+                label="Email"
+                name="email"
+                value={profile.email}
+                disabled
+              />
 
-                <Field
-                  label="Email"
-                  name="email"
-                  value={profile.email}
-                  onChange={handleProfileChange}
-                  placeholder="Email"
-                  icon={FaEnvelope}
-                  disabled
-                />
+              <InputField
+                label="Phone"
+                name="phone"
+                value={profile.phone}
+                onChange={handleProfileChange}
+                placeholder="Enter phone number"
+              />
 
-                <Field
-                  label="Phone"
-                  name="phone"
-                  value={profile.phone}
-                  onChange={handleProfileChange}
-                  placeholder="Enter phone number"
-                  icon={FaPhoneAlt}
-                />
+              <InputField
+                label="Designation"
+                name="designation"
+                value={profile.designation}
+                onChange={handleProfileChange}
+                placeholder="Administrator"
+              />
 
-                <Field
-                  label="Designation"
-                  name="designation"
-                  value={profile.designation}
-                  onChange={handleProfileChange}
-                  placeholder="Admin / Manager / Founder"
-                  icon={FaIdBadge}
-                />
+              <SelectField
+                label="Gender"
+                name="gender"
+                value={profile.gender}
+                onChange={handleProfileChange}
+              >
+                <option value="">Select gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </SelectField>
 
-                <SelectField
-                  label="Gender"
-                  name="gender"
-                  value={profile.gender}
-                  onChange={handleProfileChange}
-                >
-                  <option value="">Select Gender</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                  <option value="other">Other</option>
-                </SelectField>
+              <InputField
+                label="Date of birth"
+                name="dateOfBirth"
+                type="date"
+                value={profile.dateOfBirth}
+                onChange={handleProfileChange}
+              />
 
-                <Field
-                  label="Date of Birth"
-                  name="dateOfBirth"
-                  type="date"
-                  value={profile.dateOfBirth}
-                  onChange={handleProfileChange}
-                />
+              <InputField
+                label="City"
+                name="city"
+                value={profile.city}
+                onChange={handleProfileChange}
+                placeholder="Enter city"
+              />
 
-                <Field
-                  label="City"
-                  name="city"
-                  value={profile.city}
-                  onChange={handleProfileChange}
-                  placeholder="Enter city"
-                />
+              <InputField
+                label="Country"
+                name="country"
+                value={profile.country}
+                onChange={handleProfileChange}
+                placeholder="Enter country"
+              />
 
-                <Field
-                  label="Country"
-                  name="country"
-                  value={profile.country}
-                  onChange={handleProfileChange}
-                  placeholder="Enter country"
-                />
+              <InputField
+                label="Language"
+                name="language"
+                value={profile.language}
+                onChange={handleProfileChange}
+                placeholder="English"
+              />
 
-                <Field
-                  label="Language"
-                  name="language"
-                  value={profile.language}
-                  onChange={handleProfileChange}
-                  placeholder="English / Bangla / French"
-                />
+              <InputField
+                label="Address"
+                name="address"
+                value={profile.address}
+                onChange={handleProfileChange}
+                placeholder="Enter address"
+              />
+            </div>
 
-                <Field
-                  label="Address"
-                  name="address"
-                  value={profile.address}
-                  onChange={handleProfileChange}
-                  placeholder="Enter address"
-                  icon={FaMapMarkerAlt}
-                />
-              </div>
+            <label className="mt-4 block">
+              <span className="mb-1.5 block text-sm font-medium text-slate-700">
+                Bio
+              </span>
+              <textarea
+                name="bio"
+                value={profile.bio}
+                onChange={handleProfileChange}
+                rows={4}
+                maxLength={500}
+                placeholder="Write a short bio"
+                className="w-full resize-none rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-2 focus:ring-slate-100"
+              />
+              <span className="mt-1 block text-right text-xs text-slate-400">
+                {profile.bio.length}/500
+              </span>
+            </label>
 
-              <label className="mt-4 block">
-                <span className="mb-1.5 block text-xs font-black uppercase tracking-wide text-slate-500">
-                  Bio
-                </span>
+            <div className="mt-5 flex justify-end">
+              <button
+                type="submit"
+                disabled={savingProfile}
+                className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-slate-900 px-5 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {savingProfile ? (
+                  <FaSpinner className="animate-spin" />
+                ) : (
+                  <FaSave />
+                )}
+                {savingProfile ? "Saving..." : "Save changes"}
+              </button>
+            </div>
+          </form>
 
-                <textarea
-                  name="bio"
-                  value={profile.bio || ""}
-                  onChange={handleProfileChange}
-                  rows={4}
-                  maxLength={500}
-                  placeholder="Write short admin profile bio..."
-                  className="w-full resize-none rounded-xl border border-slate-200 bg-[#F7F9FC] px-3 py-3 text-sm font-semibold text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-[#0D4598] focus:bg-white focus:ring-4 focus:ring-blue-50"
-                />
+          <form
+            onSubmit={handlePasswordSubmit}
+            className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+          >
+            <div className="mb-5">
+              <h2 className="text-lg font-bold text-slate-900">
+                Change password
+              </h2>
+              <p className="mt-1 text-sm text-slate-500">
+                Use a strong password for your account.
+              </p>
+            </div>
 
-                <span className="mt-1 block text-right text-xs font-semibold text-slate-400">
-                  {(profile.bio || "").length}/500
-                </span>
-              </label>
+            <Message message={passwordMessage} />
 
-              <div className="mt-5 flex justify-end">
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#0D4598] px-5 py-3 text-sm font-black text-white transition hover:bg-[#083777] disabled:cursor-not-allowed disabled:opacity-70"
-                >
-                  {saving ? <FaSpinner className="animate-spin" /> : <FaSave />}
-                  {saving ? "Saving..." : "Save Profile"}
-                </button>
-              </div>
-            </form>
+            <div className="grid gap-4 md:grid-cols-3">
+              <InputField
+                label="Current password"
+                name="currentPassword"
+                type="password"
+                value={passwordForm.currentPassword}
+                onChange={handlePasswordChange}
+                placeholder="Current password"
+              />
 
-            <form
-              onSubmit={handlePasswordSubmit}
-              className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
-            >
-              <div className="mb-4 flex items-center gap-3 border-b border-slate-100 pb-4">
-                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-amber-50 text-amber-600">
+              <InputField
+                label="New password"
+                name="newPassword"
+                type="password"
+                value={passwordForm.newPassword}
+                onChange={handlePasswordChange}
+                placeholder="New password"
+              />
+
+              <InputField
+                label="Confirm password"
+                name="confirmPassword"
+                type="password"
+                value={passwordForm.confirmPassword}
+                onChange={handlePasswordChange}
+                placeholder="Confirm password"
+              />
+            </div>
+
+            <div className="mt-5 flex justify-end">
+              <button
+                type="submit"
+                disabled={savingPassword}
+                className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {savingPassword ? (
+                  <FaSpinner className="animate-spin" />
+                ) : (
                   <FaKey />
-                </div>
-
-                <div>
-                  <h2 className="text-lg font-black text-slate-900">
-                    Change Password
-                  </h2>
-                  <p className="text-sm font-medium text-slate-500">
-                    Keep your admin account secure.
-                  </p>
-                </div>
-              </div>
-
-              {passwordError ? (
-                <Alert type="error">{passwordError}</Alert>
-              ) : null}
-
-              {passwordSuccess ? <Alert>{passwordSuccess}</Alert> : null}
-
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                <Field
-                  label="Current Password"
-                  name="currentPassword"
-                  type="password"
-                  value={passwordForm.currentPassword}
-                  onChange={handlePasswordChange}
-                  placeholder="Current password"
-                  icon={FaKey}
-                />
-
-                <Field
-                  label="New Password"
-                  name="newPassword"
-                  type="password"
-                  value={passwordForm.newPassword}
-                  onChange={handlePasswordChange}
-                  placeholder="New password"
-                  icon={FaKey}
-                />
-
-                <Field
-                  label="Confirm Password"
-                  name="confirmPassword"
-                  type="password"
-                  value={passwordForm.confirmPassword}
-                  onChange={handlePasswordChange}
-                  placeholder="Confirm password"
-                  icon={FaKey}
-                />
-              </div>
-
-              <div className="mt-5 flex justify-end">
-                <button
-                  type="submit"
-                  disabled={passwordSaving}
-                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-black text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-70"
-                >
-                  {passwordSaving ? (
-                    <FaSpinner className="animate-spin" />
-                  ) : (
-                    <FaKey />
-                  )}
-                  {passwordSaving ? "Updating..." : "Update Password"}
-                </button>
-              </div>
-            </form>
-          </section>
+                )}
+                {savingPassword ? "Updating..." : "Update password"}
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </main>
+  );
+}
+
+function InputField({
+  label,
+  name,
+  value,
+  onChange,
+  placeholder,
+  type = "text",
+  disabled = false,
+}) {
+  return (
+    <label className="block">
+      <span className="mb-1.5 block text-sm font-medium text-slate-700">
+        {label}
+      </span>
+      <input
+        type={type}
+        name={name}
+        value={value || ""}
+        onChange={onChange}
+        placeholder={placeholder}
+        disabled={disabled}
+        className="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-2 focus:ring-slate-100 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-500"
+      />
+    </label>
+  );
+}
+
+function SelectField({ label, name, value, onChange, children }) {
+  return (
+    <label className="block">
+      <span className="mb-1.5 block text-sm font-medium text-slate-700">
+        {label}
+      </span>
+      <select
+        name={name}
+        value={value || ""}
+        onChange={onChange}
+        className="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-800 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-100"
+      >
+        {children}
+      </select>
+    </label>
+  );
+}
+
+function Message({ message }) {
+  if (!message.text) return null;
+
+  const isError = message.type === "error";
+
+  return (
+    <div
+      className={`mb-4 flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium ${
+        isError
+          ? "border-rose-200 bg-rose-50 text-rose-700"
+          : "border-emerald-200 bg-emerald-50 text-emerald-700"
+      }`}
+    >
+      {!isError && <FaCheckCircle className="shrink-0" />}
+      {message.text}
+    </div>
   );
 }

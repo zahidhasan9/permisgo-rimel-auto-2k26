@@ -443,3 +443,38 @@ export const revokeQuizRetakePermission = (permissionId) =>
 
 export const getMyRetakePermissions = () =>
   axios.get("/quizzes/retake-permissions/me");
+
+/////vehicle api
+
+const formDataConfig = {
+  headers: {
+    "Content-Type": "multipart/form-data",
+  },
+};
+
+export const getMyTeacherVehicles = () => axios.get("/teachers/vehicles");
+
+export const createTeacherVehicle = (formData) =>
+  axios.post("/teachers/vehicles", formData, formDataConfig);
+
+export const updateTeacherVehicle = (vehicleId, formData) =>
+  axios.patch(`/teachers/vehicles/${vehicleId}`, formData, formDataConfig);
+
+export const getAdminTeacherVehicles = (params = {}) =>
+  axios.get("/admin/teacher-vehicles", { params });
+
+export const getAdminTeacherVehicleById = (vehicleId) =>
+  axios.get(`/admin/teacher-vehicles/${vehicleId}`);
+
+export const updateAdminTeacherVehicleApproval = (
+  vehicleId,
+  approvalStatus,
+  adminNote = "",
+) =>
+  axios.patch(`/admin/teacher-vehicles/${vehicleId}/approval`, {
+    approvalStatus,
+    adminNote,
+  });
+
+export const deleteAdminTeacherVehicle = (vehicleId) =>
+  axios.delete(`/admin/teacher-vehicles/${vehicleId}`);
