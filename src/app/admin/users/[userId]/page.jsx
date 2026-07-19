@@ -21,11 +21,13 @@ import {
   getAdminUserById,
   updateUserRole,
   updateUserStatus,
+  verifyTeacher,
 } from "@/features/API";
 import { mediaUrl } from "@/utils/mediaUrl";
 
 const roleOptions = ["student", "teacher", "admin"];
 const statusOptions = ["active", "inactive", "blocked"];
+const teacherVerificationOptions = ["pending", "verified", "rejected"];
 
 const statusStyles = {
   active: "border-emerald-200 bg-emerald-50 text-emerald-700",
@@ -88,6 +90,8 @@ export default function AdminUserDetailsPage() {
   const [user, setUser] = useState(null);
   const [role, setRole] = useState("student");
   const [status, setStatus] = useState("active");
+  const [teacherVerificationStatus, setTeacherVerificationStatus] =
+    useState("pending");
   const [loading, setLoading] = useState(true);
   const [savingField, setSavingField] = useState("");
   const [error, setError] = useState("");
@@ -112,6 +116,9 @@ export default function AdminUserDetailsPage() {
       setUser(responseUser);
       setRole(responseUser?.role || "student");
       setStatus(responseUser?.status || "active");
+      setTeacherVerificationStatus(
+        responseUser?.profile?.verificationStatus || "pending",
+      );
     } catch (requestError) {
       setError(getMessage(requestError));
     } finally {
@@ -201,6 +208,35 @@ export default function AdminUserDetailsPage() {
       setToast("User status updated.");
     } catch (requestError) {
       setStatus(user.status);
+      setError(getMessage(requestError));
+    } finally {
+      setSavingField("");
+    }
+  };
+
+  const handleTeacherVerificationUpdate = async () => {
+    if (
+      !user ||
+      user.role !== "teacher" ||
+      !profile ||
+      teacherVerificationStatus === profile.verificationStatus
+    ) {
+      return;
+    }
+
+    try {
+      setSavingField("teacher-verification");
+      setError("");
+
+      await verifyTeacher(user._id, teacherVerificationStatus);
+      await loadUser();
+      setToast(
+        teacherVerificationStatus === "verified"
+          ? "Teacher verified. Their approved vehicle and active location can now appear in student search."
+          : "Teacher verification status updated.",
+      );
+    } catch (requestError) {
+      setTeacherVerificationStatus(profile.verificationStatus || "pending");
       setError(getMessage(requestError));
     } finally {
       setSavingField("");
@@ -376,6 +412,35 @@ export default function AdminUserDetailsPage() {
             </div>
 
             <ProfileDetails role={user.role} profile={profile} />
+          </section>
+        )}
+
+        {user.role === "teacher" && profile && (
+          <section className="mt-5 rounded-2xl border border-blue-200 bg-blue-50/40 p-5 shadow-sm">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <h2 className="font-bold text-slate-900">Teacher approval</h2>
+                <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-600">
+                  Only verified teachers with an approved vehicle and an active
+                  location are shown to students on the booking map.
+                </p>
+              </div>
+
+              <div className="w-full sm:w-[280px]">
+                <ActionSelect
+                  label="Verification status"
+                  value={teacherVerificationStatus}
+                  options={teacherVerificationOptions}
+                  busy={savingField === "teacher-verification"}
+                  changed={
+                    teacherVerificationStatus !==
+                    (profile.verificationStatus || "pending")
+                  }
+                  onChange={setTeacherVerificationStatus}
+                  onSave={handleTeacherVerificationUpdate}
+                />
+              </div>
+            </div>
           </section>
         )}
 
