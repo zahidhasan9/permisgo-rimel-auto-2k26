@@ -410,11 +410,15 @@ const menu = [
         href: "/student/driving-operation/planning",
       },
       {
+        name: "Lessons",
+        href: "/student/lessons",
+      },
+      {
         name: "Instructors",
         href: "/student/driving-operation/instructors",
       },
       {
-        name: "Location",
+        name: "Book Teacher",
         href: "/student/driving-operation/book-lesson",
       },
     ],

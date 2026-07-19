@@ -47,7 +47,6 @@ export const updateTeacherProfile = (data) =>
 export const getTeacherVehicles = () => axios.get("/teachers/vehicles");
 export const addTeacherVehicle = (data) =>
   axios.post("/teachers/vehicles", data);
-export const getTeacherLocations = () => axios.get("/teachers/locations");
 export const addTeacherLocation = (data) =>
   axios.post("/teachers/locations", data);
 
@@ -478,3 +477,44 @@ export const updateAdminTeacherVehicleApproval = (
 
 export const deleteAdminTeacherVehicle = (vehicleId) =>
   axios.delete(`/admin/teacher-vehicles/${vehicleId}`);
+
+/////////////////////////teacher booking
+
+export const getNearbyTeachers = (params) =>
+  axios.get("/teachers/nearby", { params });
+
+export const getTeacherLocations = () => axios.get("/teachers/locations");
+
+export const createTeacherLocation = (payload) =>
+  axios.post("/teachers/locations", payload);
+
+export const updateTeacherLocation = (locationId, payload) =>
+  axios.patch(`/teachers/locations/${locationId}`, payload);
+
+export const deleteTeacherLocation = (locationId) =>
+  axios.delete(`/teachers/locations/${locationId}`);
+
+export const getTeacherAvailability = () => axios.get("/teachers/availability");
+
+export const updateTeacherAvailability = (payload) =>
+  axios.put("/teachers/availability", payload);
+
+export const getAvailableBookingSlots = (params) =>
+  axios.get("/bookings/available-slots", { params });
+
+export const createLocationBooking = (payload) =>
+  axios.post("/bookings", payload);
+
+export const getLocationBookings = (params = {}) =>
+  axios.get("/bookings", { params });
+
+export const cancelLocationBooking = (bookingId, payload) =>
+  axios.patch(`/bookings/${bookingId}/cancel`, payload);
+
+export const confirmLocationBooking = (bookingId) =>
+  axios.patch(`/bookings/${bookingId}/confirm`);
+
+export const rejectLocationBooking = (bookingId, payload) =>
+  axios.patch(`/bookings/${bookingId}/reject`, payload);
+
+////////////////////////////
