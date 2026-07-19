@@ -523,6 +523,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { FaCog, FaSignOutAlt, FaUser } from "react-icons/fa";
@@ -803,12 +804,15 @@ export default function DashboardTopbar({
           <FiMenu size={22} />
         </button>
 
-        <Link
-          href={config.dashboardHref}
-          className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#F5F5F7] text-sm font-bold text-[#1D1D1F] sm:flex"
-        >
-          PG
-        </Link>
+        <div className="hidden h-12 items-center justify-center overflow-hidden rounded-xl bg-blue-600 shadow-md sm:flex">
+          <Image
+            src="/image/logo.png"
+            alt="Logo"
+            width={172}
+            height={36}
+            className="h-full w-full object-cover"
+          />
+        </div>
 
         <div className="min-w-0">
           <h1 className="truncate text-sm font-semibold tracking-[-0.01em] text-[#1D1D1F]">
