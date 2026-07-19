@@ -1,14 +1,9 @@
 "use client";
 
-import {
-  Autocomplete,
-  GoogleMap,
-  MarkerF,
-  useJsApiLoader,
-} from "@react-google-maps/api";
+import GooglePlaceAutocomplete from "@/components/maps/GooglePlaceAutocomplete";
+import { GoogleMap, MarkerF, useJsApiLoader } from "@react-google-maps/api";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  FaCalendarAlt,
   FaClock,
   FaEdit,
   FaLocationArrow,
@@ -26,8 +21,8 @@ import {
   updateTeacherLocation,
 } from "@/features/API";
 
-const MAP_LIBRARIES = ["places"];
-const MAP_CONTAINER_STYLE = { width: "100%", height: "420px" };
+const GOOGLE_MAP_LIBRARIES = ["places"];
+const MAP_STYLE = { width: "100%", height: "430px" };
 const DEFAULT_CENTER = { lat: 48.8566, lng: 2.3522 };
 const DAYS = [
   "Sunday",
@@ -39,7 +34,7 @@ const DAYS = [
   "Saturday",
 ];
 
-const EMPTY_LOCATION = {
+const emptyLocation = () => ({
   id: "",
   title: "Lesson meeting point",
   address: "",
@@ -51,7 +46,7 @@ const EMPTY_LOCATION = {
   serviceRadiusKm: 10,
   meetingType: "teacher_location",
   status: "active",
-};
+});
 
 const defaultSchedule = () =>
   DAYS.map((_, dayOfWeek) => ({
@@ -64,266 +59,296 @@ const defaultSchedule = () =>
 const unwrap = (response, fallback = null) =>
   response?.data?.data ?? response?.data ?? fallback;
 
-const errorMessage = (error, fallback) =>
+const getErrorMessage = (error, fallback) =>
   error?.response?.data?.message || error?.message || fallback;
-
-const getAddressPart = (components = [], type) =>
-  components.find((component) => component.types?.includes(type))?.long_name ||
-  "";
 
 const hasCoordinate = (value) =>
   value !== null && value !== "" && Number.isFinite(Number(value));
 
-const locationToForm = (location) => ({
-  id: location?._id || "",
-  title: location?.title || "Lesson meeting point",
-  address: location?.address || "",
-  city: location?.city || "",
-  postalCode: location?.postalCode || "",
-  placeId: location?.placeId || "",
-  lat: Number(
+const getLocationPoint = (location) => {
+  const lat = Number(
     location?.coordinates?.lat ?? location?.geoLocation?.coordinates?.[1],
-  ),
-  lng: Number(
+  );
+  const lng = Number(
     location?.coordinates?.lng ?? location?.geoLocation?.coordinates?.[0],
-  ),
-  serviceRadiusKm: Number(location?.serviceRadiusKm || 10),
-  meetingType: location?.meetingType || "teacher_location",
-  status: location?.status || "active",
-});
+  );
 
-function MissingGoogleKey() {
+  return Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : null;
+};
+
+const locationToForm = (location) => {
+  const point = getLocationPoint(location);
+
+  return {
+    id: location?._id || "",
+    title: location?.title || "Lesson meeting point",
+    address: location?.address || "",
+    city: location?.city || "",
+    postalCode: location?.postalCode || "",
+    placeId: location?.placeId || "",
+    lat: point?.lat ?? null,
+    lng: point?.lng ?? null,
+    serviceRadiusKm: Number(location?.serviceRadiusKm || 10),
+    meetingType: location?.meetingType || "teacher_location",
+    status: location?.status || "active",
+  };
+};
+
+const availabilityToSchedule = (availability) => {
+  if (!Array.isArray(availability?.weeklySchedule)) return defaultSchedule();
+
+  return DAYS.map((_, dayOfWeek) => {
+    const day = availability.weeklySchedule.find(
+      (item) => Number(item.dayOfWeek) === dayOfWeek,
+    );
+    const firstSlot = day?.slots?.[0];
+
+    return {
+      dayOfWeek,
+      enabled: Boolean(day?.enabled),
+      startTime: firstSlot?.startTime || "09:00",
+      endTime: firstSlot?.endTime || "18:00",
+    };
+  });
+};
+
+function MapError({ message }) {
   return (
-    <div className="mx-auto max-w-4xl p-6">
-      <div className="rounded-3xl border border-amber-200 bg-amber-50 p-6 text-amber-900">
-        <h1 className="text-2xl font-black">Google Maps key is missing</h1>
-        <p className="mt-2 text-sm leading-6">
-          Add <code>NEXT_PUBLIC_GOOGLE_MAPS_API_KEY</code> to your frontend
-          <code> .env.local</code>, restart Next.js, and open this page again.
-        </p>
-      </div>
+    <div className="rounded-3xl border border-red-200 bg-red-50 p-6 text-sm text-red-700">
+      <p className="font-black">Google Maps could not load</p>
+      <p className="mt-2">{message}</p>
+      <p className="mt-3 text-xs leading-5">
+        Use a valid key in <code>NEXT_PUBLIC_GOOGLE_MAPS_API_KEY</code> and
+        enable Maps JavaScript API plus Places API (New).
+      </p>
     </div>
   );
 }
 
 export default function TeacherLocationsPage() {
-  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-  if (!apiKey) return <MissingGoogleKey />;
-  return <TeacherLocationsManager apiKey={apiKey} />;
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY?.trim();
+
+  if (!apiKey) {
+    return (
+      <MapError message="NEXT_PUBLIC_GOOGLE_MAPS_API_KEY is missing from .env.local." />
+    );
+  }
+
+  return <TeacherLocationsMap apiKey={apiKey} />;
 }
 
-function TeacherLocationsManager({ apiKey }) {
+function TeacherLocationsMap({ apiKey }) {
   const { isLoaded, loadError } = useJsApiLoader({
-    id: "permisgo-google-map",
+    id: "permisgo-google-maps",
     googleMapsApiKey: apiKey,
-    libraries: MAP_LIBRARIES,
+    libraries: GOOGLE_MAP_LIBRARIES,
+    version: "weekly",
+    language: "en",
+    region: "FR",
   });
 
-  const autocompleteRef = useRef(null);
+  if (loadError) {
+    return <MapError message={loadError.message} />;
+  }
+
+  if (!isLoaded) {
+    return (
+      <div className="rounded-3xl border border-slate-200 bg-white p-8 text-center font-bold text-slate-500">
+        Loading Google Maps...
+      </div>
+    );
+  }
+
+  return <LocationsContent />;
+}
+
+function LocationsContent() {
   const mapRef = useRef(null);
   const [locations, setLocations] = useState([]);
-  const [form, setForm] = useState(EMPTY_LOCATION);
+  const [form, setForm] = useState(emptyLocation);
   const [schedule, setSchedule] = useState(defaultSchedule);
-  const [availabilityOptions, setAvailabilityOptions] = useState({
-    timezone: "Europe/Paris",
+  const [availabilitySettings, setAvailabilitySettings] = useState({
+    timezone:
+      Intl.DateTimeFormat().resolvedOptions().timeZone || "Europe/Paris",
     bufferMinutes: 15,
     slotIntervalMinutes: 30,
-    lessonDurationOptions: [30, 60, 90, 120],
   });
   const [loading, setLoading] = useState(true);
   const [savingLocation, setSavingLocation] = useState(false);
-  const [savingSchedule, setSavingSchedule] = useState(false);
-  const [message, setMessage] = useState("");
+  const [savingAvailability, setSavingAvailability] = useState(false);
+  const [deletingId, setDeletingId] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-  const center = useMemo(() => {
-    const lat = Number(form.lat);
-    const lng = Number(form.lng);
-    return hasCoordinate(form.lat) && hasCoordinate(form.lng)
-      ? { lat, lng }
-      : DEFAULT_CENTER;
+  const selectedPoint = useMemo(() => {
+    if (!hasCoordinate(form.lat) || !hasCoordinate(form.lng)) {
+      return DEFAULT_CENTER;
+    }
+
+    return { lat: Number(form.lat), lng: Number(form.lng) };
   }, [form.lat, form.lng]);
 
-  const loadData = useCallback(async () => {
+  const loadPageData = useCallback(async () => {
     setLoading(true);
     setError("");
 
-    const [locationResult, availabilityResult] = await Promise.allSettled([
-      getTeacherLocations(),
-      getTeacherAvailability(),
-    ]);
+    try {
+      const [locationResponse, availabilityResponse] = await Promise.all([
+        getTeacherLocations(),
+        getTeacherAvailability(),
+      ]);
 
-    if (locationResult.status === "fulfilled") {
-      const data = unwrap(locationResult.value, []);
-      setLocations(Array.isArray(data) ? data : []);
-    } else {
+      const locationData = unwrap(locationResponse, []);
+      const availabilityData = unwrap(availabilityResponse, null);
+
+      setLocations(Array.isArray(locationData) ? locationData : []);
+      setSchedule(availabilityToSchedule(availabilityData));
+      setAvailabilitySettings({
+        timezone:
+          availabilityData?.timezone ||
+          Intl.DateTimeFormat().resolvedOptions().timeZone ||
+          "Europe/Paris",
+        bufferMinutes: Number(availabilityData?.bufferMinutes ?? 15),
+        slotIntervalMinutes: Number(
+          availabilityData?.slotIntervalMinutes ?? 30,
+        ),
+      });
+    } catch (requestError) {
       setError(
-        errorMessage(
-          locationResult.reason,
-          "Teacher locations could not be loaded.",
+        getErrorMessage(
+          requestError,
+          "Locations and availability could not be loaded.",
         ),
       );
+    } finally {
+      setLoading(false);
     }
-
-    if (availabilityResult.status === "fulfilled") {
-      const data = unwrap(availabilityResult.value, null);
-      if (data) {
-        const savedDays = new Map(
-          (data.weeklySchedule || []).map((day) => [
-            Number(day.dayOfWeek),
-            day,
-          ]),
-        );
-        setSchedule(
-          DAYS.map((_, dayOfWeek) => {
-            const saved = savedDays.get(dayOfWeek);
-            const firstSlot = saved?.slots?.[0];
-            return {
-              dayOfWeek,
-              enabled: Boolean(saved?.enabled),
-              startTime: firstSlot?.startTime || "09:00",
-              endTime: firstSlot?.endTime || "18:00",
-            };
-          }),
-        );
-        setAvailabilityOptions({
-          timezone: data.timezone || "Europe/Paris",
-          bufferMinutes: Number(data.bufferMinutes ?? 15),
-          slotIntervalMinutes: Number(data.slotIntervalMinutes ?? 30),
-          lessonDurationOptions: Array.isArray(data.lessonDurationOptions)
-            ? data.lessonDurationOptions
-            : [30, 60, 90, 120],
-        });
-      }
-    }
-
-    setLoading(false);
   }, []);
 
   useEffect(() => {
-    loadData();
-  }, [loadData]);
+    loadPageData();
+  }, [loadPageData]);
 
   useEffect(() => {
-    if (!message) return undefined;
-    const timer = window.setTimeout(() => setMessage(""), 4500);
+    if (!success) return undefined;
+    const timer = window.setTimeout(() => setSuccess(""), 4500);
     return () => window.clearTimeout(timer);
-  }, [message]);
-
-  const setCoordinates = useCallback((lat, lng) => {
-    setForm((current) => ({ ...current, lat, lng }));
-    const point = { lat, lng };
-    mapRef.current?.panTo(point);
-    mapRef.current?.setZoom(15);
-  }, []);
+  }, [success]);
 
   const reverseGeocode = useCallback((lat, lng) => {
-    if (!window.google) return;
+    if (!window.google?.maps) return;
+
     const geocoder = new window.google.maps.Geocoder();
     geocoder.geocode({ location: { lat, lng } }, (results, status) => {
       if (status !== "OK" || !results?.[0]) return;
+
       const result = results[0];
+      const components = result.address_components || [];
+      const getPart = (type) =>
+        components.find((item) => item.types?.includes(type))?.long_name || "";
+
       setForm((current) => ({
         ...current,
         address: result.formatted_address || current.address,
-        city:
-          getAddressPart(result.address_components, "locality") ||
-          getAddressPart(
-            result.address_components,
-            "administrative_area_level_2",
-          ) ||
-          current.city,
-        postalCode:
-          getAddressPart(result.address_components, "postal_code") ||
-          current.postalCode,
         placeId: result.place_id || current.placeId,
+        city:
+          getPart("locality") ||
+          getPart("postal_town") ||
+          getPart("administrative_area_level_2") ||
+          current.city,
+        postalCode: getPart("postal_code") || current.postalCode,
       }));
     });
   }, []);
 
-  const choosePoint = useCallback(
-    (lat, lng, shouldReverseGeocode = true) => {
-      setCoordinates(lat, lng);
-      if (shouldReverseGeocode) reverseGeocode(lat, lng);
+  const setMapPoint = useCallback(
+    (lat, lng, shouldReverse = true) => {
+      setForm((current) => ({ ...current, lat, lng }));
+      mapRef.current?.panTo({ lat, lng });
+      mapRef.current?.setZoom(15);
+
+      if (shouldReverse) reverseGeocode(lat, lng);
     },
-    [reverseGeocode, setCoordinates],
+    [reverseGeocode],
   );
 
   const useCurrentLocation = () => {
     setError("");
+
     if (!navigator.geolocation) {
       setError("This browser does not support location access.");
       return;
     }
+
     navigator.geolocation.getCurrentPosition(
-      ({ coords }) => choosePoint(coords.latitude, coords.longitude, true),
+      ({ coords }) => setMapPoint(coords.latitude, coords.longitude, true),
       (geoError) =>
         setError(geoError.message || "Location permission was denied."),
       { enableHighAccuracy: true, timeout: 12000 },
     );
   };
 
-  const handlePlaceChanged = () => {
-    const place = autocompleteRef.current?.getPlace();
-    const lat = place?.geometry?.location?.lat();
-    const lng = place?.geometry?.location?.lng();
-    if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
-      setError("Please select an address from Google suggestions.");
-      return;
-    }
-
+  const handlePlaceSelect = (place) => {
     setForm((current) => ({
       ...current,
-      address: place.formatted_address || place.name || current.address,
-      city:
-        getAddressPart(place.address_components, "locality") ||
-        getAddressPart(place.address_components, "administrative_area_level_2"),
-      postalCode: getAddressPart(place.address_components, "postal_code"),
-      placeId: place.place_id || "",
-      lat,
-      lng,
+      address: place.address,
+      city: place.city || current.city,
+      postalCode: place.postalCode || current.postalCode,
+      placeId: place.placeId,
+      lat: place.lat,
+      lng: place.lng,
     }));
-    setCoordinates(lat, lng);
+
+    mapRef.current?.panTo({ lat: place.lat, lng: place.lng });
+    mapRef.current?.setZoom(15);
     setError("");
   };
 
   const resetForm = () => {
-    setForm(EMPTY_LOCATION);
+    setForm(emptyLocation());
     setError("");
+    setSuccess("");
     mapRef.current?.panTo(DEFAULT_CENTER);
     mapRef.current?.setZoom(11);
   };
 
   const editLocation = (location) => {
-    const next = locationToForm(location);
-    setForm(next);
-    const point = { lat: Number(next.lat), lng: Number(next.lng) };
-    if (Number.isFinite(point.lat) && Number.isFinite(point.lng)) {
-      mapRef.current?.panTo(point);
+    const nextForm = locationToForm(location);
+    setForm(nextForm);
+    setError("");
+    setSuccess("");
+
+    if (hasCoordinate(nextForm.lat) && hasCoordinate(nextForm.lng)) {
+      mapRef.current?.panTo({
+        lat: Number(nextForm.lat),
+        lng: Number(nextForm.lng),
+      });
       mapRef.current?.setZoom(15);
     }
+
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const submitLocation = async (event) => {
+  const saveLocation = async (event) => {
     event.preventDefault();
     setError("");
-    setMessage("");
+    setSuccess("");
 
     if (!form.address.trim()) {
-      setError("Select or enter a complete address.");
+      setError("Select an address from the Google suggestions.");
       return;
     }
+
     if (!hasCoordinate(form.lat) || !hasCoordinate(form.lng)) {
-      setError("Select an address, click the map, or use current location.");
+      setError("The location coordinates are missing.");
       return;
     }
 
     const payload = {
-      title: form.title,
-      address: form.address,
-      city: form.city,
-      postalCode: form.postalCode,
+      title: form.title.trim() || "Lesson meeting point",
+      address: form.address.trim(),
+      city: form.city.trim(),
+      postalCode: form.postalCode.trim(),
       placeId: form.placeId,
       lat: Number(form.lat),
       lng: Number(form.lng),
@@ -333,29 +358,22 @@ function TeacherLocationsManager({ apiKey }) {
     };
 
     setSavingLocation(true);
+
     try {
-      const response = form.id
-        ? await updateTeacherLocation(form.id, payload)
-        : await createTeacherLocation(payload);
-      const saved = unwrap(response, null);
-      if (saved?._id) {
-        setLocations((current) => {
-          const exists = current.some((item) => item._id === saved._id);
-          return exists
-            ? current.map((item) => (item._id === saved._id ? saved : item))
-            : [saved, ...current];
-        });
+      if (form.id) {
+        await updateTeacherLocation(form.id, payload);
+        setSuccess("Location updated successfully.");
       } else {
-        await loadData();
+        await createTeacherLocation(payload);
+        setSuccess("Location created successfully.");
       }
-      setMessage(
-        form.id
-          ? "Location updated successfully."
-          : "Location added successfully.",
-      );
-      resetForm();
+
+      await loadPageData();
+      setForm(emptyLocation());
     } catch (requestError) {
-      setError(errorMessage(requestError, "Location could not be saved."));
+      setError(
+        getErrorMessage(requestError, "The location could not be saved."),
+      );
     } finally {
       setSavingLocation(false);
     }
@@ -363,20 +381,27 @@ function TeacherLocationsManager({ apiKey }) {
 
   const removeLocation = async (location) => {
     const confirmed = window.confirm(
-      `Delete “${location.title || location.address}”?`,
+      `Delete ${location.title || "this location"}?`,
     );
     if (!confirmed) return;
 
+    setDeletingId(location._id);
     setError("");
+    setSuccess("");
+
     try {
       await deleteTeacherLocation(location._id);
       setLocations((current) =>
         current.filter((item) => item._id !== location._id),
       );
-      if (form.id === location._id) resetForm();
-      setMessage("Location deleted successfully.");
+      if (form.id === location._id) setForm(emptyLocation());
+      setSuccess("Location deleted successfully.");
     } catch (requestError) {
-      setError(errorMessage(requestError, "Location could not be deleted."));
+      setError(
+        getErrorMessage(requestError, "The location could not be deleted."),
+      );
+    } finally {
+      setDeletingId("");
     }
   };
 
@@ -388,13 +413,29 @@ function TeacherLocationsManager({ apiKey }) {
     );
   };
 
-  const saveSchedule = async () => {
-    setSavingSchedule(true);
+  const saveAvailability = async () => {
     setError("");
-    setMessage("");
+    setSuccess("");
+
+    const invalidDay = schedule.find(
+      (day) => day.enabled && day.endTime <= day.startTime,
+    );
+
+    if (invalidDay) {
+      setError(
+        `${DAYS[invalidDay.dayOfWeek]} end time must be after start time.`,
+      );
+      return;
+    }
+
+    setSavingAvailability(true);
+
     try {
       await updateTeacherAvailability({
-        ...availabilityOptions,
+        timezone: availabilitySettings.timezone,
+        bufferMinutes: Number(availabilitySettings.bufferMinutes),
+        slotIntervalMinutes: Number(availabilitySettings.slotIntervalMinutes),
+        lessonDurationOptions: [30, 60, 90, 120],
         weeklySchedule: schedule.map((day) => ({
           dayOfWeek: day.dayOfWeek,
           enabled: day.enabled,
@@ -403,486 +444,459 @@ function TeacherLocationsManager({ apiKey }) {
             : [],
         })),
       });
-      setMessage("Weekly availability saved successfully.");
+      setSuccess("Availability saved successfully.");
     } catch (requestError) {
-      setError(errorMessage(requestError, "Availability could not be saved."));
+      setError(
+        getErrorMessage(requestError, "Availability could not be saved."),
+      );
     } finally {
-      setSavingSchedule(false);
+      setSavingAvailability(false);
     }
   };
 
-  if (loadError) {
-    return (
-      <div className="p-6 text-red-700">
-        Google Maps failed to load: {loadError.message}
-      </div>
-    );
-  }
-
-  if (!isLoaded || loading) {
-    return (
-      <div className="p-6 font-semibold text-slate-600">
-        Loading location manager...
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-[#F5F7FB] p-4 sm:p-6 lg:p-8">
-      <div className="mx-auto max-w-7xl space-y-6">
-        <header className="rounded-3xl bg-gradient-to-r from-[#153E75] to-[#1F63B5] p-6 text-white shadow-lg sm:p-8">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <main className="space-y-6 pb-10">
+      <section className="rounded-3xl bg-gradient-to-r from-[#123D7A] to-[#1E63B7] p-6 text-white shadow-lg">
+        <p className="text-sm font-bold text-blue-100">Teacher settings</p>
+        <h1 className="mt-1 text-3xl font-black">Locations & availability</h1>
+        <p className="mt-2 max-w-2xl text-sm leading-6 text-blue-100">
+          Add accurate lesson meeting points and define when students can book
+          you.
+        </p>
+      </section>
+
+      {error && (
+        <div className="rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm font-semibold text-red-700">
+          {error}
+        </div>
+      )}
+
+      {success && (
+        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm font-semibold text-emerald-700">
+          {success}
+        </div>
+      )}
+
+      <section className="grid gap-6 xl:grid-cols-[420px_minmax(0,1fr)]">
+        <form
+          onSubmit={saveLocation}
+          className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm"
+        >
+          <div className="flex items-center justify-between gap-3">
             <div>
-              <p className="text-sm font-bold uppercase tracking-[0.2em] text-blue-100">
-                Teacher setup
+              <p className="text-xs font-black uppercase tracking-wider text-blue-600">
+                {form.id ? "Edit location" : "New location"}
               </p>
-              <h1 className="mt-2 text-3xl font-black">
-                Locations & availability
-              </h1>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-blue-100">
-                Add exact meeting points, set a service radius, and define the
-                hours when students can book you.
-              </p>
+              <h2 className="mt-1 text-xl font-black text-slate-900">
+                Lesson meeting point
+              </h2>
             </div>
-            <button
-              type="button"
-              onClick={resetForm}
-              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-5 py-3 font-bold text-[#174A9B] shadow-sm"
-            >
-              <FaPlus /> New location
-            </button>
-          </div>
-        </header>
-
-        {error && (
-          <div className="rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm font-semibold text-red-700">
-            {error}
-          </div>
-        )}
-        {message && (
-          <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm font-semibold text-emerald-700">
-            {message}
-          </div>
-        )}
-
-        <section className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
-          <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-            <GoogleMap
-              mapContainerStyle={MAP_CONTAINER_STYLE}
-              center={center}
-              zoom={form.address ? 15 : 11}
-              onLoad={(map) => {
-                mapRef.current = map;
-              }}
-              onClick={(event) =>
-                choosePoint(event.latLng.lat(), event.latLng.lng(), true)
-              }
-              options={{
-                streetViewControl: false,
-                mapTypeControl: false,
-                fullscreenControl: true,
-              }}
-            >
-              {hasCoordinate(form.lat) && hasCoordinate(form.lng) && (
-                <MarkerF
-                  position={center}
-                  draggable
-                  onDragEnd={(event) =>
-                    choosePoint(event.latLng.lat(), event.latLng.lng(), true)
-                  }
-                />
-              )}
-            </GoogleMap>
-            <div className="border-t border-slate-100 p-4 text-sm text-slate-600">
-              Click the map or drag the marker to set the exact lesson meeting
-              point.
-            </div>
-          </div>
-
-          <form
-            onSubmit={submitLocation}
-            className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6"
-          >
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-sm font-bold text-[#174A9B]">
-                  {form.id ? "Edit location" : "Add location"}
-                </p>
-                <h2 className="mt-1 text-2xl font-black text-slate-900">
-                  Lesson meeting point
-                </h2>
-              </div>
+            {form.id && (
               <button
                 type="button"
-                onClick={useCurrentLocation}
-                className="inline-flex items-center gap-2 rounded-xl bg-blue-50 px-3 py-2 text-sm font-bold text-[#174A9B]"
+                onClick={resetForm}
+                className="rounded-xl bg-slate-100 px-3 py-2 text-xs font-black text-slate-700 hover:bg-slate-200"
               >
-                <FaLocationArrow /> Use current
+                <FaPlus className="mr-1 inline" /> New
               </button>
-            </div>
-
-            <div className="mt-5 space-y-4">
-              <label className="block">
-                <span className="mb-2 block text-sm font-bold text-slate-700">
-                  Search address
-                </span>
-                <Autocomplete
-                  onLoad={(instance) => {
-                    autocompleteRef.current = instance;
-                  }}
-                  onPlaceChanged={handlePlaceChanged}
-                >
-                  <input
-                    value={form.address}
-                    onChange={(event) =>
-                      setForm((current) => ({
-                        ...current,
-                        address: event.target.value,
-                      }))
-                    }
-                    placeholder="Start typing a full address"
-                    className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-[#174A9B] focus:ring-4 focus:ring-blue-100"
-                  />
-                </Autocomplete>
-              </label>
-
-              <div className="grid gap-4 sm:grid-cols-2">
-                <Field
-                  label="Location title"
-                  value={form.title}
-                  onChange={(value) =>
-                    setForm((current) => ({ ...current, title: value }))
-                  }
-                  placeholder="Central meeting point"
-                />
-                <Field
-                  label="City"
-                  value={form.city}
-                  onChange={(value) =>
-                    setForm((current) => ({ ...current, city: value }))
-                  }
-                  placeholder="Paris"
-                />
-                <Field
-                  label="Postal code"
-                  value={form.postalCode}
-                  onChange={(value) =>
-                    setForm((current) => ({ ...current, postalCode: value }))
-                  }
-                  placeholder="75001"
-                />
-                <label className="block">
-                  <span className="mb-2 block text-sm font-bold text-slate-700">
-                    Service radius
-                  </span>
-                  <select
-                    value={form.serviceRadiusKm}
-                    onChange={(event) =>
-                      setForm((current) => ({
-                        ...current,
-                        serviceRadiusKm: Number(event.target.value),
-                      }))
-                    }
-                    className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-[#174A9B]"
-                  >
-                    {[3, 5, 10, 15, 20, 30, 50].map((radius) => (
-                      <option key={radius} value={radius}>
-                        {radius} km
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label className="block">
-                  <span className="mb-2 block text-sm font-bold text-slate-700">
-                    Lesson arrangement
-                  </span>
-                  <select
-                    value={form.meetingType}
-                    onChange={(event) =>
-                      setForm((current) => ({
-                        ...current,
-                        meetingType: event.target.value,
-                      }))
-                    }
-                    className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-[#174A9B]"
-                  >
-                    <option value="teacher_location">Student comes here</option>
-                    <option value="student_pickup">Student pickup</option>
-                    <option value="both">Both options</option>
-                  </select>
-                </label>
-                <label className="block">
-                  <span className="mb-2 block text-sm font-bold text-slate-700">
-                    Status
-                  </span>
-                  <select
-                    value={form.status}
-                    onChange={(event) =>
-                      setForm((current) => ({
-                        ...current,
-                        status: event.target.value,
-                      }))
-                    }
-                    className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-[#174A9B]"
-                  >
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                  </select>
-                </label>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3 rounded-2xl bg-slate-50 p-3 text-xs text-slate-600">
-                <span>
-                  Lat:{" "}
-                  {hasCoordinate(form.lat) ? Number(form.lat).toFixed(6) : "--"}
-                </span>
-                <span>
-                  Lng:{" "}
-                  {hasCoordinate(form.lng) ? Number(form.lng).toFixed(6) : "--"}
-                </span>
-              </div>
-
-              <button
-                type="submit"
-                disabled={savingLocation}
-                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#174A9B] px-5 py-3.5 font-black text-white shadow-sm transition hover:bg-[#123D82] disabled:opacity-60"
-              >
-                <FaSave />
-                {savingLocation
-                  ? "Saving..."
-                  : form.id
-                    ? "Update location"
-                    : "Save location"}
-              </button>
-            </div>
-          </form>
-        </section>
-
-        <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-50 text-[#174A9B]">
-              <FaMapMarkerAlt />
-            </div>
-            <div>
-              <h2 className="text-xl font-black text-slate-900">
-                Saved locations
-              </h2>
-              <p className="text-sm text-slate-500">
-                Students only see active locations inside the selected search
-                radius.
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {locations.length ? (
-              locations.map((location) => (
-                <article
-                  key={location._id}
-                  className="rounded-2xl border border-slate-200 p-4"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <h3 className="font-black text-slate-900">
-                        {location.title || "Lesson meeting point"}
-                      </h3>
-                      <p className="mt-1 text-sm leading-5 text-slate-600">
-                        {[location.address, location.city, location.postalCode]
-                          .filter(Boolean)
-                          .join(", ")}
-                      </p>
-                    </div>
-                    <span
-                      className={`rounded-full px-2.5 py-1 text-xs font-black ${
-                        location.status === "active"
-                          ? "bg-emerald-100 text-emerald-700"
-                          : "bg-slate-100 text-slate-600"
-                      }`}
-                    >
-                      {location.status}
-                    </span>
-                  </div>
-                  <div className="mt-4 flex flex-wrap gap-2 text-xs font-bold text-slate-600">
-                    <span className="rounded-full bg-slate-100 px-3 py-1.5">
-                      {location.serviceRadiusKm || 10} km radius
-                    </span>
-                    <span className="rounded-full bg-slate-100 px-3 py-1.5">
-                      {(location.meetingType || "teacher_location").replaceAll(
-                        "_",
-                        " ",
-                      )}
-                    </span>
-                  </div>
-                  <div className="mt-4 flex gap-2">
-                    <button
-                      type="button"
-                      onClick={() => editLocation(location)}
-                      className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-blue-50 px-3 py-2 text-sm font-bold text-[#174A9B]"
-                    >
-                      <FaEdit /> Edit
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => removeLocation(location)}
-                      className="inline-flex items-center justify-center gap-2 rounded-xl bg-red-50 px-3 py-2 text-sm font-bold text-red-700"
-                    >
-                      <FaTrash />
-                    </button>
-                  </div>
-                </article>
-              ))
-            ) : (
-              <div className="col-span-full rounded-2xl border border-dashed border-slate-300 p-8 text-center text-slate-500">
-                No location saved yet. Add your first lesson meeting point
-                above.
-              </div>
             )}
           </div>
-        </section>
 
-        <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-50 text-[#174A9B]">
-                <FaCalendarAlt />
-              </div>
-              <div>
-                <h2 className="text-xl font-black text-slate-900">
-                  Weekly availability
-                </h2>
-                <p className="text-sm text-slate-500">
-                  A student can only book inside these working hours.
+          <div className="mt-5 space-y-4">
+            <TextField
+              label="Location title"
+              value={form.title}
+              onChange={(value) =>
+                setForm((current) => ({ ...current, title: value }))
+              }
+              placeholder="Example: Central Station meeting point"
+            />
+
+            <div>
+              <label className="mb-2 block text-sm font-black text-slate-700">
+                Search address
+              </label>
+              <GooglePlaceAutocomplete
+                value={form.address}
+                placeholder="Type a street, city or landmark"
+                onPlaceSelect={handlePlaceSelect}
+                onError={setError}
+              />
+              {form.address && (
+                <p className="mt-2 rounded-xl bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-800">
+                  <FaMapMarkerAlt className="mr-1 inline" /> {form.address}
                 </p>
-              </div>
+              )}
             </div>
-            <div className="flex flex-wrap gap-3">
-              <label className="text-sm font-bold text-slate-600">
-                Buffer
-                <select
-                  value={availabilityOptions.bufferMinutes}
-                  onChange={(event) =>
-                    setAvailabilityOptions((current) => ({
-                      ...current,
-                      bufferMinutes: Number(event.target.value),
-                    }))
-                  }
-                  className="ml-2 rounded-xl border border-slate-200 px-3 py-2"
-                >
-                  {[0, 10, 15, 20, 30, 45, 60].map((value) => (
-                    <option key={value} value={value}>
-                      {value} min
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="text-sm font-bold text-slate-600">
-                Slot interval
-                <select
-                  value={availabilityOptions.slotIntervalMinutes}
-                  onChange={(event) =>
-                    setAvailabilityOptions((current) => ({
-                      ...current,
-                      slotIntervalMinutes: Number(event.target.value),
-                    }))
-                  }
-                  className="ml-2 rounded-xl border border-slate-200 px-3 py-2"
-                >
-                  {[15, 30, 45, 60].map((value) => (
-                    <option key={value} value={value}>
-                      {value} min
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </div>
-          </div>
 
-          <div className="mt-5 space-y-3">
-            {schedule.map((day) => (
-              <div
-                key={day.dayOfWeek}
-                className="grid gap-3 rounded-2xl border border-slate-200 p-4 sm:grid-cols-[170px_1fr] sm:items-center"
+            <button
+              type="button"
+              onClick={useCurrentLocation}
+              className="flex w-full items-center justify-center gap-2 rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm font-black text-blue-700 hover:bg-blue-100"
+            >
+              <FaLocationArrow /> Use my current location
+            </button>
+
+            <div className="grid grid-cols-2 gap-3">
+              <TextField
+                label="City"
+                value={form.city}
+                onChange={(value) =>
+                  setForm((current) => ({ ...current, city: value }))
+                }
+              />
+              <TextField
+                label="Postal code"
+                value={form.postalCode}
+                onChange={(value) =>
+                  setForm((current) => ({ ...current, postalCode: value }))
+                }
+              />
+            </div>
+
+            <SelectField
+              label="Service radius"
+              value={form.serviceRadiusKm}
+              onChange={(value) =>
+                setForm((current) => ({
+                  ...current,
+                  serviceRadiusKm: Number(value),
+                }))
+              }
+              options={[5, 10, 15, 20, 30, 50].map((value) => ({
+                value,
+                label: `${value} km`,
+              }))}
+            />
+
+            <SelectField
+              label="Meeting type"
+              value={form.meetingType}
+              onChange={(value) =>
+                setForm((current) => ({ ...current, meetingType: value }))
+              }
+              options={[
+                { value: "teacher_location", label: "Teacher meeting point" },
+                { value: "student_pickup", label: "Student pickup" },
+                { value: "both", label: "Both options" },
+              ]}
+            />
+
+            <SelectField
+              label="Status"
+              value={form.status}
+              onChange={(value) =>
+                setForm((current) => ({ ...current, status: value }))
+              }
+              options={[
+                { value: "active", label: "Active" },
+                { value: "inactive", label: "Inactive" },
+              ]}
+            />
+
+            <button
+              type="submit"
+              disabled={savingLocation}
+              className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#174A9B] px-5 py-3.5 text-sm font-black text-white shadow-md hover:bg-[#123D7A] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <FaSave />
+              {savingLocation
+                ? "Saving..."
+                : form.id
+                  ? "Update location"
+                  : "Save location"}
+            </button>
+          </div>
+        </form>
+
+        <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white p-3 shadow-sm">
+          <GoogleMap
+            mapContainerStyle={MAP_STYLE}
+            center={selectedPoint}
+            zoom={hasCoordinate(form.lat) ? 15 : 11}
+            onLoad={(map) => {
+              mapRef.current = map;
+            }}
+            onClick={(event) => {
+              if (!event.latLng) return;
+              setMapPoint(event.latLng.lat(), event.latLng.lng(), true);
+            }}
+            options={{
+              streetViewControl: false,
+              mapTypeControl: false,
+              fullscreenControl: true,
+              clickableIcons: false,
+            }}
+          >
+            {hasCoordinate(form.lat) && hasCoordinate(form.lng) && (
+              <MarkerF
+                position={{ lat: Number(form.lat), lng: Number(form.lng) }}
+                draggable
+                onDragEnd={(event) => {
+                  if (!event.latLng) return;
+                  setMapPoint(event.latLng.lat(), event.latLng.lng(), true);
+                }}
+              />
+            )}
+
+            {locations.map((location) => {
+              const point = getLocationPoint(location);
+              if (!point || location._id === form.id) return null;
+
+              return (
+                <MarkerF
+                  key={location._id}
+                  position={point}
+                  onClick={() => editLocation(location)}
+                />
+              );
+            })}
+          </GoogleMap>
+          <p className="px-2 pb-1 pt-3 text-xs font-semibold text-slate-500">
+            Search an address, click the map, or drag the marker to correct the
+            exact point.
+          </p>
+        </div>
+      </section>
+
+      <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-xs font-black uppercase tracking-wider text-blue-600">
+              Saved locations
+            </p>
+            <h2 className="mt-1 text-xl font-black text-slate-900">
+              Your lesson locations
+            </h2>
+          </div>
+          <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-black text-blue-700">
+            {locations.length} total
+          </span>
+        </div>
+
+        {loading ? (
+          <p className="py-8 text-center font-bold text-slate-500">
+            Loading locations...
+          </p>
+        ) : locations.length ? (
+          <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {locations.map((location) => (
+              <article
+                key={location._id}
+                className="rounded-2xl border border-slate-200 p-4"
               >
-                <label className="flex items-center gap-3 font-black text-slate-800">
-                  <input
-                    type="checkbox"
-                    checked={day.enabled}
-                    onChange={(event) =>
-                      updateScheduleDay(
-                        day.dayOfWeek,
-                        "enabled",
-                        event.target.checked,
-                      )
-                    }
-                    className="h-5 w-5 rounded border-slate-300"
-                  />
-                  {DAYS[day.dayOfWeek]}
-                </label>
-                {day.enabled ? (
-                  <div className="flex flex-wrap items-center gap-3">
-                    <FaClock className="text-[#174A9B]" />
-                    <input
-                      type="time"
-                      value={day.startTime}
-                      onChange={(event) =>
-                        updateScheduleDay(
-                          day.dayOfWeek,
-                          "startTime",
-                          event.target.value,
-                        )
-                      }
-                      className="rounded-xl border border-slate-200 px-3 py-2"
-                    />
-                    <span className="text-sm font-bold text-slate-400">to</span>
-                    <input
-                      type="time"
-                      value={day.endTime}
-                      onChange={(event) =>
-                        updateScheduleDay(
-                          day.dayOfWeek,
-                          "endTime",
-                          event.target.value,
-                        )
-                      }
-                      className="rounded-xl border border-slate-200 px-3 py-2"
-                    />
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <h3 className="truncate font-black text-slate-900">
+                      {location.title || "Lesson meeting point"}
+                    </h3>
+                    <p className="mt-2 text-sm leading-5 text-slate-600">
+                      {location.address}
+                    </p>
                   </div>
-                ) : (
-                  <span className="text-sm font-semibold text-slate-400">
-                    Unavailable
+                  <span
+                    className={`rounded-full px-2.5 py-1 text-[11px] font-black ${
+                      location.status === "active"
+                        ? "bg-emerald-100 text-emerald-700"
+                        : "bg-slate-100 text-slate-600"
+                    }`}
+                  >
+                    {location.status || "active"}
                   </span>
-                )}
-              </div>
+                </div>
+
+                <div className="mt-4 flex items-center justify-between text-xs font-bold text-slate-500">
+                  <span>{location.city || "City not set"}</span>
+                  <span>{location.serviceRadiusKm || 10} km radius</span>
+                </div>
+
+                <div className="mt-4 grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => editLocation(location)}
+                    className="rounded-xl bg-blue-50 px-3 py-2.5 text-xs font-black text-blue-700 hover:bg-blue-100"
+                  >
+                    <FaEdit className="mr-1 inline" /> Edit
+                  </button>
+                  <button
+                    type="button"
+                    disabled={deletingId === location._id}
+                    onClick={() => removeLocation(location)}
+                    className="rounded-xl bg-red-50 px-3 py-2.5 text-xs font-black text-red-700 hover:bg-red-100 disabled:opacity-60"
+                  >
+                    <FaTrash className="mr-1 inline" />
+                    {deletingId === location._id ? "Deleting" : "Delete"}
+                  </button>
+                </div>
+              </article>
             ))}
           </div>
+        ) : (
+          <div className="mt-5 rounded-2xl bg-slate-50 py-10 text-center text-sm font-bold text-slate-500">
+            No lesson location has been added yet.
+          </div>
+        )}
+      </section>
 
-          <button
-            type="button"
-            onClick={saveSchedule}
-            disabled={savingSchedule}
-            className="mt-5 inline-flex items-center gap-2 rounded-2xl bg-[#174A9B] px-5 py-3 font-black text-white disabled:opacity-60"
-          >
-            <FaSave />{" "}
-            {savingSchedule ? "Saving schedule..." : "Save availability"}
-          </button>
-        </section>
-      </div>
-    </div>
+      <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-xs font-black uppercase tracking-wider text-blue-600">
+              Weekly schedule
+            </p>
+            <h2 className="mt-1 text-xl font-black text-slate-900">
+              Booking availability
+            </h2>
+          </div>
+          <FaClock className="text-2xl text-blue-600" />
+        </div>
+
+        <div className="mt-5 grid gap-3">
+          {schedule.map((day) => (
+            <div
+              key={day.dayOfWeek}
+              className="grid items-center gap-3 rounded-2xl border border-slate-200 p-3 md:grid-cols-[150px_110px_1fr_1fr]"
+            >
+              <p className="font-black text-slate-800">{DAYS[day.dayOfWeek]}</p>
+
+              <label className="flex items-center gap-2 text-sm font-bold text-slate-600">
+                <input
+                  type="checkbox"
+                  checked={day.enabled}
+                  onChange={(event) =>
+                    updateScheduleDay(
+                      day.dayOfWeek,
+                      "enabled",
+                      event.target.checked,
+                    )
+                  }
+                  className="h-4 w-4 accent-blue-600"
+                />
+                Available
+              </label>
+
+              <input
+                type="time"
+                value={day.startTime}
+                disabled={!day.enabled}
+                onChange={(event) =>
+                  updateScheduleDay(
+                    day.dayOfWeek,
+                    "startTime",
+                    event.target.value,
+                  )
+                }
+                className="rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-bold outline-none focus:border-blue-500 disabled:bg-slate-100"
+              />
+
+              <input
+                type="time"
+                value={day.endTime}
+                disabled={!day.enabled}
+                onChange={(event) =>
+                  updateScheduleDay(
+                    day.dayOfWeek,
+                    "endTime",
+                    event.target.value,
+                  )
+                }
+                className="rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-bold outline-none focus:border-blue-500 disabled:bg-slate-100"
+              />
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-5 grid gap-4 md:grid-cols-3">
+          <TextField
+            label="Timezone"
+            value={availabilitySettings.timezone}
+            onChange={(value) =>
+              setAvailabilitySettings((current) => ({
+                ...current,
+                timezone: value,
+              }))
+            }
+          />
+
+          <SelectField
+            label="Buffer between lessons"
+            value={availabilitySettings.bufferMinutes}
+            onChange={(value) =>
+              setAvailabilitySettings((current) => ({
+                ...current,
+                bufferMinutes: Number(value),
+              }))
+            }
+            options={[0, 10, 15, 20, 30, 45, 60].map((value) => ({
+              value,
+              label: `${value} minutes`,
+            }))}
+          />
+
+          <SelectField
+            label="Slot interval"
+            value={availabilitySettings.slotIntervalMinutes}
+            onChange={(value) =>
+              setAvailabilitySettings((current) => ({
+                ...current,
+                slotIntervalMinutes: Number(value),
+              }))
+            }
+            options={[15, 30, 45, 60].map((value) => ({
+              value,
+              label: `${value} minutes`,
+            }))}
+          />
+        </div>
+
+        <button
+          type="button"
+          onClick={saveAvailability}
+          disabled={savingAvailability}
+          className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#174A9B] px-5 py-3.5 text-sm font-black text-white hover:bg-[#123D7A] disabled:opacity-60 md:w-auto md:min-w-56"
+        >
+          <FaSave />
+          {savingAvailability ? "Saving..." : "Save availability"}
+        </button>
+      </section>
+    </main>
   );
 }
 
-function Field({ label, value, onChange, placeholder }) {
+function TextField({ label, value, onChange, placeholder = "" }) {
   return (
     <label className="block">
-      <span className="mb-2 block text-sm font-bold text-slate-700">
+      <span className="mb-2 block text-sm font-black text-slate-700">
         {label}
       </span>
       <input
+        type="text"
+        value={value}
+        placeholder={placeholder}
+        onChange={(event) => onChange(event.target.value)}
+        className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+      />
+    </label>
+  );
+}
+
+function SelectField({ label, value, onChange, options }) {
+  return (
+    <label className="block">
+      <span className="mb-2 block text-sm font-black text-slate-700">
+        {label}
+      </span>
+      <select
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        placeholder={placeholder}
-        className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-[#174A9B] focus:ring-4 focus:ring-blue-100"
-      />
+        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+      >
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
     </label>
   );
 }

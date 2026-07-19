@@ -1519,6 +1519,68 @@ function formatMoney(value) {
   }).format(amount);
 }
 
+function formatLocation(location) {
+  if (location === null || location === undefined || location === "") {
+    return "";
+  }
+
+  if (typeof location === "string" || typeof location === "number") {
+    return String(location).trim();
+  }
+
+  if (Array.isArray(location)) {
+    return location
+      .map((item) => formatLocation(item))
+      .filter(Boolean)
+      .join(", ");
+  }
+
+  if (typeof location === "object") {
+    const parts = [
+      location.formattedAddress,
+      location.address,
+      location.street,
+      location.area,
+      location.city,
+      location.state,
+      location.postalCode,
+      location.country,
+    ]
+      .map((item) => {
+        if (typeof item === "string" || typeof item === "number") {
+          return String(item).trim();
+        }
+
+        return "";
+      })
+      .filter(Boolean);
+
+    return [...new Set(parts)].join(", ");
+  }
+
+  return "";
+}
+
+function getBookingLocation(booking) {
+  const candidates = [
+    booking?.location,
+    booking?.pickupLocation,
+    booking?.meetingLocationSnapshot,
+    booking?.studentPickupLocation,
+    booking?.teacherLocation,
+  ];
+
+  for (const candidate of candidates) {
+    const formatted = formatLocation(candidate);
+
+    if (formatted) {
+      return formatted;
+    }
+  }
+
+  return "Driving booking";
+}
+
 function StatusPill({ status }) {
   const normalized = String(status || "pending").toLowerCase();
 
@@ -1712,15 +1774,20 @@ function RecentBookingRow({ booking }) {
     booking.student?.email ||
     "Student";
 
+  const locationText = getBookingLocation(booking);
+
   return (
     <div className="flex items-center justify-between gap-3 rounded-2xl border border-slate-100 bg-white px-4 py-3 transition hover:bg-slate-50">
       <div className="min-w-0">
         <p className="truncate text-sm font-bold text-slate-900">
-          {studentName}
+          {String(studentName)}
         </p>
 
-        <p className="mt-1 truncate text-xs font-medium text-slate-400">
-          {booking.location || booking.pickupLocation || "Driving booking"}
+        <p
+          className="mt-1 truncate text-xs font-medium text-slate-400"
+          title={locationText}
+        >
+          {locationText}
         </p>
       </div>
 
