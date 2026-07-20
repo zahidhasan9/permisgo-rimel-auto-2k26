@@ -342,7 +342,9 @@ import Pagination from "@/components/Pagination";
 import {
   confirmAttendance,
   confirmLessonCompletion,
+  getLessonStats,
   getLessons,
+  getLocationBookings,
 } from "@/features/API";
 import {
   formatLessonDate,
@@ -362,19 +364,29 @@ const INITIAL_META = {
   totalPages: 1,
 };
 
-const STATUSES = [
-  "all",
-  "scheduled",
-  "in_progress",
-  "awaiting_confirmation",
-  "completed",
-  "cancelled",
-  "no_show",
-];
-
 const studentPresent = (lesson) =>
   lesson.attendance?.studentStatus === "present" ||
   lesson.attendance?.studentConfirmed === true;
+
+const TABS = [
+  { key: "action", label: "Action required" },
+  { key: "upcoming", label: "Upcoming lessons" },
+  { key: "requests", label: "Booking requests" },
+  { key: "history", label: "History" },
+];
+
+const TAB_STATUSES = {
+  action: ["in_progress", "awaiting_confirmation"],
+  upcoming: ["scheduled"],
+  history: ["completed", "cancelled", "no_show"],
+};
+
+const INITIAL_STATS = {
+  scheduled: 0,
+  in_progress: 0,
+  awaiting_confirmation: 0,
+  completed: 0,
+};
 
 export default function StudentLessonsPage() {
   const [lessons, setLessons] = useState([]);
@@ -382,6 +394,9 @@ export default function StudentLessonsPage() {
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState("");
   const [notice, setNotice] = useState(null);
+  const [activeTab, setActiveTab] = useState("action");
+  const [stats, setStats] = useState(INITIAL_STATS);
+  const [pendingRequests, setPendingRequests] = useState(0);
 
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(20);
@@ -389,6 +404,24 @@ export default function StudentLessonsPage() {
   const [search, setSearch] = useState("");
   const [sortOrder, setSortOrder] = useState("desc");
   const debouncedSearch = useDebouncedValue(search, 500);
+  const lessonView = activeTab === "requests" ? "" : activeTab;
+
+  const loadSummary = useCallback(async () => {
+    try {
+      const [statsResponse, bookingsResponse] = await Promise.all([
+        getLessonStats(),
+        getLocationBookings({ status: "pending", page: 1, limit: 1 }),
+      ]);
+      setStats({
+        ...INITIAL_STATS,
+        ...(unwrap(statsResponse, {}) || {}),
+      });
+      setPendingRequests(Number(bookingsResponse?.data?.meta?.total) || 0);
+    } catch {
+      setStats(INITIAL_STATS);
+      setPendingRequests(0);
+    }
+  }, []);
 
   const loadLessons = useCallback(async () => {
     setLoading(true);
@@ -398,6 +431,7 @@ export default function StudentLessonsPage() {
         page,
         limit,
         status,
+        view: lessonView || undefined,
         search: debouncedSearch,
         sortOrder,
       });
@@ -418,15 +452,27 @@ export default function StudentLessonsPage() {
     } finally {
       setLoading(false);
     }
-  }, [debouncedSearch, limit, page, sortOrder, status]);
+  }, [debouncedSearch, lessonView, limit, page, sortOrder, status]);
 
   useEffect(() => {
-    loadLessons();
-  }, [loadLessons]);
+    if (activeTab !== "requests") loadLessons();
+  }, [activeTab, loadLessons]);
+
+  useEffect(() => {
+    loadSummary();
+    const requestedTab = new URLSearchParams(window.location.search).get("tab");
+    if (TABS.some((tab) => tab.key === requestedTab)) {
+      setActiveTab(requestedTab);
+    }
+  }, [loadSummary]);
 
   useEffect(() => {
     setPage(1);
-  }, [debouncedSearch, limit, sortOrder, status]);
+  }, [activeTab, debouncedSearch, limit, sortOrder, status]);
+
+  useEffect(() => {
+    setStatus("all");
+  }, [activeTab]);
 
   const runAction = async (lesson, action, message) => {
     setBusyId(lesson._id);
@@ -435,7 +481,7 @@ export default function StudentLessonsPage() {
     try {
       await action();
       setNotice({ type: "success", text: message });
-      await loadLessons();
+      await Promise.all([loadLessons(), loadSummary()]);
     } catch (error) {
       setNotice({
         type: "error",
@@ -475,8 +521,70 @@ export default function StudentLessonsPage() {
           </div>
         )}
 
-        <BookingWorkspace role="student" />
+        <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          {[
+            {
+              label: "Action required",
+              value: stats.in_progress + stats.awaiting_confirmation,
+              color: "border-amber-200 bg-amber-50 text-amber-800",
+            },
+            {
+              label: "Pending requests",
+              value: pendingRequests,
+              color: "border-violet-200 bg-violet-50 text-violet-800",
+            },
+            {
+              label: "Upcoming lessons",
+              value: stats.scheduled,
+              color: "border-blue-200 bg-blue-50 text-blue-800",
+            },
+            {
+              label: "Completed lessons",
+              value: stats.completed,
+              color: "border-emerald-200 bg-emerald-50 text-emerald-800",
+            },
+          ].map((card) => (
+            <article
+              key={card.label}
+              className={`rounded-2xl border p-4 ${card.color}`}
+            >
+              <p className="text-xs font-bold uppercase tracking-wider">
+                {card.label}
+              </p>
+              <p className="mt-2 text-3xl font-black">{card.value}</p>
+            </article>
+          ))}
+        </section>
 
+        <nav className="flex gap-2 overflow-x-auto rounded-2xl border border-slate-200 bg-white p-2">
+          {TABS.map((tab) => (
+            <button
+              key={tab.key}
+              type="button"
+              onClick={() => {
+                setActiveTab(tab.key);
+                setPage(1);
+                window.history.replaceState(
+                  null,
+                  "",
+                  `/student/lessons?tab=${tab.key}`,
+                );
+              }}
+              className={`shrink-0 rounded-xl px-4 py-2.5 text-sm font-bold ${
+                activeTab === tab.key
+                  ? "bg-blue-600 text-white"
+                  : "text-slate-600 hover:bg-slate-100"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </nav>
+
+        {activeTab === "requests" ? (
+          <BookingWorkspace role="student" />
+        ) : (
+          <>
         <section className="grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 md:grid-cols-[1fr_220px_180px]">
           <label className="relative">
             <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -493,9 +601,16 @@ export default function StudentLessonsPage() {
             onChange={(event) => setStatus(event.target.value)}
             className="rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm"
           >
-            {STATUSES.map((item) => (
+            <option value="all">
+              {activeTab === "action"
+                ? "Active actions"
+                : activeTab === "upcoming"
+                  ? "Scheduled"
+                  : "History statuses"}
+            </option>
+            {(TAB_STATUSES[activeTab] || []).map((item) => (
               <option key={item} value={item}>
-                {item === "all" ? "All statuses" : statusLabel(item)}
+                {statusLabel(item)}
               </option>
             ))}
           </select>
@@ -603,7 +718,10 @@ export default function StudentLessonsPage() {
                               <FaEye /> View
                             </Link>
 
-                            {lesson.status === "in_progress" && !present && (
+                            {["in_progress", "awaiting_confirmation"].includes(
+                              lesson.status,
+                            ) &&
+                              !present && (
                               <button
                                 type="button"
                                 disabled={busy}
@@ -662,6 +780,8 @@ export default function StudentLessonsPage() {
             }}
           />
         </section>
+          </>
+        )}
       </div>
     </main>
   );

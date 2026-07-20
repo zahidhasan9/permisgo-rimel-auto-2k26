@@ -41,6 +41,10 @@ export const removeFavoriteTeacher = (teacherId) =>
 // =======================
 export const getPublicTeachers = () => axios.get("/teachers/public");
 export const getTeacherDashboard = () => axios.get("/teachers/dashboard");
+export const getTeacherStudents = (params = {}) =>
+  axios.get("/teachers/students", { params });
+export const getTeacherStudent = (studentId, params = {}) =>
+  axios.get(`/teachers/students/${studentId}`, { params });
 export const getTeacherProfile = () => axios.get("/teachers/profile");
 export const updateTeacherProfile = (data) =>
   axios.patch("/teachers/profile", data);

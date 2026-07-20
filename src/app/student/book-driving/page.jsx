@@ -1058,7 +1058,6 @@
 "use client";
 
 import {
-  Autocomplete,
   CircleF,
   GoogleMap,
   MarkerF,
@@ -1077,12 +1076,11 @@ import {
   FaUserTie,
 } from "react-icons/fa";
 import {
-  cancelLocationBooking,
   createLocationBooking,
   getAvailableBookingSlots,
-  getLocationBookings,
   getNearbyTeachers,
 } from "@/features/API";
+import GooglePlaceAutocomplete from "@/components/maps/GooglePlaceAutocomplete";
 
 const MAP_LIBRARIES = ["places"];
 const MAP_CONTAINER_STYLE = { width: "100%", height: "610px" };
@@ -1113,10 +1111,6 @@ const unwrap = (response, fallback = null) =>
 
 const errorMessage = (error, fallback) =>
   error?.response?.data?.message || error?.message || fallback;
-
-const getAddressPart = (components = [], type) =>
-  components.find((component) => component.types?.includes(type))?.long_name ||
-  "";
 
 const hasCoordinate = (value) =>
   value !== null && value !== "" && Number.isFinite(Number(value));
@@ -1157,7 +1151,7 @@ const formatDate = (value) => {
 const statusClass = (status) => {
   if (status === "confirmed") return "bg-emerald-100 text-emerald-700";
   if (status === "completed") return "bg-blue-100 text-blue-700";
-  if (["cancelled", "rejected", "expired"].includes(status)) {
+  if (["cancelled", "rejected", "no_show", "expired"].includes(status)) {
     return "bg-red-100 text-red-700";
   }
   return "bg-amber-100 text-amber-700";
@@ -1201,20 +1195,16 @@ function LocationBookingPage({ apiKey }) {
     libraries: MAP_LIBRARIES,
   });
 
-  const autocompleteRef = useRef(null);
   const mapRef = useRef(null);
   const [search, setSearch] = useState(EMPTY_SEARCH);
   const [teachers, setTeachers] = useState([]);
   const [selectedTeacherId, setSelectedTeacherId] = useState("");
   const [selectedVehicleId, setSelectedVehicleId] = useState("");
-  const [bookings, setBookings] = useState([]);
   const [availableSlots, setAvailableSlots] = useState([]);
   const [searched, setSearched] = useState(false);
   const [searching, setSearching] = useState(false);
-  const [loadingBookings, setLoadingBookings] = useState(true);
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [cancellingId, setCancellingId] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -1257,25 +1247,6 @@ function LocationBookingPage({ apiKey }) {
       ? { lat, lng }
       : DEFAULT_CENTER;
   }, [search.lat, search.lng]);
-
-  const loadBookings = useCallback(async () => {
-    setLoadingBookings(true);
-    try {
-      const response = await getLocationBookings();
-      const data = unwrap(response, []);
-      setBookings(Array.isArray(data) ? data : []);
-    } catch (requestError) {
-      setError(
-        errorMessage(requestError, "Your bookings could not be loaded."),
-      );
-    } finally {
-      setLoadingBookings(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadBookings();
-  }, [loadBookings]);
 
   useEffect(() => {
     if (!success) return undefined;
@@ -1372,23 +1343,17 @@ function LocationBookingPage({ apiKey }) {
     );
   };
 
-  const handlePlaceChanged = () => {
-    const place = autocompleteRef.current?.getPlace();
-    const lat = place?.geometry?.location?.lat();
-    const lng = place?.geometry?.location?.lng();
-    if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
-      setError("Select an address from Google suggestions.");
-      return;
-    }
+  const handlePlaceSelect = (place) => {
+    const lat = Number(place?.lat);
+    const lng = Number(place?.lng);
     setSearch((current) => ({
       ...current,
-      address: place.formatted_address || place.name || "",
-      placeId: place.place_id || "",
+      address: place.address || "",
+      placeId: place.placeId || "",
       lat,
       lng,
-      city:
-        getAddressPart(place.address_components, "locality") ||
-        getAddressPart(place.address_components, "administrative_area_level_2"),
+      city: place.city || "",
+      postalCode: place.postalCode || "",
     }));
     setSearchPoint(lat, lng, false);
     setError("");
@@ -1500,14 +1465,9 @@ function LocationBookingPage({ apiKey }) {
         },
       });
       const booking = unwrap(response, null);
-      if (booking?._id) {
-        setBookings((current) => [booking, ...current]);
-      } else {
-        await loadBookings();
-      }
       await runSearch();
       setSuccess(
-        "Booking request submitted. The lesson will be created after the teacher confirms it.",
+        `Booking request ${booking?._id ? `#${booking._id.slice(-8).toUpperCase()} ` : ""}submitted. Track it from My Lessons.`,
       );
     } catch (requestError) {
       setError(
@@ -1515,31 +1475,6 @@ function LocationBookingPage({ apiKey }) {
       );
     } finally {
       setSubmitting(false);
-    }
-  };
-
-  const cancelBooking = async (booking) => {
-    const reason = window.prompt("Why do you want to cancel this booking?");
-    if (!reason?.trim()) return;
-    setCancellingId(booking._id);
-    setError("");
-    try {
-      const response = await cancelLocationBooking(booking._id, {
-        reason: reason.trim(),
-      });
-      const updated = unwrap(response, null);
-      setBookings((current) =>
-        current.map((item) =>
-          item._id === booking._id
-            ? updated || { ...item, status: "cancelled" }
-            : item,
-        ),
-      );
-      setSuccess("Booking cancelled successfully.");
-    } catch (requestError) {
-      setError(errorMessage(requestError, "Booking could not be cancelled."));
-    } finally {
-      setCancellingId("");
     }
   };
 
@@ -1581,8 +1516,14 @@ function LocationBookingPage({ apiKey }) {
           </div>
         )}
         {success && (
-          <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm font-semibold text-emerald-700">
-            {success}
+          <div className="flex flex-col gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm font-semibold text-emerald-700 sm:flex-row sm:items-center sm:justify-between">
+            <span>{success}</span>
+            <a
+              href="/student/lessons?tab=requests"
+              className="shrink-0 rounded-xl bg-emerald-700 px-4 py-2 text-center text-xs font-black text-white"
+            >
+              View booking requests
+            </a>
           </div>
         )}
 
@@ -1596,25 +1537,19 @@ function LocationBookingPage({ apiKey }) {
                 Your location
               </span>
               <div className="flex gap-2">
-                <Autocomplete
-                  onLoad={(instance) => {
-                    autocompleteRef.current = instance;
-                  }}
-                  onPlaceChanged={handlePlaceChanged}
-                  className="min-w-0 flex-1"
-                >
-                  <input
+                <div className="min-w-0 flex-1">
+                  <GooglePlaceAutocomplete
                     value={search.address}
-                    onChange={(event) =>
-                      setSearch((current) => ({
-                        ...current,
-                        address: event.target.value,
-                      }))
-                    }
                     placeholder="Enter an address"
-                    className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-[#174A9B] focus:ring-4 focus:ring-blue-100"
+                    onPlaceSelect={handlePlaceSelect}
+                    onError={(message) =>
+                      setError(
+                        message ||
+                          "The selected address could not be loaded.",
+                      )
+                    }
                   />
-                </Autocomplete>
+                </div>
                 <button
                   type="button"
                   onClick={useCurrentLocation}
@@ -1875,42 +1810,6 @@ function LocationBookingPage({ apiKey }) {
           </section>
         )}
 
-        <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <h2 className="text-xl font-black text-slate-900">
-                My booking requests
-              </h2>
-              <p className="text-sm text-slate-500">
-                Confirmed requests automatically become scheduled lessons.
-              </p>
-            </div>
-            <span className="rounded-full bg-blue-50 px-3 py-1.5 text-sm font-black text-[#174A9B]">
-              {bookings.length}
-            </span>
-          </div>
-
-          {loadingBookings ? (
-            <p className="mt-5 text-sm font-semibold text-slate-500">
-              Loading bookings...
-            </p>
-          ) : bookings.length ? (
-            <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {bookings.map((booking) => (
-                <BookingCard
-                  key={booking._id}
-                  booking={booking}
-                  cancelling={cancellingId === booking._id}
-                  onCancel={() => cancelBooking(booking)}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="mt-5 rounded-2xl border border-dashed border-slate-300 p-8 text-center text-sm text-slate-500">
-              You have no driving lesson booking yet.
-            </div>
-          )}
-        </section>
       </div>
     </div>
   );

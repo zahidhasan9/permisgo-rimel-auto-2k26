@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  FaCalendarAlt,
   FaCamera,
   FaCheckCircle,
   FaChevronDown,
@@ -25,40 +24,13 @@ const initialForm = {
   lastName: "",
   email: "",
   phone: "",
-  dateOfBirth: "",
-  address: "",
-  city: "",
   qualification: "",
-  lessonType: "manual",
   availabilityStatus: "available",
   experienceYears: "0",
   hourlyRate: "0",
   bio: "",
   avatar: "",
 };
-
-const lessonTypeOptions = [
-  {
-    value: "manual",
-    label: "Manual Car",
-  },
-  {
-    value: "automatic",
-    label: "Automatic Car",
-  },
-  {
-    value: "code",
-    label: "Code Lesson",
-  },
-  {
-    value: "accompanied",
-    label: "Accompanied Driving",
-  },
-  {
-    value: "accelerated",
-    label: "Accelerated Course",
-  },
-];
 
 const availabilityOptions = [
   {
@@ -75,20 +47,6 @@ const inputClass =
   "h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm font-medium text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-[#103f8f] focus:ring-4 focus:ring-blue-50";
 
 const labelClass = "mb-2 block text-sm font-semibold text-slate-700";
-
-function formatDateForInput(value) {
-  if (!value) {
-    return "";
-  }
-
-  const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) {
-    return "";
-  }
-
-  return date.toISOString().slice(0, 10);
-}
 
 function splitFullName(fullName = "") {
   const nameParts = String(fullName).trim().split(/\s+/).filter(Boolean);
@@ -188,11 +146,7 @@ export default function TeacherProfilePage() {
         lastName,
         email: user.email || "",
         phone: user.phone || "",
-        dateOfBirth: formatDateForInput(user.dateOfBirth),
-        address: user.address || "",
-        city: user.city || "",
         qualification: teacherProfile.qualification || "",
-        lessonType: teacherProfile.lessonTypes?.[0] || "manual",
         availabilityStatus: teacherProfile.availabilityStatus || "available",
         experienceYears: String(teacherProfile.experienceYears ?? 0),
         hourlyRate: String(teacherProfile.hourlyRate ?? 0),
@@ -280,13 +234,22 @@ export default function TeacherProfilePage() {
     const experienceYears = Number(form.experienceYears || 0);
     const hourlyRate = Number(form.hourlyRate || 0);
 
-    if (Number.isNaN(experienceYears) || experienceYears < 0) {
-      setError("Experience years must be a valid positive number.");
+    if (!/^[+()\-\s\d]{7,20}$/.test(form.phone.trim())) {
+      setError("Enter a valid phone number.");
       return;
     }
 
-    if (Number.isNaN(hourlyRate) || hourlyRate < 0) {
-      setError("Hourly rate must be a valid positive number.");
+    if (
+      !Number.isInteger(experienceYears) ||
+      experienceYears < 0 ||
+      experienceYears > 80
+    ) {
+      setError("Experience years must be a whole number between 0 and 80.");
+      return;
+    }
+
+    if (!Number.isFinite(hourlyRate) || hourlyRate < 0 || hourlyRate > 10000) {
+      setError("Hourly rate must be between 0 and 10000.");
       return;
     }
 
@@ -297,16 +260,12 @@ export default function TeacherProfilePage() {
 
       /*
        * User collection update:
-       * name, phone, date of birth, address, city, bio and avatar
+       * name, phone and avatar
        */
       const userFormData = new FormData();
 
       userFormData.append("name", name);
       userFormData.append("phone", form.phone || "");
-      userFormData.append("dateOfBirth", form.dateOfBirth || "");
-      userFormData.append("address", form.address || "");
-      userFormData.append("city", form.city || "");
-      userFormData.append("bio", form.bio || "");
 
       if (avatarFile) {
         userFormData.append("avatar", avatarFile);
@@ -317,12 +276,11 @@ export default function TeacherProfilePage() {
 
       /*
        * TeacherProfile collection update:
-       * qualification, lesson type, availability,
+       * qualification, global booking availability,
        * experience years, hourly rate and bio
        */
       const teacherResponse = await updateTeacherProfile({
         qualification: form.qualification.trim(),
-        lessonTypes: [form.lessonType],
         availabilityStatus: form.availabilityStatus,
         experienceYears,
         hourlyRate,
@@ -353,21 +311,10 @@ export default function TeacherProfilePage() {
 
         phone: updatedUser?.phone ?? currentForm.phone,
 
-        dateOfBirth: formatDateForInput(
-          updatedUser?.dateOfBirth || currentForm.dateOfBirth,
-        ),
-
-        address: updatedUser?.address ?? currentForm.address,
-
-        city: updatedUser?.city ?? currentForm.city,
-
         avatar: updatedUser?.avatar ?? currentForm.avatar,
 
         qualification:
           updatedTeacherProfile?.qualification ?? currentForm.qualification,
-
-        lessonType:
-          updatedTeacherProfile?.lessonTypes?.[0] ?? currentForm.lessonType,
 
         availabilityStatus:
           updatedTeacherProfile?.availabilityStatus ??
@@ -537,30 +484,6 @@ export default function TeacherProfilePage() {
                 placeholder="Enter last name"
               />
 
-              <div>
-                <label className={labelClass}>Date of birth</label>
-
-                <div className="relative">
-                  <input
-                    type="date"
-                    name="dateOfBirth"
-                    value={form.dateOfBirth}
-                    onChange={handleChange}
-                    className={`${inputClass} pr-11`}
-                  />
-
-                  <FaCalendarAlt className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                </div>
-              </div>
-
-              <Field
-                label="Address"
-                name="address"
-                value={form.address}
-                onChange={handleChange}
-                placeholder="Enter address"
-              />
-
               <Field
                 label="Phone Number"
                 name="phone"
@@ -570,15 +493,7 @@ export default function TeacherProfilePage() {
               />
 
               <SelectField
-                label="Vehicle / Lesson Type"
-                name="lessonType"
-                value={form.lessonType}
-                onChange={handleChange}
-                options={lessonTypeOptions}
-              />
-
-              <SelectField
-                label="Availability Status"
+                label="Accepting New Bookings"
                 name="availabilityStatus"
                 value={form.availabilityStatus}
                 onChange={handleChange}
@@ -586,19 +501,11 @@ export default function TeacherProfilePage() {
               />
 
               <Field
-                label="Qualification / Department"
+                label="Instructor Qualification"
                 name="qualification"
                 value={form.qualification}
                 onChange={handleChange}
                 placeholder="Example: Certified driving instructor"
-              />
-
-              <Field
-                label="Your City"
-                name="city"
-                value={form.city}
-                onChange={handleChange}
-                placeholder="Enter city"
               />
 
               <Field
@@ -608,6 +515,7 @@ export default function TeacherProfilePage() {
                 onChange={handleChange}
                 type="number"
                 min="0"
+                max="80"
                 placeholder="0"
               />
 
@@ -618,6 +526,7 @@ export default function TeacherProfilePage() {
                 onChange={handleChange}
                 type="number"
                 min="0"
+                max="10000"
                 step="0.01"
                 placeholder="0"
               />
@@ -672,6 +581,7 @@ function Field({
   placeholder,
   type = "text",
   min,
+  max,
   step,
 }) {
   return (
@@ -685,6 +595,7 @@ function Field({
         onChange={onChange}
         placeholder={placeholder}
         min={min}
+        max={max}
         step={step}
         className={inputClass}
       />

@@ -738,7 +738,10 @@ function LocationsContent() {
         )}
       </section>
 
-      <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+      <section
+        id="availability"
+        className="scroll-mt-6 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm"
+      >
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="text-xs font-black uppercase tracking-wider text-blue-600">

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   FaCalendarAlt,
   FaCarSide,
@@ -21,12 +21,22 @@ import {
   rejectLocationBooking,
 } from "@/features/API";
 import { getErrorMessage, unwrap } from "@/features/lessonHelpers";
+import Pagination from "@/components/Pagination";
+
+const INITIAL_META = {
+  page: 1,
+  limit: 10,
+  total: 0,
+  totalPages: 1,
+  statusCounts: {},
+};
 
 const FILTERS = [
   { key: "pending", label: "Pending" },
   { key: "confirmed", label: "Confirmed" },
   { key: "rejected", label: "Rejected" },
   { key: "cancelled", label: "Cancelled" },
+  { key: "no_show", label: "No-show" },
   { key: "expired", label: "Expired" },
   { key: "all", label: "All" },
 ];
@@ -36,6 +46,7 @@ const STATUS_LABELS = {
   confirmed: "Lesson confirmed",
   rejected: "Rejected",
   cancelled: "Cancelled",
+  no_show: "No-show",
   expired: "Expired",
   completed: "Completed",
 };
@@ -45,6 +56,7 @@ const STATUS_CLASSES = {
   confirmed: "border-emerald-200 bg-emerald-50 text-emerald-700",
   rejected: "border-rose-200 bg-rose-50 text-rose-700",
   cancelled: "border-slate-200 bg-slate-100 text-slate-700",
+  no_show: "border-rose-200 bg-rose-50 text-rose-700",
   expired: "border-orange-200 bg-orange-50 text-orange-700",
   completed: "border-blue-200 bg-blue-50 text-blue-700",
 };
@@ -133,6 +145,9 @@ export default function BookingWorkspace({ role, onLessonCreated }) {
   const [busyId, setBusyId] = useState("");
   const [notice, setNotice] = useState(null);
   const [highlightedId, setHighlightedId] = useState("");
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [meta, setMeta] = useState(INITIAL_META);
 
   const canApprove = role === "teacher" || role === "admin";
 
@@ -140,8 +155,16 @@ export default function BookingWorkspace({ role, onLessonCreated }) {
     setLoading(true);
 
     try {
-      const response = await getLocationBookings({ status: "all" });
+      const response = await getLocationBookings({
+        status: filter,
+        page,
+        limit,
+      });
       setBookings(getBookingsArray(response));
+      setMeta({
+        ...INITIAL_META,
+        ...(response?.data?.meta || {}),
+      });
     } catch (error) {
       setBookings([]);
       setNotice({
@@ -151,7 +174,7 @@ export default function BookingWorkspace({ role, onLessonCreated }) {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [filter, limit, page]);
 
   useEffect(() => {
     loadBookings();
@@ -168,32 +191,7 @@ export default function BookingWorkspace({ role, onLessonCreated }) {
     setHighlightedId(bookingId);
   }, []);
 
-  const counts = useMemo(() => {
-    const result = { all: bookings.length };
-    FILTERS.forEach((item) => {
-      if (item.key !== "all") {
-        result[item.key] = bookings.filter(
-          (booking) => booking.status === item.key,
-        ).length;
-      }
-    });
-    return result;
-  }, [bookings]);
-
-  const filteredBookings = useMemo(() => {
-    const list =
-      filter === "all"
-        ? bookings
-        : bookings.filter((booking) => booking.status === filter);
-
-    return [...list].sort((a, b) => {
-      const aDate = new Date(a.bookingDate || a.createdAt || 0).getTime();
-      const bDate = new Date(b.bookingDate || b.createdAt || 0).getTime();
-
-      if (filter === "pending") return aDate - bDate;
-      return bDate - aDate;
-    });
-  }, [bookings, filter]);
+  const counts = meta.statusCounts || {};
 
   const replaceBooking = (updatedBooking) => {
     const updatedId = getBookingId(updatedBooking);
@@ -364,7 +362,10 @@ export default function BookingWorkspace({ role, onLessonCreated }) {
             <button
               type="button"
               key={item.key}
-              onClick={() => setFilter(item.key)}
+              onClick={() => {
+                setFilter(item.key);
+                setPage(1);
+              }}
               className={`rounded-xl border px-3 py-2 text-xs font-bold transition ${
                 filter === item.key
                   ? "border-blue-600 bg-blue-600 text-white"
@@ -382,7 +383,7 @@ export default function BookingWorkspace({ role, onLessonCreated }) {
           <div className="py-12 text-center text-sm text-slate-500">
             Loading booking requests...
           </div>
-        ) : filteredBookings.length === 0 ? (
+        ) : bookings.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-5 py-12 text-center">
             <h3 className="font-bold text-slate-800">No booking found</h3>
             <p className="mt-1 text-sm text-slate-500">
@@ -391,7 +392,7 @@ export default function BookingWorkspace({ role, onLessonCreated }) {
           </div>
         ) : (
           <div className="grid gap-4 xl:grid-cols-2">
-            {filteredBookings.map((booking) => {
+            {bookings.map((booking) => {
               const bookingId = getBookingId(booking);
               const busy = busyId === bookingId;
               const status = booking.status || "pending";
@@ -576,6 +577,18 @@ export default function BookingWorkspace({ role, onLessonCreated }) {
           </div>
         )}
       </div>
+      <Pagination
+        page={meta.page}
+        limit={meta.limit}
+        total={meta.total}
+        totalPages={meta.totalPages}
+        loading={loading}
+        onPageChange={setPage}
+        onLimitChange={(value) => {
+          setLimit(value);
+          setPage(1);
+        }}
+      />
     </section>
   );
 }
