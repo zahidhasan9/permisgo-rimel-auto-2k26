@@ -219,14 +219,14 @@ const Navbar = () => {
 
             <div className="hidden shrink-0 items-center gap-3 md:flex">
               <Link
-                href="/user-login"
+                href="/login"
                 className="rounded-full bg-white px-5 py-2.5 text-[14px] font-semibold text-[#103677] shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#2563eb] hover:text-blue"
               >
                 Login
               </Link>
 
               <Link
-                href="/admin-register"
+                href="/inscription"
                 className="hidden rounded-full bg-[#2563eb] px-5 py-2.5 text-[14px] font-semibold text-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-white  hover:!text-blue-600 xl:inline-flex"
               >
                 Inscription

@@ -1,7 +1,7 @@
 export const ROLE_ROUTES = {
-  admin: "/admin",
-  teacher: "/teacher",
-  student: "/student",
+  admin: "/admin/dashboard",
+  teacher: "/teacher/dashboard",
+  student: "/student/dashboard",
 };
 
 export const getDashboardRouteByRole = (role) => {
