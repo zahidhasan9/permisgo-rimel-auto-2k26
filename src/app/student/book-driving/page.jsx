@@ -1063,7 +1063,8 @@ import {
   MarkerF,
   useJsApiLoader,
 } from "@react-google-maps/api";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   FaCalendarAlt,
   FaCarSide,
@@ -1185,10 +1186,16 @@ function MissingGoogleKey() {
 export default function BookDrivingPage() {
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
   if (!apiKey) return <MissingGoogleKey />;
-  return <LocationBookingPage apiKey={apiKey} />;
+  return (
+    <Suspense fallback={<div className="p-6 text-slate-600">Loading booking...</div>}>
+      <LocationBookingPage apiKey={apiKey} />
+    </Suspense>
+  );
 }
 
 function LocationBookingPage({ apiKey }) {
+  const searchParams = useSearchParams();
+  const requestedTeacherId = searchParams.get("teacher") || "";
   const { isLoaded, loadError } = useJsApiLoader({
     id: "permisgo-google-map",
     googleMapsApiKey: apiKey,
@@ -1196,7 +1203,17 @@ function LocationBookingPage({ apiKey }) {
   });
 
   const mapRef = useRef(null);
-  const [search, setSearch] = useState(EMPTY_SEARCH);
+  const autoSearchStarted = useRef(false);
+  const [search, setSearch] = useState(() => ({
+    ...EMPTY_SEARCH,
+    address: searchParams.get("address") || "",
+    lat: searchParams.get("lat") ? Number(searchParams.get("lat")) : null,
+    lng: searchParams.get("lng") ? Number(searchParams.get("lng")) : null,
+    date: searchParams.get("date") || EMPTY_SEARCH.date,
+    startTime: searchParams.get("startTime") || EMPTY_SEARCH.startTime,
+    duration: Number(searchParams.get("duration")) || EMPTY_SEARCH.duration,
+    vehicleType: searchParams.get("vehicleType") || EMPTY_SEARCH.vehicleType,
+  }));
   const [teachers, setTeachers] = useState([]);
   const [selectedTeacherId, setSelectedTeacherId] = useState("");
   const [selectedVehicleId, setSelectedVehicleId] = useState("");
@@ -1399,7 +1416,10 @@ function LocationBookingPage({ apiKey }) {
       const data = unwrap(response, []);
       const list = Array.isArray(data) ? data : [];
       setTeachers(list);
-      setSelectedTeacherId(list[0]?.user?._id || "");
+      const requestedTeacher = list.find(
+        (teacher) => String(teacher.user?._id) === String(requestedTeacherId),
+      );
+      setSelectedTeacherId(requestedTeacher?.user?._id || list[0]?.user?._id || "");
       setSelectedVehicleId("");
       setSearched(true);
 
@@ -1427,6 +1447,22 @@ function LocationBookingPage({ apiKey }) {
       setSearching(false);
     }
   };
+
+  useEffect(() => {
+    if (
+      autoSearchStarted.current ||
+      !isLoaded ||
+      !requestedTeacherId ||
+      !hasCoordinate(search.lat) ||
+      !hasCoordinate(search.lng)
+    ) {
+      return;
+    }
+    autoSearchStarted.current = true;
+    runSearch();
+    // The directory query is intentionally consumed once on initial load.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoaded, requestedTeacherId]);
 
   const submitBooking = async () => {
     setError("");

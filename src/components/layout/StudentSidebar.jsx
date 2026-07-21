@@ -434,16 +434,16 @@ const menu = [
     href: "/student/offers",
     icon: FaTag,
   },
-  {
-    name: "Traffic Law",
-    href: "/student/traffic-law",
-    icon: MdOutlineTraffic,
-  },
-  {
-    name: "Book Driving",
-    href: "/student/book-driving",
-    icon: FaAddressBook,
-  },
+  // {
+  //   name: "Traffic Law",
+  //   href: "/student/traffic-law",
+  //   icon: MdOutlineTraffic,
+  // },
+  // {
+  //   name: "Book Driving",
+  //   href: "/student/book-driving",
+  //   icon: FaAddressBook,
+  // },
   {
     name: "Referral",
     href: "/student/referral",

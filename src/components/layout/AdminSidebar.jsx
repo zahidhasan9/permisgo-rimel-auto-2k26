@@ -524,10 +524,10 @@ const menu = [
       //   name: "Teachers",
       //   href: "/admin/teachers",
       // },
-      {
-        name: "Teacher Locations",
-        href: "/admin/teacher-locations",
-      },
+      // {
+      //   name: "Teacher Locations",
+      //   href: "/admin/teacher-locations",
+      // },
       {
         name: "Teacher Vehicles",
         href: "/admin/teacher-vehicles",
@@ -580,18 +580,18 @@ const menu = [
       //   name: "Vehicle",
       //   href: "/admin/teacher-vehicles",
       // },
-      {
-        name: "Bookings",
-        href: "/admin/bookings",
-      },
-      {
-        name: "Driving Planning",
-        href: "/admin/driving-planning",
-      },
-      {
-        name: "Locations",
-        href: "/admin/locations",
-      },
+      // {
+      //   name: "Bookings",
+      //   href: "/admin/bookings",
+      // },
+      // {
+      //   name: "Driving Planning",
+      //   href: "/admin/driving-planning",
+      // },
+      // {
+      //   name: "Locations",
+      //   href: "/admin/locations",
+      // },
     ],
   },
   {

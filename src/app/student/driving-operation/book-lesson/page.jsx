@@ -323,6 +323,21 @@ function BookLessonContent() {
     [teachers, selectedTeacherId],
   );
 
+  const selectedVehicle = useMemo(() => {
+    const matchingVehicles = (selectedTeacher?.vehicles || []).filter(
+      (vehicle) =>
+        vehicle?._id &&
+        vehicle.approvalStatus === "approved" &&
+        vehicle.status === "active" &&
+        vehicle.vehicleType === search.vehicleType,
+    );
+    return (
+      matchingVehicles.find((vehicle) => vehicle.isDefault) ||
+      matchingVehicles[0] ||
+      null
+    );
+  }, [search.vehicleType, selectedTeacher]);
+
   const loadBookings = useCallback(async () => {
     setLoadingBookings(true);
 
@@ -529,6 +544,11 @@ function BookLessonContent() {
       return;
     }
 
+    if (!selectedVehicle) {
+      setError("The selected teacher has no approved active vehicle for this lesson type.");
+      return;
+    }
+
     const location = selectedTeacher.nearestLocation;
     if (!location?._id) {
       setError("The selected teacher has no usable location.");
@@ -541,7 +561,8 @@ function BookLessonContent() {
       const response = await createLocationBooking({
         teacher: selectedTeacher.user._id,
         locationId: location._id,
-        vehicleType: search.vehicleType,
+        teacherVehicleId: selectedVehicle._id,
+        vehicleType: selectedVehicle.vehicleType,
         bookingDate: search.date,
         startTime: search.startTime,
         endTime,
