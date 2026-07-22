@@ -231,8 +231,8 @@ button:focus:not(:focus-visible) {
 .ab_slot:hover {
   background: var(--first-light-color);
 }
-.ab_slot.active {
+/* .ab_slot.active {
   background: var(--first-color);
   color: var(--white-color);
   border-color: var(--first-color);
-}
+} */
