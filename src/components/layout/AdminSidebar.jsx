@@ -566,6 +566,18 @@ const menu = [
         name: "Road Signs",
         href: "/admin/road-signs",
       },
+      {
+        name: "Code eBooks",
+        href: "/admin/code-ebooks",
+      },
+      {
+        name: "Knowledge Sheets",
+        href: "/admin/knowledge-sheets",
+      },
+      {
+        name: "Live Replays",
+        href: "/admin/live-replays",
+      },
     ],
   },
   {

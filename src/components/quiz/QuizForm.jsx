@@ -296,7 +296,6 @@ const quizTypes = [
   { label: "Mock Test", value: "mock_test" },
   { label: "Thematic Series", value: "thematic_series" },
   { label: "Crash Test", value: "crash_test" },
-  { label: "Road Sign", value: "road_sign" },
 ];
 
 function FieldLabel({ icon: Icon, children }) {
@@ -421,8 +420,12 @@ export default function QuizForm({
               name="type"
               value={form.type}
               onChange={handleChange}
+              disabled={initialValues?.type === "road_sign"}
               className={inputClass("cursor-pointer")}
             >
+              {initialValues?.type === "road_sign" && (
+                <option value="road_sign">Road Sign (Legacy)</option>
+              )}
               {quizTypes.map((item) => (
                 <option key={item.value} value={item.value}>
                   {item.label}

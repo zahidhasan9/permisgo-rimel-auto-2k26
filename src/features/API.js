@@ -332,6 +332,7 @@ export const finishQuizAttempt = (attemptId) =>
 export const finishCodeQuizAttempt = finishQuizAttempt;
 
 export const getMyQuizAttempts = () => axios.get("/quizzes/attempts/me");
+export const getMyTopicResults = () => axios.get("/quizzes/results/topics/me");
 
 export const getMyCodeQuizAttempts = getMyQuizAttempts;
 
@@ -388,7 +389,14 @@ export const updateQuizQuestion = (questionId, data) =>
 export const deleteQuizQuestion = (questionId) =>
   axios.delete(`/quizzes/questions/${questionId}`);
 
-export const createRoadSign = (data) => axios.post("/quizzes/road-signs", data);
+export const getAdminRoadSigns = () => axios.get("/quizzes/road-signs/admin");
+export const createRoadSign = (data) => axios.post("/quizzes/road-signs", data, {
+  headers: data instanceof FormData ? { "Content-Type": "multipart/form-data" } : {},
+});
+export const updateRoadSign = (id, data) => axios.patch(`/quizzes/road-signs/${id}`, data, {
+  headers: data instanceof FormData ? { "Content-Type": "multipart/form-data" } : {},
+});
+export const deleteRoadSign = (id) => axios.delete(`/quizzes/road-signs/${id}`);
 
 // =======================
 // Exams
@@ -421,8 +429,22 @@ export const updateLearningContent = (id, data) =>
 export const deleteLearningContent = (id) =>
   axios.delete(`/learning/admin/contents/${id}`);
 
+export const permanentlyDeleteLearningContent = (id) =>
+  axios.delete(`/learning/admin/contents/${id}/permanent`);
+
+export const uploadLearningEditorImage = (data) =>
+  axios.post("/learning/admin/editor-image", data, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+
 export const getLearningContents = (params = {}) =>
   axios.get("/learning/contents", { params });
+
+export const getLearningContentById = (id) =>
+  axios.get(`/learning/contents/${id}`);
+
+export const downloadLearningContentFile = (id) =>
+  axios.get(`/learning/contents/${id}/download`, { responseType: "blob" });
 
 export const getLearningSummary = () => axios.get("/learning/summary");
 

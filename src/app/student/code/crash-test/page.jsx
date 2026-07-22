@@ -1,11 +1,5 @@
-import CodeQuizListPage from "../_components/CodeQuizListPage";
+import SeriesListPage from "../_components/SeriesListPage";
 
 export default function CrashTestPage() {
-  return (
-    <CodeQuizListPage
-      type="crash_test"
-      title="Crash Test"
-      subtitle="Quick crash test practice series."
-    />
-  );
+  return <SeriesListPage type="crash_test" title="Crash Test List" emptyText="No crash test series is available." />;
 }

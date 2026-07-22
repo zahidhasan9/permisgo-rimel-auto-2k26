@@ -723,12 +723,24 @@ export default function QuestionForm({
           <div className="xl:col-span-4">
             <FieldLabel icon={FaLayerGroup}>Topic</FieldLabel>
 
-            <input
+            <select
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
               className={inputClass}
-              placeholder="Topic"
-            />
+              required
+            >
+              <option value="">Select topic</option>
+              <option value="L">L — Legal provisions regarding road traffic</option>
+              <option value="HAS">HAS — First aid</option>
+              <option value="C">C — The Driver</option>
+              <option value="P">P — Precautions when leaving the vehicle</option>
+              <option value="R">R — The Road</option>
+              <option value="M">M — Mechanical components & safety</option>
+              <option value="U">U — Other road users</option>
+              <option value="S">S — Vehicle safety equipment</option>
+              <option value="D">D — General regulations</option>
+              <option value="E">E — Ecology</option>
+            </select>
           </div>
 
           <div className="xl:col-span-3">

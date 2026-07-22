@@ -1,0 +1,22 @@
+"use client";
+import Link from "next/link";
+import { use, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { IoChevronBack, IoChevronForward, IoTime } from "react-icons/io5";
+import { getLearningContents } from "@/features/API";
+import { mediaUrl } from "@/utils/mediaUrl";
+
+export default function EbookChapterPage({params}) {
+  const {id}=use(params); const chapter=decodeURIComponent(id); const router=useRouter(); const [lessons,setLessons]=useState([]); const [filter,setFilter]=useState("all"); const [loading,setLoading]=useState(true);
+  useEffect(()=>{getLearningContents({type:"code-ebook",category:chapter}).then(({data})=>setLessons(data?.data||[])).finally(()=>setLoading(false));},[chapter]);
+  const filtered=useMemo(()=>lessons.filter((item)=>filter==="all"||(filter==="progress"&&item.progress?.status==="in_progress")||(filter==="completed"&&item.progress?.status==="completed")),[lessons,filter]);
+  const groups=useMemo(()=>filtered.reduce((all,item)=>{const key=item.section||"General";(all[key]||=[]).push(item);return all;},{}),[filtered]);
+  const videos=lessons.flatMap((lesson)=>(lesson.videos||[]).map((video)=>({...video,lessonId:lesson._id}))); const materials=lessons.flatMap((lesson)=>(lesson.materials||[]).map((material)=>({...material,lessonId:lesson._id})));
+  return <main className="min-h-screen bg-white px-3 py-6 sm:px-6"><div className="mx-auto max-w-[1084px]"><header className="flex items-center gap-4"><button onClick={()=>router.back()} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#e8edf5]"><IoChevronBack size={25}/></button><h1 className="break-words text-xl font-semibold text-[#173f87] sm:text-2xl">{chapter}</h1></header>
+    <section className="mt-8 rounded-2xl bg-[#e8eef7] p-4 sm:p-5"><div className="flex flex-wrap gap-3">{[["all","All"],["progress","In Progress"],["completed","Completed"]].map(([key,label])=><button key={key} onClick={()=>setFilter(key)} className={`rounded-xl border px-6 py-2.5 text-sm font-bold ${filter===key?"border-[#174a9b] bg-[#bdd5fa] text-[#173f87]":"border-slate-200 bg-transparent"}`}>{label}</button>)}</div>
+      {loading?<div className="mt-6 h-72 animate-pulse rounded-xl bg-white"/>:Object.keys(groups).length?Object.entries(groups).map(([section,items])=><div key={section} className="mt-7"><h2 className="text-xl font-bold text-[#173f87]">{section}</h2><p className="mt-2 text-sm text-slate-500">{String(items.length).padStart(2,"0")} Courses</p><div className="mt-5 space-y-4">{items.map((item)=><Link key={item._id} href={`/student/code/code-ebook/lesson/${item._id}`} className="flex min-h-[68px] items-center justify-between gap-3 rounded-xl bg-white px-5 py-4 text-sm text-slate-600 sm:text-base"><span className="break-words">{item.title}</span><IoChevronForward className="shrink-0"/></Link>)}</div></div>):<p className="mt-6 rounded-xl bg-white p-8 text-center text-slate-500">No lessons found for this filter.</p>}
+    </section>
+    <div className="mt-5 grid gap-5 lg:grid-cols-2"><Resource title="Lesson Videos">{videos.map((video,i)=><a key={`${video.url}-${i}`} href={video.url} target="_blank" rel="noreferrer" className="flex items-center gap-4 rounded-xl bg-white p-3"><img src={video.thumbnail?mediaUrl(video.thumbnail):mediaUrl(lessons.find((x)=>x._id===video.lessonId)?.image)} alt="" className="h-20 w-24 rounded-lg object-cover"/><div><h3 className="font-bold">{video.title}</h3><p className="mt-2 flex items-center gap-1 text-sm text-slate-500"><IoTime className="text-[#174a9b]"/>{video.durationMinutes||0} minutes</p></div></a>)}</Resource><Resource title="Training Materials">{materials.map((material,i)=><a key={`${material.fileUrl}-${i}`} href={mediaUrl(material.fileUrl)} download target="_blank" rel="noreferrer" className="flex items-center justify-between gap-3 rounded-xl bg-white p-4"><div><h3 className="font-bold">{material.title}</h3><p className="mt-2 flex items-center gap-1 text-sm text-slate-500"><IoTime className="text-[#174a9b]"/>{material.readMinutes||0} minutes read</p></div><span className="rounded-lg border border-[#174a9b] px-5 py-2 text-xs font-bold text-[#174a9b]">Download</span></a>)}</Resource></div>
+  </div></main>;
+}
+function Resource({title,children}){return <section className="rounded-2xl bg-[#e8eef7] p-5"><h2 className="text-2xl font-bold">{title}</h2><div className="mt-5 space-y-3">{children?.length?children:<p className="rounded-xl bg-white p-6 text-sm text-slate-500">Nothing added yet.</p>}</div></section>}

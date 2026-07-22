@@ -32,9 +32,6 @@ const defaultForm = {
 
 const contentTypes = [
   { value: "road-sign", label: "Road Signs" },
-  { value: "code-ebook", label: "Code eBook" },
-  { value: "knowledge-sheet", label: "Knowledge Sheets" },
-  { value: "live-replay", label: "Live Replays" },
 ];
 
 const difficulties = [

@@ -1,11 +1,5 @@
-import CodeQuizListPage from "../_components/CodeQuizListPage";
+import SeriesListPage from "../_components/SeriesListPage";
 
 export default function SimpleSeriesListPage() {
-  return (
-    <CodeQuizListPage
-      type="simple_series"
-      title="Simple Series"
-      subtitle="Practice simple code series questions and improve your exam preparation."
-    />
-  );
+  return <SeriesListPage type="simple_series" title="Simple Series List" emptyText="No simple series is available." />;
 }

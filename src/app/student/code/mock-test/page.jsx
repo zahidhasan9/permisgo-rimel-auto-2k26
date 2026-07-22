@@ -1,11 +1,5 @@
-import CodeQuizListPage from "../_components/CodeQuizListPage";
+import SeriesListPage from "../_components/SeriesListPage";
 
-export default function ExamMockSeriesPage() {
-  return (
-    <CodeQuizListPage
-      type="mock_test"
-      title="Exam Mock Séries"
-      subtitle="Practice mock exam series before final exam."
-    />
-  );
+export default function MockTestPage() {
+  return <SeriesListPage type="mock_test" title="Mock Test List" emptyText="No mock test series is available." />;
 }

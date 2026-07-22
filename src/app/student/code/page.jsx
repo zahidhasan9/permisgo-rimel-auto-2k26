@@ -1,831 +1,168 @@
-// "use client";
-// import Link from "next/link";
-
-// const practiceCards = [
-//   {
-//     title: "Simple series",
-//     icon: "/image/simpleseries.png",
-//     link: "/student/code/simple-series-list",
-//   },
-//   {
-//     title: "Exam Mock Séries",
-//     icon: "/image/exam-mock.png",
-//     link: "/student/code/traffic-law",
-//   },
-//   {
-//     title: "Thématiques Séries",
-//     icon: "/image/thematiques.png",
-//     link: "/student/code/thematiques-series",
-//   },
-//   {
-//     title: "Crash Test",
-//     icon: "/image/crash-test.png",
-//     link: "/student/code/crash-test",
-//   },
-//   {
-//     title: "My mistakes",
-//     count: "09",
-//     icon: "/image/mistakes.png",
-//     link: "/student/code/my-mistakes",
-//   },
-//   {
-//     title: "My History",
-//     icon: "/image/history.png",
-//     link: "/student/code/my-history",
-//   },
-// ];
-
-// const revisionCards = [
-//   {
-//     title: "Road Signs",
-//     icon: "/image/road-signs.png",
-//     link: "/student/code/road-signs",
-//   },
-//   {
-//     title: "Code eBook",
-//     icon: "/image/code-ebook.png",
-//     link: "/student/code/code-ebook",
-//   },
-//   {
-//     title: "Knowledge Sheets",
-//     icon: "/image/knowledge-sheets.png",
-//     link: "/student/code/knowledge-sheets",
-//   },
-//   {
-//     title: "Our Live Coding Replays",
-//     icon: "/image/live-replays.png",
-//     link: "/student/code/live-replays",
-//   },
-// ];
-
-// const examCards = [
-//   { title: "Learn", icon: "/image/learn.png", link: "/student/code/learn" },
-//   {
-//     title: "Evaluations",
-//     icon: "/image/evaluations.png",
-//     link: "/student/code/evaluations",
-//   },
-//   {
-//     title: "Réserve Exam API",
-//     icon: "/image/reserve-exam.png",
-//     link: "/student/code/reserve-exam",
-//   },
-//   { title: "FAQ", icon: "/image/faq.png", link: "/student/code/faq" },
-// ];
-
-// const latestSeries = [
-//   {
-//     date: "23 March, 2025",
-//     type: "Simple Series",
-//     score: "-/50",
-//     action: "Take The Exam",
-//     variant: "red",
-//   },
-//   {
-//     date: "23 March, 2025",
-//     type: "Mock Exam",
-//     score: "-/50",
-//     action: "Take The Exam",
-//     variant: "red",
-//   },
-//   {
-//     date: "23 March, 2025",
-//     type: "Simple Series",
-//     score: "-/50",
-//     action: "Take The Exam",
-//     variant: "red",
-//   },
-//   {
-//     date: "23 March, 2025",
-//     type: "Simple Series",
-//     score: "-/50",
-//     action: "Take The Exam",
-//     variant: "red",
-//   },
-//   {
-//     date: "23 March, 2025",
-//     type: "Mock Exam",
-//     score: "40/50",
-//     action: "Goodbye",
-//     variant: "blue",
-//   },
-// ];
-
-// const leftTopics = [
-//   { code: "L", value: "40%", width: "54%", color: "#67B4E3" },
-//   { code: "C", value: "40%", width: "54%", color: "#E60087" },
-//   { code: "R", value: "30%", width: "31%", color: "#B5A9D7" },
-//   { code: "U", value: "47%", width: "59%", color: "#D64D2F" },
-//   { code: "D", value: "36%", width: "46%", color: "#FFC017" },
-// ];
-
-// const rightTopics = [
-//   { code: "HAS", value: "40%", width: "37%", color: "#EF2F2B" },
-//   { code: "P", value: "47%", width: "64%", color: "#4B4B4B" },
-//   { code: "M", value: "21%", width: "39%", color: "#FC9700" },
-//   { code: "S", value: "31%", width: "45%", color: "#3D962D" },
-//   { code: "E", value: "37%", width: "47%", color: "#90AA16" },
-// ];
-
-// const topicListLeft = [
-//   {
-//     code: "L",
-//     color: "#67B4E3",
-//     text: "Legal provisions regarding road traffic",
-//   },
-//   {
-//     code: "C",
-//     color: "#E60087",
-//     text: "The Driver",
-//   },
-//   {
-//     code: "R",
-//     color: "#B5A9D7",
-//     text: "The Road",
-//   },
-//   {
-//     code: "U",
-//     color: "#D64D2F",
-//     text: "Other road users",
-//   },
-//   {
-//     code: "D",
-//     color: "#FFC017",
-//     text: "General regulations and miscellaneous",
-//   },
-// ];
-
-// const topicListRight = [
-//   {
-//     code: "HAS",
-//     color: "#EF2F2B",
-//     text: "First aid",
-//   },
-//   {
-//     code: "P",
-//     color: "#4B4B4B",
-//     text: "Precautions to take when leaving the vehicle",
-//   },
-//   {
-//     code: "M",
-//     color: "#FC9700",
-//     text: "Mechanical components and other safety-related equipment",
-//   },
-//   {
-//     code: "S",
-//     color: "#3D962D",
-//     text: "Vehicle safety equipment",
-//   },
-//   {
-//     code: "E",
-//     color: "#90AA16",
-//     text: "Rules for using the vehicle in relation to ecology",
-//   },
-// ];
-
-// function ArrowRight() {
-//   return (
-//     <svg width="10" height="18" viewBox="0 0 10 18" fill="none">
-//       <path
-//         d="M1.5 2L8 9L1.5 16"
-//         stroke="#0D4598"
-//         strokeWidth="2.5"
-//         strokeLinecap="round"
-//         strokeLinejoin="round"
-//       />
-//     </svg>
-//   );
-// }
-
-// function BackArrow() {
-//   return (
-//     <svg width="13" height="22" viewBox="0 0 13 22" fill="none">
-//       <path
-//         d="M10.5 2L2.5 11L10.5 20"
-//         stroke="#1F2937"
-//         strokeWidth="3"
-//         strokeLinecap="round"
-//         strokeLinejoin="round"
-//       />
-//     </svg>
-//   );
-// }
-
-// function MenuCard({ title, icon, count, link }) {
-//   return (
-//     <Link href={link}>
-//       <button className="h-[94px] w-full rounded-[10px] border-[1.5px] border-[#0D55A7] bg-[#E8EEF7] px-[28px]">
-//         <div className="flex h-full items-center justify-between">
-//           <div className="flex items-center gap-[18px]">
-//             <img
-//               src={icon}
-//               alt=""
-//               className="h-[45px] w-[45px] object-contain"
-//             />
-
-//             <p className="text-left text-[16px] font-semibold text-[#272A31]">
-//               {title}
-//               {count ? (
-//                 <span className="ml-1 text-[#E71936]">({count})</span>
-//               ) : null}
-//             </p>
-//           </div>
-
-//           <ArrowRight />
-//         </div>
-//       </button>
-//     </Link>
-//   );
-// }
-
-// function SectionTitle({ title }) {
-//   return (
-//     <h2 className="mb-[22px] mt-[34px] text-[22px] font-bold text-[#0D4598]">
-//       {title}
-//     </h2>
-//   );
-// }
-
-// function TopicBar({ code, value, width, color }) {
-//   return (
-//     <div className="relative h-[45px] overflow-hidden rounded-[4px] bg-white">
-//       <div
-//         className="absolute left-0 top-0 flex h-full min-w-[132px] items-center justify-between rounded-[4px] px-[18px] text-[20px] font-bold text-white"
-//         style={{
-//           width,
-//           backgroundColor: color,
-//         }}
-//       >
-//         <span>{code}</span>
-//         <span>{value}</span>
-//       </div>
-//     </div>
-//   );
-// }
-
-// function TopicText({ code, color, text }) {
-//   return (
-//     <p className="text-[13px] font-medium text-[#7B7F89]">
-//       <span className="mr-1 text-[18px] font-bold" style={{ color }}>
-//         {code} :
-//       </span>
-//       {text}
-//     </p>
-//   );
-// }
-
-// export default function CodePracticePage() {
-//   return (
-//     <main className="min-h-screen bg-white px-[24px] py-[31px]">
-//       <div className="mx-auto max-w-[1030px]">
-//         <header className="mb-[34px] flex items-center gap-[18px]">
-//           <button className="flex h-[48px] w-[48px] items-center justify-center rounded-[12px] bg-[#EEF2F8]">
-//             <BackArrow />
-//           </button>
-
-//           <h1 className="text-[25px] font-bold text-[#0D4598]">
-//             Code Practice
-//           </h1>
-//         </header>
-
-//         <section className="grid grid-cols-1 gap-[20px] md:grid-cols-2 xl:grid-cols-3">
-//           {practiceCards.map((item) => (
-//             <MenuCard key={item.title} {...item} />
-//           ))}
-//         </section>
-
-//         <SectionTitle title="Code Revisions" />
-
-//         <section className="grid grid-cols-1 gap-[20px] md:grid-cols-2 xl:grid-cols-3">
-//           {revisionCards.map((item) => (
-//             <MenuCard key={item.title} {...item} />
-//           ))}
-//         </section>
-
-//         <SectionTitle title="Exam" />
-
-//         <section className="grid grid-cols-1 gap-[20px] md:grid-cols-2 xl:grid-cols-3">
-//           {examCards.map((item) => (
-//             <MenuCard key={item.title} {...item} />
-//           ))}
-//         </section>
-
-//         <section className="mt-[32px] rounded-[10px] bg-[#E8EEF7] px-[22px] pb-[24px] pt-[22px]">
-//           <h2 className="text-[22px] font-bold text-[#0D4598]">
-//             My Latest Series
-//           </h2>
-
-//           <div className="mt-[20px] overflow-hidden rounded-[8px] bg-white px-[24px]">
-//             {latestSeries.map((item, index) => (
-//               <div
-//                 key={`${item.type}-${index}`}
-//                 className="grid min-h-[62px] grid-cols-1 items-center gap-3 border-b border-[#E3E7EE] py-3 last:border-b-0 md:grid-cols-[190px_1fr_170px_140px]"
-//               >
-//                 <div>
-//                   <span className="inline-flex h-[31px] w-[120px] items-center justify-center rounded-[4px] bg-[#BFCBE2] text-[12px] font-bold text-[#0D4598]">
-//                     {item.date}
-//                   </span>
-//                 </div>
-
-//                 <p className="text-[12px] font-semibold text-[#24262B]">
-//                   {item.type}
-//                 </p>
-
-//                 <p className="text-[12px] font-medium text-[#878B94]">
-//                   Last Score: {item.score}
-//                 </p>
-
-//                 <button
-//                   className={`h-[36px] w-[120px] justify-self-start rounded-[8px] text-[12px] font-bold text-white md:justify-self-end ${
-//                     item.variant === "red" ? "bg-[#E9223D]" : "bg-[#0C3B78]"
-//                   }`}
-//                 >
-//                   {item.action}
-//                 </button>
-//               </div>
-//             ))}
-//           </div>
-//         </section>
-
-//         <section className="mt-[18px] rounded-[7px] bg-[#E8EEF7] px-[12px] pb-[14px] pt-[12px]">
-//           <h2 className="text-[14px] font-bold text-[#0D4598]">
-//             My result by topic
-//           </h2>
-
-//           <div className="mt-[10px] grid grid-cols-1 gap-x-[12px] gap-y-[8px] lg:grid-cols-2">
-//             <div className="space-y-[8px]">
-//               {leftTopics.map((topic) => (
-//                 <TopicBar key={topic.code} {...topic} />
-//               ))}
-//             </div>
-
-//             <div className="space-y-[8px]">
-//               {rightTopics.map((topic) => (
-//                 <TopicBar key={topic.code} {...topic} />
-//               ))}
-//             </div>
-//           </div>
-
-//           <div className="mt-[10px] rounded-[6px] bg-white px-[12px] py-[12px]">
-//             <h3 className="mb-[10px] text-[11px] font-bold text-[#0D4598]">
-//               List of topics:
-//             </h3>
-
-//             <div className="grid grid-cols-1 gap-x-[35px] gap-y-[8px] lg:grid-cols-2">
-//               <div className="space-y-[8px]">
-//                 {topicListLeft.map((topic) => (
-//                   <TopicText key={topic.code} {...topic} />
-//                 ))}
-//               </div>
-
-//               <div className="space-y-[8px]">
-//                 {topicListRight.map((topic) => (
-//                   <TopicText key={topic.code} {...topic} />
-//                 ))}
-//               </div>
-//             </div>
-//           </div>
-//         </section>
-//       </div>
-//     </main>
-//   );
-// }
-
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+
+import { getMyQuizAttempts, getMyTopicResults } from "@/features/API";
 
 const practiceCards = [
-  {
-    title: "Simple series",
-    icon: "/image/simpleseries.png",
-    link: "/student/code/simple-series-list",
-  },
-  {
-    title: "Exam Mock Séries",
-    icon: "/image/exam-mock.png",
-    link: "/student/code/mock-test",
-  },
-  {
-    title: "Thématiques Séries",
-    icon: "/image/thematiques.png",
-    link: "/student/code/thematiques-series",
-  },
-  {
-    title: "Crash Test",
-    icon: "/image/crash-test.png",
-    link: "/student/code/crash-test",
-  },
-  {
-    title: "My History",
-    icon: "/image/history.png",
-    link: "/student/code/my-history",
-  },
+  ["Simple series", "/image/simpleseries.png", "/student/code/simple-series-list"],
+  ["Exam Mock Séries", "/image/exam-mock.png", "/student/code/mock-test"],
+  ["Thématiques Séries", "/image/thematiques.png", "/student/code/thematiques-series"],
+  ["Crash Test", "/image/crash-test.png", "/student/code/crash-test"],
+  ["My mistakes", "/image/mistakes.png", "/student/code/my-mistakes", "09"],
+  ["My History", "/image/history.png", "/student/code/my-history"],
 ];
 
 const revisionCards = [
-  {
-    title: "Road Signs",
-    icon: "/image/road-signs.png",
-    link: "/student/code/road-signs",
-  },
-  {
-    title: "Code eBook",
-    icon: "/image/code-ebook.png",
-    link: "/student/code/code-ebook",
-  },
-  {
-    title: "Knowledge Sheets",
-    icon: "/image/knowledge-sheets.png",
-    link: "/student/code/knowledge-sheets",
-  },
-  {
-    title: "My Mistakes",
-    icon: "/image/knowledge-sheets.png",
-    link: "/student/code/my-mistakes",
-  },
-  {
-    title: "Our Live Coding Replays",
-    icon: "/image/live-replays.png",
-    link: "/student/code/live-replays",
-  },
+  ["Road Signs", "/image/road-signs.png", "/student/code/road-signs"],
+  ["Code eBook", "/image/code-ebook.png", "/student/code/code-ebook"],
+  ["Knowledge Sheets", "/image/knowledge-sheets.png", "/student/code/knowledge-sheets"],
+  ["Our Live Coding Replays", "/image/live-replays.png", "/student/code/live-replays"],
 ];
 
 const examCards = [
-  { title: "Learn", icon: "/image/learn.png", link: "/student/code/learn" },
-  {
-    title: "Evaluations",
-    icon: "/image/evaluations.png",
-    link: "/student/code/evaluations",
-  },
-  {
-    title: "Réserve Exam API",
-    icon: "/image/reserve-exam.png",
-    link: "/student/code/reserve-exam",
-  },
-  { title: "FAQ", icon: "/image/faq.png", link: "/student/code/faq" },
+  ["Learn", "/image/learn.png", "/student/code-learning"],
+  ["Evaluations", "/image/evaluations.png", "/student/code-learning?tab=evaluations"],
+  ["Réserve Exam API", "/image/reserve-exam.png", "https://app.klaxo.fr/mon-compte/connecter"],
+  ["FAQ", "/image/faq.png", "/student/code/faq"],
 ];
 
-const latestSeries = [
-  {
-    date: "23 March, 2025",
-    type: "Simple Series",
-    score: "-/50",
-    action: "Take The Exam",
-    variant: "red",
-  },
-  {
-    date: "23 March, 2025",
-    type: "Mock Exam",
-    score: "-/50",
-    action: "Take The Exam",
-    variant: "red",
-  },
-  {
-    date: "23 March, 2025",
-    type: "Simple Series",
-    score: "-/50",
-    action: "Take The Exam",
-    variant: "red",
-  },
-  {
-    date: "23 March, 2025",
-    type: "Simple Series",
-    score: "-/50",
-    action: "Take The Exam",
-    variant: "red",
-  },
-  {
-    date: "23 March, 2025",
-    type: "Mock Exam",
-    score: "40/50",
-    action: "Goodbye",
-    variant: "blue",
-  },
-];
+const quizTypeLabel = {
+  simple_series: "Simple Series",
+  mock_test: "Mock Exam",
+  thematic_series: "Thematic Series",
+  crash_test: "Crash Test",
+};
+
+const formatAttemptDate = (value) => {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Date unavailable";
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  }).format(date);
+};
 
 const leftTopics = [
-  { code: "L", value: "40%", width: "54%", color: "#67B4E3" },
-  { code: "C", value: "40%", width: "54%", color: "#E60087" },
-  { code: "R", value: "30%", width: "31%", color: "#B5A9D7" },
-  { code: "U", value: "47%", width: "59%", color: "#D64D2F" },
-  { code: "D", value: "36%", width: "46%", color: "#FFC017" },
+  ["L", "40%", "54%", "#67B4E3"], ["C", "40%", "54%", "#E60087"],
+  ["R", "30%", "31%", "#B5A9D7"], ["U", "47%", "59%", "#D64D2F"],
+  ["D", "36%", "46%", "#FFC017"],
 ];
-
 const rightTopics = [
-  { code: "HAS", value: "40%", width: "37%", color: "#EF2F2B" },
-  { code: "P", value: "47%", width: "64%", color: "#4B4B4B" },
-  { code: "M", value: "21%", width: "39%", color: "#FC9700" },
-  { code: "S", value: "31%", width: "45%", color: "#3D962D" },
-  { code: "E", value: "37%", width: "47%", color: "#90AA16" },
+  ["HAS", "40%", "37%", "#EF2F2B"], ["P", "47%", "64%", "#555553"],
+  ["M", "21%", "39%", "#FC9700"], ["S", "31%", "45%", "#3D962D"],
+  ["E", "37%", "47%", "#90AA16"],
+];
+const leftTopicList = [
+  ["L", "#67B4E3", "Legal provisions regarding road traffic"],
+  ["C", "#E60087", "The Driver"], ["R", "#B5A9D7", "The Road"],
+  ["U", "#D64D2F", "Other road users"], ["D", "#FFC017", "General regulations and miscellaneous"],
+];
+const rightTopicList = [
+  ["HAS", "#EF2F2B", "First aid"], ["P", "#555553", "Precautions to take when leaving the vehicle"],
+  ["M", "#FC9700", "Mechanical components and other safety-related equipment"],
+  ["S", "#3D962D", "Vehicle safety equipment"],
+  ["E", "#90AA16", "Rules for using the vehicle in relation to ecology"],
 ];
 
-const topicListLeft = [
-  {
-    code: "L",
-    color: "#67B4E3",
-    text: "Legal provisions regarding road traffic",
-  },
-  {
-    code: "C",
-    color: "#E60087",
-    text: "The Driver",
-  },
-  {
-    code: "R",
-    color: "#B5A9D7",
-    text: "The Road",
-  },
-  {
-    code: "U",
-    color: "#D64D2F",
-    text: "Other road users",
-  },
-  {
-    code: "D",
-    color: "#FFC017",
-    text: "General regulations and miscellaneous",
-  },
-];
-
-const topicListRight = [
-  {
-    code: "HAS",
-    color: "#EF2F2B",
-    text: "First aid",
-  },
-  {
-    code: "P",
-    color: "#4B4B4B",
-    text: "Precautions to take when leaving the vehicle",
-  },
-  {
-    code: "M",
-    color: "#FC9700",
-    text: "Mechanical components and safety equipment",
-  },
-  {
-    code: "S",
-    color: "#3D962D",
-    text: "Vehicle safety equipment",
-  },
-  {
-    code: "E",
-    color: "#90AA16",
-    text: "Rules for using the vehicle in relation to ecology",
-  },
-];
-
-function ArrowRight() {
-  return (
-    <svg width="7" height="13" viewBox="0 0 10 18" fill="none">
-      <path
-        d="M1.5 2L8 9L1.5 16"
-        stroke="#0D4598"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
+function Chevron({ back = false }) {
+  return <svg width={back ? 13 : 10} height={back ? 22 : 18} viewBox={back ? "0 0 13 22" : "0 0 10 18"} fill="none"><path d={back ? "M10.5 2L2.5 11L10.5 20" : "M1.5 2L8 9L1.5 16"} stroke={back ? "#1F2937" : "#0D4598"} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg>;
 }
 
-function BackArrow() {
-  return (
-    <svg width="9" height="15" viewBox="0 0 13 22" fill="none">
-      <path
-        d="M10.5 2L2.5 11L10.5 20"
-        stroke="#1F2937"
-        strokeWidth="3"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
+function MenuCard({ item }) {
+  const [title, icon, link, count] = item;
+  return <Link href={link} className="flex h-[94px] w-full items-center justify-between rounded-[10px] border-[1.5px] border-[#0D55A7] bg-[#E8EEF7] px-[28px] transition hover:bg-[#dfe8f5]">
+    <span className="flex min-w-0 items-center gap-[18px]"><img src={icon} alt="" className="h-[45px] w-[45px] shrink-0 object-contain" /><span className="text-[16px] font-semibold text-[#272A31]">{title}{count && <b className="ml-1 text-[#E71936]">({count})</b>}</span></span><Chevron />
+  </Link>;
 }
 
-function MenuCard({ title, icon, count, link }) {
-  return (
-    <Link
-      href={link}
-      className="group block rounded-[14px] border border-[#d7e2f2] bg-white p-2.5 shadow-[0_8px_22px_rgba(15,23,42,0.04)] transition hover:-translate-y-0.5 hover:border-[#0D55A7]/40 hover:bg-[#f7faff]"
-    >
-      <div className="flex min-h-[58px] items-center justify-between gap-2">
-        <div className="flex min-w-0 flex-1 items-center gap-2.5">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#E8EEF7]">
-            <img src={icon} alt="" className="h-7 w-7 object-contain" />
-          </div>
-
-          <p className="whitespace-normal break-words text-left text-[12.5px] font-bold leading-[16px] text-[#272A31]">
-            {title}
-            {count ? (
-              <span className="ml-1 text-[#E71936]">({count})</span>
-            ) : null}
-          </p>
-        </div>
-
-        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#E8EEF7] transition group-hover:bg-white">
-          <ArrowRight />
-        </div>
-      </div>
-    </Link>
-  );
+function MenuGrid({ items }) {
+  return <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">{items.map((item) => <MenuCard key={item[0]} item={item} />)}</div>;
 }
 
-function SectionBlock({ title, children }) {
-  return (
-    <section className="rounded-[16px] border border-slate-200 bg-white p-3 shadow-[0_8px_22px_rgba(15,23,42,0.04)]">
-      <div className="mb-2 flex items-center justify-between">
-        <h2 className="text-[15px] font-bold text-[#0D4598]">{title}</h2>
-
-        <span className="rounded-full bg-[#E8EEF7] px-2.5 py-1 text-[10px] font-bold text-[#0D4598]">
-          Menu
-        </span>
-      </div>
-
-      {children}
-    </section>
-  );
+function TopicBar({ item }) {
+  const [code, value, width, color] = item;
+  return <div className="relative h-[45px] overflow-hidden rounded-[4px] bg-white"><div className="absolute inset-y-0 left-0 flex items-center justify-between overflow-hidden rounded-[4px] px-[18px] text-[20px] font-bold text-white transition-[width] duration-500" style={{ width, minWidth: width === "0%" ? 0 : 132, backgroundColor: color }}><span>{code}</span><span>{value}</span></div></div>;
 }
 
-function TopicBar({ code, value, width, color }) {
-  return (
-    <div className="relative h-[24px] overflow-hidden rounded-lg bg-white">
-      <div
-        className="absolute left-0 top-0 flex h-full min-w-[76px] items-center justify-between rounded-lg px-2.5 text-[11px] font-bold text-white"
-        style={{
-          width,
-          backgroundColor: color,
-        }}
-      >
-        <span>{code}</span>
-        <span>{value}</span>
-      </div>
-    </div>
-  );
-}
-
-function TopicText({ code, color, text }) {
-  return (
-    <p className="text-[10.5px] font-medium leading-4 text-[#7B7F89]">
-      <span className="mr-1 text-[12px] font-bold" style={{ color }}>
-        {code}:
-      </span>
-      {text}
-    </p>
-  );
+function TopicText({ item }) {
+  return <p className="text-[13px] font-medium text-[#7B7F89]"><b className="mr-1 text-[18px]" style={{ color: item[1] }}>{item[0]} :</b>{item[2]}</p>;
 }
 
 export default function CodePracticePage() {
-  return (
-    <main className="min-h-screen overflow-x-hidden bg-[#f8f8fb] px-3 py-3 md:px-4 lg:px-5">
-      <div className="mx-auto w-full max-w-[1320px]">
-        <header className="mb-3 flex items-center justify-between gap-3">
-          <div className="flex min-w-0 items-center gap-2.5">
-            <Link
-              href="/student"
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white shadow-sm transition hover:bg-slate-50"
-            >
-              <BackArrow />
-            </Link>
+  const router = useRouter();
+  const [latestSeries, setLatestSeries] = useState([]);
+  const [latestLoading, setLatestLoading] = useState(true);
+  const [topicResults, setTopicResults] = useState({});
 
-            <div className="min-w-0">
-              <div className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold text-slate-400">
-                <span>Student</span>
-                <span>/</span>
-                <span className="text-slate-600">Code Practice</span>
-              </div>
+  useEffect(() => {
+    let active = true;
+    getMyQuizAttempts()
+      .then((response) => {
+        if (active) setLatestSeries((response.data?.data || []).slice(0, 5));
+      })
+      .catch(() => {
+        if (active) setLatestSeries([]);
+      })
+      .finally(() => {
+        if (active) setLatestLoading(false);
+      });
+    return () => { active = false; };
+  }, []);
 
-              <h1 className="text-xl font-bold tracking-tight text-[#0D4598] md:text-2xl">
-                Code Practice
-              </h1>
-            </div>
-          </div>
+  useEffect(() => {
+    let active = true;
+    getMyTopicResults()
+      .then((response) => {
+        if (!active) return;
+        const map = {};
+        (response.data?.data || []).forEach((item) => { map[item.code] = item; });
+        setTopicResults(map);
+      })
+      .catch(() => { if (active) setTopicResults({}); });
+    return () => { active = false; };
+  }, []);
 
-          <div className="hidden rounded-full border border-[#d7e2f2] bg-white px-3 py-1.5 text-[11px] font-bold text-[#0D4598] shadow-sm sm:block">
-            Practice Dashboard
-          </div>
-        </header>
+  const liveTopic = (item) => {
+    const percentage = Number(topicResults[item[0]]?.percentage || 0);
+    return [item[0], `${percentage}%`, `${percentage}%`, item[3]];
+  };
 
-        <div className="grid gap-3 xl:grid-cols-[1.2fr_0.8fr]">
-          <div className="space-y-3">
-            <SectionBlock title="Practice">
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                {practiceCards.map((item) => (
-                  <MenuCard key={item.title} {...item} />
-                ))}
-              </div>
-            </SectionBlock>
+  return <main className="min-h-screen bg-white px-3 py-[31px] sm:px-6">
+    <div className="mx-auto w-full max-w-[1030px]">
+      <header className="mb-[34px] flex items-center gap-[18px]"><button type="button" onClick={() => router.back()} className="flex h-[48px] w-[48px] items-center justify-center rounded-[12px] bg-[#EEF2F8]"><Chevron back /></button><h1 className="text-[25px] font-bold text-[#0D4598]">Code Practice</h1></header>
 
-            <SectionBlock title="Code Revisions">
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                {revisionCards.map((item) => (
-                  <MenuCard key={item.title} {...item} />
-                ))}
-              </div>
-            </SectionBlock>
+      <MenuGrid items={practiceCards} />
+      <h2 className="mb-[22px] mt-[34px] text-[22px] font-bold text-[#0D4598]">Code Revisions</h2>
+      <MenuGrid items={revisionCards} />
+      <h2 className="mb-[22px] mt-[34px] text-[22px] font-bold text-[#0D4598]">Exam</h2>
+      <MenuGrid items={examCards} />
 
-            <SectionBlock title="Exam">
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                {examCards.map((item) => (
-                  <MenuCard key={item.title} {...item} />
-                ))}
-              </div>
-            </SectionBlock>
-          </div>
-
-          <div className="space-y-3">
-            <section className="rounded-[16px] border border-slate-200 bg-white p-3 shadow-[0_8px_22px_rgba(15,23,42,0.04)]">
-              <div className="mb-2 flex items-center justify-between">
-                <h2 className="text-[15px] font-bold text-[#0D4598]">
-                  My Latest Series
-                </h2>
-
-                <span className="rounded-full bg-[#E8EEF7] px-2.5 py-1 text-[10px] font-bold text-[#0D4598]">
-                  Recent
-                </span>
-              </div>
-
-              <div className="overflow-hidden rounded-[12px] border border-slate-100">
-                {latestSeries.map((item, index) => (
-                  <div
-                    key={`${item.type}-${index}`}
-                    className="grid min-h-[48px] grid-cols-[92px_minmax(0,1fr)_92px] items-center gap-2 border-b border-[#E3E7EE] bg-[#fbfbfd] px-2.5 py-2 last:border-b-0"
-                  >
-                    <span className="inline-flex min-h-6 items-center justify-center rounded-lg bg-[#E8EEF7] px-2 text-center text-[9.5px] font-bold leading-[12px] text-[#0D4598]">
-                      {item.date}
-                    </span>
-
-                    <div className="min-w-0">
-                      <p className="whitespace-normal break-words text-[11px] font-bold leading-4 text-[#24262B]">
-                        {item.type}
-                      </p>
-
-                      <p className="text-[10px] font-medium text-[#878B94]">
-                        Score: {item.score}
-                      </p>
-                    </div>
-
-                    <button
-                      className={`min-h-7 rounded-lg px-2 text-[10px] font-bold leading-[12px] text-white ${
-                        item.variant === "red" ? "bg-[#E9223D]" : "bg-[#0C3B78]"
-                      }`}
-                    >
-                      {item.action}
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            <section className="rounded-[16px] border border-slate-200 bg-white p-3 shadow-[0_8px_22px_rgba(15,23,42,0.04)]">
-              <div className="mb-2 flex items-center justify-between">
-                <h2 className="text-[15px] font-bold text-[#0D4598]">
-                  My result by topic
-                </h2>
-
-                <span className="rounded-full bg-[#E8EEF7] px-2.5 py-1 text-[10px] font-bold text-[#0D4598]">
-                  Result
-                </span>
-              </div>
-
-              <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
-                <div className="space-y-1.5">
-                  {leftTopics.map((topic) => (
-                    <TopicBar key={topic.code} {...topic} />
-                  ))}
-                </div>
-
-                <div className="space-y-1.5">
-                  {rightTopics.map((topic) => (
-                    <TopicBar key={topic.code} {...topic} />
-                  ))}
-                </div>
-              </div>
-
-              <div className="mt-2 rounded-[12px] border border-slate-100 bg-[#fbfbfd] p-2.5">
-                <h3 className="mb-1.5 text-[11px] font-bold text-[#0D4598]">
-                  List of topics
-                </h3>
-
-                <div className="grid grid-cols-1 gap-x-4 gap-y-1 lg:grid-cols-2">
-                  <div className="space-y-1">
-                    {topicListLeft.map((topic) => (
-                      <TopicText key={topic.code} {...topic} />
-                    ))}
-                  </div>
-
-                  <div className="space-y-1">
-                    {topicListRight.map((topic) => (
-                      <TopicText key={topic.code} {...topic} />
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </section>
-          </div>
+      <section className="mt-[32px] rounded-[10px] bg-[#E8EEF7] px-[22px] pb-[24px] pt-[22px]">
+        <h2 className="text-[22px] font-bold text-[#0D4598]">My Latest Series</h2>
+        <div className="mt-5 overflow-hidden rounded-[8px] bg-white px-6">
+          {latestLoading ? Array.from({ length: 5 }).map((_, index) => <div key={index} className="h-[62px] animate-pulse border-b border-[#E3E7EE] bg-slate-50 last:border-0" />) : latestSeries.length ? latestSeries.map((attempt) => {
+            const quiz = attempt.quiz || {};
+            const completed = attempt.status === "completed";
+            const href = completed ? `/student/code/my-history?latest=${attempt._id}` : `/student/code/code-challenge?quizId=${quiz._id || quiz}`;
+            return <div key={attempt._id} className="grid min-h-[62px] grid-cols-1 items-center gap-3 border-b border-[#E3E7EE] py-3 last:border-0 md:grid-cols-[190px_1fr_170px_140px]">
+              <span className="inline-flex h-[31px] w-[120px] items-center justify-center rounded-[4px] bg-[#BFCBE2] text-[12px] font-bold text-[#0D4598]">{formatAttemptDate(attempt.createdAt)}</span>
+              <p className="text-[12px] font-semibold text-[#24262B]">{quizTypeLabel[quiz.type] || quiz.title || "Quiz Series"}</p>
+              <p className="text-[12px] font-medium text-[#878B94]">Last Score: {completed ? `${attempt.score || 0}/${attempt.totalQuestions || 0}` : `-/${attempt.totalQuestions || 0}`}</p>
+              <Link href={href} className={`flex h-9 w-[120px] items-center justify-center justify-self-start rounded-[8px] text-[12px] font-bold text-white md:justify-self-end ${completed ? "bg-[#0C3B78]" : "bg-[#E9223D]"}`}>{completed ? "View Result" : "Take The Exam"}</Link>
+            </div>;
+          }) : <div className="flex min-h-[90px] items-center justify-center text-[13px] font-medium text-[#878B94]">No quiz attempt yet.</div>}
         </div>
-      </div>
-    </main>
-  );
+      </section>
+
+      <section className="mt-[30px] rounded-[7px] bg-[#E8EEF7] px-[22px] pb-[22px] pt-[22px]">
+        <h2 className="text-[22px] font-bold text-[#0D4598]">My result by topic</h2>
+        <div className="mt-5 grid grid-cols-1 gap-x-5 gap-y-5 lg:grid-cols-2"><div className="space-y-5">{leftTopics.map((item) => <TopicBar key={item[0]} item={liveTopic(item)} />)}</div><div className="space-y-5">{rightTopics.map((item) => <TopicBar key={item[0]} item={liveTopic(item)} />)}</div></div>
+        <div className="mt-5 rounded-[6px] bg-white px-[18px] py-[20px]"><h3 className="mb-[18px] text-[15px] font-bold text-[#0D4598]">List of topics:</h3><div className="grid grid-cols-1 gap-x-[35px] gap-y-[15px] lg:grid-cols-2"><div className="space-y-[15px]">{leftTopicList.map((item) => <TopicText key={item[0]} item={item} />)}</div><div className="space-y-[15px]">{rightTopicList.map((item) => <TopicText key={item[0]} item={item} />)}</div></div></div>
+      </section>
+    </div>
+  </main>;
 }
