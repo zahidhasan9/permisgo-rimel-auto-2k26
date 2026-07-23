@@ -35,7 +35,7 @@ const Navbar = () => {
     { name: "Offers", href: "/pricing" },
     { name: "Traffic Laws", href: "/traffic-laws" },
     { name: "Driving License", href: "/driving-license" },
-    { name: "Contact Us", href: "/contact-us" },
+    { name: "Contact", href: "/contact-us" },
     { name: "Appointment", href: "/appointment" },
     { name: "Help", href: "/helps" },
   ];
@@ -132,21 +132,21 @@ const Navbar = () => {
             <ul className="flex min-w-0 items-center gap-4">
               <li>
                 <a
-                  href="tel:+6145845887"
+                  href="tel:1774649438"
                   className="flex items-center gap-1.5 whitespace-nowrap text-[13px] font-medium text-[#103677] transition hover:text-[#2563eb] sm:text-[14px]"
                 >
                   <FaPhoneSquareAlt className="text-[15px]" />
-                  <span>+61 4584 5887</span>
+                  <span>1774649438</span>
                 </a>
               </li>
 
               <li className="hidden md:block">
                 <a
-                  href="mailto:info@permisgoautoecole.com"
+                  href="mailto:yourmail@mail.com"
                   className="flex items-center gap-1.5 text-[14px] font-medium text-[#103677] transition hover:text-[#2563eb]"
                 >
                   <MdOutlineEmail className="text-[17px]" />
-                  <span>info@permisgoautoecole.com</span>
+                  <span>yourmail@mail.com</span>
                 </a>
               </li>
             </ul>
@@ -191,9 +191,9 @@ const Navbar = () => {
         </div>
 
         {/* Main Navbar */}
-        <div className="bg-[#103677] shadow-[0_10px_30px_rgba(16,54,119,0.18)]">
+        <div className="bg-[#174a9b] shadow-[0_10px_30px_rgba(16,54,119,0.18)]">
           <div className="mx-auto flex h-[72px] max-w-[1320px] items-center justify-between px-4 sm:px-6 lg:px-8">
-            <Link href="/" className="flex shrink-0 items-center">
+            <Link href="/" className="flex h-full shrink-0 items-center bg-[#123f86] px-4 sm:px-5">
               <Image
                 src={Logo}
                 alt="Permisgo Logo"
@@ -220,14 +220,14 @@ const Navbar = () => {
             <div className="hidden shrink-0 items-center gap-3 md:flex">
               <Link
                 href="/login"
-                className="rounded-full bg-white px-5 py-2.5 text-[14px] font-semibold text-[#103677] shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#2563eb] hover:text-blue"
+                className="rounded-[10px] bg-[#e2233d] px-7 py-2.5 text-[14px] font-semibold text-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-white hover:text-[#174a9b]"
               >
                 Login
               </Link>
 
               <Link
                 href="/inscription"
-                className="hidden rounded-full bg-[#2563eb] px-5 py-2.5 text-[14px] font-semibold text-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-white  hover:!text-blue-600 xl:inline-flex"
+                className="hidden rounded-[10px] border-2 border-[#e2233d] bg-transparent px-6 py-2 text-[14px] font-semibold text-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#e2233d] xl:inline-flex"
               >
                 Inscription
               </Link>
@@ -305,7 +305,7 @@ const Navbar = () => {
               </Link>
 
               <Link
-                href="/admin-register"
+                href="/inscription"
                 onClick={() => setOpenMenu(false)}
                 className="rounded-xl bg-[#2563eb] px-5 py-3 text-center text-[16px] font-semibold text-white transition hover:bg-[#103677]"
               >
@@ -334,19 +334,19 @@ const Navbar = () => {
 
             <div className="mt-5 space-y-2 text-[14px] text-slate-600">
               <a
-                href="tel:+6145845887"
+                href="tel:1774649438"
                 className="flex items-center gap-2 transition hover:text-[#103677]"
               >
                 <FaPhoneSquareAlt />
-                +61 4584 5887
+                1774649438
               </a>
 
               <a
-                href="mailto:info@permisgoautoecole.com"
+                href="mailto:yourmail@mail.com"
                 className="flex items-center gap-2 break-all transition hover:text-[#103677]"
               >
                 <MdOutlineEmail />
-                info@permisgoautoecole.com
+                yourmail@mail.com
               </a>
             </div>
           </div>

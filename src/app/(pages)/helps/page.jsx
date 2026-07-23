@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
+import { FaMagnifyingGlass } from "react-icons/fa6";
 
-// Images
 import helpFirst from "../../../../public/image/help-first.png";
 import helpSecond1 from "../../../../public/image/help-second1.png";
 import helpSecond2 from "../../../../public/image/help-second2.png";
@@ -9,174 +9,146 @@ import helpSecond3 from "../../../../public/image/help-second3.png";
 import helpThird1 from "../../../../public/image/help-third1.png";
 import helpThird2 from "../../../../public/image/help-third2.png";
 
-// Icons
-import { IoChatbubbleEllipsesOutline } from "react-icons/io5";
-
 const drivingTips = [
   {
-    id: 1,
     image: helpSecond1,
     title: "Discover By Car Permisgo",
     description:
-      "Lorem ipsum, dolor sit amet consectetur adipisicing elit. Impedit quidem totam autem molestias, corporis, excepturi officiis nisi tempore atque animi eum natus cupiditate laudantium, quibusdam ad error maiores esse. Nostrum.",
+      "Find out who we are, the services we offer, and the different ways to contact us.",
+    href: "/who-are-we",
   },
   {
-    id: 2,
     image: helpSecond2,
-    title: "My Driving School File",
+    title: "My driving school file",
     description:
-      "Lorem ipsum, dolor sit amet consectetur adipisicing elit. Impedit quidem totam autem molestias, corporis, excepturi officiis nisi tempore atque animi eum natus cupiditate laudantium, quibusdam ad error maiores esse. Nostrum.",
+      "All the essential information you need to manage your driving school file and easily register with the administration!",
+    href: "/appointment",
   },
   {
-    id: 3,
     image: helpSecond3,
-    title: "Payments & Lesson Credit",
+    title: "My payments and lesson credits",
     description:
-      "Lorem ipsum, dolor sit amet consectetur adipisicing elit. Impedit quidem totam autem molestias, corporis, excepturi officiis nisi tempore atque animi eum natus cupiditate laudantium, quibusdam ad error maiores esse. Nostrum.",
+      "All the information you need to manage your payments, resolve a problem, or request a refund.",
+    href: "/pricing",
   },
 ];
 
-const Helps = () => {
+export default function HelpsPage() {
   return (
-    <>
-      {/* Hero Section */}
-      <section className="bg-gradient-to-b from-blue-950 to-[#00215a] px-[50px] py-[50px] max-[900px]:px-[10px] max-[900px]:py-[30px]">
-        <div className="w-full">
-          <div className="rounded-[20px]">
-            <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-2">
-              <div>
-                <h1 className="mb-[25px] text-[50px] font-bold leading-tight text-white max-[500px]:text-[35px]">
-                  Need help? We're here to help!
-                </h1>
+    <div className="bg-[#eef3fb] text-[#1d1d1f]">
+      {/* Hero */}
+      <section className="overflow-hidden bg-gradient-to-b from-[#174a9b] via-[#0b3066] to-[#020f25]">
+        <div className="mx-auto grid min-h-[638px] w-full max-w-[1360px] grid-cols-[minmax(0,1fr)] items-center gap-10 px-5 py-16 sm:px-8 md:grid-cols-[1.08fr_0.92fr] lg:px-10 lg:py-0">
+          <div className="min-w-0 text-center md:text-left">
+            <h1 className="max-w-[550px] text-[34px] font-extrabold leading-[1.15] tracking-[-0.02em] text-white sm:text-[40px] lg:text-[42px]">
+              Need help? We&apos;re here to
+              <br className="hidden md:block" /> help!
+            </h1>
+            <p className="mx-auto mt-6 max-w-[600px] !text-[20px] font-bold leading-[1.35] text-white md:mx-0 sm:!text-[22px] lg:!text-[24px]">
+              Ask us all your questions about driving lessons, exams or
+              licenses!
+            </p>
 
-                <h5 className="text-[30px] font-medium leading-snug text-white max-[500px]:text-[20px]">
-                  Ask us all your questions about driving lessons, exams or
-                  licenses!
-                </h5>
-
-                <div className="mt-5">
-                  <input
-                    type="text"
-                    placeholder="🔎 Search...."
-                    className="w-full rounded-md border border-gray-200 bg-white px-4 py-3 text-lg text-gray-900 outline-none transition duration-300 placeholder:text-gray-400 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/20"
-                  />
-                </div>
-              </div>
-
-              <div className="text-right max-[900px]:hidden">
-                <Image
-                  src={helpFirst}
-                  alt="Driving help support illustration"
-                  width={600}
-                  height={400}
-                  priority
-                  sizes="(max-width: 900px) 0px, 50vw"
-                  className="ml-auto h-auto w-full max-w-[600px]"
-                />
-              </div>
+            <label htmlFor="help-search" className="sr-only">
+              Search help resources
+            </label>
+            <div className="relative mx-auto mt-10 max-w-[660px] md:mx-0">
+              <FaMagnifyingGlass
+                aria-hidden="true"
+                className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[18px] text-[#777d87]"
+              />
+              <input
+                id="help-search"
+                type="search"
+                placeholder="Search"
+                className="h-12 w-full rounded-[9px] border border-[#cbd2dc] bg-[#f5f6f8] pl-12 pr-4 !text-[14px] font-medium text-[#1d1d1f] outline-none transition-all duration-300 [&::placeholder]:!text-[13px] [&::placeholder]:text-[#858a92] focus:border-[#e2233d] focus:bg-white focus:ring-4 focus:ring-[#e2233d]/15"
+              />
             </div>
+          </div>
+
+          <div className="flex min-w-0 justify-center md:justify-end">
+            <Image
+              src={helpFirst}
+              alt="Happy learner driver with her instructor"
+              priority
+              sizes="(max-width: 767px) 92vw, 500px"
+              className="h-auto w-full min-w-0 max-w-[530px] lg:-translate-x-9"
+            />
           </div>
         </div>
       </section>
 
-      {/* Latest Driving Tips */}
-      <section className="px-[50px] py-[50px] max-[900px]:px-[10px] max-[900px]:py-[30px]">
-        <div className="w-full">
-          <div className="text-center">
-            <h2 className="text-[40px] font-bold leading-tight text-gray-900 max-[500px]:text-[30px]">
+      {/* Resources and support */}
+      <section className="bg-[#eef3fb] px-5 pt-20 sm:px-8 lg:px-10">
+        <div className="mx-auto w-full max-w-[1280px]">
+          <header className="text-center">
+            <h2 className="text-[30px] font-extrabold tracking-[-0.02em] text-[#202020] sm:text-[36px]">
               Latest driving tips
             </h2>
-
-            <p className="mt-2 text-base text-gray-600">
+            <p className="mt-3 !text-[14px] font-medium text-[#84878d]">
               Newly updated resources for students
             </p>
-          </div>
+          </header>
 
-          <div className="mt-4">
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-              {drivingTips.map((tip) => (
-                <div
-                  key={tip.id}
-                  className="rounded-[10px] border-[3px] border-blue-200 p-[30px] text-center max-[900px]:mt-[15px]"
+          <div className="mt-12 grid grid-cols-[minmax(0,1fr)] gap-6 md:grid-cols-3">
+            {drivingTips.map((tip) => (
+              <article
+                key={tip.title}
+                className="group flex min-h-[504px] min-w-0 flex-col items-center rounded-[12px] bg-white px-8 pb-[60px] pt-14 text-center shadow-[0_2px_10px_rgba(20,55,105,0.02)] transition-all duration-300 hover:-translate-y-1 hover:shadow-xl lg:px-10"
+              >
+                <Image
+                  src={tip.image}
+                  alt=""
+                  sizes="86px"
+                  className="h-[86px] w-[86px] object-contain transition-transform duration-300 group-hover:scale-110"
+                />
+                <h3 className="mt-9 max-w-[330px] text-[26px] font-extrabold leading-[1.15] text-[#174a9b] sm:text-[28px] lg:text-[30px]">
+                  {tip.title}
+                </h3>
+                <p className="mt-9 max-w-[330px] !text-[14px] font-medium leading-[1.55] text-[#33363b]">
+                  {tip.description}
+                </p>
+                <Link
+                  href={tip.href}
+                  className="mt-auto flex h-12 w-full items-center justify-center rounded-[9px] bg-[#e2233d] px-6 !text-[14px] font-extrabold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#174a9b] hover:shadow-lg"
                 >
-                  <Image
-                    src={tip.image}
-                    alt={tip.title}
-                    width={120}
-                    height={120}
-                    sizes="120px"
-                    className="mx-auto mb-[20px] h-auto w-[120px]"
-                  />
-
-                  <h3 className="mb-[20px] text-[30px] font-bold leading-tight text-blue-950">
-                    {tip.title}
-                  </h3>
-
-                  <p className="h-[130px] overflow-y-scroll text-base leading-relaxed text-gray-600">
-                    {tip.description}
-                  </p>
-
-                  <div className="mt-4">
-                    <Link
-                      href="#"
-                      className="inline-block w-full rounded-md bg-orange-500 px-5 py-3 font-semibold text-white transition duration-300 hover:bg-orange-600"
-                    >
-                      Read more
-                    </Link>
-                  </div>
-                </div>
-              ))}
-            </div>
+                  Read now
+                </Link>
+              </article>
+            ))}
           </div>
-        </div>
-      </section>
 
-      {/* Support CTA */}
-      <section className="px-[50px] py-[50px] max-[900px]:px-[10px] max-[900px]:py-[30px]">
-        <div className="w-full">
-          <div className="relative overflow-hidden rounded-[20px] bg-blue-950 px-[50px] py-[100px] max-[900px]:px-0 max-[900px]:py-[50px] max-[500px]:px-[10px]">
+          <aside className="relative mt-20 flex min-h-[340px] items-center justify-center overflow-hidden rounded-[12px] bg-[#174a9b] px-6 py-12 text-center">
             <Image
               src={helpThird1}
-              alt="Decorative support shape"
-              width={150}
-              height={150}
-              sizes="150px"
-              className="absolute left-[-5px] top-0 h-auto w-[150px] rounded-[15px] max-[900px]:hidden"
+              alt=""
+              sizes="220px"
+              className="pointer-events-none absolute left-0 top-0 hidden h-auto w-[220px] object-contain md:block"
             />
-
             <Image
               src={helpThird2}
-              alt="Decorative support shape"
-              width={150}
-              height={150}
-              sizes="150px"
-              className="absolute bottom-[-5px] right-[-15px] h-auto w-[150px] rounded-[15px] max-[900px]:hidden"
+              alt=""
+              sizes="220px"
+              className="pointer-events-none absolute -bottom-2 -right-3 hidden h-auto w-[220px] object-contain md:block"
             />
 
-            <div className="relative text-center">
-              <h3 className="text-[40px] font-bold leading-tight text-white max-[500px]:text-[30px]">
+            <div className="relative z-10">
+              <h2 className="text-[28px] font-extrabold leading-tight text-white sm:text-[32px]">
                 Do you still have any questions ?
-              </h3>
-
-              <p className="mt-3 text-base text-white">
+              </h2>
+              <p className="mt-5 !text-[14px] font-medium text-white/80">
                 Our friendly team is here to help you pass your driving test!
               </p>
-
-              <div className="mt-5">
-                <Link
-                  href="/contact-us"
-                  className="inline-flex items-center justify-center gap-2 rounded-md bg-white px-6 py-3 text-lg font-semibold text-orange-500 transition duration-300 hover:bg-orange-500 hover:text-white"
-                >
-                  <IoChatbubbleEllipsesOutline className="text-2xl" />
-                  Chat with support
-                </Link>
-              </div>
+              <Link
+                href="/contact-us"
+                className="mt-6 inline-flex h-12 items-center justify-center rounded-[9px] bg-white px-7 !text-[14px] font-extrabold text-[#e2233d] transition-all duration-300 hover:-translate-y-1 hover:bg-[#e2233d] hover:text-white hover:shadow-lg"
+              >
+                Chat with support
+              </Link>
             </div>
-          </div>
+          </aside>
         </div>
       </section>
-    </>
+    </div>
   );
-};
-
-export default Helps;
+}

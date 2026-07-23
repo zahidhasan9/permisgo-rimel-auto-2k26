@@ -1,283 +1,252 @@
 import Image from "next/image";
 import Link from "next/link";
 
-// Image
-import DriveImage from "../../../../public/image/car-driver.jpg";
+import heroImage from "../../../../public/image/image2.jpeg";
+import mentorImage from "../../../../public/image/image1.jpeg";
+import indicator1 from "../../../../public/image/indicate1.png";
+import indicator2 from "../../../../public/image/indicate2.png";
+import indicator3 from "../../../../public/image/indicate3.png";
+import indicator4 from "../../../../public/image/indicate4.png";
 
-// Icons
 import {
+  FaFacebookF,
   FaInstagram,
-  FaLinkedin,
-  FaPhoneSquareAlt,
-  FaPinterestSquare,
-  FaRegCheckCircle,
+  FaLinkedinIn,
+  FaLocationDot,
+  FaPhone,
+  FaPinterestP,
   FaYoutube,
-} from "react-icons/fa";
-import { FaFacebook } from "react-icons/fa6";
-import { FiUsers } from "react-icons/fi";
-import { GrLocation } from "react-icons/gr";
-import { IoBookOutline } from "react-icons/io5";
-import { LuPhoneCall } from "react-icons/lu";
-import { MdOutlineEmail } from "react-icons/md";
-import { TbTargetArrow } from "react-icons/tb";
+} from "react-icons/fa6";
+import { FaBookOpen, FaEnvelope, FaFileLines, FaUser } from "react-icons/fa6";
+import { IoMdCheckbox } from "react-icons/io";
 
-// Components
-import WhyChoose from "@/components/why-choose";
+const container = "mx-auto w-full max-w-[1360px] px-5 sm:px-8 lg:px-10";
 
-const AboutUs = () => {
+const programs = [
+  "Category B driving licence (standard and accelerated)",
+  "Supervised driving (AAC)",
+  "Supervised driving",
+  "Highway Code in person and online",
+  "Advanced training courses",
+  "Supervised driving",
+  "Supervised driving (AAC)",
+];
+
+const reasons = [
+  { image: indicator1, label: "Moniteur diplômé" },
+  { image: indicator2, label: "+ 500 d’élève réussites" },
+  { image: indicator3, label: "Certifié Qualiopi" },
+  { image: indicator4, label: "Écoles de conduite labellisées" },
+];
+
+const socialLinks = [
+  { icon: FaFacebookF, label: "Facebook" },
+  { icon: FaPinterestP, label: "Pinterest" },
+  { icon: FaInstagram, label: "Instagram" },
+  { icon: FaYoutube, label: "YouTube" },
+  { icon: FaLinkedinIn, label: "LinkedIn" },
+];
+
+function HeadingIcon({ children }) {
   return (
-    <>
-      {/* Hero Section */}
-      <section className="px-[50px] py-[50px] max-[900px]:px-[10px] max-[900px]:py-[30px]">
-        <div className="w-full">
-          <div className="grid grid-cols-1 items-center gap-8 md:grid-cols-12">
-            <div className="md:col-span-5">
-              <h1 className="mb-[20px] text-[50px] font-bold leading-tight text-slate-950 max-[500px]:text-[40px]">
-                Who{" "}
-                <span className="bg-gradient-to-br from-[#023389] to-[#bb1e2f] bg-clip-text text-transparent">
-                  are we?
-                </span>
-              </h1>
+    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[4px] bg-[#174a9b] text-[18px] text-white shadow-sm">
+      {children}
+    </span>
+  );
+}
 
-              <h4 className="mb-4 text-2xl font-semibold leading-snug text-slate-900">
-                Permis Go is a driving school that connects candidates with
-                state-certified driving instructors .
-              </h4>
+export default function WhoAreWePage() {
+  return (
+    <div className="bg-[#eef3fb] text-[#1d1d1f]">
+      {/* Introduction */}
+      <section className={`${container} pb-10 pt-16 md:pb-11 md:pt-20`}>
+        <div className="grid items-center gap-10 lg:grid-cols-[0.83fr_1.17fr] lg:gap-12">
+          <div>
+            <h1 className="text-[36px] font-extrabold leading-[1.15] tracking-[-0.025em] text-[#1d1d1f] sm:text-[40px]">
+              Who are we?
+            </h1>
 
-              <p className="text-[18px] leading-relaxed text-slate-700">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Ducimus
-                quisquam voluptas doloremque pariatur voluptatibus. Distinctio
-                sit blanditiis eius odit illo itaque, ratione, laudantium est
-                sunt perspiciatis ullam corrupti, in sint.
-              </p>
+            <h2 className="mt-5 max-w-[520px] text-[20px] font-extrabold leading-[1.55] text-[#242424] sm:text-[22px]">
+              Permis Go is a driving school that connects candidates with
+              state-certified driving instructors
+            </h2>
 
-              <div className="mt-4">
-                <Link
-                  href="#"
-                  className="inline-flex items-center gap-2 rounded-md bg-[#bb1e2f] px-6 py-3 text-lg font-semibold text-white transition duration-300 hover:bg-[#20ba2b]"
-                >
-                  <LuPhoneCall />
-                  <span>|</span>
-                  Book Your First Lesson
-                </Link>
-              </div>
-            </div>
-
-            <div className="md:col-span-7">
-              <iframe
-                width="100%"
-                height="450"
-                src="https://www.youtube.com/embed/PntTra6wJPE?si=o0SjX9qifWio2_fP"
-                title="YouTube video player"
-                className="rounded max-[500px]:mt-[20px]"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerPolicy="strict-origin-when-cross-origin"
-                allowFullScreen
-              ></iframe>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Mission Section */}
-      <section className="px-[50px] py-[50px] max-[900px]:px-[10px] max-[900px]:py-[30px]">
-        <div className="w-full">
-          <div className="rounded-[10px] bg-[#ffdadd] p-[40px] max-[500px]:p-[25px]">
-            <h3 className="mb-[15px] flex items-center gap-2 text-[35px] font-bold leading-tight text-slate-950 max-[500px]:text-[30px]">
-              <TbTargetArrow />
-              Our{" "}
-              <span className="bg-gradient-to-br from-[#023389] to-[#bb1e2f] bg-clip-text text-transparent">
-                Mission
-              </span>
-            </h3>
-
-            <p className="mb-0 text-[18px] leading-relaxed text-slate-700">
-              Our goal is to offer you quality training, tailored to your pace
-              and needs. Whether you&apos;re a beginner or looking to improve
-              your skills, we do everything we can to help you obtain your
-              license with confidence.
+            <p className="mt-7 max-w-[505px] !text-[15px] font-medium leading-[1.85] text-[#444] sm:!text-[16px]">
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Ducimus
+              quisquam voluptas doloremque pariatur voluptatibus. Distinctio
+              sit blanditiis eius odit illo itaque, ratione, laudantium est sunt
+              perspiciatis ullam corrupti, in sint.
             </p>
+
+            <Link
+              href="/book-lesson"
+              className="mt-7 inline-flex min-h-12 items-center justify-center rounded-[10px] bg-[#e5273d] px-6 text-[15px] font-extrabold text-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:bg-[#174a9b] hover:shadow-lg"
+            >
+              Book Your Lesson
+            </Link>
+          </div>
+
+          <div className="overflow-hidden rounded-[9px] bg-white shadow-sm">
+            <Image
+              src={heroImage}
+              alt="Driver holding the steering wheel"
+              priority
+              sizes="(max-width: 1024px) 100vw, 58vw"
+              className="aspect-[737/363] h-auto w-full object-cover transition-transform duration-700 hover:scale-[1.025]"
+            />
           </div>
         </div>
       </section>
 
-      {/* Expert Mentor Programme */}
-      <section className="px-[50px] py-[50px] max-[900px]:px-[10px] max-[900px]:py-[30px]">
-        <div className="w-full">
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            {/* Mentor Box */}
-            <div className="h-[400px] overflow-y-scroll rounded-[10px] bg-[#d9ffdc] p-[40px] max-[500px]:mb-[20px] max-[500px]:p-[25px]">
-              <h3 className="mb-[15px] flex items-center gap-2 text-[35px] font-bold leading-tight text-slate-950 max-[500px]:text-[30px]">
-                <FiUsers />
-                Expert{" "}
-                <span className="bg-gradient-to-br from-[#023389] to-[#bb1e2f] bg-clip-text text-transparent">
-                  Monitors
-                </span>
-              </h3>
+      {/* Mission */}
+      <section className={`${container} pb-20`}>
+        <div className="rounded-[12px] bg-[#ffd7db] px-6 py-6 sm:px-7">
+          <h2 className="flex items-center gap-3 text-[25px] font-extrabold leading-tight tracking-[-0.02em] sm:text-[28px]">
+            <HeadingIcon>
+              <FaFileLines />
+            </HeadingIcon>
+            Our Mission
+          </h2>
+          <p className="mt-4 !text-[15px] font-medium leading-[1.75] text-[#333] sm:!text-[16px]">
+            Our goal is to offer you quality training, tailored to your pace and
+            needs. Whether you’re a beginner or looking to improve your skills,
+            we do everything we can to help you obtain your license with
+            confidence.
+          </p>
+        </div>
+      </section>
 
-              <p className="mb-0 text-[18px] leading-relaxed text-slate-700">
-                Our goal is to offer you quality training, tailored to your pace
-                and needs. Whether you&apos;re a beginner or looking to improve
-                your skills, we do everything we can to help you obtain your
-                license with confidence.
-              </p>
-
+      {/* Mentors and programmes */}
+      <section className={`${container} pb-20`}>
+        <div className="grid gap-6 lg:grid-cols-2">
+          <article className="flex min-h-[455px] flex-col rounded-[12px] bg-[#d9ffdc] p-5 sm:p-6">
+            <h2 className="flex items-center gap-3 text-[25px] font-extrabold leading-tight tracking-[-0.02em] sm:text-[28px]">
+              <HeadingIcon>
+                <FaUser />
+              </HeadingIcon>
+              Expert Mentors
+            </h2>
+            <p className="mt-5 !text-[15px] font-medium leading-[1.75] text-[#333] sm:!text-[16px]">
+              Our goal is to offer you quality training, tailored to your pace
+              and needs. Whether you’re a beginner or looking to improve your
+              skills, we do everything we can to help you obtain your license
+              with confidence.
+            </p>
+            <div className="mt-auto overflow-hidden rounded-[10px] pt-5">
               <Image
-                src={DriveImage}
-                alt="Driving instructor with student"
-                sizes="(max-width: 768px) 100vw, 50vw"
-                className="mt-[20px] h-auto w-full rounded-[10px]"
+                src={mentorImage}
+                alt="Student learning to drive with a mentor"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="aspect-[588/239] h-auto w-full object-cover transition-transform duration-700 hover:scale-[1.025]"
               />
             </div>
+          </article>
 
-            {/* Programme Box */}
-            <div className="h-[400px] overflow-y-scroll rounded-[10px] bg-[#d6e5ff] p-[40px] max-[500px]:mb-[20px] max-[500px]:p-[25px]">
-              <h3 className="mb-[15px] flex items-center gap-2 text-[35px] font-bold leading-tight text-slate-950 max-[500px]:text-[30px]">
-                <IoBookOutline />
-                Our{" "}
-                <span className="bg-gradient-to-br from-[#023389] to-[#bb1e2f] bg-clip-text text-transparent">
-                  Programs
-                </span>
-              </h3>
-
-              <h4 className="text-xl font-semibold text-slate-900">
-                We offer different packages to meet all needs:
-              </h4>
-
-              <div className="mt-4">
-                <ul>
-                  {[
-                    "Category B driving licence (standard and accelerated)",
-                    "Supervised driving (AAC)",
-                    "Supervised driving",
-                    "Highway Code in person and online",
-                    "Advanced training courses",
-                    "Supervised driving",
-                    "Supervised driving (AAC)",
-                  ].map((item, index) => (
-                    <li
-                      key={index}
-                      className="flex items-start gap-2 pb-[15px] text-[18px] leading-relaxed text-slate-700"
-                    >
-                      <FaRegCheckCircle className="mt-1 shrink-0 text-[#bb1e2f]" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </div>
+          <article className="min-h-[455px] rounded-[12px] bg-[#d6e5ff] p-5 sm:p-6">
+            <h2 className="flex items-center gap-3 text-[25px] font-extrabold leading-tight tracking-[-0.02em] sm:text-[28px]">
+              <HeadingIcon>
+                <FaBookOpen />
+              </HeadingIcon>
+              Our Programs
+            </h2>
+            <h3 className="mt-5 text-[16px] font-extrabold leading-6 text-[#242424] sm:text-[17px]">
+              We offer different packages to meet all needs:
+            </h3>
+            <ul className="mt-4 space-y-2">
+              {programs.map((program, index) => (
+                <li
+                  key={`${program}-${index}`}
+                  className="flex items-start gap-2.5 !text-[15px] font-medium leading-6 text-[#333] sm:!text-[16px]"
+                >
+                  <IoMdCheckbox className="mt-[3px] shrink-0 text-[19px] text-[#20ba2b]" />
+                  <span>{program}</span>
+                </li>
+              ))}
+            </ul>
+          </article>
         </div>
       </section>
 
-      <WhyChoose />
+      {/* Why choose Permisgo */}
+      <section className={`${container} pb-20`}>
+        <h2 className="text-center text-[32px] font-extrabold leading-tight tracking-[-0.025em] text-[#1d1d1f] sm:text-[36px]">
+          Why choose Permisgo
+        </h2>
 
-      {/* Adventure Section */}
-      <section className="px-[50px] py-[50px] max-[900px]:px-0 max-[900px]:py-[30px]">
-        <div className="w-full">
-          <div className="mb-[50px] rounded-[20px] bg-[#bb1e2f] p-[50px] max-[900px]:p-[30px_10px]">
-            <div className="pb-4 text-center">
-              <h3 className="text-[40px] font-bold leading-tight text-white max-[500px]:text-[30px]">
-                Ready to begin your driving adventure?
+        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {reasons.map((reason) => (
+            <article
+              key={reason.label}
+              className="group flex min-h-[112px] rounded-md items-center justify-center gap-4 bg-white px-7 py-5 shadow-sm transition-all duration-300 [clip-path:polygon(7%_0,100%_0,93%_100%,0_100%)] hover:-translate-y-1.5 hover:bg-[#174a9b] hover:shadow-xl"
+            >
+              <Image
+                src={reason.image}
+                alt=""
+                aria-hidden="true"
+                sizes="48px"
+                className="h-11 w-11 shrink-0 object-contain transition-transform duration-300 group-hover:scale-110"
+              />
+              <h3 className="!text-[15px] font-extrabold leading-6 text-[#222] transition-colors group-hover:text-white sm:!text-[16px]">
+                {reason.label}
               </h3>
+            </article>
+          ))}
+        </div>
+      </section>
 
-              <hr className="mt-4 border-white" />
-            </div>
+      {/* Contact CTA */}
+      <section className={`${container} pb-10`}>
+        <div className="rounded-[12px] bg-[#e2233d] px-6 py-16 text-white sm:px-10 lg:px-16 lg:py-20">
+          <div className="mx-auto max-w-[760px]">
+            <h2 className="text-center text-[30px] font-extrabold leading-tight tracking-[-0.025em] sm:text-[36px]">
+              Ready to begin your driving adventure?
+            </h2>
+            <div className="mx-auto mt-7 h-px w-full bg-white/70" />
 
-            <div className="mx-auto w-full max-w-[1140px]">
-              <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-2">
-                {/* Contact Info */}
-                <div>
-                  <ul>
-                    <li className="mb-[10px] rounded-[5px] bg-white/20 p-[15px] text-[18px] text-white backdrop-blur-md transition duration-500 ease-in-out hover:translate-x-[10px] hover:bg-[#20ba2b]">
-                      <p className="mb-0 flex items-center gap-2">
-                        <GrLocation />
-                        <span>|</span>
-                        100 Rue Danielle Casanova 93300 Aubervilliers, France
-                      </p>
-                    </li>
+            <div className="mt-7 grid items-center gap-10 lg:grid-cols-[1.15fr_0.85fr]">
+              <ul className="space-y-2.5">
+                <li className="group flex items-start gap-3 rounded-[8px] border border-white/30 bg-white/20 px-4 py-3 !text-[14px] font-semibold leading-5 text-white transition-all duration-300 hover:translate-x-1.5 hover:bg-white/30">
+                  <FaLocationDot className="mt-1 shrink-0" />
+                  <span>
+                    | 100 Rue Danielle Casanova 93300
+                    <br />
+                    Aubervilliers, France
+                  </span>
+                </li>
+                <li className="group flex items-center gap-3 rounded-[8px] border border-white/30 bg-white/20 px-4 py-3 !text-[14px] font-semibold text-white transition-all duration-300 hover:translate-x-1.5 hover:bg-white/30">
+                  <FaPhone className="shrink-0" />
+                  <span>| +948 1458 5584</span>
+                </li>
+                <li className="group flex items-center gap-3 rounded-[8px] border border-white/30 bg-white/20 px-4 py-3 !text-[14px] font-semibold text-white transition-all duration-300 hover:translate-x-1.5 hover:bg-white/30">
+                  <FaEnvelope className="shrink-0" />
+                  <span>| permisgo.fr@gmail.com</span>
+                </li>
+              </ul>
 
-                    <li className="mb-[10px] rounded-[5px] bg-white/20 p-[15px] text-[18px] text-white backdrop-blur-md transition duration-500 ease-in-out hover:translate-x-[10px] hover:bg-[#20ba2b]">
-                      <p className="mb-0 flex items-center gap-2">
-                        <FaPhoneSquareAlt />
-                        <span>|</span>
-                        09 56 73 63 33
-                      </p>
-                    </li>
-
-                    <li className="mb-[10px] rounded-[5px] bg-white/20 p-[15px] text-[18px] text-white backdrop-blur-md transition duration-500 ease-in-out hover:translate-x-[10px] hover:bg-[#20ba2b]">
-                      <p className="mb-0 flex items-center gap-2">
-                        <MdOutlineEmail />
-                        <span>|</span>
-                        permisgo.fr@gmail.com
-                      </p>
-                    </li>
-                  </ul>
-                </div>
-
-                {/* Button + Social */}
-                <div>
-                  <div className="text-center">
+              <div className="text-center">
+                <Link
+                  href="/book-lesson"
+                  className="inline-flex min-h-12 items-center justify-center rounded-[8px] bg-white px-6 text-[14px] font-extrabold text-[#e2233d] shadow-sm transition-all duration-300 hover:-translate-y-1 hover:bg-[#174a9b] hover:text-white hover:shadow-xl"
+                >
+                  Book Your First Lesson
+                </Link>
+                <div className="mt-4 flex items-center justify-center gap-4">
+                  {socialLinks.map(({ icon: Icon, label }) => (
                     <Link
+                      key={label}
                       href="#"
-                      className="mb-[15px] inline-block rounded-md bg-white px-6 py-3 text-lg font-semibold text-[#023389] transition duration-500 ease-in-out hover:-translate-y-[5px] hover:bg-[#20ba2b] hover:text-white max-[900px]:mt-[20px]"
+                      aria-label={label}
+                      className="text-[16px] text-white transition-all duration-300 hover:-translate-y-1 hover:text-[#d6e5ff]"
                     >
-                      Book Your First Lesson
+                      <Icon />
                     </Link>
-
-                    <div>
-                      <ul className="flex items-center justify-center gap-5">
-                        <li>
-                          <Link
-                            href="#"
-                            className="text-[20px] text-white transition duration-300 hover:text-[#d6e5ff]"
-                          >
-                            <FaFacebook />
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            href="#"
-                            className="text-[20px] text-white transition duration-300 hover:text-[#d6e5ff]"
-                          >
-                            <FaInstagram />
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            href="#"
-                            className="text-[20px] text-white transition duration-300 hover:text-[#d6e5ff]"
-                          >
-                            <FaLinkedin />
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            href="#"
-                            className="text-[20px] text-white transition duration-300 hover:text-[#d6e5ff]"
-                          >
-                            <FaPinterestSquare />
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            href="#"
-                            className="text-[20px] text-white transition duration-300 hover:text-[#d6e5ff]"
-                          >
-                            <FaYoutube />
-                          </Link>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </div>
             </div>
           </div>
         </div>
       </section>
-    </>
+    </div>
   );
-};
-
-export default AboutUs;
+}

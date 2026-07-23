@@ -1,4 +1,12 @@
+"use client";
+
 import { useMemo, useState } from "react";
+import {
+  FaCalendarDays,
+  FaChevronLeft,
+  FaChevronRight,
+  FaGlobe,
+} from "react-icons/fa6";
 
 const MONTHS = [
   "January",
@@ -17,17 +25,79 @@ const MONTHS = [
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const TIME_SLOTS = ["11:00 AM", "02:00 PM", "04:00 PM", "05:00 PM"];
+const INITIAL_DATE = new Date(2021, 11, 23);
+
+function buildCalendar(viewDate) {
+  const year = viewDate.getFullYear();
+  const month = viewDate.getMonth();
+  const mondayFirstOffset = (new Date(year, month, 1).getDay() + 6) % 7;
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const daysInPreviousMonth = new Date(year, month, 0).getDate();
+  const cells = [];
+
+  for (let index = mondayFirstOffset - 1; index >= 0; index -= 1) {
+    const day = daysInPreviousMonth - index;
+    cells.push({
+      day,
+      muted: true,
+      date: new Date(year, month - 1, day),
+    });
+  }
+
+  for (let day = 1; day <= daysInMonth; day += 1) {
+    cells.push({ day, muted: false, date: new Date(year, month, day) });
+  }
+
+  const requiredCells = cells.length > 35 ? 42 : 35;
+  let nextDay = 1;
+
+  while (cells.length < requiredCells) {
+    cells.push({
+      day: nextDay,
+      muted: true,
+      date: new Date(year, month + 1, nextDay),
+    });
+    nextDay += 1;
+  }
+
+  return cells;
+}
+
+function isSameDay(first, second) {
+  return (
+    first.getFullYear() === second.getFullYear() &&
+    first.getMonth() === second.getMonth() &&
+    first.getDate() === second.getDate()
+  );
+}
+
+function formatInputDate(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function formatCalendarHeader(date) {
+  return `${MONTHS[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+}
+
+function formatSelectedDate(date) {
+  if (isSameDay(date, INITIAL_DATE)) return "Wed, December, 23";
+
+  const weekday = date.toLocaleDateString("en-US", { weekday: "short" });
+  return `${weekday}, ${MONTHS[date.getMonth()]}, ${date.getDate()}`;
+}
+
+const labelClass =
+  "mb-2 block !text-[12px] font-semibold leading-none text-[#4b4b4b]";
+const inputClass =
+  "h-11 w-full rounded-[8px] border border-[#c2cfe2] bg-white px-3 !text-[13px] font-medium text-[#222] outline-none transition-all duration-300 [&::placeholder]:!text-[13px] [&::placeholder]:text-[#a0a0a0] focus:border-[#174a9b] focus:ring-4 focus:ring-[#174a9b]/10";
 
 export default function AppointmentBooking() {
-  const today = new Date();
-
-  const [viewDate, setViewDate] = useState(
-    new Date(today.getFullYear(), today.getMonth(), 1),
-  );
-
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [viewDate, setViewDate] = useState(new Date(2021, 11, 1));
+  const [selectedDate, setSelectedDate] = useState(INITIAL_DATE);
   const [selectedTime, setSelectedTime] = useState("");
-
   const [form, setForm] = useState({
     courseTitle: "",
     instructor: "",
@@ -38,350 +108,328 @@ export default function AppointmentBooking() {
     notes: "",
   });
 
-  const calendarCells = useMemo(() => {
-    const year = viewDate.getFullYear();
-    const month = viewDate.getMonth();
+  const calendarCells = useMemo(() => buildCalendar(viewDate), [viewDate]);
 
-    const firstDay = new Date(year, month, 1).getDay();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const daysInPrev = new Date(year, month, 0).getDate();
-
-    const cells = [];
-
-    for (let i = firstDay - 1; i >= 0; i--) {
-      cells.push({
-        day: daysInPrev - i,
-        muted: true,
-        date: new Date(year, month - 1, daysInPrev - i),
-      });
-    }
-
-    for (let d = 1; d <= daysInMonth; d++) {
-      cells.push({
-        day: d,
-        muted: false,
-        date: new Date(year, month, d),
-      });
-    }
-
-    let next = 1;
-
-    while (cells.length < 42) {
-      cells.push({
-        day: next,
-        muted: true,
-        date: new Date(year, month + 1, next),
-      });
-      next++;
-    }
-
-    return cells;
-  }, [viewDate]);
-
-  const isSameDay = (a, b) =>
-    a &&
-    b &&
-    a.getFullYear() === b.getFullYear() &&
-    a.getMonth() === b.getMonth() &&
-    a.getDate() === b.getDate();
-
-  const formatDateInput = (date) => {
-    const offset = date.getTimezoneOffset();
-    const localDate = new Date(date.getTime() - offset * 60000);
-    return localDate.toISOString().slice(0, 10);
+  const updateForm = (event) => {
+    const { name, value } = event.target;
+    setForm((current) => ({ ...current, [name]: value }));
   };
 
-  const formatHeader = (date) =>
-    `${date.toLocaleString("en-US", { weekday: "short" })}, ${date.toLocaleString(
-      "en-US",
-      { month: "long" },
-    )}, ${date.getDate()}`;
-
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const changeMonth = (offset) => {
+    const nextView = new Date(
+      viewDate.getFullYear(),
+      viewDate.getMonth() + offset,
+      1,
+    );
+    setViewDate(nextView);
+    setSelectedDate(nextView);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    console.log({
-      ...form,
-      date: selectedDate,
-      time: selectedTime,
-    });
-
-    alert("Appointment booked!");
+  const selectCalendarDate = (date) => {
+    setSelectedDate(date);
+    setViewDate(new Date(date.getFullYear(), date.getMonth(), 1));
   };
 
-  const labelClass = "mb-1.5 block text-sm font-medium text-[#5b6478]";
-
-  const inputClass =
-    "w-full rounded-lg border border-[#e3e6ee] bg-white px-3 py-2.5 text-sm text-[#0f1729] outline-none transition focus:border-[#2f6bff] focus:ring-4 focus:ring-[#2f6bff]/10";
+  const selectInputDate = (value) => {
+    if (!value) return;
+    const [year, month, day] = value.split("-").map(Number);
+    selectCalendarDate(new Date(year, month - 1, day));
+  };
 
   return (
-    <section className="min-h-screen bg-[#eef1fb] px-0 py-[30px] min-[501px]:px-[10px] min-[901px]:px-[50px] min-[901px]:py-[50px]">
-      <div className="mx-auto w-full max-w-[1400px]">
-        <h2 className="mb-6 text-center text-[30px] font-bold text-[#0f1729] min-[901px]:text-[40px]">
-          Appointment Booking Form
-        </h2>
+    <section
+      id="appointment-booking"
+      className="mx-auto min-w-0 w-full max-w-[1280px] overflow-hidden rounded-[12px] bg-white px-3 pb-6 pt-6 sm:px-6"
+    >
+      <h2 className="text-center text-[30px] font-extrabold tracking-[-0.02em] text-[#222] sm:text-[36px]">
+        Appointment Booking Form
+      </h2>
 
-        <div className="rounded-2xl bg-white p-3 shadow-[0_8px_30px_rgba(15,23,41,0.06)] md:p-6">
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-            {/* LEFT FORM */}
-            <div className="h-full rounded-[14px] border border-[#eef0f5] bg-white p-4 md:p-6">
-              <p className="mb-1 text-sm text-[#5b6478]">
-                PermisGo Driving School
-              </p>
+      <div className="mt-10 min-w-0 rounded-[12px] bg-[#dce4f1] p-3 sm:p-6">
+        <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[1.12fr_1fr]">
+          {/* Appointment form */}
+          <div className="min-w-0 rounded-[12px] bg-white px-5 py-8 sm:px-10 lg:min-h-[980px] lg:px-12 lg:py-12">
+            <p className="!text-[12px] font-medium text-[#494949]">
+              PermisGo Driving School
+            </p>
+            <h3 className="mt-3 text-[24px] font-extrabold leading-tight text-[#181818] sm:text-[28px]">
+              Your Appointment with PermisGo
+            </h3>
+            <p className="mt-3 !text-[12px] font-medium leading-5 text-[#7b7b7b]">
+              To schedule an appointment, please fill out the information
+              below.
+            </p>
 
-              <h4 className="mb-2 text-xl font-bold text-[#0f1729]">
-                Your Appointment with PermisGo
-              </h4>
+            <form
+              className="mt-7 space-y-6"
+              onSubmit={(event) => event.preventDefault()}
+            >
+              <div>
+                <label htmlFor="course-title" className={labelClass}>
+                  Course Title
+                </label>
+                <input
+                  id="course-title"
+                  name="courseTitle"
+                  type="text"
+                  value={form.courseTitle}
+                  onChange={updateForm}
+                  className={inputClass}
+                />
+              </div>
 
-              <p className="mb-6 text-sm text-gray-500">
-                To schedule an appointment, please fill out the information
-                below.
-              </p>
+              <div>
+                <label htmlFor="instructor" className={labelClass}>
+                  Choose Instructor
+                </label>
+                <select
+                  id="instructor"
+                  name="instructor"
+                  value={form.instructor}
+                  onChange={updateForm}
+                  className={inputClass}
+                >
+                  <option value="" aria-label="Select instructor" />
+                  <option value="john-doe">John Doe</option>
+                  <option value="marie-curie">Marie Curie</option>
+                  <option value="alex-smith">Alex Smith</option>
+                </select>
+              </div>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-[minmax(0,1fr)] gap-5 sm:grid-cols-2">
                 <div>
-                  <label className={labelClass}>Course Title</label>
-                  <input
-                    type="text"
-                    name="courseTitle"
-                    value={form.courseTitle}
-                    onChange={handleChange}
-                    className={inputClass}
-                  />
+                  <label htmlFor="appointment-date" className={labelClass}>
+                    Select Date
+                  </label>
+                  <div className="relative">
+                    <input
+                      id="appointment-date"
+                      name="date"
+                      type="date"
+                      value={formatInputDate(selectedDate)}
+                      onChange={(event) => selectInputDate(event.target.value)}
+                      className={`${inputClass} pr-10 [&::-webkit-calendar-picker-indicator]:opacity-0`}
+                    />
+                    <FaCalendarDays
+                      aria-hidden="true"
+                      className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#202020]"
+                    />
+                  </div>
                 </div>
 
                 <div>
-                  <label className={labelClass}>Choose Instructor</label>
+                  <label htmlFor="appointment-time" className={labelClass}>
+                    Select Time
+                  </label>
                   <select
-                    name="instructor"
-                    value={form.instructor}
-                    onChange={handleChange}
+                    id="appointment-time"
+                    name="time"
+                    value={selectedTime}
+                    onChange={(event) => setSelectedTime(event.target.value)}
                     className={inputClass}
                   >
-                    <option value="">Select instructor</option>
-                    <option>John Doe</option>
-                    <option>Marie Curie</option>
-                    <option>Alex Smith</option>
+                    <option value="" aria-label="Select time" />
+                    {TIME_SLOTS.map((time) => (
+                      <option key={time} value={time}>
+                        {time}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-[minmax(0,1fr)] gap-5 sm:grid-cols-2">
+                <div>
+                  <label htmlFor="duration" className={labelClass}>
+                    Duration
+                  </label>
+                  <select
+                    id="duration"
+                    name="duration"
+                    value={form.duration}
+                    onChange={updateForm}
+                    className={inputClass}
+                  >
+                    <option value="" aria-label="Select duration" />
+                    <option value="30">30 minutes</option>
+                    <option value="60">1 hour</option>
+                    <option value="120">2 hours</option>
                   </select>
                 </div>
 
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <div>
-                    <label className={labelClass}>Select Date</label>
-                    <input
-                      type="date"
-                      value={formatDateInput(selectedDate)}
-                      onChange={(e) =>
-                        setSelectedDate(new Date(`${e.target.value}T00:00:00`))
-                      }
-                      className={inputClass}
-                    />
-                  </div>
-
-                  <div>
-                    <label className={labelClass}>Select Time</label>
-                    <select
-                      value={selectedTime}
-                      onChange={(e) => setSelectedTime(e.target.value)}
-                      className={inputClass}
-                    >
-                      <option value="">--:--</option>
-                      {TIME_SLOTS.map((time) => (
-                        <option key={time}>{time}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <div>
-                    <label className={labelClass}>Duration</label>
-                    <select
-                      name="duration"
-                      value={form.duration}
-                      onChange={handleChange}
-                      className={inputClass}
-                    >
-                      <option value="">Select</option>
-                      <option>30 min</option>
-                      <option>1 hour</option>
-                      <option>2 hours</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className={labelClass}>Your Name</label>
-                    <input
-                      type="text"
-                      name="name"
-                      value={form.name}
-                      onChange={handleChange}
-                      className={inputClass}
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <div>
-                    <label className={labelClass}>Email Address</label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={form.email}
-                      onChange={handleChange}
-                      className={inputClass}
-                    />
-                  </div>
-
-                  <div>
-                    <label className={labelClass}>Phone Number</label>
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={form.phone}
-                      onChange={handleChange}
-                      className={inputClass}
-                    />
-                  </div>
-                </div>
-
                 <div>
-                  <label className={labelClass}>Additional Notes</label>
-                  <textarea
-                    name="notes"
-                    rows="3"
-                    placeholder="Write here"
-                    value={form.notes}
-                    onChange={handleChange}
+                  <label htmlFor="full-name" className={labelClass}>
+                    Your Name
+                  </label>
+                  <input
+                    id="full-name"
+                    name="name"
+                    type="text"
+                    autoComplete="name"
+                    value={form.name}
+                    onChange={updateForm}
+                    className={inputClass}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-[minmax(0,1fr)] gap-5 sm:grid-cols-2">
+                <div>
+                  <label htmlFor="email-address" className={labelClass}>
+                    Email Address
+                  </label>
+                  <input
+                    id="email-address"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    value={form.email}
+                    onChange={updateForm}
                     className={inputClass}
                   />
                 </div>
 
-                <button
-                  type="submit"
-                  className="w-full rounded-[10px] bg-[#0E4D8C] px-4 py-3 font-semibold text-white transition hover:bg-[#08375f]"
-                >
-                  Submit
-                </button>
-              </form>
-            </div>
+                <div>
+                  <label htmlFor="phone-number" className={labelClass}>
+                    Phone Number
+                  </label>
+                  <input
+                    id="phone-number"
+                    name="phone"
+                    type="tel"
+                    autoComplete="tel"
+                    value={form.phone}
+                    onChange={updateForm}
+                    className={inputClass}
+                  />
+                </div>
+              </div>
 
-            {/* RIGHT CALENDAR */}
-            <div className="flex h-full flex-col rounded-[14px] border border-[#eef0f5] bg-white p-4 md:p-6">
-              <div className="mb-4 flex items-center justify-between gap-4">
-                <h6 className="font-semibold text-[#0f1729]">
-                  {MONTHS[viewDate.getMonth()]} {viewDate.getFullYear()}
-                </h6>
+              <div>
+                <label htmlFor="additional-notes" className={labelClass}>
+                  Additional Notes
+                </label>
+                <textarea
+                  id="additional-notes"
+                  name="notes"
+                  rows={4}
+                  value={form.notes}
+                  onChange={updateForm}
+                  placeholder="Write here"
+                  className={`${inputClass} min-h-[118px] resize-none py-3`}
+                />
+              </div>
 
-                <div className="flex gap-2">
+              <button
+                type="submit"
+                className="flex h-12 w-full items-center justify-center rounded-[8px] bg-[#e2233d] px-5 !text-[13px] font-extrabold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#174a9b] hover:shadow-lg"
+              >
+                Submit
+              </button>
+            </form>
+          </div>
+
+          {/* Calendar and time slots */}
+          <div className="min-w-0">
+            <div className="overflow-hidden rounded-[12px] bg-white">
+              <div className="flex h-14 items-center justify-between border-b border-[#cbd5e3] px-5">
+                <h3 className="!font-sans !text-[14px] font-extrabold text-[#242424]">
+                  {formatCalendarHeader(selectedDate)}
+                </h3>
+                <div className="flex items-center gap-4 text-[#174a9b]">
                   <button
                     type="button"
-                    onClick={() =>
-                      setViewDate(
-                        new Date(
-                          viewDate.getFullYear(),
-                          viewDate.getMonth() - 1,
-                          1,
-                        ),
-                      )
-                    }
-                    className="flex h-[30px] w-[30px] items-center justify-center rounded-md border border-[#e3e6ee] text-[#2f6bff] transition hover:bg-[#f3f6ff]"
+                    onClick={() => changeMonth(-1)}
+                    aria-label="Previous month"
+                    className="transition-transform duration-300 hover:-translate-x-1 hover:text-[#e2233d]"
                   >
-                    ‹
+                    <FaChevronLeft />
                   </button>
-
                   <button
                     type="button"
-                    onClick={() =>
-                      setViewDate(
-                        new Date(
-                          viewDate.getFullYear(),
-                          viewDate.getMonth() + 1,
-                          1,
-                        ),
-                      )
-                    }
-                    className="flex h-[30px] w-[30px] items-center justify-center rounded-md border border-[#e3e6ee] text-[#2f6bff] transition hover:bg-[#f3f6ff]"
+                    onClick={() => changeMonth(1)}
+                    aria-label="Next month"
+                    className="transition-transform duration-300 hover:translate-x-1 hover:text-[#e2233d]"
                   >
-                    ›
+                    <FaChevronRight />
                   </button>
                 </div>
               </div>
 
-              <div className="overflow-hidden rounded-[10px] border border-[#eef0f5]">
-                <div className="grid grid-cols-7 bg-[#fafbff]">
-                  {WEEKDAYS.map((day) => (
-                    <div
-                      key={day}
-                      className="border border-[#f1f3f8] bg-[#fafbff] px-1 py-3 text-center text-sm font-semibold text-[#5b6478]"
+              <div className="grid grid-cols-7 border-b border-[#d3dae5]">
+                {WEEKDAYS.map((weekday) => (
+                  <div
+                    key={weekday}
+                    className="flex h-14 items-center justify-center !text-[12px] font-extrabold text-[#202020] lg:h-[100px]"
+                  >
+                    {weekday}
+                  </div>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-7">
+                {calendarCells.map((cell) => {
+                  const active =
+                    !cell.muted && isSameDay(cell.date, selectedDate);
+
+                  return (
+                    <button
+                      key={cell.date.toISOString()}
+                      type="button"
+                      disabled={cell.muted}
+                      onClick={() => selectCalendarDate(cell.date)}
+                      aria-label={`${MONTHS[cell.date.getMonth()]} ${cell.day}, ${cell.date.getFullYear()}`}
+                      aria-pressed={active}
+                      className={`flex h-14 items-center justify-center border-b border-r border-[#e1e5eb] !text-[12px] font-bold transition-colors duration-300 [&:nth-child(7n)]:border-r-0 lg:h-[102px] ${
+                        cell.muted
+                          ? "cursor-default bg-white text-[#c1c1c1]"
+                          : "bg-white text-[#333] hover:bg-[#edf3fb] hover:text-[#174a9b]"
+                      }`}
                     >
-                      {day}
-                    </div>
-                  ))}
-                </div>
-
-                <div className="grid grid-cols-7">
-                  {calendarCells.map((cell, index) => {
-                    const active =
-                      isSameDay(cell.date, selectedDate) && !cell.muted;
-
-                    return (
-                      <button
-                        key={index}
-                        type="button"
-                        disabled={cell.muted}
-                        onClick={() =>
-                          !cell.muted && setSelectedDate(cell.date)
-                        }
-                        className={[
-                          "border border-[#f1f3f8] px-1 py-4 text-center text-sm transition",
-                          cell.muted
-                            ? "cursor-default bg-white text-[#c4c9d6]"
-                            : "cursor-pointer bg-white text-[#0f1729] hover:bg-[#f3f6ff]",
-                          active
-                            ? "bg-[#2f6bff] font-semibold text-white hover:bg-[#2f6bff]"
-                            : "",
-                        ].join(" ")}
+                      <span
+                        className={`flex h-10 w-10 items-center justify-center rounded-[7px] ${
+                          active ? "bg-[#174a9b] text-white" : ""
+                        }`}
                       >
                         {String(cell.day).padStart(2, "0")}
-                      </button>
-                    );
-                  })}
-                </div>
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
+            </div>
 
-              <div className="mt-4 rounded-[10px] border border-[#eef0f5] bg-white p-4 lg:mt-auto">
-                <p className="mb-4 font-semibold text-[#0f1729]">
-                  {formatHeader(selectedDate)}
-                </p>
-
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                  {TIME_SLOTS.map((time) => (
+            <div className="mt-5 rounded-[12px] bg-white p-5">
+              <h3 className="!font-sans !text-[14px] font-extrabold text-[#343434]">
+                {formatSelectedDate(selectedDate)}
+              </h3>
+              <div className="mt-5 grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-2">
+                {TIME_SLOTS.map((time) => {
+                  const active = selectedTime === time;
+                  return (
                     <button
                       key={time}
                       type="button"
                       onClick={() => setSelectedTime(time)}
-                      className={[
-                        "w-full rounded-lg border px-4 py-3 text-sm font-medium transition",
-                        selectedTime === time
-                          ? "border-[#2f6bff] bg-[#2f6bff] text-white"
-                          : "border-[#e3e6ee] bg-white text-[#0f1729] hover:bg-[#f3f6ff]",
-                      ].join(" ")}
+                      aria-pressed={active}
+                      className={`h-11 rounded-[8px] border !text-[12px] font-semibold transition-all duration-300 ${
+                        active
+                          ? "border-[#174a9b] bg-[#174a9b] text-white"
+                          : "border-[#174a9b] bg-white text-[#555] hover:bg-[#edf3fb]"
+                      }`}
                     >
                       {time}
                     </button>
-                  ))}
-                </div>
-
-                <p className="mt-4 text-sm text-gray-500">
-                  🌐 France/ Paris 09:00 PM ▾
-                </p>
+                  );
+                })}
               </div>
             </div>
+
+            <p className="mt-5 flex items-center gap-2 !text-[11px] font-semibold text-[#313131]">
+              <FaGlobe className="text-[#174a9b]" />
+              France/ Paris(09:00 PM)
+              <span aria-hidden="true">▾</span>
+            </p>
           </div>
         </div>
       </div>

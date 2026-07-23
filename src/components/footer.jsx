@@ -9,6 +9,7 @@ import BottomMenu from "./bottom-menu";
 
 // Icons
 import {
+  FaComments,
   FaInstagram,
   FaLinkedin,
   FaPhoneSquareAlt,
@@ -30,10 +31,10 @@ const Footer = () => {
 
   const socialLinks = [
     { icon: <FaFacebook />, href: "" },
-    { icon: <FaInstagram />, href: "" },
-    { icon: <FaLinkedin />, href: "" },
     { icon: <FaPinterestSquare />, href: "" },
+    { icon: <FaInstagram />, href: "" },
     { icon: <FaYoutube />, href: "" },
+    { icon: <FaLinkedin />, href: "" },
   ];
 
   const openingTimes = [
@@ -100,8 +101,8 @@ const Footer = () => {
       <BottomMenu />
 
       {/* Car Image */}
-      <section className="bg-white">
-        <div className="mx-auto flex max-w-7xl justify-end px-4 pt-8 sm:px-6 lg:px-8 lg:pt-12">
+      <section className="bg-[#eef3fb]">
+        <div className="mx-auto flex max-w-7xl justify-end px-4 pt-8 sm:px-6 lg:px-8 lg:pt-[72px]">
           <Image
             src={downCar}
             alt="Car"
@@ -111,7 +112,15 @@ const Footer = () => {
         </div>
       </section>
 
-      <footer className="overflow-hidden bg-[#103677]">
+      <footer className="relative overflow-hidden bg-[#103677]">
+        <Link
+          href="/contact-us"
+          aria-label="Chat with PermisGo"
+          className="absolute right-4 top-[45%] z-20 flex h-16 w-16 items-center justify-center rounded-full bg-[#22c93b] text-[28px] text-white shadow-lg transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:bg-[#e2233d] sm:right-6"
+        >
+          <FaComments />
+        </Link>
+
         {/* Main Footer */}
         <div className="relative px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
           {/* Soft background effect */}
@@ -119,9 +128,9 @@ const Footer = () => {
           <div className="pointer-events-none absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-[var(--second-color)]/20 blur-3xl" />
 
           <div className="relative mx-auto max-w-7xl">
-            <div className="grid grid-cols-1 gap-10 md:grid-cols-2 xl:grid-cols-[1.35fr_1fr_1.15fr_1fr] xl:gap-12">
+            <div className="grid grid-cols-1 gap-10 md:grid-cols-2 xl:grid-cols-[1.05fr_1fr_1.15fr_1fr] xl:gap-14">
               {/* Company Info */}
-              <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-6 shadow-lg backdrop-blur-sm">
+              <div>
                 <Link href="/" className="inline-block">
                   <Image
                     src={Logo}
@@ -132,26 +141,29 @@ const Footer = () => {
                 </Link>
 
                 <p className="max-w-sm text-[15px] leading-7 text-white/75">
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                  Quidem.
+                  Getting my license quickly, very
                 </p>
 
+                <h4 className="mt-3 !font-sans !text-[14px] font-extrabold uppercase tracking-wide text-white">
+                  Contact Information
+                </h4>
+
                 {/* Contact Info */}
-                <ul className="mt-6 space-y-4 text-[15px] text-white/80">
+                <ul className="mt-3 space-y-3 text-[15px] text-white/80">
                   <li className="flex items-start gap-3">
                     <span className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-white">
                       <FaPhoneSquareAlt />
                     </span>
-                    <span className="leading-7">+61 4584 5887</span>
+                    <a href="tel:0956736333" className="leading-7">09 56 73 63 33</a>
                   </li>
 
                   <li className="flex items-start gap-3">
                     <span className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-white">
                       <MdOutlineEmail />
                     </span>
-                    <span className="break-all leading-7">
-                      info@permisgoautoecole.com
-                    </span>
+                    <a href="mailto:support@permisgo.fr" className="break-all leading-7">
+                      support@permisgo.fr
+                    </a>
                   </li>
 
                   <li className="flex items-start gap-3">
@@ -159,13 +171,13 @@ const Footer = () => {
                       <GrLocation />
                     </span>
                     <span className="leading-7">
-                      Road no-2, Sector-6, Uttara, Dhaka, Bangladesh
+                      100 rue Danielle Casanova 93300 Aubervilliers
                     </span>
                   </li>
                 </ul>
 
                 {/* Social */}
-                <div className="mt-7">
+                <div className="mt-5">
                   <ul className="flex flex-wrap items-center gap-3">
                     {socialLinks.map((item, index) => (
                       <li key={index}>
@@ -181,7 +193,7 @@ const Footer = () => {
                 </div>
 
                 {/* Opening Time */}
-                <div className="mt-7">
+                <div className="mt-5">
                   <button
                     type="button"
                     onClick={() => setOpenTime(!openTime)}
@@ -231,7 +243,7 @@ const Footer = () => {
               {/* Partnership */}
               <div className="pt-1">
                 <h4 className="relative mb-6 text-[20px] font-semibold text-white after:absolute after:-bottom-2 after:left-0 after:h-[2px] after:w-10 after:rounded-full after:bg-[var(--second-color)]">
-                  Partnership Request
+                  Partnership Requests
                 </h4>
 
                 <ul className="space-y-3">
@@ -248,7 +260,7 @@ const Footer = () => {
               {/* Services */}
               <div className="pt-1">
                 <h4 className="relative mb-6 text-[20px] font-semibold text-white after:absolute after:-bottom-2 after:left-0 after:h-[2px] after:w-10 after:rounded-full after:bg-[var(--second-color)]">
-                  Our Services
+                  Our Service
                 </h4>
 
                 <ul className="space-y-3">

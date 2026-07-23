@@ -1,38 +1,30 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
+import { FaArrowLeft, FaArrowRight, FaStar, FaTimesCircle } from "react-icons/fa";
+import { FaLocationDot, FaSquareCheck } from "react-icons/fa6";
 
-// Images
 import broomLogo from "../../../../public/image/broomLogo.png";
 import googleLogo from "../../../../public/image/googleLogo.png";
 import laws3 from "../../../../public/image/laws3.png";
-import map from "../../../../public/image/map.png";
+import mapMarker from "../../../../public/image/map.png";
+import priceBadge from "../../../../public/image/traffic-two-price-batch.png";
 import road from "../../../../public/image/road.png";
+import tes1 from "../../../../public/image/tes1.png";
+import tes2 from "../../../../public/image/tes2.png";
+import tes3 from "../../../../public/image/tes3.png";
 import trafficHero from "../../../../public/image/traffic-hero.png";
-import priceBatch from "../../../../public/image/traffic-two-price-batch.png";
 import trustLogo from "../../../../public/image/trustLogo.png";
-
-// Icons
-import { FaStar, FaTimesCircle } from "react-icons/fa";
-import { FaLocationDot, FaSquareCheck } from "react-icons/fa6";
-
-// Components
-import Testimonials from "@/components/testimonials";
 
 const packs = [
   {
     title: "Eco Code",
     subtitle: "Complete revision + Administrative procedures",
     price: "FREE",
-    oldPrice: null,
-    badge: false,
-    bestValue: false,
     features: [
-      { text: "Duration: Unlimited", active: true },
-      { text: "Access to the code app", active: true },
-      { text: "Video course and online manual", active: true },
-      { text: "5000 questions and 30 practice exams", active: true },
+      "Duration: Unlimited",
+      "Access to the code app",
+      "Video course and online manual",
+      "5000 questions and 30 practice exams",
     ],
   },
   {
@@ -43,11 +35,11 @@ const packs = [
     badge: true,
     bestValue: true,
     features: [
-      { text: "Duration: 12 month package", active: true },
-      { text: "Access to the code app", active: true },
-      { text: "Video course and online manual", active: true },
-      { text: "5000 questions and 30 practice exams", active: true },
-      { text: "Administrative procedures & Coaching", active: false },
+      "Duration: 12 month package",
+      "Access to the code app",
+      "Video course and online manual",
+      "5000 questions and 30 practice exams",
+      "Administrative procedures & Coaching",
     ],
   },
   {
@@ -56,354 +48,306 @@ const packs = [
     price: "€33.99",
     oldPrice: "€43.99",
     badge: true,
-    bestValue: false,
     features: [
-      { text: "Duration: Unlimited", active: true },
-      { text: "Access to the code app", active: true },
-      { text: "Video course and online manual", active: true },
-      { text: "5000 questions and 30 practice exams", active: true },
-      { text: "A place for a highway code exam", active: true },
+      "Duration: 12 month package",
+      "Access to the code app",
+      "Video course and online manual",
+      "5000 questions and 30 practice exams",
+      "A place for a highway code exam",
     ],
   },
 ];
 
 const workSteps = [
   {
-    number: "01",
     title: "Traffic Laws",
-    description:
-      "Suitable for all profiles, our E-learning application accompanies you at every step towards success in coding.",
+    text: "Suitable for all profiles, our E-learning application accompanies you at every step towards success in coding.",
   },
   {
-    number: "02",
     title: "Driving Lessons",
-    description:
-      "Book online and take advantage of a dedicated e-learning program on our app to optimize every driving lesson.",
+    text: "Book online and take advantage of a dedicated e-learning program on our app to optimize every driving lesson.",
   },
   {
-    number: "03",
     title: "Personalized follow-up",
-    description:
-      "Book online and take advantage of a dedicated e-learning program on our app to optimize every driving lesson.",
+    text: "Book online and take advantage of a dedicated e-learning program on our app to optimize every driving lesson.",
   },
   {
-    number: "04",
     title: "Procedures and review",
-    description:
-      "Suitable for all profiles, our E-learning application accompanies you at every step towards success in coding.",
+    text: "Book online and take advantage of a dedicated e-learning program on our app to optimize every driving lesson.",
   },
 ];
 
-const reviews = [
-  {
-    logo: broomLogo,
-    title: "VroomVroom",
-    rating: "04 out of 05",
-  },
-  {
-    logo: googleLogo,
-    title: "Google Ratings",
-    rating: "04 out of 05",
-  },
-  {
-    logo: trustLogo,
-    title: "Trustpilot Ratings",
-    rating: "04 out of 05",
-  },
+const ratingCards = [
+  { image: broomLogo, title: "VroomVroom" },
+  { image: googleLogo, title: "Google Ratings" },
+  { image: trustLogo, title: "Trustpilot Ratings" },
 ];
 
-const TrafficLaws = () => {
+const testimonials = [
+  { image: tes1, name: "Esther Howard" },
+  { image: tes2, name: "Marvin McKinney" },
+  { image: tes3, name: "Wade Warren" },
+  { image: tes1, name: "Annette Black" },
+];
+
+export default function TrafficLawsPage() {
   return (
-    <>
-      {/* Hero Section */}
-      <section className="bg-emerald-50 px-4 py-10 sm:px-6 lg:px-12 lg:py-14">
-        <div className="mx-auto max-w-7xl">
-          <div className="grid items-center gap-10 lg:grid-cols-2">
-            <div>
-              <h1 className="mb-5 text-4xl font-bold leading-tight text-slate-950 sm:text-5xl lg:text-6xl">
-                Your <span className="text-orange-500">FREE</span> Highway code
-              </h1>
-
-              <p className="max-w-xl text-base leading-7 text-slate-700 sm:text-lg">
-                Sign up for the code, and while you are practicing, start
-                driving. It’s the winning combo for the practicing, start
-                driving. It’s the winning rapid progress.
-              </p>
-
-              <div className="mt-8 grid gap-4 sm:grid-cols-2">
-                <Link
-                  href="#"
-                  className="inline-flex w-full items-center justify-center rounded-lg bg-orange-500 px-6 py-3 text-base font-semibold text-white transition hover:bg-amber-600"
-                >
-                  Register for FREE
-                </Link>
-
-                <Link
-                  href="#"
-                  className="inline-flex w-full items-center justify-center rounded-lg border-2 border-emerald-700 px-6 py-3 text-base font-semibold text-orange-500 transition hover:border-orange-500 hover:bg-orange-500 hover:text-white"
-                >
-                  Discover all our offers
-                </Link>
-              </div>
+    <main className="overflow-hidden bg-white text-[#202124]">
+      <section className="bg-[#eaf0f9]">
+        <div className="mx-auto grid min-h-[560px] max-w-[1280px] grid-cols-[minmax(0,1fr)] items-center gap-10 px-5 py-14 sm:px-8 md:grid-cols-2 lg:px-10">
+          <div className="max-w-[620px]">
+            <h1 className="text-[35px] font-bold leading-tight tracking-[-0.025em] text-[#202124] sm:text-[40px] lg:text-[43px]">
+              Your <span className="text-[#e4213c]">FREE</span> Highway code
+            </h1>
+            <p className="mt-7 max-w-[620px] !text-[16px] leading-7 text-[#70757b]">
+              Sign up for the code, and while you are practicing, start driving. It&apos;s the winning
+              combo for the rapid progress.
+            </p>
+            <div className="mt-10 grid max-w-[540px] grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-2">
+              <Link
+                href="/register"
+                className="inline-flex min-h-[48px] items-center justify-center rounded-[9px] bg-[#e4213c] px-6 !text-[15px] font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-[#174a9b] hover:shadow-lg"
+              >
+                Register for FREE
+              </Link>
+              <Link
+                href="/offers"
+                className="inline-flex min-h-[48px] items-center justify-center rounded-[9px] border-2 border-[#174a9b] px-6 !text-[15px] font-semibold text-[#e4213c] transition duration-300 hover:-translate-y-0.5 hover:bg-[#174a9b] hover:text-white hover:shadow-lg"
+              >
+                Discover all our offers
+              </Link>
             </div>
-
-            <div>
-              <Image
-                src={trafficHero}
-                alt="Highway code learning illustration"
-                priority
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                className="h-auto w-full"
-              />
-            </div>
+          </div>
+          <div className="flex justify-center md:justify-end">
+            <Image
+              src={trafficHero}
+              alt="Driving instructor teaching highway code"
+              priority
+              sizes="(max-width: 768px) 92vw, 560px"
+              className="h-auto w-full max-w-[560px]"
+            />
           </div>
         </div>
       </section>
 
-      {/* Pricing Section */}
-      <section className="bg-white px-4 py-10 sm:px-6 lg:px-12 lg:py-14">
-        <div className="mx-auto max-w-7xl">
+      <section className="bg-[#eaf0f9] px-5 py-20 sm:px-8 lg:py-24">
+        <div className="mx-auto max-w-[1280px]">
           <div className="text-center">
-            <h2 className="text-3xl font-bold text-emerald-700 sm:text-4xl">
-              Permisgo’s Highway Code Packs
+            <h2 className="text-[34px] font-bold tracking-[-0.025em] text-[#222] lg:text-[38px]">
+              Permisgo&apos;s Highway Code Packs
             </h2>
-            <p className="mt-3 text-slate-600">What is your need?</p>
+            <p className="mt-4 !text-[14px] text-[#6b7077]">What is your need?</p>
           </div>
 
-          <div className="mt-12 grid gap-10 lg:grid-cols-3">
+          <div className="mt-12 grid grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-3">
             {packs.map((pack) => (
-              <div
+              <article
                 key={pack.title}
-                className="relative rounded-3xl border-2 border-emerald-700 bg-white px-5 py-10 shadow-sm transition hover:shadow-xl"
+                className="relative flex min-h-[620px] flex-col rounded-[10px] border-2 border-[#174a9b] bg-white px-7 py-10 transition duration-300 hover:-translate-y-1 hover:shadow-xl"
               >
                 {pack.badge && (
                   <Image
-                    src={priceBatch}
-                    alt="Best value badge"
-                    width={70}
-                    height={70}
-                    sizes="70px"
-                    className="absolute -top-10 right-5 h-auto w-[70px]"
+                    src={priceBadge}
+                    alt="Recommended package"
+                    sizes="48px"
+                    className="absolute -right-2 -top-7 h-12 w-12 object-contain"
                   />
                 )}
-
                 <div className="text-center">
                   {pack.bestValue && (
-                    <h6 className="mb-2 font-semibold text-emerald-700">
-                      Best Value
-                    </h6>
+                    <p className="mb-1 !text-[13px] font-semibold text-[#174a9b]">Best Value</p>
                   )}
-
-                  <h3 className="text-3xl font-bold text-orange-500 sm:text-4xl">
-                    {pack.title}
-                  </h3>
-
-                  <p className="mt-3 text-slate-600">{pack.subtitle}</p>
-                </div>
-
-                <div className="mx-auto my-7 w-full max-w-[240px] rounded-full border border-emerald-700 px-4 py-2 text-center">
-                  <h4 className="text-2xl font-bold text-emerald-700 sm:text-3xl">
-                    {pack.price}{" "}
+                  <h3 className="text-[28px] font-bold text-[#e4213c]">{pack.title}</h3>
+                  <p className="mt-2 !text-[13px] font-medium text-[#3e69a4]">{pack.subtitle}</p>
+                  <div className="mx-auto mt-6 flex min-h-[44px] max-w-[190px] items-center justify-center rounded-full border border-[#174a9b] px-5">
+                    <span className="text-[20px] font-bold text-[#174a9b]">{pack.price}</span>
                     {pack.oldPrice && (
-                      <sub className="text-base font-medium text-slate-500 line-through">
+                      <span className="ml-3 !text-[12px] font-semibold text-[#67717f] line-through">
                         {pack.oldPrice}
-                      </sub>
+                      </span>
                     )}
-                  </h4>
+                  </div>
                 </div>
 
-                <h5 className="text-center text-2xl font-semibold text-emerald-700">
+                <h4 className="mt-7 text-center text-[18px] font-bold text-[#174a9b]">
                   Package Contents
-                </h5>
-
-                <div className="mt-8 h-[250px] overflow-y-auto pr-2">
-                  <ul className="space-y-3">
-                    {pack.features.map((feature) => (
-                      <li
-                        key={feature.text}
-                        className="flex gap-3 text-base leading-7 text-slate-700 sm:text-lg"
-                      >
-                        {feature.active ? (
-                          <FaSquareCheck className="mt-1 shrink-0 text-xl text-emerald-700" />
+                </h4>
+                <ul className="mt-6 flex-1 space-y-4">
+                  {pack.features.map((feature, index) => {
+                    const inactive = pack.title === "Zen Code" && index === pack.features.length - 1;
+                    return (
+                      <li key={feature} className="flex gap-3 !text-[14px] leading-6 text-[#34383e]">
+                        {inactive ? (
+                          <FaTimesCircle className="mt-1 shrink-0 text-[#e4213c]" />
                         ) : (
-                          <FaTimesCircle className="mt-1 shrink-0 text-xl text-orange-500" />
+                          <FaSquareCheck className="mt-1 shrink-0 text-[#174a9b]" />
                         )}
-                        <span>{feature.text}</span>
+                        <span>{feature}</span>
                       </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div className="mt-10 text-center">
-                  <Link
-                    href="#"
-                    className="inline-flex items-center justify-center rounded-lg bg-orange-500 px-7 py-3 text-base font-semibold text-white transition hover:bg-amber-600"
-                  >
-                    Sign Up
-                  </Link>
-                </div>
-              </div>
+                    );
+                  })}
+                </ul>
+                <Link
+                  href="/register"
+                  className="mx-auto mt-8 inline-flex min-h-[42px] min-w-[160px] items-center justify-center rounded-full bg-[#e4213c] px-6 !text-[13px] font-semibold uppercase text-white transition duration-300 hover:bg-[#174a9b] hover:shadow-md"
+                >
+                  Sign Up
+                </Link>
+              </article>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Labelled Driving Schools */}
-      <section className="bg-white px-4 py-10 sm:px-6 lg:px-12 lg:py-14">
-        <div className="mx-auto max-w-7xl">
-          <div className="rounded-3xl bg-emerald-700 px-6 py-10 lg:rounded-[120px] lg:px-16 lg:py-14">
-            <div className="grid items-center gap-8 lg:grid-cols-[1fr_300px]">
-              <div>
-                <h3 className="text-3xl font-bold text-white sm:text-4xl">
-                  écoles de conduite labellisées
-                </h3>
-                <p className="mt-4 max-w-2xl text-white/90">
-                  Des centres de formation agréés, respectant des standards de
-                  qualité élevés.
-                </p>
-              </div>
-
-              <Image
-                src={laws3}
-                alt="Approved driving school illustration"
-                sizes="(max-width: 1024px) 180px, 300px"
-                className="mx-auto h-auto w-[180px] lg:w-[300px]"
-              />
+      <section className="bg-white px-5 py-20 sm:px-8 lg:py-24">
+        <div className="mx-auto max-w-[1280px] rounded-[55px] bg-[#174a9b] px-8 py-12 sm:rounded-[110px] lg:px-[180px]">
+          <div className="grid grid-cols-[minmax(0,1fr)] items-center gap-10 md:grid-cols-[1fr_230px]">
+            <div>
+              <h2 className="text-[27px] font-bold text-white lg:text-[31px]">
+                écoles de conduite labellisées
+              </h2>
+              <p className="mt-5 !text-[15px] text-white/85">
+                Des centres de formation agréés, respectant des standards de qualité élevés.
+              </p>
             </div>
+            <Image
+              src={laws3}
+              alt="Qualiopi certified driving school"
+              sizes="200px"
+              className="mx-auto h-auto w-[190px] rounded-[6px]"
+            />
           </div>
         </div>
       </section>
 
-      {/* How It Works */}
-      <section className="bg-white py-10 lg:py-14">
-        <div className="mb-10 px-4 text-center">
-          <h3 className="text-3xl font-bold text-slate-950 sm:text-4xl">
+      <section className="bg-[#eaf0f9] pb-20 pt-20 lg:pb-24">
+        <div className="text-center">
+          <h2 className="text-[34px] font-bold tracking-[-0.025em] text-[#222] lg:text-[38px]">
             How It Works
-          </h3>
-          <p className="mt-3 text-slate-600">
+          </h2>
+          <p className="mt-4 !text-[14px] text-[#73777d]">
             Driving licence learning transformed by permisgo
           </p>
         </div>
 
-        <Image
-          src={road}
-          alt="Road process line"
-          sizes="100vw"
-          className="h-auto w-full"
-        />
-
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-12">
-          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:-mt-16 lg:grid-cols-4">
-            {workSteps.map((step) => (
-              <div key={step.number}>
-                <div className="relative mx-auto w-[70px]">
-                  <div className="absolute left-1/2 top-3 z-10 -translate-x-1/2 rounded-full bg-emerald-700 px-2 py-1">
-                    <h5 className="text-xs font-bold text-white">
-                      {step.number}
-                    </h5>
-                  </div>
-
-                  <Image
-                    src={map}
-                    alt={`${step.title} icon`}
-                    width={60}
-                    height={60}
-                    sizes="60px"
-                    className="mx-auto h-auto w-[60px]"
-                  />
-                </div>
-
-                <div className="mt-4 rounded-xl bg-emerald-700 p-5 text-center">
-                  <h4 className="text-xl font-bold text-white">{step.title}</h4>
-                  <p className="mt-3 text-sm leading-6 text-white/90">
-                    {step.description}
-                  </p>
-                </div>
+        <div className="relative mt-10">
+          <Image src={road} alt="Learning journey road" sizes="100vw" className="h-[96px] w-full object-cover" />
+          <div className="absolute inset-0 mx-auto grid max-w-[1280px] grid-cols-4 items-center px-8">
+            {workSteps.map((step, index) => (
+              <div key={step.title} className="relative flex justify-center">
+                <Image src={mapMarker} alt="" sizes="34px" className="h-[34px] w-[34px] object-contain" />
+                <span className="absolute top-[8px] !text-[9px] font-bold text-[#174a9b]">0{index + 1}</span>
               </div>
             ))}
           </div>
         </div>
+
+        <div className="mx-auto grid max-w-[1280px] grid-cols-[minmax(0,1fr)] gap-6 px-5 pt-8 sm:grid-cols-2 sm:px-8 lg:grid-cols-4">
+          {workSteps.map((step) => (
+            <article
+              key={step.title}
+              className="rounded-[10px] bg-[#174a9b] px-5 py-7 text-center text-white transition duration-300 hover:-translate-y-1 hover:bg-[#e4213c] hover:shadow-xl"
+            >
+              <h3 className="text-[18px] font-bold">{step.title}</h3>
+              <p className="mt-4 !text-[13px] leading-6 text-white/90">{step.text}</p>
+            </article>
+          ))}
+        </div>
       </section>
 
-      {/* After Code Section */}
-      <section className="bg-white px-4 py-10 sm:px-6 lg:px-12 lg:py-14">
-        <div className="mx-auto max-w-7xl">
-          <div className="rounded-3xl bg-emerald-700 px-5 py-10 text-center sm:px-8 lg:py-14">
-            <h2 className="text-3xl font-bold text-white sm:text-4xl">
-              And After your code?
-            </h2>
-            <p className="mt-3 text-white/90">
-              Discover Our Lisence Offers Starting at $500
-            </p>
-
-            <div className="mt-7">
-              <Link
-                href="#"
-                className="inline-flex items-center justify-center rounded-lg bg-orange-500 px-7 py-3 text-base font-semibold text-white transition hover:bg-amber-600"
-              >
-                Discover All Our Offers
-              </Link>
+      <section className="bg-white px-5 py-20 sm:px-8 lg:py-24">
+        <div className="mx-auto max-w-[1280px] rounded-[10px] bg-[#174a9b] px-5 py-14 text-center sm:px-10 lg:py-20">
+          <h2 className="text-[32px] font-bold text-white lg:text-[37px]">And After your code?</h2>
+          <p className="mt-4 !text-[14px] text-white/85">Discover Our License Offers Starting at $500</p>
+          <Link
+            href="/offers"
+            className="mt-7 inline-flex min-h-[46px] min-w-[360px] max-w-full items-center justify-center rounded-[9px] bg-[#e4213c] px-7 !text-[14px] font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-white hover:text-[#174a9b] hover:shadow-lg"
+          >
+            Discover All Our Offers
+          </Link>
+          <div className="mx-auto mt-10 grid max-w-[900px] grid-cols-[minmax(0,1fr)] gap-6 md:grid-cols-2">
+            <div className="flex min-h-[94px] items-center justify-center gap-4 rounded-[9px] bg-white px-6">
+              <FaLocationDot className="text-[30px] text-[#174a9b]" />
+              <span className="!text-[15px] font-semibold text-[#292d33]">71 Approved Agencies</span>
             </div>
-
-            <div className="mx-auto mt-10 grid max-w-4xl gap-6 md:grid-cols-2">
-              <div className="rounded-xl bg-white p-6">
-                <FaLocationDot className="mx-auto mb-4 text-4xl text-emerald-700" />
-                <h4 className="text-xl font-semibold text-slate-950">
-                  71 Approved Agencies
-                </h4>
-              </div>
-
-              <div className="rounded-xl bg-white p-6">
-                <FaStar className="mx-auto mb-4 text-4xl text-emerald-700" />
-                <h4 className="text-xl font-semibold text-slate-950">
-                  100% of our students are satisfied
-                </h4>
-              </div>
+            <div className="flex min-h-[94px] items-center justify-center gap-4 rounded-[9px] bg-white px-6">
+              <FaStar className="text-[30px] text-[#174a9b]" />
+              <span className="!text-[15px] font-semibold text-[#292d33]">
+                100% of our students are satisfied
+              </span>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Review Logo Section */}
-      <section className="bg-emerald-700 px-4 py-10 sm:px-6 lg:px-12 lg:py-14">
-        <div className="mx-auto max-w-7xl">
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {reviews.map((review) => (
-              <div
-                key={review.title}
-                className="rounded-2xl border-4 border-slate-200 bg-white p-6 text-center"
-              >
-                <Image
-                  src={review.logo}
-                  alt={`${review.title} logo`}
-                  width={70}
-                  height={70}
-                  sizes="70px"
-                  className="mx-auto mb-5 h-auto w-[70px]"
-                />
+      <section className="bg-[#174a9b] px-5 py-16 sm:px-8 lg:py-20">
+        <div className="mx-auto grid max-w-[1280px] grid-cols-[minmax(0,1fr)] gap-6 md:grid-cols-3">
+          {ratingCards.map((rating) => (
+            <article
+              key={rating.title}
+              className="flex min-h-[165px] flex-col items-center justify-center rounded-[20px] bg-[#f6f8fb] px-6 py-6 text-center transition duration-300 hover:-translate-y-1 hover:bg-white hover:shadow-xl"
+            >
+              <Image src={rating.image} alt="" sizes="40px" className="h-10 w-10 object-contain" />
+              <h3 className="mt-2 text-[18px] font-bold text-[#292929]">{rating.title}</h3>
+              <div className="mt-2 flex gap-3 text-[#ffc52c]">
+                {[0, 1, 2, 3, 4].map((star) => (
+                  <FaStar key={star} className="text-[17px]" />
+                ))}
+              </div>
+              <p className="mt-2 !text-[13px] text-[#303030]">04 out of 05</p>
+            </article>
+          ))}
+        </div>
+      </section>
 
-                <h4 className="text-2xl font-bold text-emerald-700 sm:text-3xl">
-                  {review.title}
-                </h4>
+      <section className="bg-[#f5f7fa] px-5 py-20 sm:px-8 lg:py-24">
+        <div className="mx-auto max-w-[1280px]">
+          <div className="flex items-end justify-between gap-5">
+            <div>
+              <span className="inline-flex rounded-[5px] bg-[#e7f7ec] px-4 py-2 !text-[12px] font-semibold text-[#20a657]">
+                Testimonials
+              </span>
+              <h2 className="mt-5 text-[34px] font-bold tracking-[-0.025em] text-[#222] lg:text-[38px]">
+                What Our Students Say
+              </h2>
+            </div>
+            <div className="flex gap-3">
+              <button type="button" aria-label="Previous testimonial" className="flex h-10 w-10 items-center justify-center rounded-[8px] bg-[#e7edf6] text-[#174a9b] transition hover:bg-[#174a9b] hover:text-white">
+                <FaArrowLeft />
+              </button>
+              <button type="button" aria-label="Next testimonial" className="flex h-10 w-10 items-center justify-center rounded-[8px] bg-[#e4213c] text-white transition hover:bg-[#174a9b]">
+                <FaArrowRight />
+              </button>
+            </div>
+          </div>
 
-                <ul className="mt-4 flex justify-center gap-2 text-xl text-amber-400">
-                  {[...Array(5)].map((_, index) => (
-                    <li key={index}>
-                      <FaStar />
-                    </li>
+          <div className="mt-12 grid grid-cols-[minmax(0,1fr)] gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {testimonials.map((testimonial) => (
+              <article key={testimonial.name} className="rounded-[10px] bg-white p-6 transition duration-300 hover:-translate-y-1 hover:shadow-xl">
+                <p className="!text-[14px] leading-6 text-[#50545a]">
+                  Thanks to the instructors, I passed my driving test on the first try. The lessons were clear and very helpful!
+                </p>
+                <div className="mt-5 flex gap-2 text-[#ffc52c]">
+                  {[0, 1, 2, 3, 4].map((star) => (
+                    <FaStar key={star} />
                   ))}
-                </ul>
-
-                <p className="mt-3 mb-0 text-slate-600">{review.rating}</p>
-              </div>
+                </div>
+                <div className="mt-6 flex items-center gap-3">
+                  <Image src={testimonial.image} alt={testimonial.name} sizes="42px" className="h-10 w-10 rounded-full object-cover" />
+                  <div>
+                    <h3 className="text-[13px] font-bold text-[#303238]">{testimonial.name}</h3>
+                    <p className="!text-[12px] text-[#747981]">Web Designer</p>
+                  </div>
+                </div>
+              </article>
             ))}
           </div>
+
+          <Link href="/reviews" className="mt-10 inline-flex rounded-[8px] bg-[#e4213c] px-6 py-3 !text-[14px] font-semibold text-white transition hover:bg-[#174a9b] hover:shadow-md">
+            View All
+          </Link>
         </div>
       </section>
-
-      <Testimonials />
-    </>
+    </main>
   );
-};
-
-export default TrafficLaws;
+}
