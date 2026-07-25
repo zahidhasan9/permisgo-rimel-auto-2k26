@@ -17,6 +17,7 @@
 // import Testimonials from "@/components/testimonials";
 
 // import blogImg from "../../public/image/blog.jpg";
+// import heroBg from "../../public/image/hero-bg.jpg";
 // import broomLogo from "../../public/image/broomLogo.png";
 // import carAnime from "../../public/image/car-animate.gif";
 // import googleLogo from "../../public/image/googleLogo.png";
@@ -59,11 +60,11 @@
 
 // const cn = (...classes) => classes.filter(Boolean).join(" ");
 
-// const container = "mx-auto max-w-6xl px-4 sm:px-5 lg:px-6";
+// const container = "mx-auto max-w-[1320px] px-4 sm:px-5 lg:px-6";
 // const section = "py-9 md:py-12 lg:py-14";
 
 // const badge =
-//   "inline-flex items-center rounded-full bg-white px-3.5 py-1.5 text-xs font-bold tracking-wide text-orange-500 shadow-sm ring-1 ring-slate-100";
+//   "inline-flex items-center rounded-full bg-white px-3.5 py-1.5 text-[15px] font-bold tracking-wide text-orange-500 shadow-sm ring-1 ring-slate-100";
 
 // const primaryBtn =
 //   "inline-flex items-center justify-center rounded-full bg-blue-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition duration-300 hover:bg-blue-900 hover:shadow-md";
@@ -201,6 +202,27 @@
 //   const swiperRefOne = useRef(null);
 //   const swiperRefThree = useRef(null);
 
+//   const instructorInfo = [
+//     {
+//       name: "Robert Fox",
+//       experience: "05 Years+",
+//     },
+//     {
+//       name: "Ronald Richards",
+//       experience: "05 Years+",
+//     },
+//     {
+//       name: "Arlene McCoy",
+//       experience: "05 Years+",
+//     },
+//     {
+//       name: "Bessie Cooper",
+//       experience: "05 Years+",
+//     },
+//   ];
+
+//   const [activeInstructor, setActiveInstructor] = useState(0);
+
 //   const [activeTab, setActiveTab] = useState("manual");
 //   const [openFaq, setOpenFaq] = useState(0);
 
@@ -208,107 +230,120 @@
 //     <>
 //       <Navbar />
 
-//       {/* Hero */}
-//       <section className="relative overflow-hidden bg-blue-950 bg-[url('/image/hero-bg.jpg')] bg-cover bg-center bg-no-repeat">
-//         <div className="absolute inset-0 bg-gradient-to-r from-blue-950 via-blue-900/90 to-blue-800/60" />
-//         <div className="absolute -left-20 top-20 h-60 w-60 rounded-full bg-blue-500/20 blur-3xl" />
-//         <div className="absolute -right-20 bottom-8 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
+//       {/* Hero Section */}
+//       <section className="relative overflow-hidden bg-[#08275f]">
+//         {/* Background image */}
+//         <div
+//           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+//           style={{
+//             backgroundImage: `url(${heroBg.src})`,
+//           }}
+//         />
 
-//         <div className={cn(container, "relative")}>
-//           <div className="grid min-h-[520px] grid-cols-1 items-center gap-8 py-10 md:py-12 lg:grid-cols-12 lg:py-14">
-//             <div className="lg:col-span-5">
-//               <div className="max-w-lg">
-//                 <h5 className="inline-flex rounded-full bg-white/10 px-3.5 py-1.5 text-xs font-bold text-white shadow-sm ring-1 ring-white/20">
+//         {/* Very light overlay */}
+//         <div className="pointer-events-none absolute inset-0 bg-[#00132f]/10" />
+
+//         <div className="relative z-10 mx-auto w-full max-w-[1320px] px-5 sm:px-7 lg:px-8">
+//           <div className="relative min-h-[520px] py-8 sm:py-10 lg:h-[520px] lg:py-[30px]">
+//             {/* Left content */}
+//             <div className="relative z-20 w-full lg:w-[59%]">
+//               {/* Approval badge */}
+//               <div className="inline-flex min-h-[28px] items-center justify-center rounded-full bg-gradient-to-r from-[#2476ef] to-[#a142e9] px-4 py-1.5 shadow-md">
+//                 <span className="text-[10px] font-bold leading-none text-white sm:text-[11px]">
 //                   Approved by the prefecture E 25 093 0029 0
-//                 </h5>
+//                 </span>
+//               </div>
 
-//                 <h1 className="mt-5 text-3xl font-black leading-tight tracking-tight text-white sm:text-4xl lg:text-5xl">
-//                   Conduisez vers la liberté, Per|
-//                 </h1>
+//               {/* Heading */}
+//               <h1 className="mt-3 max-w-[680px] text-[31px] font-black leading-[1.12] tracking-[-0.7px] text-white drop-shadow-sm sm:text-[36px] lg:text-[39px] xl:text-[42px]">
+//                 Conduisez vers la liberté, Per|
+//               </h1>
 
-//                 <p className="mt-4 max-w-md text-base font-medium leading-7 text-white/85">
-//                   Comprehensive training, guaranteed safety.
-//                 </p>
+//               {/* Description */}
+//               <p className="mt-6 max-w-[460px] text-[12px] font-medium leading-5 text-white/95 sm:text-[13px]">
+//                 Comprehensive training, guaranteed safety.
+//               </p>
 
-//                 <div className="mt-6 flex flex-wrap gap-3">
-//                   <Link href="#" className={primaryBtn}>
-//                     Start the courses
-//                   </Link>
+//               {/* Main button */}
+//               <div className="mt-4">
+//                 <Link
+//                   href="#"
+//                   className="inline-flex h-[39px] items-center justify-center rounded-[7px] bg-[#ef233c] px-[19px] text-[11px] font-extrabold text-white shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#d71934] hover:shadow-lg"
+//                 >
+//                   Start the courses
+//                 </Link>
+//               </div>
 
-//                   <Link
-//                     href="#"
-//                     className="inline-flex items-center justify-center rounded-full border border-white/30 bg-white/10 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition duration-300 hover:bg-white hover:text-blue-900"
+//               {/* Offer cards */}
+//               <div className="mt-7 flex w-full max-w-[345px] flex-col gap-3">
+//                 {[
+//                   {
+//                     title: "Driving License 13H From",
+//                     oldPrice: "€850",
+//                     price: "€749",
+//                   },
+//                   {
+//                     title: "Highway Code from",
+//                     oldPrice: "€50",
+//                     price: "€30",
+//                   },
+//                 ].map((offer, index) => (
+//                   <div
+//                     key={offer.title}
+//                     className="relative min-h-[112px] overflow-hidden rounded-[9px] border border-[#9ab8ea] bg-[#05275c]/45 px-4 py-3 text-white shadow-[0_8px_25px_rgba(0,0,0,0.12)] backdrop-blur-[1px]"
 //                   >
-//                     Inscription
-//                   </Link>
-//                 </div>
+//                     {/* Card top */}
+//                     <div className="flex items-start justify-between gap-4">
+//                       <div>
+//                         <h4 className="text-[13px] font-extrabold leading-[18px] text-white">
+//                           {offer.title}
+//                         </h4>
 
-//                 <div className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-//                   {[
-//                     {
-//                       title: "Driving License 13H From",
-//                       oldPrice: "€850",
-//                       price: "€749",
-//                     },
-//                     {
-//                       title: "Highway code from",
-//                       oldPrice: "€50",
-//                       price: "€30",
-//                     },
-//                   ].map((offer, index) => (
-//                     <div
-//                       key={index}
-//                       className="rounded-2xl border border-white/15 bg-white/10 p-4 text-white shadow-lg backdrop-blur transition duration-300 hover:bg-white/15"
-//                     >
-//                       <div className="flex items-start justify-between gap-3">
-//                         <div>
-//                           <h4 className="text-sm font-bold leading-5 text-white">
-//                             {offer.title}
-//                           </h4>
-
-//                           <p className="mt-1 text-base font-bold text-orange-400 line-through">
-//                             {offer.oldPrice}
-//                           </p>
-//                         </div>
-
-//                         <Image
-//                           src={batch}
-//                           alt="Offer badge"
-//                           sizes="48px"
-//                           className="h-auto w-10"
-//                         />
+//                         <p className="mt-1 text-[11px] font-bold text-[#27d26b] line-through">
+//                           {offer.oldPrice}
+//                         </p>
 //                       </div>
 
-//                       <div className="mt-4 flex items-end justify-between gap-3">
-//                         <div>
-//                           <small className="text-xs font-medium text-white/70">
-//                             of the
-//                           </small>
-//                           <h3 className="text-3xl font-black leading-none text-white">
-//                             {offer.price}
-//                           </h3>
-//                         </div>
-
-//                         <Link
-//                           href="#"
-//                           className="rounded-full bg-white px-3.5 py-2 text-xs font-bold text-blue-900 transition hover:bg-blue-600 hover:text-white"
-//                         >
-//                           Permit Offer
-//                         </Link>
-//                       </div>
+//                       <Image
+//                         src={batch}
+//                         alt={`${offer.title} badge`}
+//                         sizes="40px"
+//                         className="h-auto w-[36px] shrink-0 opacity-80"
+//                       />
 //                     </div>
-//                   ))}
-//                 </div>
+
+//                     {/* Card bottom */}
+//                     <div className="mt-3 flex items-end justify-between gap-4">
+//                       <div>
+//                         <p className="text-[9px] font-medium leading-none text-white/80">
+//                           of the
+//                         </p>
+
+//                         <h3 className="mt-1 text-[22px] font-black leading-none text-white">
+//                           {offer.price}
+//                         </h3>
+//                       </div>
+
+//                       <Link
+//                         href="#"
+//                         className="inline-flex h-[31px] items-center justify-center rounded-[7px] bg-[#ef233c] px-[14px] text-[10px] font-extrabold text-white shadow-sm transition-all duration-300 hover:bg-[#d71934] hover:shadow-md"
+//                       >
+//                         Permit Offer
+//                       </Link>
+//                     </div>
+//                   </div>
+//                 ))}
 //               </div>
 //             </div>
 
-//             <div className="lg:col-span-7">
+//             {/* Right car image */}
+//             <div className="relative z-10 mt-10 flex w-full items-end justify-center lg:absolute lg:bottom-0 lg:right-[-15px] lg:mt-0 lg:h-full lg:w-[58%] lg:justify-end">
 //               <Image
 //                 src={carAnime}
-//                 alt="Driving car animation"
+//                 alt="Driving school car"
 //                 priority
 //                 sizes="(max-width: 1024px) 100vw, 58vw"
-//                 className="ml-auto h-auto w-full max-w-2xl object-contain"
+//                 className="h-auto w-full max-w-[680px] object-contain object-bottom lg:max-h-[500px] xl:max-w-[750px]"
 //               />
 //             </div>
 //           </div>
@@ -316,33 +351,35 @@
 //       </section>
 
 //       {/* Indicators */}
-//       <section className={cn(section, "bg-white")}>
-//         <div className={container}>
-//           <SectionHeading
-//             small="Services"
-//             title="Your driving licence with Permisgo"
-//           />
+//       <section className="bg-white pb-20 pt-[72px]">
+//         <div className="mx-auto w-full max-w-[1260px] px-5 xl:px-0">
+//           {/* Trust Indicator label */}
+//           <div className="flex justify-center">
+//             <div className="flex h-[42px] items-center justify-center rounded-[10px] bg-[#E7ECF4] px-[18px]">
+//               <span className="text-[15px] font-semibold leading-none text-[#2BBF3A]">
+//                 Trust Indicator
+//               </span>
+//             </div>
+//           </div>
 
-//           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+//           {/* Indicator cards */}
+//           <div className="mt-12 grid grid-cols-1 gap-6 px-2 sm:grid-cols-2 lg:grid-cols-4 lg:gap-10 lg:px-0">
 //             {indicators.map((item, index) => (
 //               <div
-//                 key={index}
-//                 className={cn(
-//                   "rounded-2xl border border-slate-100 bg-white p-4 shadow-sm ring-1 ring-slate-50",
-//                   cardHover,
-//                 )}
+//                 key={item.title || index}
+//                 className="h-[112px] rounded-[18px] bg-[#E7ECF4] [transform:skewX(-8deg)]"
 //               >
-//                 <div className="flex items-center gap-3">
-//                   <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-50">
+//                 <div className="flex h-full items-center gap-4 px-8 [transform:skewX(8deg)] lg:px-10">
+//                   <div className="flex h-12 w-12 shrink-0 items-center justify-center">
 //                     <Image
 //                       src={item.img}
 //                       alt={item.title}
-//                       sizes="40px"
-//                       className="h-auto w-8"
+//                       sizes="48px"
+//                       className="h-auto max-h-12 w-auto max-w-12 object-contain"
 //                     />
 //                   </div>
 
-//                   <h4 className="text-sm font-black leading-5 text-blue-900">
+//                   <h4 className="text-[16px] font-semibold leading-[22px] text-[#111111]">
 //                     {item.title}
 //                   </h4>
 //                 </div>
@@ -353,85 +390,148 @@
 //       </section>
 
 //       {/* Services */}
-//       <section className={cn(section, "bg-slate-50")}>
-//         <div className={container}>
-//           <SectionHeading
-//             small="Services"
-//             title="Professional driving courses"
-//             desc="Choose the right package and start your driving journey with confidence."
-//           />
+//       <section className="bg-white py-[60px] md:py-[78px]">
+//         <div className="mx-auto w-full max-w-[1320px] px-4 sm:px-6">
+//           {/* Section heading */}
+//           <div className="text-center">
+//             <span className="inline-flex min-h-[30px] items-center justify-center rounded-[7px] bg-[#E7ECF4] px-[14px] text-[15px] font-semibold text-[#20C943]">
+//               Services
+//             </span>
 
-//           <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
-//             {services.map((service, index) => (
-//               <div
-//                 key={index}
-//                 className={cn(
-//                   "rounded-2xl border border-slate-100 bg-white p-5 text-center shadow-sm ring-1 ring-slate-50",
-//                   cardHover,
-//                 )}
-//               >
-//                 <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-50">
-//                   <Image
-//                     src={service.img}
-//                     alt={service.title}
-//                     sizes="48px"
-//                     className="h-auto w-11"
-//                   />
-//                 </div>
+//             <h2 className="mt-5 text-[25px] font-extrabold leading-tight text-[#202020] md:text-[33px]">
+//               Your driving licence with Permisgo
+//             </h2>
+//           </div>
 
-//                 <h4 className="mt-4 min-h-11 text-base font-black leading-6 text-blue-900">
-//                   {service.title}
-//                 </h4>
+//           {/* Services grid */}
+//           <div className="relative mt-[42px]">
+//             {/* Dotted connector line – second row */}
+//             <div className="pointer-events-none absolute left-[21%] right-[21%] top-[350px] z-0 hidden border-t-2 border-dotted border-[#168BFF] xl:block" />
 
-//                 <h3 className="mt-1 text-xl font-black text-orange-500">
-//                   {service.price}
-//                 </h3>
+//             <div className="relative z-10 grid grid-cols-1 gap-[18px] sm:grid-cols-2 xl:grid-cols-3">
+//               {services.map((service, index) => (
+//                 <div
+//                   key={service.title || index}
+//                   className={cn(
+//                     "group relative flex min-h-[280px] flex-col items-center justify-center overflow-hidden rounded-[8px] bg-[#E7ECF4] px-5 py-8 text-center",
+//                     "transition-all duration-300 hover:-translate-y-1 hover:shadow-lg",
+//                   )}
+//                 >
+//                   {/* Service icon */}
+//                   <div className="flex h-[70px] w-[78px] items-center justify-center">
+//                     <Image
+//                       src={service.img}
+//                       alt={service.title}
+//                       sizes="78px"
+//                       className="max-h-[70px] w-auto max-w-[78px] object-contain"
+//                     />
+//                   </div>
 
-//                 <div className="mt-5">
-//                   <Link href="#" className={outlineBtn}>
+//                   {/* Service title */}
+//                   <h4 className="mt-5 min-h-[42px] max-w-[240px] text-[17px] font-extrabold leading-[21px] text-[#101010]">
+//                     {service.title}
+//                   </h4>
+
+//                   {/* Price */}
+//                   <p className="mt-1 text-[18px] font-bold leading-5 text-[#16C53A]">
+//                     {service.price}
+//                   </p>
+
+//                   {/* Button */}
+//                   <Link
+//                     href={service.href || "#"}
+//                     className={cn(
+//                       "mt-5 inline-flex min-h-[38px] items-center justify-center rounded-[7px]",
+//                       "border border-[#064CB5] px-[18px]",
+//                       "text-[12px] font-bold text-[#F02036]",
+//                       "transition-all duration-300",
+//                       "hover:border-[#ED1F3B] hover:bg-[#ED1F3B] hover:text-white",
+//                       "focus:outline-none focus:ring-2 focus:ring-[#ED1F3B]/30",
+//                     )}
+//                   >
 //                     Learn more
 //                   </Link>
 //                 </div>
-//               </div>
-//             ))}
+//               ))}
+//             </div>
 //           </div>
 //         </div>
 //       </section>
 
 //       {/* Location */}
-//       <section className={cn(section, "bg-white")}>
-//         <div className={container}>
-//           <SectionHeading
-//             small="Location"
-//             title="Permisgo near you"
-//             desc="Lessons near your home, your work, your school… we're everywhere!"
-//           />
+//       <section className="bg-[#F7F9FC] py-[60px] md:py-[80px]">
+//         <div className="mx-auto w-full max-w-[1320px] px-4 sm:px-6 lg:px-8">
+//           {/* Heading */}
+//           <div className="mb-[46px] text-center">
+//             <span className="inline-flex min-h-[28px] items-center justify-center rounded-[7px] bg-[#E8EDF4] px-[13px] text-[15px] font-semibold text-[#20C943]">
+//               Location
+//             </span>
 
-//           <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-//             <div className="lg:col-span-4">
-//               <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-lg shadow-slate-200/70">
+//             <h2 className="mt-5 text-[26px] font-extrabold leading-tight text-[#202020] md:text-[33px]">
+//               Permisgo near you
+//             </h2>
+
+//             <p className="mt-4 text-[12px] font-medium text-[#555B65] md:text-[15px]">
+//               Lessons near your home, your work, your school… we&apos;re
+//               everywhere!
+//             </p>
+//           </div>
+
+//           <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:items-start">
+//             {/* Left side */}
+//             <div className="lg:col-span-5">
+//               {/* Search */}
+//               <div className="relative">
+//                 <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2">
+//                   <svg
+//                     width="19"
+//                     height="19"
+//                     viewBox="0 0 24 24"
+//                     fill="none"
+//                     xmlns="http://www.w3.org/2000/svg"
+//                   >
+//                     <circle
+//                       cx="11"
+//                       cy="11"
+//                       r="7"
+//                       stroke="#68717E"
+//                       strokeWidth="1.7"
+//                     />
+//                     <path
+//                       d="M16.5 16.5L21 21"
+//                       stroke="#68717E"
+//                       strokeWidth="1.7"
+//                       strokeLinecap="round"
+//                     />
+//                   </svg>
+//                 </span>
+
 //                 <input
 //                   type="text"
-//                   placeholder="🔍 Search by address, city ..."
-//                   className={inputClass}
+//                   placeholder="Search by address, city..."
+//                   className="h-[50px] w-full rounded-[10px] border-0 bg-[#E8EBF0] pl-12 pr-4 text-[13px] font-medium text-[#30343B] outline-none placeholder:text-[#707782] focus:ring-2 focus:ring-[#174FA5]/20"
 //                 />
+//               </div>
 
-//                 <div className="mt-5">
-//                   <h4 className="mb-3 text-lg font-black leading-6 text-blue-900">
-//                     Find lessons based on your vehicle type
-//                   </h4>
+//               {/* Vehicle type */}
+//               <div className="mt-8">
+//                 <h4 className="mb-4 text-[17px] font-extrabold leading-6 text-[#17191D]">
+//                   Find lessons based on your vehicle type
+//                 </h4>
 
-//                   <div className="grid gap-2.5">
+//                 <div className="rounded-[10px] bg-[#E9EDF5] p-4">
+//                   <div className="grid grid-cols-2 gap-3">
 //                     {mapTabs.map((tab) => (
 //                       <button
 //                         key={tab.key}
 //                         type="button"
 //                         onClick={() => setActiveTab(tab.key)}
 //                         className={cn(
-//                           "rounded-xl px-3.5 py-2.5 text-left text-sm font-bold transition duration-300",
+//                           "flex min-h-[39px] items-center justify-center rounded-[8px] border px-3",
+//                           "text-center text-[11px] lg:text-[13px] font-bold leading-4 transition-all duration-300",
 //                           activeTab === tab.key
-//                             ? "bg-blue-600 text-white shadow-sm"
-//                             : "bg-slate-50 text-blue-900 hover:bg-blue-50",
+//                             ? "border-[#174FA5] bg-[#B8C9E5] text-[#12458D]"
+//                             : "border-transparent bg-white text-[#17191D] hover:border-[#174FA5] hover:text-[#174FA5]",
 //                         )}
 //                       >
 //                         {tab.title}
@@ -439,21 +539,28 @@
 //                     ))}
 //                   </div>
 //                 </div>
+//               </div>
 
-//                 <div className="mt-5">
-//                   <h4 className="mb-3 text-lg font-black leading-6 text-blue-900">
-//                     Find available teacher near you
-//                   </h4>
+//               {/* Available teacher */}
+//               <div className="mt-8">
+//                 <h4 className="mb-4 text-[16px] font-extrabold leading-6 text-[#17191D]">
+//                   Find lessons based on available teacher near you
+//                 </h4>
 
-//                   <button type="button" className={cn(primaryBtn, "w-full")}>
+//                 <div className="rounded-[10px] bg-[#E9EDF5] p-4">
+//                   <button
+//                     type="button"
+//                     className="flex h-[42px] w-full items-center justify-center rounded-[8px] border border-[#174FA5] bg-[#B8C9E5] px-4 text-[13px] font-bold text-[#123F7A] transition duration-300 hover:bg-[#174FA5] hover:text-white"
+//                   >
 //                     Start Searching
 //                   </button>
 //                 </div>
 //               </div>
 //             </div>
 
-//             <div className="lg:col-span-8">
-//               <div className="overflow-hidden rounded-2xl border border-slate-100 bg-white p-1.5 shadow-lg shadow-slate-200/70">
+//             {/* Map side */}
+//             <div className="lg:col-span-7">
+//               <div className="relative min-h-[430px] overflow-hidden rounded-[8px] bg-[#DDE8EC]">
 //                 <iframe
 //                   src={mapSrc}
 //                   width="100%"
@@ -461,9 +568,87 @@
 //                   allowFullScreen
 //                   loading="lazy"
 //                   referrerPolicy="no-referrer-when-downgrade"
-//                   className="rounded-xl"
+//                   className="block h-[430px] w-full border-0"
 //                   title="Permisgo location map"
 //                 />
+
+//                 {/* Teacher information card */}
+//                 <div className="absolute bottom-5 right-5 w-[300px] max-w-[calc(100%-40px)] rounded-[12px] border-2 border-[#174FA5] bg-white p-3 shadow-[0_12px_35px_rgba(15,44,88,0.24)]">
+//                   {/* Card top */}
+//                   <div className="flex items-start justify-between">
+//                     <div className="flex items-center gap-3">
+//                       <div className="flex h-[46px] w-[46px] shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#D9E5F4] text-[12px] font-extrabold text-[#174FA5]">
+//                         RF
+//                       </div>
+
+//                       <div>
+//                         <h4 className="text-[13px] font-extrabold text-[#174FA5]">
+//                           Robert Fox
+//                         </h4>
+//                       </div>
+//                     </div>
+
+//                     <div className="flex items-start gap-3">
+//                       <div className="text-right">
+//                         <p className="text-[10px] font-semibold text-[#555B65]">
+//                           Experience 05 Years+
+//                         </p>
+
+//                         <div className="mt-1 text-[12px] leading-none tracking-[2px] text-[#174FA5]">
+//                           ★★★★★
+//                         </div>
+//                       </div>
+
+//                       <button
+//                         type="button"
+//                         aria-label="Close teacher card"
+//                         className="flex h-5 w-5 items-center justify-center text-[18px] font-medium leading-none text-[#272B30]"
+//                       >
+//                         ×
+//                       </button>
+//                     </div>
+//                   </div>
+
+//                   {/* Availability */}
+//                   <div className="mt-3 rounded-[8px] bg-[#EEF1F6] px-3 py-3">
+//                     <p className="mb-3 text-[10px] font-medium text-[#7B828D]">
+//                       Available Time
+//                     </p>
+
+//                     <div className="grid grid-cols-2 gap-x-4 gap-y-[7px]">
+//                       <p className="text-[9px] font-semibold text-[#333840]">
+//                         Mar&nbsp; 08h00 - 10h30
+//                       </p>
+
+//                       <p className="text-[9px] font-semibold text-[#333840]">
+//                         Apr&nbsp; 08h00 - 10h30
+//                       </p>
+
+//                       <p className="text-[9px] font-semibold text-[#333840]">
+//                         May&nbsp; 08h00 - 10h30
+//                       </p>
+
+//                       <p className="text-[9px] font-semibold text-[#333840]">
+//                         Jun&nbsp; 08h00 - 10h30
+//                       </p>
+
+//                       <p className="text-[9px] font-semibold text-[#333840]">
+//                         Nov&nbsp; 08h00 - 10h30
+//                       </p>
+
+//                       <p className="text-[9px] font-semibold text-[#333840]">
+//                         Dec&nbsp; 08h00 - 10h30
+//                       </p>
+//                     </div>
+//                   </div>
+
+//                   <button
+//                     type="button"
+//                     className="mt-3 flex h-[40px] w-full items-center justify-center rounded-[7px] bg-[#E9243F] px-4 text-[10px] font-extrabold text-white transition duration-300 hover:bg-[#C91831]"
+//                   >
+//                     Book Now
+//                   </button>
+//                 </div>
 //               </div>
 //             </div>
 //           </div>
@@ -471,88 +656,142 @@
 //       </section>
 
 //       {/* Instructors */}
-//       <section className={cn(section, "bg-slate-50")}>
-//         <div className={container}>
-//           <SectionHeading
-//             small="Instructors"
-//             title="You'll love our instructors"
-//           />
+//       <section className="overflow-hidden bg-[#F5F7FA] pb-[82px] pt-[10px]">
+//         <div className="mx-auto w-full max-w-[1320px] px-4 xl:px-0">
+//           {/* Heading */}
+//           <div className="mb-[54px] text-center">
+//             <span className="inline-flex h-[38px] min-w-[100px] items-center justify-center rounded-[8px] bg-[#E7ECF4] px-4 text-[15px] font-medium leading-none text-[#28C34B]">
+//               Instructors
+//             </span>
+
+//             <h2 className="mt-[22px] text-[27px] font-extrabold leading-[38px] text-[#171717] md:text-[31px]">
+//               You&apos;ll love our instructors
+//             </h2>
+//           </div>
 
 //           <Swiper
-//             spaceBetween={18}
-//             breakpoints={{
-//               300: { slidesPerView: 1 },
-//               540: { slidesPerView: 2 },
-//               1024: { slidesPerView: 4 },
-//               1440: { slidesPerView: 5 },
-//             }}
+//             slidesPerView={1}
+//             slidesPerGroup={1}
+//             spaceBetween={24}
+//             speed={600}
+//             watchOverflow={true}
+//             loop={instructors.length > 4}
 //             autoplay={{
-//               delay: 2200,
+//               delay: 3000,
 //               disableOnInteraction: false,
 //             }}
-//             freeMode
-//             loop
-//             modules={[FreeMode, Autoplay, Navigation]}
-//             onSwiper={(swiper) => (swiperRefOne.current = swiper)}
+//             breakpoints={{
+//               480: {
+//                 slidesPerView: 2,
+//                 spaceBetween: 18,
+//               },
+//               768: {
+//                 slidesPerView: 3,
+//                 spaceBetween: 20,
+//               },
+//               1024: {
+//                 slidesPerView: 4,
+//                 spaceBetween: 24,
+//               },
+//             }}
+//             modules={[Autoplay, Navigation]}
+//             onSwiper={(swiper) => {
+//               swiperRefOne.current = swiper;
+//               setActiveInstructor(swiper.realIndex);
+//             }}
+//             onSlideChange={(swiper) => {
+//               setActiveInstructor(swiper.realIndex);
+//             }}
 //             className="w-full"
 //           >
-//             {instructors.map((img, index) => (
-//               <SwiperSlide key={index}>
-//                 <div
-//                   className={cn(
-//                     "rounded-2xl border border-slate-100 bg-white p-4 text-center shadow-sm ring-1 ring-slate-50",
-//                     cardHover,
-//                   )}
-//                 >
-//                   <Image
-//                     src={img}
-//                     alt="Instructor"
-//                     sizes="80px"
-//                     className="mx-auto h-20 w-20 rounded-full object-cover ring-4 ring-blue-50"
-//                   />
+//             {instructors.map((img, index) => {
+//               const info = instructorInfo[index % instructorInfo.length];
+//               const isActive = activeInstructor === index;
 
-//                   <h4 className="mt-3 text-lg font-black text-blue-900">
-//                     Robert Fox
-//                   </h4>
+//               return (
+//                 <SwiperSlide key={index} className="h-auto">
+//                   <div
+//                     className={cn(
+//                       "box-border flex h-[308px] w-full flex-col items-center",
+//                       "rounded-[10px] border-2 bg-[#E7ECF4]",
+//                       "px-[24px] pb-[20px] pt-[24px] text-center",
+//                       "transition-colors duration-300",
+//                       isActive ? "border-[#245AA8]" : "border-transparent",
+//                     )}
+//                   >
+//                     {/* Fixed avatar wrapper */}
+//                     <div className="relative h-[64px] w-[64px] shrink-0 overflow-hidden rounded-full">
+//                       <Image
+//                         src={img}
+//                         alt={info.name}
+//                         fill
+//                         sizes="64px"
+//                         priority={index < 4}
+//                         className="!h-full !w-full rounded-full object-cover"
+//                       />
+//                     </div>
 
-//                   <div className="mt-3 rounded-xl bg-slate-50 p-3">
-//                     <p className="mb-2 text-xs font-medium text-slate-600">
-//                       Experience{" "}
-//                       <span className="font-black text-blue-900">
-//                         05 Years+
-//                       </span>
-//                     </p>
+//                     {/* Name */}
+//                     <h4 className="mt-[22px] text-[15px] font-extrabold leading-[20px] text-[#123E8C]">
+//                       {info.name}
+//                     </h4>
 
-//                     <Stars />
+//                     {/* Experience box */}
+//                     <div className="mt-[17px] flex h-[88px] w-full shrink-0 flex-col items-center justify-center rounded-[8px] bg-white px-3">
+//                       <p className="text-[11px] font-normal leading-[16px] text-[#70747B]">
+//                         Experience{" "}
+//                         <span className="font-extrabold text-[#20242A]">
+//                           {info.experience}
+//                         </span>
+//                       </p>
+
+//                       <div className="mt-[10px] flex items-center justify-center gap-[7px] text-[12px] leading-none text-[#123E8C]">
+//                         <FaStar />
+//                         <FaStar />
+//                         <FaStar />
+//                         <FaStar />
+//                         <FaStar />
+//                       </div>
+//                     </div>
+
+//                     {/* Buttons */}
+//                     <div className="mt-[15px] grid w-full grid-cols-2 gap-[13px]">
+//                       <Link
+//                         href="#"
+//                         className="flex h-[38px] items-center justify-center rounded-[6px] border border-[#D72638] bg-[#D72638] px-2 text-[10px] font-bold leading-none text-white transition-colors duration-300 hover:bg-[#B91F30]"
+//                       >
+//                         Book Now
+//                       </Link>
+
+//                       <Link
+//                         href="#"
+//                         className="flex h-[38px] items-center justify-center rounded-[6px] border border-[#D72638] bg-transparent px-2 text-[10px] font-bold leading-none text-[#123E8C] transition-colors duration-300 hover:bg-[#D72638] hover:text-white"
+//                       >
+//                         Message
+//                       </Link>
+//                     </div>
 //                   </div>
-
-//                   <div className="mt-4 grid grid-cols-2 gap-2.5">
-//                     <Link href="#" className={primaryBtn}>
-//                       Book
-//                     </Link>
-
-//                     <Link href="#" className={outlineBtn}>
-//                       Message
-//                     </Link>
-//                   </div>
-//                 </div>
-//               </SwiperSlide>
-//             ))}
+//                 </SwiperSlide>
+//               );
+//             })}
 //           </Swiper>
 
-//           <div className="mt-7 flex justify-center gap-3">
+//           {/* Navigation */}
+//           <div className="mt-[48px] flex items-center justify-center gap-[12px]">
 //             <button
 //               type="button"
-//               className={navBtn}
+//               aria-label="Previous instructor"
 //               onClick={() => swiperRefOne.current?.slidePrev()}
+//               className="flex h-[40px] w-[40px] items-center justify-center rounded-[10px] bg-[#E7ECF4] text-[14px] text-[#D72638] transition-colors duration-300 hover:bg-[#DDE3EC]"
 //             >
 //               <FaArrowLeftLong />
 //             </button>
 
 //             <button
 //               type="button"
-//               className={navBtn}
+//               aria-label="Next instructor"
 //               onClick={() => swiperRefOne.current?.slideNext()}
+//               className="flex h-[40px] w-[40px] items-center justify-center rounded-[10px] bg-[#D72638] text-[14px] text-white transition-colors duration-300 hover:bg-[#B91F30]"
 //             >
 //               <FaArrowRightLong />
 //             </button>
@@ -624,27 +863,54 @@
 //       </section>
 
 //       {/* FAQ */}
-//       <section className={cn(section, "bg-white")}>
-//         <div className={container}>
-//           <SectionHeading small="FAQ" title="Frequently Asked Question" />
+//       {/* FAQ */}
+//       <section className="bg-white py-[70px] md:py-[86px]">
+//         <div className="mx-auto w-full max-w-[1320px] px-4 sm:px-6 lg:px-8">
+//           {/* Heading */}
+//           <div className="mb-[46px] text-center">
+//             <span className="inline-flex h-[30px] min-w-[54px] items-center justify-center rounded-[7px] bg-[#E8EDF4] px-[13px] text-[15px] font-semibold leading-none text-[#27BF43]">
+//               FAQ
+//             </span>
 
-//           <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-//             <div className="lg:col-span-5">
-//               <div className="rounded-2xl border border-slate-100 bg-slate-50 p-5 shadow-sm">
-//                 <h3 className="text-xl font-black leading-tight text-blue-900">
-//                   Got a question about lessons, courses, or documents?
+//             <h2 className="mt-[19px] text-[27px] font-extrabold leading-[36px] text-[#1A1A1A] md:text-[33px]">
+//               Frequently Asked Question
+//             </h2>
+//           </div>
+
+//           {/* FAQ content */}
+//           <div className="grid grid-cols-1 gap-[24px] lg:grid-cols-[460px_minmax(0,1fr)] lg:items-start">
+//             {/* Left side */}
+//             <div>
+//               <div className="mb-[27px]">
+//                 <h3 className="max-w-[390px] text-[25px] font-extrabold leading-[24px] text-[#202020]">
+//                   Got a question about lessons,
+//                   <br />
+//                   courses, or documents?
 //                 </h3>
 
-//                 <p className="mt-2 text-sm font-medium leading-6 text-slate-600">
-//                   Fill out the form below and we’ll respond as soon as possible.
+//                 <p className="mt-[14px] text-[14px] font-medium leading-[18px] text-[#676D76]">
+//                   Fill out the form below and we&apos;ll respond as soon as
+//                   possible.
+//                 </p>
+//               </div>
+
+//               {/* Form card */}
+//               <div className="rounded-[8px] bg-[#E7ECF4] px-[24px] pb-[32px] pt-[27px]">
+//                 <h4 className="text-[18px] font-extrabold leading-[20px] text-[#202020]">
+//                   Get in touch
+//                 </h4>
+
+//                 <p className="mt-[13px] text-[14px] font-medium leading-[17px] text-[#646A73]">
+//                   Fill out this form with necessary information
 //                 </p>
 
-//                 <form className="mt-5">
-//                   <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
+//                 <form className="mt-[24px]">
+//                   <div className="grid grid-cols-1 gap-x-[20px] gap-y-[18px] sm:grid-cols-2">
+//                     {/* First name */}
 //                     <div>
 //                       <label
 //                         htmlFor="first-name"
-//                         className="mb-1.5 block text-xs font-black uppercase tracking-wide text-slate-700"
+//                         className="mb-[8px] block text-[13px] font-semibold leading-none text-[#25282D]"
 //                       >
 //                         First Name
 //                       </label>
@@ -652,15 +918,16 @@
 //                       <input
 //                         type="text"
 //                         id="first-name"
-//                         className={inputClass}
 //                         placeholder="Write name here"
+//                         className="h-[38px] w-full rounded-[8px] border border-[#C8D1DD] bg-white px-[13px] text-[10px] font-medium text-[#25282D] outline-none placeholder:text-[#A0A5AD] focus:border-[#174B9B] focus:ring-2 focus:ring-[#174B9B]/10"
 //                       />
 //                     </div>
 
+//                     {/* Last name */}
 //                     <div>
 //                       <label
 //                         htmlFor="last-name"
-//                         className="mb-1.5 block text-xs font-black uppercase tracking-wide text-slate-700"
+//                         className="mb-[8px] block text-[13px] font-semibold leading-none text-[#25282D]"
 //                       >
 //                         Last Name
 //                       </label>
@@ -668,31 +935,33 @@
 //                       <input
 //                         type="text"
 //                         id="last-name"
-//                         className={inputClass}
 //                         placeholder="Write name here"
+//                         className="h-[38px] w-full rounded-[8px] border border-[#C8D1DD] bg-white px-[13px] text-[10px] font-medium text-[#25282D] outline-none placeholder:text-[#A0A5AD] focus:border-[#174B9B] focus:ring-2 focus:ring-[#174B9B]/10"
 //                       />
 //                     </div>
 
+//                     {/* Email */}
 //                     <div>
 //                       <label
 //                         htmlFor="email"
-//                         className="mb-1.5 block text-xs font-black uppercase tracking-wide text-slate-700"
+//                         className="mb-[8px] block text-[13px] font-semibold leading-none text-[#25282D]"
 //                       >
-//                         Email
+//                         Email address
 //                       </label>
 
 //                       <input
 //                         type="email"
 //                         id="email"
-//                         className={inputClass}
-//                         placeholder="Write email address"
+//                         placeholder="Write Email address"
+//                         className="h-[38px] w-full rounded-[8px] border border-[#C8D1DD] bg-white px-[13px] text-[10px] font-medium text-[#25282D] outline-none placeholder:text-[#A0A5AD] focus:border-[#174B9B] focus:ring-2 focus:ring-[#174B9B]/10"
 //                       />
 //                     </div>
 
+//                     {/* Phone */}
 //                     <div>
 //                       <label
 //                         htmlFor="phone-number"
-//                         className="mb-1.5 block text-xs font-black uppercase tracking-wide text-slate-700"
+//                         className="mb-[8px] block text-[13px] font-semibold leading-none text-[#25282D]"
 //                       >
 //                         Phone Number
 //                       </label>
@@ -700,31 +969,32 @@
 //                       <input
 //                         type="tel"
 //                         id="phone-number"
-//                         className={inputClass}
 //                         placeholder="Write phone number"
+//                         className="h-[38px] w-full rounded-[8px] border border-[#C8D1DD] bg-white px-[13px] text-[10px] font-medium text-[#25282D] outline-none placeholder:text-[#A0A5AD] focus:border-[#174B9B] focus:ring-2 focus:ring-[#174B9B]/10"
 //                       />
 //                     </div>
 
+//                     {/* Message */}
 //                     <div className="sm:col-span-2">
 //                       <label
 //                         htmlFor="question"
-//                         className="mb-1.5 block text-xs font-black uppercase tracking-wide text-slate-700"
+//                         className="mb-[8px] block text-[13px] font-semibold leading-none text-[#25282D]"
 //                       >
-//                         Ask your questions
+//                         Message
 //                       </label>
 
 //                       <textarea
-//                         rows={4}
 //                         id="question"
-//                         className={inputClass}
-//                         placeholder="Write question here"
+//                         placeholder="Write message"
+//                         className="h-[172px] w-full resize-none rounded-[8px] border border-[#C8D1DD] bg-white px-[13px] py-[12px] text-[10px] font-medium leading-[16px] text-[#25282D] outline-none placeholder:text-[#A0A5AD] focus:border-[#174B9B] focus:ring-2 focus:ring-[#174B9B]/10"
 //                       />
 //                     </div>
 
+//                     {/* Submit */}
 //                     <div className="sm:col-span-2">
 //                       <button
 //                         type="submit"
-//                         className={cn(primaryBtn, "w-full sm:w-auto")}
+//                         className="inline-flex h-[40px] min-w-[82px] items-center justify-center rounded-[7px] bg-[#E4223C] px-[20px] text-[13px] font-bold text-white transition-colors duration-300 hover:bg-[#C91830]"
 //                       >
 //                         Submit
 //                       </button>
@@ -734,34 +1004,50 @@
 //               </div>
 //             </div>
 
-//             <div className="lg:col-span-7">
-//               <div className="space-y-2.5">
-//                 {faqs.map((faq, index) => (
+//             {/* Right accordion */}
+//             <div className="space-y-[20px]">
+//               {faqs.map((faq, index) => {
+//                 const isOpen = openFaq === index;
+
+//                 return (
 //                   <div
 //                     key={index}
-//                     className="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm"
+//                     className="overflow-hidden rounded-[8px] bg-[#F4F6F9]"
 //                   >
 //                     <button
 //                       type="button"
-//                       onClick={() =>
-//                         setOpenFaq(openFaq === index ? null : index)
-//                       }
-//                       className="flex w-full items-center justify-between gap-4 px-4 py-3.5 text-left text-sm font-black text-blue-900 transition hover:bg-slate-50"
+//                       onClick={() => setOpenFaq(isOpen ? null : index)}
+//                       aria-expanded={isOpen}
+//                       className="flex min-h-[64px] w-full items-center justify-between gap-5 rounded-[8px] bg-[#194A99] px-[25px] py-[16px] text-left transition-colors duration-300 hover:bg-[#123F86]"
 //                     >
-//                       <span>{faq.q}</span>
-//                       <span className="text-xl leading-none">
-//                         {openFaq === index ? "−" : "+"}
+//                       <span className="text-[16px] font-extrabold leading-[19px] text-white">
+//                         {faq.q}
+//                       </span>
+
+//                       <span className="flex h-[20px] w-[20px] shrink-0 items-center justify-center text-[18px] font-normal leading-none text-white">
+//                         {isOpen ? "−" : "+"}
 //                       </span>
 //                     </button>
 
-//                     {openFaq === index && (
-//                       <div className="border-t border-slate-100 px-4 py-3.5 text-sm font-medium leading-6 text-slate-600">
-//                         {faq.a}
+//                     {isOpen && (
+//                       <div className="bg-[#F4F6F9] px-[16px] pb-[18px] pt-[14px]">
+//                         <p className="text-[14px] font-medium leading-[18px] text-[#4F555E]">
+//                           {faq.a}
+//                         </p>
+
+//                         {faq.link && (
+//                           <Link
+//                             href="#"
+//                             className="mt-[12px] inline-block text-[13px] font-medium text-[#194A99] underline underline-offset-2"
+//                           >
+//                             {faq.link}
+//                           </Link>
+//                         )}
 //                       </div>
 //                     )}
 //                   </div>
-//                 ))}
-//               </div>
+//                 );
+//               })}
 //             </div>
 //           </div>
 //         </div>
@@ -900,9 +1186,6 @@
 //   );
 // }
 
-
-
-
 "use client";
 
 import Image from "next/image";
@@ -922,6 +1205,7 @@ import Navbar from "@/components/navbar";
 import Testimonials from "@/components/testimonials";
 
 import blogImg from "../../public/image/blog.jpg";
+import heroBg from "../../public/image/hero-bg.jpg";
 import broomLogo from "../../public/image/broomLogo.png";
 import carAnime from "../../public/image/car-animate.gif";
 import googleLogo from "../../public/image/googleLogo.png";
@@ -941,6 +1225,7 @@ import instruc1 from "../../public/image/instrac1.png";
 import instruc2 from "../../public/image/instrac2.png";
 import instruc3 from "../../public/image/instrac3.png";
 import instruc4 from "../../public/image/instrac4.png";
+import drivingInstructor from "../../public/image/driving-instructor.webp";
 
 import hser1 from "../../public/image/hser1.png";
 import hser2 from "../../public/image/hser2.png";
@@ -1131,110 +1416,145 @@ export default function Home() {
   const [openFaq, setOpenFaq] = useState(0);
 
   return (
-    <>
+    <div className="permisgo-page">
+      <style jsx global>{`
+        .permisgo-page button,
+        .permisgo-page a[class*="inline-flex"],
+        .permisgo-page
+          a[class*="flex"][class*="items-center"][class*="justify-center"] {
+          transition-property:
+            background-color, border-color, color, transform, box-shadow;
+          transition-duration: 300ms;
+          transition-timing-function: ease;
+        }
+
+        .permisgo-page button:hover,
+        .permisgo-page a[class*="inline-flex"]:hover,
+        .permisgo-page
+          a[class*="flex"][class*="items-center"][class*="justify-center"]:hover {
+          background-color: #2bbf3a !important;
+          border-color: #2bbf3a !important;
+          color: #ffffff !important;
+          box-shadow: 0 8px 20px rgba(43, 191, 58, 0.28) !important;
+        }
+      `}</style>
+
       <Navbar />
 
-      {/* Hero */}
-      <section className="relative overflow-hidden bg-blue-950 bg-[url('/image/hero-bg.jpg')] bg-cover bg-center bg-no-repeat">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-950 via-blue-900/90 to-blue-800/60" />
-        <div className="absolute -left-20 top-20 h-60 w-60 rounded-full bg-blue-500/20 blur-3xl" />
-        <div className="absolute -right-20 bottom-8 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
+      {/* Hero Section */}
+      <section className="relative overflow-hidden bg-[#08275f]">
+        {/* Background image */}
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: `url(${heroBg.src})`,
+          }}
+        />
 
-        <div className={cn(container, "relative")}>
-          <div className="grid min-h-[520px] grid-cols-1 items-center gap-8 py-10 md:py-12 lg:grid-cols-12 lg:py-14">
-            <div className="lg:col-span-5">
-              <div className="max-w-lg">
-                <h5 className="inline-flex rounded-full bg-white/10 px-3.5 py-1.5 text-xs font-bold text-white shadow-sm ring-1 ring-white/20">
+        {/* Very light overlay */}
+        <div className="pointer-events-none absolute inset-0 bg-[#00132f]/10" />
+
+        <div className="relative z-10 mx-auto w-full max-w-[1320px] px-5 sm:px-7 lg:px-8">
+          <div className="relative min-h-[520px] py-8 sm:py-10 lg:h-[520px] lg:py-[30px]">
+            {/* Left content */}
+            <div className="relative z-20 w-full lg:w-[59%]">
+              {/* Approval badge */}
+              <div className="inline-flex min-h-[28px] items-center justify-center rounded-full bg-gradient-to-r from-[#2476ef] to-[#a142e9] px-4 py-1.5 shadow-md">
+                <span className="text-[10px] font-bold leading-none text-white sm:text-[11px]">
                   Approved by the prefecture E 25 093 0029 0
-                </h5>
+                </span>
+              </div>
 
-                <h1 className="mt-5 text-3xl font-black leading-tight tracking-tight text-white sm:text-4xl lg:text-5xl">
-                  Conduisez vers la liberté, Per|
-                </h1>
+              {/* Heading */}
+              <h1 className="mt-3 max-w-[680px] text-[31px] font-black leading-[1.12] tracking-[-0.7px] text-white drop-shadow-sm sm:text-[36px] lg:text-[39px] xl:text-[42px]">
+                Conduisez vers la liberté, Per|
+              </h1>
 
-                <p className="mt-4 max-w-md text-base font-medium leading-7 text-white/85">
-                  Comprehensive training, guaranteed safety.
-                </p>
+              {/* Description */}
+              <p className="mt-6 max-w-[460px] text-[12px] font-medium leading-5 text-white/95 sm:text-[13px]">
+                Comprehensive training, guaranteed safety.
+              </p>
 
-                <div className="mt-6 flex flex-wrap gap-3">
-                  <Link href="#" className={primaryBtn}>
-                    Start the courses
-                  </Link>
+              {/* Main button */}
+              <div className="mt-4">
+                <Link
+                  href="#"
+                  className="inline-flex h-[39px] items-center justify-center rounded-[7px] bg-[#ef233c] px-[19px] text-[11px] font-extrabold text-white shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#d71934] hover:shadow-lg"
+                >
+                  Start the courses
+                </Link>
+              </div>
 
-                  <Link
-                    href="#"
-                    className="inline-flex items-center justify-center rounded-full border border-white/30 bg-white/10 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition duration-300 hover:bg-white hover:text-blue-900"
+              {/* Offer cards */}
+              <div className="mt-7 flex w-full max-w-[345px] flex-col gap-3">
+                {[
+                  {
+                    title: "Driving License 13H From",
+                    oldPrice: "€850",
+                    price: "€749",
+                  },
+                  {
+                    title: "Highway Code from",
+                    oldPrice: "€50",
+                    price: "€30",
+                  },
+                ].map((offer, index) => (
+                  <div
+                    key={offer.title}
+                    className="relative min-h-[112px] overflow-hidden rounded-[9px] border border-[#9ab8ea] bg-[#05275c]/45 px-4 py-3 text-white shadow-[0_8px_25px_rgba(0,0,0,0.12)] backdrop-blur-[1px]"
                   >
-                    Inscription
-                  </Link>
-                </div>
+                    {/* Card top */}
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <h4 className="text-[13px] font-extrabold leading-[18px] text-white">
+                          {offer.title}
+                        </h4>
 
-                <div className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-                  {[
-                    {
-                      title: "Driving License 13H From",
-                      oldPrice: "€850",
-                      price: "€749",
-                    },
-                    {
-                      title: "Highway code from",
-                      oldPrice: "€50",
-                      price: "€30",
-                    },
-                  ].map((offer, index) => (
-                    <div
-                      key={index}
-                      className="rounded-2xl border border-white/15 bg-white/10 p-4 text-white shadow-lg backdrop-blur transition duration-300 hover:bg-white/15"
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <h4 className="text-sm font-bold leading-5 text-white">
-                            {offer.title}
-                          </h4>
-
-                          <p className="mt-1 text-base font-bold text-orange-400 line-through">
-                            {offer.oldPrice}
-                          </p>
-                        </div>
-
-                        <Image
-                          src={batch}
-                          alt="Offer badge"
-                          sizes="48px"
-                          className="h-auto w-10"
-                        />
+                        <p className="mt-1 text-[11px] font-bold text-[#27d26b] line-through">
+                          {offer.oldPrice}
+                        </p>
                       </div>
 
-                      <div className="mt-4 flex items-end justify-between gap-3">
-                        <div>
-                          <small className="text-xs font-medium text-white/70">
-                            of the
-                          </small>
-                          <h3 className="text-3xl font-black leading-none text-white">
-                            {offer.price}
-                          </h3>
-                        </div>
-
-                        <Link
-                          href="#"
-                          className="rounded-full bg-white px-3.5 py-2 text-xs font-bold text-blue-900 transition hover:bg-blue-600 hover:text-white"
-                        >
-                          Permit Offer
-                        </Link>
-                      </div>
+                      <Image
+                        src={batch}
+                        alt={`${offer.title} badge`}
+                        sizes="40px"
+                        className="h-auto w-[36px] shrink-0 opacity-80"
+                      />
                     </div>
-                  ))}
-                </div>
+
+                    {/* Card bottom */}
+                    <div className="mt-3 flex items-end justify-between gap-4">
+                      <div>
+                        <p className="text-[9px] font-medium leading-none text-white/80">
+                          of the
+                        </p>
+
+                        <h3 className="mt-1 text-[22px] font-black leading-none text-white">
+                          {offer.price}
+                        </h3>
+                      </div>
+
+                      <Link
+                        href="#"
+                        className="inline-flex h-[31px] items-center justify-center rounded-[7px] bg-[#ef233c] px-[14px] text-[10px] font-extrabold text-white shadow-sm transition-all duration-300 hover:bg-[#d71934] hover:shadow-md"
+                      >
+                        Permit Offer
+                      </Link>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 
-            <div className="lg:col-span-7">
+            {/* Right car image */}
+            <div className="relative z-10 mt-10 flex w-full items-end justify-center lg:absolute lg:bottom-0 lg:right-[-15px] lg:mt-0 lg:h-full lg:w-[58%] lg:justify-end">
               <Image
                 src={carAnime}
-                alt="Driving car animation"
+                alt="Driving school car"
                 priority
                 sizes="(max-width: 1024px) 100vw, 58vw"
-                className="ml-auto h-auto w-full max-w-2xl object-contain"
+                className="h-auto w-full max-w-[680px] object-contain object-bottom lg:max-h-[500px] xl:max-w-[750px]"
               />
             </div>
           </div>
@@ -1726,28 +2046,42 @@ export default function Home() {
       <Testimonials />
 
       {/* Instructor CTA */}
-      <section className="relative overflow-hidden bg-slate-900 bg-[url('/image/driving-instructor.webp')] bg-cover bg-top bg-no-repeat">
-        <div className="absolute inset-0 bg-black/70" />
+      {/* Instructor CTA */}
+      <section className="relative w-full overflow-hidden bg-slate-900">
+        <div className="relative w-full">
+          {/* Full-width image — no crop */}
+          <Image
+            src={drivingInstructor}
+            alt="Professional driving instructor"
+            priority
+            sizes="100vw"
+            className="block h-auto w-full"
+          />
 
-        <div
-          className={cn(
-            container,
-            "relative flex min-h-[430px] items-end justify-center py-12 lg:min-h-[560px]",
-          )}
-        >
-          <div className="max-w-2xl text-center">
-            <h3 className="text-2xl font-black leading-tight tracking-tight text-white sm:text-3xl lg:text-4xl">
-              Are you a driving instructor? And super friendly?
-            </h3>
+          {/* Overlay */}
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-black/5" />
 
-            <p className="mt-3 text-base font-medium text-white/85">
-              Become a freelance driving instructor.
-            </p>
+          {/* Content */}
+          <div className="absolute inset-0 z-10 flex items-end justify-center">
+            <div className="w-full px-4 pb-4 text-center sm:px-6 sm:pb-7 md:pb-10 lg:pb-14">
+              <div className="mx-auto max-w-3xl">
+                <h3 className="text-[18px] font-black leading-tight tracking-tight text-white drop-shadow-lg sm:text-2xl md:text-3xl lg:text-4xl">
+                  Are you a driving instructor? And super friendly?
+                </h3>
 
-            <div className="mt-6">
-              <Link href="#" className={primaryBtn}>
-                Join us a driving instructor
-              </Link>
+                <p className="mx-auto mt-2 max-w-xl text-xs font-medium leading-5 text-white/90 drop-shadow sm:mt-3 sm:text-sm md:text-base">
+                  Become a freelance driving instructor.
+                </p>
+
+                <div className="mt-3 flex justify-center sm:mt-5 md:mt-6">
+                  <Link
+                    href="#"
+                    className="inline-flex min-h-[38px] items-center justify-center rounded-full bg-blue-600 px-4 py-2 text-[11px] font-bold text-white shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#2BBF3A] hover:text-white hover:shadow-lg sm:min-h-[42px] sm:px-6 sm:text-sm"
+                  >
+                    Join us as a driving instructor
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -2073,6 +2407,6 @@ export default function Home() {
       </section>
 
       <Footer />
-    </>
+    </div>
   );
 }

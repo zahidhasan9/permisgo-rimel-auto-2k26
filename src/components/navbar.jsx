@@ -193,7 +193,10 @@ const Navbar = () => {
         {/* Main Navbar */}
         <div className="bg-[#174a9b] shadow-[0_10px_30px_rgba(16,54,119,0.18)]">
           <div className="mx-auto flex h-[72px] max-w-[1320px] items-center justify-between px-4 sm:px-6 lg:px-8">
-            <Link href="/" className="flex h-full shrink-0 items-center bg-[#123f86] px-4 sm:px-5">
+            <Link
+              href="/"
+              className="flex h-full shrink-0 items-center  px-4 sm:px-5"
+            >
               <Image
                 src={Logo}
                 alt="Permisgo Logo"
@@ -219,7 +222,7 @@ const Navbar = () => {
 
             <div className="hidden shrink-0 items-center gap-3 md:flex">
               <Link
-                href="/login"
+                href="/user-login"
                 className="rounded-[10px] bg-[#e2233d] px-7 py-2.5 text-[14px] font-semibold text-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-white hover:text-[#174a9b]"
               >
                 Login

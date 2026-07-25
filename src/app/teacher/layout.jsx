@@ -43,7 +43,7 @@
 
 "use client";
 
-// import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import DashboardTopbar from "@/components/layout/DashboardTopbar";
 import TeacherSidebar from "@/components/layout/TeacherSidebar";
 import { useState } from "react";
@@ -52,7 +52,7 @@ export default function TeacherLayout({ children }) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-   // <ProtectedRoute allowedRoles={["teacher"]}>
+    <ProtectedRoute allowedRoles={["teacher"]}>
       <div className="flex h-screen overflow-hidden bg-gray-100">
         {/* DESKTOP SIDEBAR */}
         <TeacherSidebar variant="desktop" />
@@ -83,6 +83,6 @@ export default function TeacherLayout({ children }) {
           </>
         )}
       </div>
-   //</ProtectedRoute>
+    </ProtectedRoute>
   );
 }
