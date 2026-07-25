@@ -102,7 +102,7 @@ const Footer = () => {
 
       {/* Car Image */}
       <section className="bg-[#eef3fb]">
-        <div className="mx-auto flex max-w-7xl justify-end px-4 pt-8 sm:px-6 lg:px-8 lg:pt-[72px]">
+        <div className="mx-auto flex  max-w-[1320px] justify-end px-4 pt-8 sm:px-6 lg:px-8 lg:pt-[72px]">
           <Image
             src={downCar}
             alt="Car"
@@ -167,7 +167,7 @@ const Footer = () => {
                   </li>
 
                   <li className="flex items-start gap-3">
-                    <span className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-white">
+                    <span className=" flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-white">
                       <GrLocation />
                     </span>
                     <span className="leading-7">
@@ -197,11 +197,11 @@ const Footer = () => {
                   <button
                     type="button"
                     onClick={() => setOpenTime(!openTime)}
-                    className="flex w-full items-center justify-between rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-left text-[14px] leading-6 text-white backdrop-blur-md transition-all duration-300 hover:bg-white/15"
+                    className="flex w-full items-center justify-between rounded-xl border border-white/15 bg-white/10 px-3 py-3 text-left text-[14px] leading-6 text-white backdrop-blur-md transition-all duration-300 hover:bg-white/15"
                   >
                     <span>{openingTimes[0]}</span>
                     <IoChevronDown
-                      className={`ml-3 shrink-0 text-xl transition-transform duration-300 ${
+                      className={` shrink-0 text-xl transition-transform duration-300 ${
                         openTime ? "rotate-180" : ""
                       }`}
                     />
@@ -280,7 +280,7 @@ const Footer = () => {
         {/* Copyright */}
         <div className="border-t border-white/10 bg-[#0b2b60] px-4 py-5 pb-20 sm:px-6 md:pb-5 lg:px-8">
           <div className="mx-auto max-w-7xl">
-            <div className="flex flex-col items-center justify-between gap-4 lg:flex-row">
+            <div className="flex flex-col items-center justify-between gap-4 ">
               <ul className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
                 {supportLinks.map((link, index) => (
                   <li key={index}>

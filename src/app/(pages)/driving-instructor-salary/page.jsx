@@ -19,7 +19,7 @@ export default function DrivingInstructorSalaryPage() {
   return (
     <main className="overflow-hidden bg-white text-[#202124]">
       <section className="bg-[#eaf0f9]">
-        <div className="mx-auto grid min-h-[560px] max-w-[1280px] grid-cols-[minmax(0,1fr)] items-center gap-10 px-5 py-14 sm:px-8 md:grid-cols-2 lg:px-10">
+        <div className="mx-auto grid min-h-[560px] max-w-[1280px] grid-cols-[minmax(0,1fr)] items-center gap-10 px-5 py-14  md:grid-cols-2 ">
           <div className="max-w-[650px]">
             <h1 className="text-[35px] font-bold leading-[1.2] tracking-[-0.025em] text-[#202124] sm:text-[41px] lg:text-[44px]">
               Calculate your salary as a

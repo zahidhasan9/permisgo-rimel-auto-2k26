@@ -505,7 +505,7 @@ export default function ChangePasswordPage() {
 
   return (
     <main className="min-h-screen bg-white px-4 py-5 sm:px-6 sm:py-6">
-      <div className="mx-auto w-full max-w-[1160px]">
+      <div className="mx-auto w-full ">
         {/* HEADER */}
         <header>
           <div className="flex items-center gap-4">

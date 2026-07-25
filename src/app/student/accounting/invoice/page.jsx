@@ -17,7 +17,7 @@ const invoices = Array.from({ length: 10 }, (_, i) => ({
 export default function Page() {
   return (
     <main className="min-h-screen bg-[#f6f7fb] px-6 py-6 text-[#111827]">
-      <div className="mx-auto max-w-[1100px] space-y-5">
+      <div className="mx-auto  space-y-5">
         {/* HEADER */}
         <header className="flex items-center gap-3">
           <Link

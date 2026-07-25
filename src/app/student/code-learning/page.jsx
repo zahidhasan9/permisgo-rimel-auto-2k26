@@ -2,33 +2,421 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { IoChevronBack, IoChevronForward, IoTimeOutline } from "react-icons/io5";
-import { getLearningContents, getMyExams, getMyQuizAttempts, getQuizzes } from "@/features/API";
+import {
+  IoChevronBack,
+  IoChevronForward,
+  IoTimeOutline,
+} from "react-icons/io5";
+import {
+  getLearningContents,
+  getMyExams,
+  getMyQuizAttempts,
+  getQuizzes,
+} from "@/features/API";
 
-const tabs=["Learn","Evaluations","Exams"];
-const array=(response)=>Array.isArray(response?.data?.data)?response.data.data:Array.isArray(response?.data)?response.data:[];
-const progressValue=(lesson)=>lesson.progress?.status==="completed"?100:Number(lesson.progress?.readPercent||0);
+const tabs = ["Learn", "Evaluations", "Exams"];
+const array = (response) =>
+  Array.isArray(response?.data?.data)
+    ? response.data.data
+    : Array.isArray(response?.data)
+      ? response.data
+      : [];
+const progressValue = (lesson) =>
+  lesson.progress?.status === "completed"
+    ? 100
+    : Number(lesson.progress?.readPercent || 0);
 
-export default function CodeLearningPage(){const router=useRouter();const[tab,setTab]=useState("Learn");const[lessons,setLessons]=useState([]);const[quizzes,setQuizzes]=useState([]);const[attempts,setAttempts]=useState([]);const[exams,setExams]=useState([]);const[loading,setLoading]=useState(true);const[error,setError]=useState("");
-useEffect(()=>{Promise.allSettled([getLearningContents({type:"code-ebook"}),getQuizzes(),getMyQuizAttempts(),getMyExams()]).then(([learning,quiz,attempt,exam])=>{if(learning.status==="fulfilled")setLessons(array(learning.value));else setError("Learning data could not be loaded.");if(quiz.status==="fulfilled")setQuizzes(array(quiz.value));if(attempt.status==="fulfilled")setAttempts(array(attempt.value));if(exam.status==="fulfilled")setExams(array(exam.value));}).finally(()=>setLoading(false));},[]);
-useEffect(()=>{const requested=new URLSearchParams(window.location.search).get("tab");if(requested==="evaluations")setTab("Evaluations");if(requested==="exams")setTab("Exams");},[]);
-const topics=useMemo(()=>Object.values(lessons.reduce((all,lesson)=>{const name=lesson.category||"General";if(!all[name])all[name]={name,lessons:[]};all[name].lessons.push(lesson);return all;},{})).map((topic)=>({...topic,progress:topic.lessons.length?Math.round(topic.lessons.reduce((sum,item)=>sum+progressValue(item),0)/topic.lessons.length):0})),[lessons]);
-const overall=lessons.length?Math.round(lessons.reduce((sum,item)=>sum+progressValue(item),0)/lessons.length):0;
-const current=useMemo(()=>[...lessons].filter((item)=>item.progress).sort((a,b)=>new Date(b.progress?.lastViewedAt||0)-new Date(a.progress?.lastViewedAt||0))[0]||lessons[0],[lessons]);
-const evaluations=quizzes.filter((quiz)=>quiz.type==="evaluation");
-if(loading)return <main className="min-h-screen bg-white p-6"><div className="mx-auto h-[700px] max-w-[1092px] animate-pulse rounded-2xl bg-[#e8eef7]"/></main>;
-return <main className="min-h-screen overflow-x-hidden bg-white px-3 py-6 sm:px-6"><div className="mx-auto max-w-[1092px]"><header className="flex items-center gap-4"><button onClick={()=>router.back()} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#e8edf5]"><IoChevronBack size={25}/></button><h1 className="text-[22px] font-semibold text-[#173f87] sm:text-[25px]">Traffic Laws</h1></header>
-<nav className="mt-8 flex flex-wrap gap-3">{tabs.map((item)=><button key={item} onClick={()=>item==="Exams"?window.location.assign("https://app.klaxo.fr/mon-compte/connecter"):setTab(item)} className={`h-10 rounded-xl border border-[#174a9b] text-sm font-bold ${item==="Learn"?"w-[88px]":item==="Evaluations"?"w-[132px]":"w-[95px]"} ${tab===item?"bg-[#bdd5fa] text-[#173f87]":"bg-white text-black"}`}>{item}</button>)}</nav>{error&&<p className="mt-5 rounded-xl bg-red-50 p-4 text-red-700">{error}</p>}
-{tab==="Learn"&&<div className="mt-8 grid min-w-0 gap-5 lg:grid-cols-[344px_minmax(0,1fr)]"><aside className="min-w-0"><section className="flex min-h-[443px] flex-col items-center justify-center rounded-2xl bg-[#e8eef7] p-6"><div className="relative flex h-[230px] w-[230px] items-center justify-center rounded-full" style={{background:`conic-gradient(#174596 ${overall*3.6}deg,#fff 0)`}}><div className="flex h-[207px] w-[207px] items-center justify-center rounded-full bg-[#e8eef7]"><span className="text-5xl font-bold text-[#174596]">{overall}%</span></div></div><h2 className="mt-10 text-2xl font-bold">Revision progress</h2></section>{current&&<section className="mt-5 rounded-2xl bg-[#194997] p-6 text-white"><h2 className="break-words text-2xl font-bold">{current.title}</h2><p className="mt-5 break-words text-sm leading-6 text-blue-50">{current.subtitle||current.description||"Continue your traffic law revision lesson."}</p><p className="mt-3 flex items-center gap-1.5 text-sm"><IoTimeOutline size={19}/>{current.readMinutes||0} Minutes</p><Link href={`/student/code/code-ebook/lesson/${current._id}`} className="mt-10 inline-flex rounded-lg bg-[#e3263c] px-3 py-2 text-xs font-bold">Continue Courses</Link></section>}</aside>
-<section className="min-h-[708px] min-w-0 rounded-2xl bg-[#e8eef7] p-4 sm:p-6"><h2 className="text-2xl font-bold">Revision Topics</h2><div className="mt-7 space-y-4">{topics.length?topics.map((topic)=>{const next=topic.lessons.find((item)=>item.progress?.status!=="completed")||topic.lessons[0];return <Link key={topic.name} href={`/student/code/code-ebook/lesson/${next._id}`} className="grid min-w-0 grid-cols-[70px_minmax(0,1fr)] gap-3"><div className="flex min-h-[85px] items-center justify-center rounded-xl bg-white"><span className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-[#174596] text-sm font-bold text-[#174596]">{topic.progress}%</span></div><div className="flex min-h-[85px] min-w-0 items-center justify-between gap-3 rounded-xl bg-white px-4 py-4"><div className="min-w-0"><h3 className="break-words font-bold">{topic.name}</h3><p className="mt-2 text-sm text-slate-500">{String(topic.lessons.length).padStart(2,"0")} Lessons</p></div><IoChevronForward className="shrink-0 text-slate-400"/></div></Link>}):<Empty text="No revision topics available."/>}</div></section></div>}
-{tab==="Evaluations"&&<EvaluationTab quizzes={quizzes} attempts={attempts}/>} 
-{tab==="Exams"&&<Panel title="Exams">{exams.length?exams.map((exam)=><Row key={exam._id} title={`${exam.examType||"Code"} Exam`} meta={`${String(exam.status||"not scheduled").replaceAll("_"," ")}${exam.examDate?` · ${new Date(exam.examDate).toLocaleDateString()}`:""}`} actionHref="/student/driving-operation/demand-driving-exam" action="View"/>):<Empty text="No exams requested yet."/>}</Panel>}
-</div></main>}
-function Panel({title,children}){return <section className="mt-8 rounded-2xl bg-[#e8eef7] p-4 sm:p-6"><h2 className="text-2xl font-bold">{title}</h2><div className="mt-6 grid gap-4 md:grid-cols-2">{children}</div></section>}
-function Row({title,meta,actionHref,action}){return <article className="flex min-w-0 flex-col gap-4 rounded-xl bg-white p-5 sm:flex-row sm:items-center sm:justify-between"><div className="min-w-0"><h3 className="break-words font-bold">{title}</h3><p className="mt-2 text-sm capitalize text-slate-500">{meta}</p></div><Link href={actionHref} className="shrink-0 rounded-lg bg-[#e3263c] px-5 py-2.5 text-center text-xs font-bold text-white">{action}</Link></article>}
-function Empty({text}){return <p className="rounded-xl bg-white p-8 text-center text-slate-500 md:col-span-2">{text}</p>}
+export default function CodeLearningPage() {
+  const router = useRouter();
+  const [tab, setTab] = useState("Learn");
+  const [lessons, setLessons] = useState([]);
+  const [quizzes, setQuizzes] = useState([]);
+  const [attempts, setAttempts] = useState([]);
+  const [exams, setExams] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  useEffect(() => {
+    Promise.allSettled([
+      getLearningContents({ type: "code-ebook" }),
+      getQuizzes(),
+      getMyQuizAttempts(),
+      getMyExams(),
+    ])
+      .then(([learning, quiz, attempt, exam]) => {
+        if (learning.status === "fulfilled") setLessons(array(learning.value));
+        else setError("Learning data could not be loaded.");
+        if (quiz.status === "fulfilled") setQuizzes(array(quiz.value));
+        if (attempt.status === "fulfilled") setAttempts(array(attempt.value));
+        if (exam.status === "fulfilled") setExams(array(exam.value));
+      })
+      .finally(() => setLoading(false));
+  }, []);
+  useEffect(() => {
+    const requested = new URLSearchParams(window.location.search).get("tab");
+    if (requested === "evaluations") setTab("Evaluations");
+    if (requested === "exams") setTab("Exams");
+  }, []);
+  const topics = useMemo(
+    () =>
+      Object.values(
+        lessons.reduce((all, lesson) => {
+          const name = lesson.category || "General";
+          if (!all[name]) all[name] = { name, lessons: [] };
+          all[name].lessons.push(lesson);
+          return all;
+        }, {}),
+      ).map((topic) => ({
+        ...topic,
+        progress: topic.lessons.length
+          ? Math.round(
+              topic.lessons.reduce(
+                (sum, item) => sum + progressValue(item),
+                0,
+              ) / topic.lessons.length,
+            )
+          : 0,
+      })),
+    [lessons],
+  );
+  const overall = lessons.length
+    ? Math.round(
+        lessons.reduce((sum, item) => sum + progressValue(item), 0) /
+          lessons.length,
+      )
+    : 0;
+  const current = useMemo(
+    () =>
+      [...lessons]
+        .filter((item) => item.progress)
+        .sort(
+          (a, b) =>
+            new Date(b.progress?.lastViewedAt || 0) -
+            new Date(a.progress?.lastViewedAt || 0),
+        )[0] || lessons[0],
+    [lessons],
+  );
+  const evaluations = quizzes.filter((quiz) => quiz.type === "evaluation");
+  if (loading)
+    return (
+      <main className="min-h-screen bg-white p-6">
+        <div className="mx-auto h-[700px] max-w-[1092px] animate-pulse rounded-2xl bg-[#e8eef7]" />
+      </main>
+    );
+  return (
+    <main className="min-h-screen overflow-x-hidden bg-white px-3 py-6 sm:px-6">
+      <div className="mx-auto ">
+        <header className="flex items-center gap-4">
+          <button
+            onClick={() => router.back()}
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#e8edf5]"
+          >
+            <IoChevronBack size={25} />
+          </button>
+          <h1 className="text-[22px] font-semibold text-[#173f87] sm:text-[25px]">
+            Traffic Laws
+          </h1>
+        </header>
+        <nav className="mt-8 flex flex-wrap gap-3">
+          {tabs.map((item) => (
+            <button
+              key={item}
+              onClick={() =>
+                item === "Exams"
+                  ? window.location.assign(
+                      "https://app.klaxo.fr/mon-compte/connecter",
+                    )
+                  : setTab(item)
+              }
+              className={`h-10 rounded-xl border border-[#174a9b] text-sm font-bold ${item === "Learn" ? "w-[88px]" : item === "Evaluations" ? "w-[132px]" : "w-[95px]"} ${tab === item ? "bg-[#bdd5fa] text-[#173f87]" : "bg-white text-black"}`}
+            >
+              {item}
+            </button>
+          ))}
+        </nav>
+        {error && (
+          <p className="mt-5 rounded-xl bg-red-50 p-4 text-red-700">{error}</p>
+        )}
+        {tab === "Learn" && (
+          <div className="mt-8 grid min-w-0 gap-5 lg:grid-cols-[344px_minmax(0,1fr)]">
+            <aside className="min-w-0">
+              <section className="flex min-h-[443px] flex-col items-center justify-center rounded-2xl bg-[#e8eef7] p-6">
+                <div
+                  className="relative flex h-[230px] w-[230px] items-center justify-center rounded-full"
+                  style={{
+                    background: `conic-gradient(#174596 ${overall * 3.6}deg,#fff 0)`,
+                  }}
+                >
+                  <div className="flex h-[207px] w-[207px] items-center justify-center rounded-full bg-[#e8eef7]">
+                    <span className="text-5xl font-bold text-[#174596]">
+                      {overall}%
+                    </span>
+                  </div>
+                </div>
+                <h2 className="mt-10 text-2xl font-bold">Revision progress</h2>
+              </section>
+              {current && (
+                <section className="mt-5 rounded-2xl bg-[#194997] p-6 text-white">
+                  <h2 className="break-words text-2xl font-bold">
+                    {current.title}
+                  </h2>
+                  <p className="mt-5 break-words text-sm leading-6 text-blue-50">
+                    {current.subtitle ||
+                      current.description ||
+                      "Continue your traffic law revision lesson."}
+                  </p>
+                  <p className="mt-3 flex items-center gap-1.5 text-sm">
+                    <IoTimeOutline size={19} />
+                    {current.readMinutes || 0} Minutes
+                  </p>
+                  <Link
+                    href={`/student/code/code-ebook/lesson/${current._id}`}
+                    className="mt-10 inline-flex rounded-lg bg-[#e3263c] px-3 py-2 text-xs font-bold"
+                  >
+                    Continue Courses
+                  </Link>
+                </section>
+              )}
+            </aside>
+            <section className="min-h-[708px] min-w-0 rounded-2xl bg-[#e8eef7] p-4 sm:p-6">
+              <h2 className="text-2xl font-bold">Revision Topics</h2>
+              <div className="mt-7 space-y-4">
+                {topics.length ? (
+                  topics.map((topic) => {
+                    const next =
+                      topic.lessons.find(
+                        (item) => item.progress?.status !== "completed",
+                      ) || topic.lessons[0];
+                    return (
+                      <Link
+                        key={topic.name}
+                        href={`/student/code/code-ebook/lesson/${next._id}`}
+                        className="grid min-w-0 grid-cols-[70px_minmax(0,1fr)] gap-3"
+                      >
+                        <div className="flex min-h-[85px] items-center justify-center rounded-xl bg-white">
+                          <span className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-[#174596] text-sm font-bold text-[#174596]">
+                            {topic.progress}%
+                          </span>
+                        </div>
+                        <div className="flex min-h-[85px] min-w-0 items-center justify-between gap-3 rounded-xl bg-white px-4 py-4">
+                          <div className="min-w-0">
+                            <h3 className="break-words font-bold">
+                              {topic.name}
+                            </h3>
+                            <p className="mt-2 text-sm text-slate-500">
+                              {String(topic.lessons.length).padStart(2, "0")}{" "}
+                              Lessons
+                            </p>
+                          </div>
+                          <IoChevronForward className="shrink-0 text-slate-400" />
+                        </div>
+                      </Link>
+                    );
+                  })
+                ) : (
+                  <Empty text="No revision topics available." />
+                )}
+              </div>
+            </section>
+          </div>
+        )}
+        {tab === "Evaluations" && (
+          <EvaluationTab quizzes={quizzes} attempts={attempts} />
+        )}
+        {tab === "Exams" && (
+          <Panel title="Exams">
+            {exams.length ? (
+              exams.map((exam) => (
+                <Row
+                  key={exam._id}
+                  title={`${exam.examType || "Code"} Exam`}
+                  meta={`${String(exam.status || "not scheduled").replaceAll("_", " ")}${exam.examDate ? ` · ${new Date(exam.examDate).toLocaleDateString()}` : ""}`}
+                  actionHref="/student/driving-operation/demand-driving-exam"
+                  action="View"
+                />
+              ))
+            ) : (
+              <Empty text="No exams requested yet." />
+            )}
+          </Panel>
+        )}
+      </div>
+    </main>
+  );
+}
+function Panel({ title, children }) {
+  return (
+    <section className="mt-8 rounded-2xl bg-[#e8eef7] p-4 sm:p-6">
+      <h2 className="text-2xl font-bold">{title}</h2>
+      <div className="mt-6 grid gap-4 md:grid-cols-2">{children}</div>
+    </section>
+  );
+}
+function Row({ title, meta, actionHref, action }) {
+  return (
+    <article className="flex min-w-0 flex-col gap-4 rounded-xl bg-white p-5 sm:flex-row sm:items-center sm:justify-between">
+      <div className="min-w-0">
+        <h3 className="break-words font-bold">{title}</h3>
+        <p className="mt-2 text-sm capitalize text-slate-500">{meta}</p>
+      </div>
+      <Link
+        href={actionHref}
+        className="shrink-0 rounded-lg bg-[#e3263c] px-5 py-2.5 text-center text-xs font-bold text-white"
+      >
+        {action}
+      </Link>
+    </article>
+  );
+}
+function Empty({ text }) {
+  return (
+    <p className="rounded-xl bg-white p-8 text-center text-slate-500 md:col-span-2">
+      {text}
+    </p>
+  );
+}
 
-function EvaluationTab({quizzes,attempts}){const mockQuizzes=quizzes.filter((quiz)=>quiz.type==="mock_test"||quiz.type==="evaluation");const completed=attempts.filter((item)=>item.status==="completed"&&(item.quiz?.type==="mock_test"||item.quiz?.type==="evaluation"));const average=completed.length?Math.round(completed.reduce((sum,item)=>sum+Number(item.percentage??item.score??0),0)/completed.length):0;const passed=completed.filter((item)=>item.passed).length;const recent=[...completed].sort((a,b)=>new Date(b.finishedAt||b.createdAt)-new Date(a.finishedAt||a.createdAt))[0];const firstQuiz=mockQuizzes[0];
-return <><section className="mt-8 rounded-2xl bg-[#e8eef7] p-4 sm:p-6"><div className="grid gap-6 md:grid-cols-2"><Summary title="Total Performance in Mock Exam" description="See your overall score and track your progress in traffic rules knowledge."><p>Score: {average}%</p><p>Total Mock Test: {completed.length}</p><p>Passed: {passed}</p>{firstQuiz?<Link href={`/student/code/code-challenge?quizId=${firstQuiz._id}`} className="mt-4 inline-flex rounded-lg bg-[#e3263c] px-3 py-2 text-xs font-bold text-white">Take Practice Test</Link>:<span className="mt-4 inline-flex rounded-lg bg-slate-300 px-3 py-2 text-xs font-bold text-white">No Test Available</span>}</Summary><Summary title="Recent Quiz Result" description="See your latest score and track your progress in traffic rules knowledge.">{recent?<><p>Latest Score: {Math.round(Number(recent.percentage??recent.score??0))}%</p><p>Correct Answers: {recent.correctCount||0} / {recent.totalQuestions||0}</p><p>Status: {recent.passed?"Passed":"Failed"}</p><Link href={`/student/code/results?attemptId=${recent._id}`} className="mt-4 inline-flex rounded-lg bg-[#e3263c] px-3 py-2 text-xs font-bold text-white">Review Answers</Link></>:<p className="text-slate-500">No completed quiz result yet.</p>}</Summary></div></section>
-<section className="mt-8 rounded-2xl bg-[#e8eef7] p-4 sm:p-6"><div className="rounded-xl bg-white p-4 sm:p-6"><h2 className="text-2xl font-bold text-[#173f87]">Mock Exam</h2><div className="mt-7 overflow-hidden rounded-lg bg-[#e8eef7]">{mockQuizzes.length?mockQuizzes.map((quiz)=>{const latest=attempts.find((item)=>String(item.quiz?._id||item.quiz)===String(quiz._id)&&item.status==="completed");const date=new Date(latest?.finishedAt||latest?.createdAt||quiz.createdAt||Date.now()).toLocaleDateString("en-GB",{day:"2-digit",month:"long",year:"numeric"});return <div key={quiz._id} className="grid gap-3 border-b border-slate-400 px-4 py-4 last:border-0 sm:grid-cols-[160px_1fr_1fr_145px] sm:items-center"><span className="w-fit rounded bg-[#bfd0eb] px-4 py-2 text-xs font-bold text-[#174596]">{date}</span><span className="text-sm font-semibold">{quiz.title}</span><span className="text-sm text-slate-500">Last Score: {latest?`${latest.correctCount||0}/${latest.totalQuestions||quiz.totalQuestions||0}`:`-/${quiz.totalQuestions||0}`}</span><Link href={latest?`/student/code/results?attemptId=${latest._id}`:`/student/code/code-challenge?quizId=${quiz._id}`} className="rounded-lg bg-[#e3263c] px-4 py-2.5 text-center text-xs font-bold text-white">{latest?"View Result":"Take The Exam"}</Link></div>}):<p className="p-8 text-center text-slate-500">No mock exams available.</p>}</div></div></section></>}
-function Summary({title,description,children}){return <article className="min-h-[261px] rounded-xl bg-white p-5 sm:p-6"><h2 className="text-xl font-bold">{title}</h2><p className="mt-5 max-w-md text-sm leading-6">{description}</p><div className="mt-3 text-sm leading-6">{children}</div></article>}
+function EvaluationTab({ quizzes, attempts }) {
+  const mockQuizzes = quizzes.filter(
+    (quiz) => quiz.type === "mock_test" || quiz.type === "evaluation",
+  );
+  const completed = attempts.filter(
+    (item) =>
+      item.status === "completed" &&
+      (item.quiz?.type === "mock_test" || item.quiz?.type === "evaluation"),
+  );
+  const average = completed.length
+    ? Math.round(
+        completed.reduce(
+          (sum, item) => sum + Number(item.percentage ?? item.score ?? 0),
+          0,
+        ) / completed.length,
+      )
+    : 0;
+  const passed = completed.filter((item) => item.passed).length;
+  const recent = [...completed].sort(
+    (a, b) =>
+      new Date(b.finishedAt || b.createdAt) -
+      new Date(a.finishedAt || a.createdAt),
+  )[0];
+  const firstQuiz = mockQuizzes[0];
+  return (
+    <>
+      <section className="mt-8 rounded-2xl bg-[#e8eef7] p-4 sm:p-6">
+        <div className="grid gap-6 md:grid-cols-2">
+          <Summary
+            title="Total Performance in Mock Exam"
+            description="See your overall score and track your progress in traffic rules knowledge."
+          >
+            <p>Score: {average}%</p>
+            <p>Total Mock Test: {completed.length}</p>
+            <p>Passed: {passed}</p>
+            {firstQuiz ? (
+              <Link
+                href={`/student/code/code-challenge?quizId=${firstQuiz._id}`}
+                className="mt-4 inline-flex rounded-lg bg-[#e3263c] px-3 py-2 text-xs font-bold text-white"
+              >
+                Take Practice Test
+              </Link>
+            ) : (
+              <span className="mt-4 inline-flex rounded-lg bg-slate-300 px-3 py-2 text-xs font-bold text-white">
+                No Test Available
+              </span>
+            )}
+          </Summary>
+          <Summary
+            title="Recent Quiz Result"
+            description="See your latest score and track your progress in traffic rules knowledge."
+          >
+            {recent ? (
+              <>
+                <p>
+                  Latest Score:{" "}
+                  {Math.round(Number(recent.percentage ?? recent.score ?? 0))}%
+                </p>
+                <p>
+                  Correct Answers: {recent.correctCount || 0} /{" "}
+                  {recent.totalQuestions || 0}
+                </p>
+                <p>Status: {recent.passed ? "Passed" : "Failed"}</p>
+                <Link
+                  href={`/student/code/results?attemptId=${recent._id}`}
+                  className="mt-4 inline-flex rounded-lg bg-[#e3263c] px-3 py-2 text-xs font-bold text-white"
+                >
+                  Review Answers
+                </Link>
+              </>
+            ) : (
+              <p className="text-slate-500">No completed quiz result yet.</p>
+            )}
+          </Summary>
+        </div>
+      </section>
+      <section className="mt-8 rounded-2xl bg-[#e8eef7] p-4 sm:p-6">
+        <div className="rounded-xl bg-white p-4 sm:p-6">
+          <h2 className="text-2xl font-bold text-[#173f87]">Mock Exam</h2>
+          <div className="mt-7 overflow-hidden rounded-lg bg-[#e8eef7]">
+            {mockQuizzes.length ? (
+              mockQuizzes.map((quiz) => {
+                const latest = attempts.find(
+                  (item) =>
+                    String(item.quiz?._id || item.quiz) === String(quiz._id) &&
+                    item.status === "completed",
+                );
+                const date = new Date(
+                  latest?.finishedAt ||
+                    latest?.createdAt ||
+                    quiz.createdAt ||
+                    Date.now(),
+                ).toLocaleDateString("en-GB", {
+                  day: "2-digit",
+                  month: "long",
+                  year: "numeric",
+                });
+                return (
+                  <div
+                    key={quiz._id}
+                    className="grid gap-3 border-b border-slate-400 px-4 py-4 last:border-0 sm:grid-cols-[160px_1fr_1fr_145px] sm:items-center"
+                  >
+                    <span className="w-fit rounded bg-[#bfd0eb] px-4 py-2 text-xs font-bold text-[#174596]">
+                      {date}
+                    </span>
+                    <span className="text-sm font-semibold">{quiz.title}</span>
+                    <span className="text-sm text-slate-500">
+                      Last Score:{" "}
+                      {latest
+                        ? `${latest.correctCount || 0}/${latest.totalQuestions || quiz.totalQuestions || 0}`
+                        : `-/${quiz.totalQuestions || 0}`}
+                    </span>
+                    <Link
+                      href={
+                        latest
+                          ? `/student/code/results?attemptId=${latest._id}`
+                          : `/student/code/code-challenge?quizId=${quiz._id}`
+                      }
+                      className="rounded-lg bg-[#e3263c] px-4 py-2.5 text-center text-xs font-bold text-white"
+                    >
+                      {latest ? "View Result" : "Take The Exam"}
+                    </Link>
+                  </div>
+                );
+              })
+            ) : (
+              <p className="p-8 text-center text-slate-500">
+                No mock exams available.
+              </p>
+            )}
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
+function Summary({ title, description, children }) {
+  return (
+    <article className="min-h-[261px] rounded-xl bg-white p-5 sm:p-6">
+      <h2 className="text-xl font-bold">{title}</h2>
+      <p className="mt-5 max-w-md text-sm leading-6">{description}</p>
+      <div className="mt-3 text-sm leading-6">{children}</div>
+    </article>
+  );
+}

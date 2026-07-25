@@ -48,7 +48,7 @@ export default function SeriesListPage({ type, title, emptyText }) {
   const series = useMemo(() => [...quizzes].sort((a, b) => Number(a.order || 0) - Number(b.order || 0) || new Date(a.createdAt) - new Date(b.createdAt)), [quizzes]);
 
   return <main className="min-h-screen bg-white px-3 py-6 sm:px-6">
-    <div className="mx-auto w-full max-w-[1084px]">
+    <div className="mx-auto w-full ">
       <header className="flex h-11 items-center gap-4">
         <button type="button" onClick={() => router.back()} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#e8edf5] text-black"><IoChevronBack size={25} /></button>
         <h1 className="text-[25px] font-semibold leading-none tracking-[-0.02em] text-[#173f87]">{title}</h1>

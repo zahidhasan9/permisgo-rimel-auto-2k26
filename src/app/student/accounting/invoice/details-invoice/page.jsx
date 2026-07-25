@@ -6,7 +6,7 @@ import { IoChevronBack } from "react-icons/io5";
 export default function Page() {
   return (
     <main className="min-h-screen bg-[#f6f7fb] px-6 py-6 text-[#111827]">
-      <div className="mx-auto max-w-[1200px]">
+      <div className="mx-auto ">
         {/* HEADER */}
         <header className="mb-5 flex items-center justify-between">
           <div className="flex items-center gap-3">

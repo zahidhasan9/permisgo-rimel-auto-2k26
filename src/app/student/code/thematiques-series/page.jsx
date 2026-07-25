@@ -64,7 +64,7 @@ export default function ThematiquesSeriesPage() {
 
   return (
     <main className="min-h-screen bg-white px-3 py-[26px] sm:px-6">
-      <div className="mx-auto w-full max-w-[1084px]">
+      <div className="mx-auto w-full ">
         <header className="flex h-11 items-center gap-[18px]">
           <button type="button" onClick={() => router.back()} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#e8eef7] text-black"><IoChevronBack size={26} /></button>
           <h1 className="text-[24px] font-bold leading-none text-[#173f8f]">Thematic Series List</h1>

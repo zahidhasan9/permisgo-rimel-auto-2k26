@@ -132,7 +132,7 @@ export default function CodePracticePage() {
   };
 
   return <main className="min-h-screen bg-white px-3 py-[31px] sm:px-6">
-    <div className="mx-auto w-full max-w-[1030px]">
+    <div className="mx-auto w-full ">
       <header className="mb-[34px] flex items-center gap-[18px]"><button type="button" onClick={() => router.back()} className="flex h-[48px] w-[48px] items-center justify-center rounded-[12px] bg-[#EEF2F8]"><Chevron back /></button><h1 className="text-[25px] font-bold text-[#0D4598]">Code Practice</h1></header>
 
       <MenuGrid items={practiceCards} />

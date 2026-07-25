@@ -69,7 +69,7 @@ export default function MyHistoryPage() {
   };
 
   return <main className="min-h-screen bg-white px-3 py-6 sm:px-6">
-    <div className="mx-auto w-full max-w-[1084px]">
+    <div className="mx-auto w-full ">
       <header className="flex h-11 items-center justify-between">
         <div className="flex items-center gap-4"><button type="button" onClick={() => router.back()} className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#e8edf5] text-black"><IoChevronBack size={25} /></button><h1 className="text-[25px] font-semibold text-[#173f87]">My History</h1></div>
         <button type="button" disabled={!completed.length} onClick={download} className="h-10 rounded-lg bg-[#dc2338] px-5 text-xs font-bold text-white disabled:opacity-50">Download</button>

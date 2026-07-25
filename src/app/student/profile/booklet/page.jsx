@@ -247,7 +247,7 @@ export default function Page() {
       `}</style>
 
       <main className="min-h-screen bg-white">
-        <div className="mx-auto w-full max-w-[1132px] px-[24px] pb-[24px] pt-[24px]">
+        <div className="mx-auto w-full  px-[24px] pb-[24px] pt-[24px]">
           <Header />
           <BookletCta />
           <TrackingSheet />

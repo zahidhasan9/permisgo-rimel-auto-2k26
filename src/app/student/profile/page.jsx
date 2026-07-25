@@ -1123,7 +1123,7 @@ export default function Page() {
 
   return (
     <main className="min-h-screen bg-[#F6F8FC] px-3 py-3 font-sans sm:px-5 sm:py-5 lg:px-6">
-      <div className="mx-auto grid w-full max-w-[1160px] grid-cols-1 gap-4 xl:grid-cols-[1fr_280px]">
+      <div className="mx-auto grid w-full  grid-cols-1 gap-4 xl:grid-cols-[1fr_280px]">
         {/* LEFT SIDE */}
         <div className="space-y-4">
           {/* HEADER */}

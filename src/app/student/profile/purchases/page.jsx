@@ -236,6 +236,9 @@ function Header() {
   );
 }
 
+
+
+
 function CreditCard() {
   const router = useRouter();
 
@@ -321,7 +324,7 @@ export default function Page() {
       `}</style>
 
       <main className="min-h-screen bg-white">
-        <div className="mx-auto w-full max-w-[1132px] px-[24px] pb-[24px] pt-[26px]">
+        <div className="mx-auto w-full  px-[24px] pb-[24px] pt-[26px]">
           <Header />
 
           <div className="mt-[34px] grid grid-cols-1 gap-[20px] lg:grid-cols-[340px_1fr]">

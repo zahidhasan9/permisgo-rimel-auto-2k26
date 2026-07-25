@@ -56,7 +56,7 @@ export default function MyMistakesPage() {
   const correctOption = item?.question?.options?.[item?.correctIndex];
 
   return <main className="min-h-screen overflow-x-hidden bg-white px-3 py-6 sm:px-6">
-    <div className="mx-auto min-w-0 w-full max-w-[1084px]">
+    <div className="mx-auto min-w-0 w-full ">
       <header className="flex min-w-0 items-center gap-4"><button type="button" onClick={() => router.back()} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#e8edf5] text-black"><IoChevronBack size={25} /></button><div className="min-w-0"><h1 className="text-[22px] font-semibold text-[#173f87] sm:text-[25px]">My Mistakes</h1><p className="truncate text-xs text-slate-500">Review wrong answers and learn the correct answer.</p></div></header>
 
       <section className="mt-8 rounded-2xl bg-[#e8eef7] p-5">

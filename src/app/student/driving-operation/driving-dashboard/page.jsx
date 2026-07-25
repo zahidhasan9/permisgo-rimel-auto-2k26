@@ -115,7 +115,7 @@ export default function Page() {
 
   return (
     <main className="min-h-screen bg-white px-4 py-5 font-sans text-[#171717] sm:px-6 lg:px-8">
-      <div className="mx-auto w-full max-w-[1080px]">
+      <div className="mx-auto w-full ">
         {/* Header */}
         <header className="flex items-center gap-3 sm:gap-4">
           <button

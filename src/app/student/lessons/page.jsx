@@ -494,7 +494,7 @@ export default function StudentLessonsPage() {
 
   return (
     <main className="min-h-screen bg-slate-50 p-4 md:p-6">
-      <div className="mx-auto max-w-7xl space-y-5">
+      <div className="mx-auto  space-y-5">
         <header>
           <p className="text-sm font-bold uppercase tracking-wider text-blue-600">
             Student dashboard

@@ -5,11 +5,136 @@ import { useRouter } from "next/navigation";
 import { IoChevronBack, IoClose, IoPlay, IoTime } from "react-icons/io5";
 import { getLearningContents } from "@/features/API";
 
-function youtubeId(value) { try { const url=new URL(value); if(url.hostname.includes("youtu.be"))return url.pathname.split("/")[1]; return url.searchParams.get("v")||url.pathname.match(/\/(?:embed|shorts)\/([^/?]+)/)?.[1]||""; } catch{return "";} }
+function youtubeId(value) {
+  try {
+    const url = new URL(value);
+    if (url.hostname.includes("youtu.be")) return url.pathname.split("/")[1];
+    return (
+      url.searchParams.get("v") ||
+      url.pathname.match(/\/(?:embed|shorts)\/([^/?]+)/)?.[1] ||
+      ""
+    );
+  } catch {
+    return "";
+  }
+}
 
-export default function LiveReplaysPage(){const router=useRouter();const[replays,setReplays]=useState([]);const[selected,setSelected]=useState(null);const[loading,setLoading]=useState(true);const[error,setError]=useState("");
-  useEffect(()=>{getLearningContents({type:"live-replay"}).then(({data})=>setReplays(data?.data||[])).catch((e)=>setError(e.response?.data?.message||"Live replays could not be loaded.")).finally(()=>setLoading(false));},[]);
-  return <main className="min-h-screen bg-white px-3 py-6 sm:px-6"><div className="mx-auto max-w-[1084px]"><header className="flex items-center gap-4"><button onClick={()=>router.back()} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#e8edf5]"><IoChevronBack size={25}/></button><h1 className="text-[22px] font-semibold text-[#173f87] sm:text-[25px]">Our Live Coding Replay List</h1></header>
-    <section className="mt-8 rounded-2xl bg-[#e8eef7] p-4 sm:p-5">{loading?<div className="grid gap-3 md:grid-cols-2">{Array.from({length:6}).map((_,i)=><div key={i} className="h-[105px] animate-pulse rounded-xl bg-white"/>)}</div>:error?<p className="rounded-xl bg-red-50 p-5 text-red-700">{error}</p>:replays.length?<div className="grid gap-3 md:grid-cols-2">{replays.map((replay)=>{const id=youtubeId(replay.videoUrl);return <button key={replay._id} onClick={()=>setSelected({...replay,youtubeId:id})} className="group flex min-w-0 items-center gap-4 rounded-xl bg-white p-3 text-left transition hover:-translate-y-0.5 hover:shadow-md"><div className="relative h-20 w-24 shrink-0 overflow-hidden rounded-xl bg-slate-200"><img src={`https://i.ytimg.com/vi/${id}/hqdefault.jpg`} alt="" className="h-full w-full object-cover"/><span className="absolute inset-0 flex items-center justify-center bg-black/20"><IoPlay className="text-4xl text-white drop-shadow"/></span></div><div className="min-w-0"><h2 className="break-words text-base font-bold text-black">{replay.title}</h2><p className="mt-2 flex items-center gap-1.5 text-sm text-slate-500"><span className="flex h-4 w-4 items-center justify-center rounded-full bg-[#174a9b] text-white"><IoTime size={11}/></span>{replay.readMinutes||0} minutes</p></div></button>})}</div>:<p className="rounded-xl bg-white p-10 text-center text-slate-500">No live replays available yet.</p>}</section>
-  </div>{selected&&<div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 p-3" onClick={()=>setSelected(null)}><div className="w-full max-w-4xl overflow-hidden rounded-2xl bg-white shadow-2xl" onClick={(e)=>e.stopPropagation()}><div className="flex items-center justify-between gap-3 px-4 py-3"><h2 className="truncate font-bold text-[#173f87]">{selected.title}</h2><button onClick={()=>setSelected(null)} className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100"><IoClose size={23}/></button></div><div className="aspect-video bg-black"><iframe className="h-full w-full" src={`https://www.youtube-nocookie.com/embed/${selected.youtubeId}?autoplay=1&rel=0`} title={selected.title} allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen/></div></div></div>}</main>;
+export default function LiveReplaysPage() {
+  const router = useRouter();
+  const [replays, setReplays] = useState([]);
+  const [selected, setSelected] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  useEffect(() => {
+    getLearningContents({ type: "live-replay" })
+      .then(({ data }) => setReplays(data?.data || []))
+      .catch((e) =>
+        setError(
+          e.response?.data?.message || "Live replays could not be loaded.",
+        ),
+      )
+      .finally(() => setLoading(false));
+  }, []);
+  return (
+    <main className="min-h-screen bg-white px-3 py-6 sm:px-6">
+      <div className="mx-auto ">
+        <header className="flex items-center gap-4">
+          <button
+            onClick={() => router.back()}
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#e8edf5]"
+          >
+            <IoChevronBack size={25} />
+          </button>
+          <h1 className="text-[22px] font-semibold text-[#173f87] sm:text-[25px]">
+            Our Live Coding Replay List
+          </h1>
+        </header>
+        <section className="mt-8 rounded-2xl bg-[#e8eef7] p-4 sm:p-5">
+          {loading ? (
+            <div className="grid gap-3 md:grid-cols-2">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="h-[105px] animate-pulse rounded-xl bg-white"
+                />
+              ))}
+            </div>
+          ) : error ? (
+            <p className="rounded-xl bg-red-50 p-5 text-red-700">{error}</p>
+          ) : replays.length ? (
+            <div className="grid gap-3 md:grid-cols-2">
+              {replays.map((replay) => {
+                const id = youtubeId(replay.videoUrl);
+                return (
+                  <button
+                    key={replay._id}
+                    onClick={() => setSelected({ ...replay, youtubeId: id })}
+                    className="group flex min-w-0 items-center gap-4 rounded-xl bg-white p-3 text-left transition hover:-translate-y-0.5 hover:shadow-md"
+                  >
+                    <div className="relative h-20 w-24 shrink-0 overflow-hidden rounded-xl bg-slate-200">
+                      <img
+                        src={`https://i.ytimg.com/vi/${id}/hqdefault.jpg`}
+                        alt=""
+                        className="h-full w-full object-cover"
+                      />
+                      <span className="absolute inset-0 flex items-center justify-center bg-black/20">
+                        <IoPlay className="text-4xl text-white drop-shadow" />
+                      </span>
+                    </div>
+                    <div className="min-w-0">
+                      <h2 className="break-words text-base font-bold text-black">
+                        {replay.title}
+                      </h2>
+                      <p className="mt-2 flex items-center gap-1.5 text-sm text-slate-500">
+                        <span className="flex h-4 w-4 items-center justify-center rounded-full bg-[#174a9b] text-white">
+                          <IoTime size={11} />
+                        </span>
+                        {replay.readMinutes || 0} minutes
+                      </p>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          ) : (
+            <p className="rounded-xl bg-white p-10 text-center text-slate-500">
+              No live replays available yet.
+            </p>
+          )}
+        </section>
+      </div>
+      {selected && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 p-3"
+          onClick={() => setSelected(null)}
+        >
+          <div
+            className="w-full max-w-4xl overflow-hidden rounded-2xl bg-white shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between gap-3 px-4 py-3">
+              <h2 className="truncate font-bold text-[#173f87]">
+                {selected.title}
+              </h2>
+              <button
+                onClick={() => setSelected(null)}
+                className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100"
+              >
+                <IoClose size={23} />
+              </button>
+            </div>
+            <div className="aspect-video bg-black">
+              <iframe
+                className="h-full w-full"
+                src={`https://www.youtube-nocookie.com/embed/${selected.youtubeId}?autoplay=1&rel=0`}
+                title={selected.title}
+                allow="autoplay; encrypted-media; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+          </div>
+        </div>
+      )}
+    </main>
+  );
 }

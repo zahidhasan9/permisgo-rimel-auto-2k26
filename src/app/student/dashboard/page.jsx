@@ -1692,7 +1692,7 @@ export default function Page() {
       `}</style>
 
       <main className="min-h-screen w-full min-w-0 overflow-x-hidden bg-white">
-        <div className="mx-auto w-full max-w-[1080px] px-4 pb-6 pt-6 sm:px-5 lg:px-6">
+        <div className="mx-auto w-full  px-4 pb-6 pt-6 sm:px-5 lg:px-6">
           <header>
             <h1 className="text-[24px] font-[700] leading-tight text-[#174A9B] sm:text-[28px]">
               Welcome, {studentName}
