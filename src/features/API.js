@@ -454,6 +454,22 @@ export const updateLearningProgress = (id, data) =>
 export const toggleLearningFavorite = (id) =>
   axios.patch(`/learning/contents/${id}/favorite`);
 
+export const getEbookCourses = () => axios.get("/learning/ebook/courses");
+export const createEbookCourse = (data) => axios.post("/learning/admin/ebook/courses", data, { headers: { "Content-Type": "multipart/form-data" } });
+export const updateEbookCourse = (id, data) => axios.patch(`/learning/admin/ebook/courses/${id}`, data, { headers: { "Content-Type": "multipart/form-data" } });
+export const deleteEbookCourse = (id) => axios.delete(`/learning/admin/ebook/courses/${id}`);
+export const getEbookTopics = (courseId) => axios.get(`/learning/ebook/courses/${courseId}/topics`);
+export const createEbookTopic = (courseId, data) => axios.post(`/learning/admin/ebook/courses/${courseId}/topics`, data);
+export const updateEbookTopic = (id, data) => axios.patch(`/learning/admin/ebook/topics/${id}`, data);
+export const deleteEbookTopic = (id) => axios.delete(`/learning/admin/ebook/topics/${id}`);
+export const getAdminEbookLessons = (params = {}) => axios.get("/learning/admin/ebook/lessons", { params });
+export const getAdminEbookLesson = (id) => axios.get(`/learning/admin/ebook/lessons/${id}`);
+export const createEbookLesson = (data) => axios.post("/learning/admin/ebook/lessons", data, { headers: { "Content-Type": "multipart/form-data" } });
+export const updateEbookLesson = (id, data) => axios.patch(`/learning/admin/ebook/lessons/${id}`, data, { headers: { "Content-Type": "multipart/form-data" } });
+export const deleteEbookLesson = (id) => axios.delete(`/learning/admin/ebook/lessons/${id}`);
+export const getStudentEbookLessons = (courseId, topicId) => axios.get(`/learning/ebook/courses/${courseId}/topics/${topicId}/lessons`);
+export const getStudentEbookLesson = (id) => axios.get(`/learning/ebook/lessons/${id}`);
+
 // =======================
 // Admin Controlled Quiz Retake
 // =======================

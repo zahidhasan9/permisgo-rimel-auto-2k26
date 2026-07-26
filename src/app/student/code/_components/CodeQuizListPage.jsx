@@ -331,7 +331,7 @@ function SeriesCard({ quiz, index, attempt, retakePermission }) {
 
   const isCompleted = status === "completed";
   const isInProgress = status === "in_progress";
-  const hasRetakePermission = Boolean(retakePermission);
+  const hasRetakePermission = true;
 
   const href =
     isCompleted && !hasRetakePermission
@@ -340,7 +340,7 @@ function SeriesCard({ quiz, index, attempt, retakePermission }) {
 
   const buttonText =
     isCompleted && hasRetakePermission
-      ? "RETAKE APPROVED"
+      ? "RETAKE QUIZ"
       : isCompleted
         ? "VIEW RESULT"
         : isInProgress
@@ -349,7 +349,7 @@ function SeriesCard({ quiz, index, attempt, retakePermission }) {
 
   const badgeText =
     isCompleted && hasRetakePermission
-      ? "Retake On"
+      ? "Unlimited Retake"
       : isCompleted
         ? "Completed"
         : isInProgress
@@ -417,7 +417,7 @@ function SeriesCard({ quiz, index, attempt, retakePermission }) {
 
         {isCompleted && hasRetakePermission && (
           <div className="mt-4 rounded-xl border border-emerald-100 bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-700">
-            Admin allowed retake. You can retake this quiz one time.
+            Retake is always available. You can take this quiz as many times as you want.
           </div>
         )}
 

@@ -8,7 +8,7 @@ import { getMyQuizAttempts, getMyTopicResults } from "@/features/API";
 
 const practiceCards = [
   ["Simple series", "/image/simpleseries.png", "/student/code/simple-series-list"],
-  ["Exam Mock Séries", "/image/exam-mock.png", "/student/code/mock-test"],
+  ["Exam Mock Séries", "/image/exam-mock.png", "/student/code-learning"],
   ["Thématiques Séries", "/image/thematiques.png", "/student/code/thematiques-series"],
   ["Crash Test", "/image/crash-test.png", "/student/code/crash-test"],
   ["My mistakes", "/image/mistakes.png", "/student/code/my-mistakes", "09"],
@@ -74,7 +74,10 @@ function Chevron({ back = false }) {
 
 function MenuCard({ item }) {
   const [title, icon, link, count] = item;
-  return <Link href={link} className="flex h-[94px] w-full items-center justify-between rounded-[10px] border-[1.5px] border-[#0D55A7] bg-[#E8EEF7] px-[28px] transition hover:bg-[#dfe8f5]">
+  const external = /^https?:\/\//i.test(link);
+  return <Link href={link} target={external ? "_blank" : undefined}
+    rel={external ? "noopener noreferrer" : undefined}
+    className="flex h-[94px] w-full items-center justify-between rounded-[10px] border-[1.5px] border-[#0D55A7] bg-[#E8EEF7] px-[28px] transition hover:bg-[#dfe8f5]">
     <span className="flex min-w-0 items-center gap-[18px]"><img src={icon} alt="" className="h-[45px] w-[45px] shrink-0 object-contain" /><span className="text-[16px] font-semibold text-[#272A31]">{title}{count && <b className="ml-1 text-[#E71936]">({count})</b>}</span></span><Chevron />
   </Link>;
 }

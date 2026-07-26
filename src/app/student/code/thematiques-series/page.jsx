@@ -80,7 +80,7 @@ export default function ThematiquesSeriesPage() {
             const answered = Number(attempt?.answers?.length || 0);
             const completed = attempt?.status === "completed";
             const progress = completed ? 100 : total ? Math.min(100, Math.round((answered / total) * 100)) : 0;
-            const href = completed ? `/student/code/my-history?latest=${attempt?._id || ""}` : `/student/code/code-challenge?quizId=${quiz._id}`;
+            const href = `/student/code/code-challenge?quizId=${quiz._id}`;
 
             return (
               <article key={quiz._id} className="relative h-[108px] rounded-[10px]" style={{ backgroundColor: theme.color }}>

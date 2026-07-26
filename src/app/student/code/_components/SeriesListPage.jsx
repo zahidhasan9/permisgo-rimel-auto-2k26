@@ -63,7 +63,7 @@ export default function SeriesListPage({ type, title, emptyText }) {
           const answered = Number(attempt?.answers?.length || 0);
           const completed = attempt?.status === "completed";
           const progress = completed ? 100 : total ? Math.min(100, Math.round((answered / total) * 100)) : 0;
-          const href = completed ? `/student/code/my-history?latest=${attempt?._id || ""}` : `/student/code/code-challenge?quizId=${quiz._id}`;
+          const href = `/student/code/code-challenge?quizId=${quiz._id}`;
           return <article key={quiz._id} className="relative h-[105px] rounded-xl bg-[#e8edf5] px-7 pt-[32px]">
             <div className="w-[252px] max-w-[calc(100%_-_40px)]">
               <h2 className="truncate text-[16px] font-semibold leading-5 text-[#171717]">Series {String(index + 1).padStart(2, "0")}</h2>
