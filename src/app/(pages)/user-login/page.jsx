@@ -34,7 +34,7 @@ const LoginRoleSelect = () => {
           <div className="flex flex-col items-center justify-center gap-5 sm:flex-row sm:gap-6 md:gap-8">
             {/* Student Card */}
             <Link
-              href="/login"
+              href="/login/student"
               className="group flex w-full max-w-[160px] flex-col items-center justify-center rounded-2xl border border-white/25 bg-white/5 px-5 py-6 transition-all duration-300 hover:-translate-y-1 hover:border-white/50 hover:bg-white/10 hover:shadow-lg sm:max-w-[170px] sm:px-6 sm:py-7"
             >
               <div className="mb-4 flex h-[90px] w-[90px] items-center justify-center sm:h-[100px] sm:w-[100px]">
@@ -57,7 +57,7 @@ const LoginRoleSelect = () => {
 
             {/* Teacher Card */}
             <Link
-              href="/login"
+              href="/login/teacher"
               className="group flex w-full max-w-[160px] flex-col items-center justify-center rounded-2xl border border-white/25 bg-white/5 px-5 py-6 transition-all duration-300 hover:-translate-y-1 hover:border-white/50 hover:bg-white/10 hover:shadow-lg sm:max-w-[170px] sm:px-6 sm:py-7"
             >
               <div className="mb-4 flex h-[90px] w-[90px] items-center justify-center sm:h-[100px] sm:w-[100px]">

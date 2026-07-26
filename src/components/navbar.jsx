@@ -26,9 +26,21 @@ const Navbar = () => {
   const pathname = usePathname();
 
   const options = [
-    { value: "EN", label: "English", img: "/image/eng-flag.png" },
-    { value: "BN", label: "Bangla", img: "/image/ban-flag.png" },
-    { value: "FR", label: "Français", img: "/image/fra-flag.png" },
+    {
+      value: "EN",
+      label: "English",
+      img: "/image/eng-flag.png",
+    },
+    {
+      value: "BN",
+      label: "Bangla",
+      img: "/image/ban-flag.png",
+    },
+    {
+      value: "FR",
+      label: "Français",
+      img: "/image/fra-flag.png",
+    },
   ];
 
   const navLinks = [
@@ -60,33 +72,40 @@ const Navbar = () => {
       fontSize: "13px",
       backgroundColor: "#ffffff",
       transition: "0.25s ease",
+
       ":hover": {
         borderColor: "rgba(16, 54, 119, 0.25)",
       },
     }),
+
     valueContainer: (base) => ({
       ...base,
       padding: "0 7px",
       height: "32px",
     }),
+
     singleValue: (base) => ({
       ...base,
       color: "#103677",
       fontWeight: 600,
     }),
+
     indicatorsContainer: (base) => ({
       ...base,
       height: "32px",
       paddingRight: "4px",
     }),
+
     dropdownIndicator: (base) => ({
       ...base,
       padding: "2px",
       color: "#103677",
     }),
+
     indicatorSeparator: () => ({
       display: "none",
     }),
+
     menu: (base) => ({
       ...base,
       zIndex: 9999,
@@ -95,6 +114,7 @@ const Navbar = () => {
       boxShadow: "0 18px 40px rgba(15, 23, 42, 0.16)",
       border: "1px solid rgba(15, 23, 42, 0.08)",
     }),
+
     option: (base, state) => ({
       ...base,
       cursor: "pointer",
@@ -110,7 +130,7 @@ const Navbar = () => {
   };
 
   const desktopLinkClass = (href) =>
-    `relative rounded-full px-3 py-2 text-[15px] font-medium transition-all duration-300 ${
+    `relative whitespace-nowrap rounded-full px-2.5 py-2 text-[13px] font-medium transition-all duration-300 2xl:px-3 2xl:text-[15px] ${
       pathname === href
         ? "bg-white/15 text-white"
         : "text-white/90 hover:bg-white/10 hover:text-white"
@@ -126,7 +146,7 @@ const Navbar = () => {
   return (
     <>
       <nav className="relative z-50 w-full bg-white">
-        {/* Top Bar */}
+        {/* TOP BAR */}
         <div className="border-b border-slate-200 bg-slate-50">
           <div className="mx-auto flex h-[38px] max-w-[1320px] items-center justify-between px-4 sm:px-6 lg:px-8">
             <ul className="flex min-w-0 items-center gap-4">
@@ -136,6 +156,7 @@ const Navbar = () => {
                   className="flex items-center gap-1.5 whitespace-nowrap text-[13px] font-medium text-[#103677] transition hover:text-[#2563eb] sm:text-[14px]"
                 >
                   <FaPhoneSquareAlt className="text-[15px]" />
+
                   <span>1774649438</span>
                 </a>
               </li>
@@ -146,13 +167,14 @@ const Navbar = () => {
                   className="flex items-center gap-1.5 text-[14px] font-medium text-[#103677] transition hover:text-[#2563eb]"
                 >
                   <MdOutlineEmail className="text-[17px]" />
+
                   <span>yourmail@mail.com</span>
                 </a>
               </li>
             </ul>
 
-            <div className="flex items-center gap-3">
-              <div className="w-[88px]">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="w-[82px] sm:w-[88px]">
                 <Select
                   options={options}
                   defaultValue={options[0]}
@@ -168,13 +190,14 @@ const Navbar = () => {
                         height={18}
                         className="mr-1.5 rounded-full"
                       />
+
                       <span>{opt.value}</span>
                     </div>
                   )}
                 />
               </div>
 
-              <ul className="hidden items-center gap-2 sm:flex">
+              <ul className="hidden items-center gap-1 sm:flex lg:gap-2">
                 {socialLinks.map((item, index) => (
                   <li key={index}>
                     <Link
@@ -190,23 +213,25 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Main Navbar */}
+        {/* MAIN NAVBAR */}
         <div className="bg-[#174a9b] shadow-[0_10px_30px_rgba(16,54,119,0.18)]">
           <div className="mx-auto flex h-[72px] max-w-[1320px] items-center justify-between px-4 sm:px-6 lg:px-8">
+            {/* LOGO */}
             <Link
               href="/"
-              className="flex h-full shrink-0 items-center  px-4 sm:px-5"
+              className="flex h-full shrink-0 items-center pr-2 sm:pr-4 xl:px-2 2xl:px-4"
             >
               <Image
                 src={Logo}
                 alt="Permisgo Logo"
                 priority
-                className="h-auto w-[145px] sm:w-[155px] lg:w-[165px]"
+                className="h-auto w-[130px] sm:w-[145px] lg:w-[155px] xl:w-[145px] 2xl:w-[165px]"
               />
             </Link>
 
-            <div className="hidden lg:flex lg:flex-1 lg:justify-center">
-              <ul className="flex items-center gap-1 xl:gap-2">
+            {/* DESKTOP NAVIGATION - SHOW FROM 1280PX */}
+            <div className="hidden min-w-0 flex-1 justify-center xl:flex">
+              <ul className="flex items-center gap-0 2xl:gap-2">
                 {navLinks.map((link, index) => (
                   <li key={index}>
                     <Link
@@ -220,45 +245,50 @@ const Navbar = () => {
               </ul>
             </div>
 
-            <div className="hidden shrink-0 items-center gap-3 md:flex">
-              <Link
-                href="/user-login"
-                className="rounded-[10px] bg-[#e2233d] px-7 py-2.5 text-[14px] font-semibold text-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-white hover:text-[#174a9b]"
-              >
-                Login
-              </Link>
+            {/* RIGHT SIDE BUTTONS AND MENU */}
+            <div className="ml-auto flex shrink-0 items-center gap-2 lg:gap-3">
+              {/* LOGIN AND INSCRIPTION */}
+              <div className="hidden items-center gap-2 md:flex lg:gap-3">
+                <Link
+                  href="/user-login"
+                  className="inline-flex h-[40px] items-center justify-center whitespace-nowrap rounded-[10px] bg-[#e2233d] px-4 text-[13px] font-semibold text-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-white hover:text-[#174a9b] lg:px-5 xl:px-4 2xl:px-7 2xl:text-[14px]"
+                >
+                  Login
+                </Link>
 
-              <Link
-                href="/inscription"
-                className="hidden rounded-[10px] border-2 border-[#e2233d] bg-transparent px-6 py-2 text-[14px] font-semibold text-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#e2233d] xl:inline-flex"
+                <Link
+                  href="/inscription"
+                  className="inline-flex h-[40px] items-center justify-center whitespace-nowrap rounded-[10px] border-2 border-[#e2233d] bg-transparent px-4 text-[13px] font-semibold text-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#e2233d] lg:px-5 xl:px-4 2xl:px-6 2xl:text-[14px]"
+                >
+                  Inscription
+                </Link>
+              </div>
+
+              {/* MENU BUTTON - HIDE FROM 1280PX */}
+              <button
+                type="button"
+                onClick={() => setOpenMenu(true)}
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/20 bg-white/10 text-[26px] text-white transition hover:bg-white/20 xl:hidden"
+                aria-label="Open menu"
               >
-                Inscription
-              </Link>
+                <IoMenu />
+              </button>
             </div>
-
-            <button
-              type="button"
-              onClick={() => setOpenMenu(true)}
-              className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/20 bg-white/10 text-[26px] text-white transition hover:bg-white/20 lg:hidden"
-              aria-label="Open menu"
-            >
-              <IoMenu />
-            </button>
           </div>
         </div>
       </nav>
 
-      {/* Mobile Overlay */}
+      {/* MOBILE AND TABLET OVERLAY */}
       {openMenu && (
         <div
-          className="fixed inset-0 z-[998] bg-slate-950/55 backdrop-blur-[2px] lg:hidden"
+          className="fixed inset-0 z-[998] bg-slate-950/55 backdrop-blur-[2px] xl:hidden"
           onClick={() => setOpenMenu(false)}
         />
       )}
 
-      {/* Mobile Drawer */}
+      {/* MOBILE AND TABLET DRAWER */}
       <aside
-        className={`fixed right-0 top-0 z-[999] h-full w-[320px] max-w-[86%] bg-white shadow-2xl transition-transform duration-300 lg:hidden ${
+        className={`fixed right-0 top-0 z-[999] h-full w-[320px] max-w-[86%] bg-white shadow-2xl transition-transform duration-300 xl:hidden ${
           openMenu ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -298,7 +328,8 @@ const Navbar = () => {
               ))}
             </ul>
 
-            <div className="mt-6 grid grid-cols-1 gap-3">
+            {/* MOBILE LOGIN BUTTONS */}
+            <div className="mt-6 grid grid-cols-1 gap-3 md:hidden">
               <Link
                 href="/user-login"
                 onClick={() => setOpenMenu(false)}
@@ -341,7 +372,8 @@ const Navbar = () => {
                 className="flex items-center gap-2 transition hover:text-[#103677]"
               >
                 <FaPhoneSquareAlt />
-                1774649438
+
+                <span>1774649438</span>
               </a>
 
               <a
@@ -349,7 +381,8 @@ const Navbar = () => {
                 className="flex items-center gap-2 break-all transition hover:text-[#103677]"
               >
                 <MdOutlineEmail />
-                yourmail@mail.com
+
+                <span>yourmail@mail.com</span>
               </a>
             </div>
           </div>

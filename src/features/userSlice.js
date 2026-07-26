@@ -26,23 +26,29 @@ const getErrorMessage = (error, fallback) => {
   );
 };
 
-export const register = createAsyncThunk("user/register", async (userData, { rejectWithValue }) => {
-  try {
-    const { data } = await registerUser(userData);
-    return data;
-  } catch (error) {
-    return rejectWithValue(getErrorMessage(error, "Registration failed"));
-  }
-});
+export const register = createAsyncThunk(
+  "user/register",
+  async (userData, { rejectWithValue }) => {
+    try {
+      const { data } = await registerUser(userData);
+      return data;
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error, "Registration failed"));
+    }
+  },
+);
 
-export const login = createAsyncThunk("user/login", async (userData, { rejectWithValue }) => {
-  try {
-    const { data } = await loginUser(userData);
-    return data;
-  } catch (error) {
-    return rejectWithValue(getErrorMessage(error, "Login failed"));
-  }
-});
+export const login = createAsyncThunk(
+  "user/login",
+  async (userData, { rejectWithValue }) => {
+    try {
+      const { data } = await loginUser(userData);
+      return data;
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error, "Login failed"));
+    }
+  },
+);
 
 export const fetchLoggedInUser = createAsyncThunk(
   "user/fetchLoggedInUser",
@@ -53,7 +59,7 @@ export const fetchLoggedInUser = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(getErrorMessage(error, "Failed to fetch user"));
     }
-  }
+  },
 );
 
 export const forgotUserPassword = createAsyncThunk(
@@ -63,9 +69,11 @@ export const forgotUserPassword = createAsyncThunk(
       const { data } = await forgotPassword(formData);
       return data;
     } catch (error) {
-      return rejectWithValue(getErrorMessage(error, "Failed to send reset request"));
+      return rejectWithValue(
+        getErrorMessage(error, "Failed to send reset request"),
+      );
     }
-  }
+  },
 );
 
 export const resetUserPassword = createAsyncThunk(
@@ -77,7 +85,7 @@ export const resetUserPassword = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(getErrorMessage(error, "Password reset failed"));
     }
-  }
+  },
 );
 
 export const fetchStudentDashboard = createAsyncThunk(
@@ -87,9 +95,11 @@ export const fetchStudentDashboard = createAsyncThunk(
       const { data } = await getStudentDashboard();
       return data;
     } catch (error) {
-      return rejectWithValue(getErrorMessage(error, "Failed to fetch dashboard"));
+      return rejectWithValue(
+        getErrorMessage(error, "Failed to fetch dashboard"),
+      );
     }
-  }
+  },
 );
 
 export const fetchStudentProfile = createAsyncThunk(
@@ -101,7 +111,7 @@ export const fetchStudentProfile = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(getErrorMessage(error, "Failed to fetch profile"));
     }
-  }
+  },
 );
 
 export const updateStudent = createAsyncThunk(
@@ -111,9 +121,11 @@ export const updateStudent = createAsyncThunk(
       const { data } = await updateStudentProfile(formData);
       return data;
     } catch (error) {
-      return rejectWithValue(getErrorMessage(error, "Failed to update profile"));
+      return rejectWithValue(
+        getErrorMessage(error, "Failed to update profile"),
+      );
     }
-  }
+  },
 );
 
 export const addFavorite = createAsyncThunk(
@@ -123,9 +135,11 @@ export const addFavorite = createAsyncThunk(
       const { data } = await addFavoriteTeacher(teacherId);
       return { data, teacherId };
     } catch (error) {
-      return rejectWithValue(getErrorMessage(error, "Failed to add favorite teacher"));
+      return rejectWithValue(
+        getErrorMessage(error, "Failed to add favorite teacher"),
+      );
     }
-  }
+  },
 );
 
 export const removeFavorite = createAsyncThunk(
@@ -135,9 +149,11 @@ export const removeFavorite = createAsyncThunk(
       const { data } = await removeFavoriteTeacher(teacherId);
       return { data, teacherId };
     } catch (error) {
-      return rejectWithValue(getErrorMessage(error, "Failed to remove favorite teacher"));
+      return rejectWithValue(
+        getErrorMessage(error, "Failed to remove favorite teacher"),
+      );
     }
-  }
+  },
 );
 
 const initialState = {
@@ -276,7 +292,8 @@ const userSlice = createSlice({
       .addCase(forgotUserPassword.fulfilled, (state, action) => {
         state.loading = false;
         state.success = true;
-        state.message = action.payload?.message || "Password reset request sent";
+        state.message =
+          action.payload?.message || "Password reset request sent";
       })
       .addCase(forgotUserPassword.rejected, (state, action) => {
         state.loading = false;
