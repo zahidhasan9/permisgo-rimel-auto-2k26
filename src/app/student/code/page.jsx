@@ -150,12 +150,12 @@ export default function CodePracticePage() {
           {latestLoading ? Array.from({ length: 5 }).map((_, index) => <div key={index} className="h-[62px] animate-pulse border-b border-[#E3E7EE] bg-slate-50 last:border-0" />) : latestSeries.length ? latestSeries.map((attempt) => {
             const quiz = attempt.quiz || {};
             const completed = attempt.status === "completed";
-            const href = completed ? `/student/code/my-history?latest=${attempt._id}` : `/student/code/code-challenge?quizId=${quiz._id || quiz}`;
+            const href = completed ? `/student/code/results?attemptId=${attempt._id}` : `/student/code/code-challenge?quizId=${quiz._id || quiz}`;
             return <div key={attempt._id} className="grid min-h-[62px] grid-cols-1 items-center gap-3 border-b border-[#E3E7EE] py-3 last:border-0 md:grid-cols-[190px_1fr_170px_140px]">
               <span className="inline-flex h-[31px] w-[120px] items-center justify-center rounded-[4px] bg-[#BFCBE2] text-[12px] font-bold text-[#0D4598]">{formatAttemptDate(attempt.createdAt)}</span>
               <p className="text-[12px] font-semibold text-[#24262B]">{quizTypeLabel[quiz.type] || quiz.title || "Quiz Series"}</p>
               <p className="text-[12px] font-medium text-[#878B94]">Last Score: {completed ? `${attempt.score || 0}/${attempt.totalQuestions || 0}` : `-/${attempt.totalQuestions || 0}`}</p>
-              <Link href={href} className={`flex h-9 w-[120px] items-center justify-center justify-self-start rounded-[8px] text-[12px] font-bold text-white md:justify-self-end ${completed ? "bg-[#0C3B78]" : "bg-[#E9223D]"}`}>{completed ? "View Result" : "Take The Exam"}</Link>
+              <Link href={href} className={`flex h-9 w-[120px] items-center justify-center justify-self-start rounded-[8px] text-[12px] font-bold text-white md:justify-self-end ${completed ? "bg-[#0C3B78]" : "bg-[#E9223D]"}`}>{completed ? "Goodbye" : "Take The Exam"}</Link>
             </div>;
           }) : <div className="flex min-h-[90px] items-center justify-center text-[13px] font-medium text-[#878B94]">No quiz attempt yet.</div>}
         </div>

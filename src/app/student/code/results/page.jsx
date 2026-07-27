@@ -1,24 +1,24 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { IoArrowBack, IoArrowForward, IoChevronBack } from "react-icons/io5";
-
+import { IoChevronBack, IoMusicalNotes } from "react-icons/io5";
 import { getCodeQuizAttemptReview, getMyQuizAttempts } from "@/features/API";
 import { mediaUrl } from "@/utils/mediaUrl";
 
-const optionLetter = (index) => String.fromCharCode(65 + index);
+const letter = (index) => String.fromCharCode(65 + index);
 
-function Message({ error = false, children }) {
-  return <main className="min-h-screen bg-white p-6"><div className={`mx-auto max-w-xl rounded-xl border p-5 text-center text-sm font-semibold ${error ? "border-red-200 bg-red-50 text-red-700" : "border-slate-200 text-[#173f87]"}`}>{children}</div></main>;
+function Message({ error, children }) {
+  return <main className="min-h-screen bg-white p-6"><div className={`mx-auto max-w-xl rounded-xl p-5 text-center text-sm font-semibold ${error ? "bg-red-50 text-red-700" : "bg-[#e8eef7] text-[#173f87]"}`}>{children}</div></main>;
 }
 
-function ResultsContent() {
+function ScoreContent() {
   const router = useRouter();
-  const params = useSearchParams();
-  const requestedId = params.get("attemptId") || params.get("latest");
+  const requestedId = useSearchParams().get("attemptId");
+  const refs = useRef({});
   const [result, setResult] = useState(null);
-  const [index, setIndex] = useState(0);
+  const [resultFilter, setResultFilter] = useState("all");
+  const [themeFilter, setThemeFilter] = useState("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -26,65 +26,80 @@ function ResultsContent() {
     let active = true;
     const load = async () => {
       try {
-        let attemptId = requestedId;
-        if (!attemptId) {
-          const response = await getMyQuizAttempts();
-          attemptId = (response.data?.data || []).find((item) => item.status === "completed")?._id;
+        let id = requestedId;
+        if (!id) {
+          const attempts = await getMyQuizAttempts();
+          id = (attempts.data?.data || []).find((item) => item.status === "completed")?._id;
         }
-        if (!attemptId) throw new Error("No completed quiz result found.");
-        const response = await getCodeQuizAttemptReview(attemptId);
+        if (!id) throw new Error("No completed result found.");
+        const response = await getCodeQuizAttemptReview(id);
         if (active) setResult(response.data?.data || null);
-      } catch (requestError) {
-        if (active) setError(requestError.response?.data?.message || requestError.message || "Result could not be loaded.");
-      } finally {
-        if (active) setLoading(false);
-      }
+      } catch (requestError) { if (active) setError(requestError.response?.data?.message || requestError.message || "Score could not be loaded."); }
+      finally { if (active) setLoading(false); }
     };
     load();
     return () => { active = false; };
   }, [requestedId]);
 
-  if (loading) return <Message>Loading result...</Message>;
-  if (error || !result) return <Message error>{error || "Result not found."}</Message>;
+  const themes = useMemo(() => [...new Set((result?.answers || []).map((answer) => answer.question?.topic).filter(Boolean))], [result]);
+  const visibleAnswers = useMemo(() => (result?.answers || []).filter((answer) => {
+    if (resultFilter === "correct" && !answer.isCorrect) return false;
+    if (resultFilter === "wrong" && answer.isCorrect) return false;
+    return themeFilter === "all" || answer.question?.topic === themeFilter;
+  }), [result, resultFilter, themeFilter]);
 
-  const answers = result.answers || [];
-  const answer = answers[index];
-  const question = answer?.question || {};
-  const selected = Number(answer?.selectedOptionIndex);
-  const correct = Number(answer?.correctOptionIndex);
+  const speak = (question) => {
+    if (!window.speechSynthesis || !question) return;
+    window.speechSynthesis.cancel();
+    const speech = new SpeechSynthesisUtterance(question.voiceText || question.questionText);
+    speech.lang = "fr-FR";
+    window.speechSynthesis.speak(speech);
+  };
 
-  return <main className="min-h-screen overflow-x-hidden bg-[#f8fafc] px-3 py-5 sm:px-5 lg:px-6">
-    <div className="mx-auto min-w-0 w-full max-w-[1084px]">
-      <header className="flex min-w-0 items-center gap-3"><button type="button" onClick={() => router.back()} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#e8edf5] text-black"><IoChevronBack size={25} /></button><div className="min-w-0"><h1 className="text-[22px] font-semibold leading-tight text-[#173f87] sm:text-[25px]">Quiz Result</h1><p className="mt-0.5 truncate text-xs text-slate-500">{result.quiz?.title || "Quiz review"}</p></div></header>
+  if (loading) return <Message>Loading your score...</Message>;
+  if (error || !result) return <Message error>{error || "Score not found."}</Message>;
 
-      <section className="mt-8 rounded-2xl bg-[#e8eef7] p-5">
-        <div className="grid min-w-0 grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5">
-          {[["Score", `${result.score || 0}/${result.totalQuestions || 0}`], ["Percentage", `${result.percentage || 0}%`], ["Correct", result.correctCount || 0], ["Wrong", result.wrongCount || 0], ["Status", result.passed ? "Passed" : "Failed"]].map(([label, value]) => <div key={label} className={`min-w-0 rounded-xl bg-white p-3.5 ${label === "Status" ? "col-span-2 md:col-span-1" : ""}`}><p className="truncate text-[10px] font-semibold uppercase tracking-wide text-slate-500">{label}</p><p className={`mt-1 truncate text-lg font-bold sm:text-xl ${label === "Correct" || (label === "Status" && result.passed) ? "text-green-600" : label === "Wrong" || label === "Status" ? "text-red-600" : "text-[#173f87]"}`}>{value}</p></div>)}
-        </div>
-        <div className="mt-4 flex items-center gap-3"><div className="h-3 min-w-0 flex-1 overflow-hidden rounded-full bg-white"><div className="h-full rounded-full bg-[#17479a]" style={{ width: `${result.percentage || 0}%` }} /></div><b className="shrink-0 text-xs text-[#173f87]">{result.percentage || 0}%</b></div>
-      </section>
+  return <main className="min-h-screen bg-white px-3 py-5 sm:px-6">
+    <div className="mx-auto max-w-[1200px]">
+      <header className="flex items-center gap-3"><button onClick={() => router.back()} className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#e8edf5]"><IoChevronBack size={25}/></button><h1 className="text-[25px] font-bold text-[#173f87]">My Score</h1></header>
+      <div className="mt-7 grid gap-5 lg:grid-cols-[265px_minmax(0,1fr)]">
+        <aside className="space-y-5 lg:sticky lg:top-5 lg:self-start">
+          <section className="rounded-xl bg-[#e8eef7] p-5"><p className="text-xs text-slate-500">My score</p><h2 className="mt-2 text-sm font-bold uppercase text-[#173f87]">{result.quiz?.title || "Quiz Series"}</h2><p className="mt-4 text-3xl font-black text-[#173f87]">{result.score || 0}/{result.totalQuestions || 0}</p></section>
+          <section className="rounded-xl bg-[#e8eef7] p-5"><h2 className="text-sm font-bold uppercase text-[#173f87]">Filter by..</h2><select value={resultFilter} onChange={(e) => setResultFilter(e.target.value)} className="mt-4 w-full rounded-lg border-0 bg-white px-3 py-3 text-xs"><option value="all">Results</option><option value="correct">Correct answers</option><option value="wrong">Wrong answers</option></select><select value={themeFilter} onChange={(e) => setThemeFilter(e.target.value)} className="mt-3 w-full rounded-lg border-0 bg-white px-3 py-3 text-xs"><option value="all">Themes</option>{themes.map((theme) => <option key={theme} value={theme}>{theme}</option>)}</select></section>
+          <section className="rounded-xl bg-[#e8eef7] p-5"><h2 className="text-sm font-bold text-[#173f87]">Show the question...</h2><div className="mt-4 flex flex-wrap gap-3">{result.answers?.map((answer,index) => <button key={index} onClick={() => refs.current[index]?.scrollIntoView({ behavior: "smooth", block: "start" })} className={`flex h-9 w-9 items-center justify-center rounded-lg text-xs font-bold text-white ${answer.isCorrect ? "bg-[#24bd3b]" : "bg-[#df263d]"}`}>{index + 1}</button>)}</div></section>
+        </aside>
 
-      {answer ? <section className="mt-8 rounded-2xl bg-[#e8eef7] p-5">
-        <div className="mb-5 flex min-w-0 items-center justify-between gap-3"><div className="min-w-0"><p className="text-xs font-bold uppercase text-[#173f87]">Answer Review</p><h2 className="mt-1 text-lg font-bold sm:text-xl">Question {index + 1} of {answers.length}</h2></div><div className="flex shrink-0 gap-2"><button type="button" aria-label="Previous question" disabled={index === 0} onClick={() => setIndex((value) => value - 1)} className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#dce6f4] text-[#e3263c] disabled:opacity-40"><IoArrowBack /></button><button type="button" aria-label="Next question" disabled={index + 1 >= answers.length} onClick={() => setIndex((value) => value + 1)} className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#e3263c] text-white disabled:opacity-40"><IoArrowForward /></button></div></div>
-
-        <article className="min-w-0 overflow-hidden rounded-xl bg-white p-4 sm:p-5">
-          <div className={`grid min-w-0 gap-5 ${question.questionImage ? "xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]" : "grid-cols-1"}`}>
-            {question.questionImage && <div className="min-w-0 rounded-xl bg-slate-50 p-2"><img src={mediaUrl(question.questionImage)} alt="Question" className="mx-auto max-h-[360px] w-full rounded-lg object-contain" /></div>}
-            <div className="min-w-0"><div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-start sm:justify-between"><h3 className="min-w-0 break-words text-base font-bold leading-7 sm:text-lg">{question.questionText || "Question"}</h3><span className={`w-fit shrink-0 rounded-full px-3 py-1 text-xs font-bold ${answer.isCorrect ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"}`}>{answer.isCorrect ? "Correct" : "Wrong"}</span></div>
-              <div className="mt-4 space-y-2">{question.options?.map((option, optionIndex) => {
-                const isCorrect = optionIndex === correct;
-                const isWrongSelected = optionIndex === selected && !answer.isCorrect;
-                return <div key={optionIndex} className={`grid min-w-0 grid-cols-[28px_minmax(0,1fr)] items-start gap-3 rounded-lg border p-3 text-sm font-semibold sm:grid-cols-[28px_minmax(0,1fr)_auto] ${isCorrect ? "border-green-300 bg-green-50 text-green-800" : isWrongSelected ? "border-red-300 bg-red-50 text-red-800" : "border-slate-200 bg-white text-slate-600"}`}><span className={`flex h-7 w-7 items-center justify-center rounded-md ${isCorrect ? "bg-green-600 text-white" : isWrongSelected ? "bg-red-600 text-white" : "bg-slate-100"}`}>{optionLetter(optionIndex)}</span><span className="min-w-0 break-words leading-6">{option.text}</span>{isCorrect && <b className="col-start-2 text-[10px] uppercase sm:col-auto sm:self-center">Correct answer</b>}{isWrongSelected && <b className="col-start-2 text-[10px] uppercase sm:col-auto sm:self-center">Your answer</b>}</div>;
-              })}</div>
-            </div>
-          </div>
-          {(question.markedAnswerImage || question.explanationImage || question.explanationText) && <div className="mt-5 min-w-0 overflow-hidden rounded-xl bg-[#f5f8fc] p-4"><h4 className="font-bold text-[#173f87]">Explanation</h4>{question.explanationText && <p className="mt-2 break-words text-sm leading-6 text-slate-600">{question.explanationText}</p>}{(question.markedAnswerImage || question.explanationImage) && <img src={mediaUrl(question.markedAnswerImage || question.explanationImage)} alt="Correct answer explanation" className="mx-auto mt-3 max-h-[360px] max-w-full rounded-xl object-contain" />}</div>}
-        </article>
-      </section> : <section className="mt-8 rounded-xl bg-[#e8eef7] p-10 text-center text-sm text-slate-500">No answer review is available.</section>}
+        <section className="space-y-7">
+          {!visibleAnswers.length && <div className="rounded-xl bg-[#e8eef7] p-10 text-center text-sm text-slate-500">No answer matches this filter.</div>}
+          {visibleAnswers.map((answer) => {
+            const originalIndex = result.answers.indexOf(answer);
+            const question = answer.question || {};
+            const selected = Number(answer.selectedOptionIndex);
+            const correct = Number(answer.correctOptionIndex);
+            return <article ref={(node) => { refs.current[originalIndex] = node; }} key={`${question._id}-${originalIndex}`} className="scroll-mt-5 overflow-hidden rounded-[11px] bg-[#e8eef7] p-3">
+              {question.questionImage && <img src={mediaUrl(question.questionImage)} alt="Question" className="h-[250px] w-full rounded-[9px] bg-white object-cover sm:h-[365px]"/>}
+              <div className={`mt-5 grid gap-5 ${answer.isCorrect ? "lg:grid-cols-[minmax(0,1fr)_210px]" : "lg:grid-cols-[minmax(0,1fr)_230px]"}`}>
+                <div className="min-w-0">
+                  <div className="flex gap-3"><span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-[7px] text-sm font-bold text-white ${answer.isCorrect ? "bg-[#20bd39]" : "bg-[#e2253b]"}`}>{originalIndex + 1}</span><div><h2 className="text-[15px] font-bold text-[#173f87]">{answer.isCorrect ? "Right answer" : "Wrong answer"}</h2><p className="mt-1 text-[11px] text-slate-500">{answer.isCorrect ? "You answered correctly" : "You didn’t answer correctly"}</p></div></div>
+                  <h3 className="mt-7 text-[13px] font-bold">{question.questionText}</h3>
+                  <div className="mt-4 space-y-2">{question.options?.map((option,index) => {
+                    const correctOption = index === correct;
+                    const wrongSelection = index === selected && !answer.isCorrect;
+                    return <div key={index} className={`flex min-h-[38px] items-center justify-between gap-4 rounded-[7px] border px-3 py-2 text-[11px] ${correctOption ? "border-[#20bd39] bg-[#f5fff6] text-[#287b35]" : wrongSelection ? "border-[#e2253b] bg-[#fff7f8] text-[#b82033]" : "border-transparent bg-transparent text-slate-600"}`}><span>{option.text}</span><span className="min-w-[90px] border-b border-dashed border-slate-500 pb-0.5 text-right font-bold">{letter(index)}</span></div>;
+                  })}</div>
+                </div>
+                <aside className="space-y-3">
+                  <div className="flex items-center gap-3"><span className="flex h-11 min-w-11 items-center justify-center rounded-full bg-[#f6b72d] px-2 text-[11px] font-bold text-white">{question.topic || "—"}</span><button onClick={() => speak(question)} className="flex h-11 flex-1 items-center justify-center gap-2 rounded-[8px] bg-white px-3 text-[11px] font-bold text-[#173f87]"><IoMusicalNotes/> Listen to the answer</button></div>
+                  {!answer.isCorrect && <div className="rounded-[9px] bg-white p-4 text-[11px]"><p className="font-bold text-[#173f87]">My first answer</p><span className="mt-3 inline-flex rounded-[6px] bg-[#20bd39] px-4 py-2 font-bold text-white">{question.topic || letter(correct)}</span><p className="mt-5 font-bold text-[#173f87]">My second answer</p><div className="mt-3 flex gap-3"><span className="rounded-[6px] bg-[#20bd39] px-4 py-2 font-bold text-white">{question.topic || letter(correct)}</span><span className="rounded-[6px] bg-[#e2253b] px-4 py-2 font-bold text-white">{letter(selected)}</span></div></div>}
+                </aside>
+              </div>
+              {(question.explanationText || question.explanationImage || question.markedAnswerImage) && <div className="mt-5 rounded-xl bg-white p-4">{question.explanationText && <p className="text-sm leading-6 text-slate-600">{question.explanationText}</p>}{(question.markedAnswerImage || question.explanationImage) && <img src={mediaUrl(question.markedAnswerImage || question.explanationImage)} alt="Explanation" className="mx-auto mt-3 max-h-[320px] rounded-lg object-contain"/>}</div>}
+            </article>;
+          })}
+        </section>
+      </div>
     </div>
   </main>;
 }
 
-export default function StudentCodeResultsPage() {
-  return <Suspense fallback={<Message>Loading result...</Message>}><ResultsContent /></Suspense>;
-}
+export default function ScorePage() { return <Suspense fallback={<Message>Loading your score...</Message>}><ScoreContent/></Suspense>; }

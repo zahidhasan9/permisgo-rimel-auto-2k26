@@ -70,7 +70,7 @@ function QuizContent() {
     try {
       window.speechSynthesis?.cancel();
       const response = await finishQuizAttempt(attempt._id);
-      router.push(`/student/code/my-history?latest=${response.data?.data?._id || ""}`);
+      router.push(`/student/code/results?attemptId=${response.data?.data?._id || attempt._id}`);
     } catch (requestError) {
       finishedRef.current = false;
       setError(requestError.response?.data?.message || requestError.message || "Quiz could not be finished.");

@@ -95,7 +95,6 @@ export default function CodeLearningPage() {
         )[0] || lessons[0],
     [lessons],
   );
-  const evaluations = quizzes.filter((quiz) => quiz.type === "evaluation");
   if (loading)
     return (
       <main className="min-h-screen bg-white p-6">
@@ -276,13 +275,11 @@ function Empty({ text }) {
 }
 
 function EvaluationTab({ quizzes, attempts }) {
-  const mockQuizzes = quizzes.filter(
-    (quiz) => quiz.type === "mock_test" || quiz.type === "evaluation",
+  const availableQuizzes = quizzes.filter(
+    (quiz) => !quiz.status || quiz.status === "active",
   );
   const completed = attempts.filter(
-    (item) =>
-      item.status === "completed" &&
-      (item.quiz?.type === "mock_test" || item.quiz?.type === "evaluation"),
+    (item) => item.status === "completed",
   );
   const average = completed.length
     ? Math.round(
@@ -298,17 +295,17 @@ function EvaluationTab({ quizzes, attempts }) {
       new Date(b.finishedAt || b.createdAt) -
       new Date(a.finishedAt || a.createdAt),
   )[0];
-  const firstQuiz = mockQuizzes[0];
+  const firstQuiz = availableQuizzes[0];
   return (
     <>
       <section className="mt-8 rounded-2xl bg-[#e8eef7] p-4 sm:p-6">
         <div className="grid gap-6 md:grid-cols-2">
           <Summary
-            title="Total Performance in Mock Exam"
-            description="See your overall score and track your progress in traffic rules knowledge."
+            title="Total Performance in All Tests"
+            description="See your overall score and track progress across every available test."
           >
             <p>Score: {average}%</p>
-            <p>Total Mock Test: {completed.length}</p>
+            <p>Total Tests Taken: {completed.length}</p>
             <p>Passed: {passed}</p>
             {firstQuiz ? (
               <Link
@@ -353,15 +350,21 @@ function EvaluationTab({ quizzes, attempts }) {
       </section>
       <section className="mt-8 rounded-2xl bg-[#e8eef7] p-4 sm:p-6">
         <div className="rounded-xl bg-white p-4 sm:p-6">
-          <h2 className="text-2xl font-bold text-[#173f87]">Mock Exam</h2>
+          <h2 className="text-2xl font-bold text-[#173f87]">All Tests</h2>
           <div className="mt-7 overflow-hidden rounded-lg bg-[#e8eef7]">
-            {mockQuizzes.length ? (
-              mockQuizzes.map((quiz) => {
-                const latest = attempts.find(
-                  (item) =>
-                    String(item.quiz?._id || item.quiz) === String(quiz._id) &&
-                    item.status === "completed",
-                );
+            {availableQuizzes.length ? (
+              availableQuizzes.map((quiz) => {
+                const latest = attempts
+                  .filter(
+                    (item) =>
+                      String(item.quiz?._id || item.quiz) === String(quiz._id) &&
+                      item.status === "completed",
+                  )
+                  .sort(
+                    (a, b) =>
+                      new Date(b.finishedAt || b.createdAt) -
+                      new Date(a.finishedAt || a.createdAt),
+                  )[0];
                 const date = new Date(
                   latest?.finishedAt ||
                     latest?.createdAt ||
@@ -393,16 +396,18 @@ function EvaluationTab({ quizzes, attempts }) {
                           ? `/student/code/results?attemptId=${latest._id}`
                           : `/student/code/code-challenge?quizId=${quiz._id}`
                       }
-                      className="rounded-lg bg-[#e3263c] px-4 py-2.5 text-center text-xs font-bold text-white"
+                      className={`rounded-lg px-4 py-2.5 text-center text-xs font-bold text-white ${
+                        latest ? "bg-[#103677]" : "bg-[#e3263c]"
+                      }`}
                     >
-                      {latest ? "View Result" : "Take The Exam"}
+                      {latest ? "Goodbye" : "Take The Exam"}
                     </Link>
                   </div>
                 );
               })
             ) : (
               <p className="p-8 text-center text-slate-500">
-                No mock exams available.
+                No tests are available.
               </p>
             )}
           </div>
