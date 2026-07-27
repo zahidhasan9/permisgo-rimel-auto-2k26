@@ -11,7 +11,7 @@ const practiceCards = [
   ["Exam Mock Séries", "/image/exam-mock.png", "/student/code-learning"],
   ["Thématiques Séries", "/image/thematiques.png", "/student/code/thematiques-series"],
   ["Crash Test", "/image/crash-test.png", "/student/code/crash-test"],
-  ["My mistakes", "/image/mistakes.png", "/student/code/my-mistakes", "09"],
+  ["My mistakes", "/image/mistakes.png", "/student/code/my-mistakes"],
   ["My History", "/image/history.png", "/student/code/my-history"],
 ];
 
@@ -88,11 +88,17 @@ function MenuGrid({ items }) {
 
 function TopicBar({ item }) {
   const [code, value, width, color] = item;
-  return <div className="relative h-[45px] overflow-hidden rounded-[4px] bg-white"><div className="absolute inset-y-0 left-0 flex items-center justify-between overflow-hidden rounded-[4px] px-[18px] text-[20px] font-bold text-white transition-[width] duration-500" style={{ width, minWidth: width === "0%" ? 0 : 132, backgroundColor: color }}><span>{code}</span><span>{value}</span></div></div>;
+  return <div className="relative h-[48px] overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+    <div className="absolute inset-y-0 left-0 rounded-r-lg opacity-90 transition-[width] duration-500" style={{ width, backgroundColor: color }} />
+    <div className="absolute inset-0 flex items-center justify-between px-3">
+      <span className="rounded-md bg-white/95 px-2.5 py-1 text-[15px] font-extrabold shadow-sm" style={{ color }}>{code}</span>
+      <span className="min-w-[58px] rounded-md bg-white/95 px-2.5 py-1 text-center text-[15px] font-extrabold text-[#173f87] shadow-sm">{value}</span>
+    </div>
+  </div>;
 }
 
 function TopicText({ item }) {
-  return <p className="text-[13px] font-medium text-[#7B7F89]"><b className="mr-1 text-[18px]" style={{ color: item[1] }}>{item[0]} :</b>{item[2]}</p>;
+  return <p className="flex items-start gap-2 text-[13px] font-medium leading-6 text-[#4b5563]"><b className="min-w-[38px] shrink-0 text-[17px]" style={{ color: item[1] }}>{item[0]} :</b><span>{item[2]}</span></p>;
 }
 
 export default function CodePracticePage() {
@@ -100,15 +106,29 @@ export default function CodePracticePage() {
   const [latestSeries, setLatestSeries] = useState([]);
   const [latestLoading, setLatestLoading] = useState(true);
   const [topicResults, setTopicResults] = useState({});
+  const [mistakeCount, setMistakeCount] = useState(0);
 
   useEffect(() => {
     let active = true;
     getMyQuizAttempts()
       .then((response) => {
-        if (active) setLatestSeries((response.data?.data || []).slice(0, 5));
+        if (!active) return;
+        const attempts = response.data?.data || [];
+        setLatestSeries(attempts.slice(0, 5));
+        setMistakeCount(
+          attempts
+            .filter((attempt) => attempt.status === "completed")
+            .reduce(
+              (total, attempt) => total + Number(attempt.wrongCount || 0),
+              0,
+            ),
+        );
       })
       .catch(() => {
-        if (active) setLatestSeries([]);
+        if (active) {
+          setLatestSeries([]);
+          setMistakeCount(0);
+        }
       })
       .finally(() => {
         if (active) setLatestLoading(false);
@@ -138,7 +158,7 @@ export default function CodePracticePage() {
     <div className="mx-auto w-full ">
       <header className="mb-[34px] flex items-center gap-[18px]"><button type="button" onClick={() => router.back()} className="flex h-[48px] w-[48px] items-center justify-center rounded-[12px] bg-[#EEF2F8]"><Chevron back /></button><h1 className="text-[25px] font-bold text-[#0D4598]">Code Practice</h1></header>
 
-      <MenuGrid items={practiceCards} />
+      <MenuGrid items={practiceCards.map((item) => item[0] === "My mistakes" ? [...item, String(mistakeCount)] : item)} />
       <h2 className="mb-[22px] mt-[34px] text-[22px] font-bold text-[#0D4598]">Code Revisions</h2>
       <MenuGrid items={revisionCards} />
       <h2 className="mb-[22px] mt-[34px] text-[22px] font-bold text-[#0D4598]">Exam</h2>

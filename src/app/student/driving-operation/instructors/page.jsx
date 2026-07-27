@@ -138,7 +138,7 @@ export default function InstructorsPage() {
                   <div className="truncate pr-3 text-gray-600" title={location?.address}>{[location?.city, location?.postalCode].filter(Boolean).join(", ") || user.city || "Location not set"}</div>
                   <div className="text-gray-600">{teacher.experienceYears || 0} years</div>
                   <div className="capitalize text-gray-600">{vehicle?.vehicleType || teacher.lessonTypes?.[0] || "Not set"}</div>
-                  <div className="text-right"><Link href={{ pathname: "/student/book-driving", query: { teacher: user._id, lat: location?.coordinates?.lat, lng: location?.coordinates?.lng, address: location?.address, date, startTime, duration, vehicleType: vehicle?.vehicleType || vehicleType || "manual" } }} className="inline-flex rounded-md bg-red-600 px-3 py-1.5 font-semibold text-white hover:bg-red-700">View & book</Link></div>
+                  <div className="text-right"><Link href="/student/driving-operation/book-lesson" className="inline-flex rounded-md bg-red-600 px-3 py-1.5 font-semibold text-white hover:bg-red-700">View & book</Link></div>
                 </div>
               );
             }) : (

@@ -1,222 +1,44 @@
-// "use client";
-
-// import { useState } from "react";
-// import { FaSearch, FaMapMarkerAlt } from "react-icons/fa";
-
-// const places = ["Paris", "Jussieu", "Belleville", "Louvre", "Berlin"];
-
-// const list = [
-//   { name: "Jussieu Metro Station", km: "1.3 km", date: "Tue, April 14" },
-//   { name: "Belleville", km: "2.5 km", date: "March 07 - 10" },
-//   { name: "Louvre Station", km: "3.1 km", date: "March 09 - 12" },
-//   { name: "Paris Central", km: "1.0 km", date: "March 11 - 15" },
-// ];
-
-// export default function Page() {
-//   const [search, setSearch] = useState("");
-
-//   const filtered = places.filter((p) =>
-//     p.toLowerCase().includes(search.toLowerCase()),
-//   );
-
-//   return (
-//     <div className="h-screen w-full bg-[#F3F6FB] flex flex-col p-2">
-//       {/* HEADER (compact) */}
-//       <div className="mb-2">
-//         <h1 className="text-lg font-bold text-[#0F3D91]">Book Lesson</h1>
-//       </div>
-
-//       {/* MAIN WRAPPER */}
-//       <div className="flex-1 bg-[#E6EBF5] rounded-xl p-3 flex gap-3 overflow-hidden">
-//         {/* LEFT PANEL */}
-//         <div className="w-[300px] flex flex-col gap-3">
-//           {/* SEARCH */}
-//           <div className="relative">
-//             <FaSearch className="absolute left-3 top-3 text-gray-400 text-xs" />
-
-//             <input
-//               value={search}
-//               onChange={(e) => setSearch(e.target.value)}
-//               placeholder="Search location..."
-//               className="w-full pl-9 pr-3 py-2 rounded-lg bg-white text-xs outline-none"
-//             />
-
-//             {search && (
-//               <div className="absolute z-10 w-full bg-white mt-1 rounded-lg shadow border">
-//                 {filtered.map((p, i) => (
-//                   <div
-//                     key={i}
-//                     onClick={() => setSearch(p)}
-//                     className="p-2 text-xs hover:bg-gray-100 cursor-pointer"
-//                   >
-//                     📍 {p}
-//                   </div>
-//                 ))}
-//               </div>
-//             )}
-//           </div>
-
-//           {/* BUTTONS */}
-//           <button className="bg-[#0F3D91] text-white py-2 rounded-lg text-xs">
-//             Manual
-//           </button>
-
-//           <button className="bg-white py-2 rounded-lg text-xs">
-//             Automatic
-//           </button>
-
-//           {/* LIST */}
-//           <div className="flex-1 overflow-auto space-y-2">
-//             {list.map((item, i) => (
-//               <div key={i} className="bg-white rounded-lg p-3 shadow-sm">
-//                 <div className="flex gap-2">
-//                   <FaMapMarkerAlt className="text-[#0F3D91] text-xs mt-1" />
-
-//                   <div>
-//                     <h3 className="text-xs font-semibold">{item.name}</h3>
-
-//                     <p className="text-[10px] text-gray-500">{item.km}</p>
-
-//                     <p className="text-[10px] text-[#0F3D91] mt-1">
-//                       {item.date}
-//                     </p>
-//                   </div>
-//                 </div>
-//               </div>
-//             ))}
-//           </div>
-//         </div>
-
-//         {/* RIGHT MAP */}
-//         <div className="flex-1 rounded-xl overflow-hidden relative">
-//           <iframe
-//             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2625.6313577021792!2d2.352085076463716!3d48.84616997133053!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47e671faaf02920b%3A0x53500e1db50cf704!2sJussieu!5e0!3m2!1sen!2sbd!4v1782977932097!5m2!1sen!2sbd"
-//             className="w-full h-full border-0"
-//             loading="lazy"
-//           />
-
-//           {/* FLOAT CARD (smaller) */}
-//           <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-white rounded-xl p-3 shadow-lg w-[240px]">
-//             <div className="flex items-center gap-2">
-//               <img
-//                 src="https://i.pravatar.cc/80"
-//                 className="w-8 h-8 rounded-full"
-//                 alt=""
-//               />
-
-//               <div>
-//                 <h3 className="text-xs font-semibold">Robert Fox</h3>
-
-//                 <p className="text-[10px] text-gray-500">5+ Years</p>
-//               </div>
-//             </div>
-
-//             <button className="mt-2 w-full bg-red-600 text-white py-1 rounded text-xs">
-//               View Details
-//             </button>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
 "use client";
 
 import GooglePlaceAutocomplete from "@/components/maps/GooglePlaceAutocomplete";
 import {
-  CircleF,
   GoogleMap,
+  InfoWindowF,
   MarkerF,
   useJsApiLoader,
 } from "@react-google-maps/api";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
-  FaCalendarAlt,
   FaCarSide,
+  FaChevronDown,
+  FaChevronUp,
   FaClock,
-  FaLocationArrow,
+  FaHeart,
   FaMapMarkerAlt,
-  FaSearch,
+  FaRegHeart,
   FaStar,
-  FaTimesCircle,
-  FaUserTie,
 } from "react-icons/fa";
+import { IoChevronBack } from "react-icons/io5";
+
 import {
-  cancelLocationBooking,
   createLocationBooking,
   getAvailableBookingSlots,
-  getLocationBookings,
   getNearbyTeachers,
+  getTeacherReviews,
 } from "@/features/API";
+import { mediaUrl } from "@/utils/mediaUrl";
 
-const GOOGLE_MAP_LIBRARIES = ["places"];
-const MAP_STYLE = { width: "100%", height: "620px" };
+const MAP_LIBRARIES = ["places"];
 const DEFAULT_CENTER = { lat: 48.8566, lng: 2.3522 };
-
-const getToday = () => {
-  const now = new Date();
-  const offset = now.getTimezoneOffset();
-  return new Date(now.getTime() - offset * 60 * 1000)
-    .toISOString()
-    .slice(0, 10);
+const MAP_OPTIONS = {
+  disableDefaultUI: true,
+  zoomControl: true,
+  clickableIcons: false,
 };
-
-const initialSearch = () => ({
-  address: "",
-  placeId: "",
-  lat: null,
-  lng: null,
-  vehicleType: "manual",
-  date: getToday(),
-  startTime: "09:00",
-  duration: 60,
-  radius: 10,
-});
 
 const unwrap = (response, fallback = null) =>
   response?.data?.data ?? response?.data ?? fallback;
-
-const getErrorMessage = (error, fallback) =>
-  error?.response?.data?.message || error?.message || fallback;
-
-const hasCoordinate = (value) =>
-  value !== null && value !== "" && Number.isFinite(Number(value));
-
-const timeToMinutes = (value) => {
-  const [hours, minutes] = String(value || "")
-    .split(":")
-    .map(Number);
-
-  if (!Number.isFinite(hours) || !Number.isFinite(minutes)) return null;
-  return hours * 60 + minutes;
-};
-
-const minutesToTime = (minutes) => {
-  if (!Number.isFinite(minutes) || minutes < 0 || minutes >= 1440) return "";
-  const hours = Math.floor(minutes / 60);
-  const remainder = minutes % 60;
-  return `${String(hours).padStart(2, "0")}:${String(remainder).padStart(2, "0")}`;
-};
-
-const calculateEndTime = (startTime, duration) => {
-  const start = timeToMinutes(startTime);
-  if (start === null) return "";
-  return minutesToTime(start + Number(duration));
-};
-
-const formatDate = (value) => {
-  if (!value) return "Date not set";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-
-  return new Intl.DateTimeFormat("en-GB", {
-    weekday: "short",
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  }).format(date);
-};
 
 const teacherPoint = (teacher) => {
   const location = teacher?.nearestLocation;
@@ -226,988 +48,451 @@ const teacherPoint = (teacher) => {
   const lng = Number(
     location?.coordinates?.lng ?? location?.geoLocation?.coordinates?.[0],
   );
-
   return Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : null;
 };
 
-const statusClasses = (status) => {
-  if (status === "confirmed") return "bg-emerald-100 text-emerald-700";
-  if (status === "completed") return "bg-blue-100 text-blue-700";
-  if (["cancelled", "rejected", "expired"].includes(status)) {
-    return "bg-red-100 text-red-700";
-  }
-  return "bg-amber-100 text-amber-700";
+const dateKey = (date) => {
+  const offset = date.getTimezoneOffset();
+  return new Date(date.getTime() - offset * 60000).toISOString().slice(0, 10);
 };
 
-function MapError({ message }) {
+const futureDates = (count = 7) =>
+  Array.from({ length: count }, (_, index) => {
+    const date = new Date();
+    date.setDate(date.getDate() + index);
+    return dateKey(date);
+  });
+
+const formatDate = (value) =>
+  new Intl.DateTimeFormat("en-GB", {
+    weekday: "long",
+    month: "long",
+    day: "2-digit",
+  }).format(new Date(`${value}T12:00:00`));
+
+const formatBookingDate = (value) =>
+  new Intl.DateTimeFormat("en-GB", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  }).format(new Date(value));
+
+const teacherName = (teacher) =>
+  teacher?.user?.name || teacher?.user?.fullName || "Driving Instructor";
+
+const vehicleFor = (teacher, type) => {
+  const vehicles = (teacher?.vehicles || []).filter(
+    (vehicle) => vehicle.vehicleType === type,
+  );
+  return vehicles.find((vehicle) => vehicle.isDefault) || vehicles[0] || null;
+};
+
+function BackHeader({ onBack }) {
   return (
-    <div className="rounded-3xl border border-red-200 bg-red-50 p-6 text-sm text-red-700">
-      <p className="font-black">Google Maps could not load</p>
-      <p className="mt-2">{message}</p>
-      <p className="mt-3 text-xs leading-5">
-        Put a valid key in <code>NEXT_PUBLIC_GOOGLE_MAPS_API_KEY</code>, then
-        enable Maps JavaScript API and Places API (New).
-      </p>
-    </div>
+    <header className="mb-7 flex items-center gap-4">
+      <button type="button" onClick={onBack} className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#eef2f8]"><IoChevronBack size={24} /></button>
+      <h1 className="text-[24px] font-bold text-[#123f88]">Book Lesson</h1>
+    </header>
+  );
+}
+
+function Notice({ error }) {
+  if (!error) return null;
+  return <div className="mb-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700">{error}</div>;
+}
+
+function Avatar({ teacher, className = "h-12 w-12" }) {
+  return teacher?.user?.avatar ? (
+    <img src={mediaUrl(teacher.user.avatar)} alt={teacherName(teacher)} className={`${className} rounded-full object-cover`} />
+  ) : (
+    <div className={`${className} flex items-center justify-center rounded-full bg-[#dbe7f7] text-lg font-black text-[#123f88]`}>{teacherName(teacher).charAt(0)}</div>
   );
 }
 
 export default function BookLessonPage() {
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY?.trim();
-
-  if (!apiKey) {
-    return (
-      <MapError message="NEXT_PUBLIC_GOOGLE_MAPS_API_KEY is missing from .env.local." />
-    );
-  }
-
-  return <BookLessonMap apiKey={apiKey} />;
-}
-
-function BookLessonMap({ apiKey }) {
   const { isLoaded, loadError } = useJsApiLoader({
-    id: "permisgo-google-maps",
-    googleMapsApiKey: apiKey,
-    libraries: GOOGLE_MAP_LIBRARIES,
-    version: "weekly",
+    id: "permisgo-booking-map",
+    googleMapsApiKey: apiKey || "",
+    libraries: MAP_LIBRARIES,
     language: "en",
     region: "FR",
   });
 
-  if (loadError) return <MapError message={loadError.message} />;
-
-  if (!isLoaded) {
-    return (
-      <div className="rounded-3xl border border-slate-200 bg-white p-8 text-center font-bold text-slate-500">
-        Loading Google Maps...
-      </div>
-    );
-  }
-
-  return <BookLessonContent />;
+  if (!apiKey) return <MapMessage text="Google Maps key is missing." />;
+  if (loadError) return <MapMessage text="Google Maps could not be loaded." />;
+  if (!isLoaded) return <MapMessage text="Loading booking map..." />;
+  return <BookingFlow />;
 }
 
-function BookLessonContent() {
+function MapMessage({ text }) {
+  return <main className="min-h-screen bg-white p-6"><div className="rounded-xl bg-[#e8eef7] p-10 text-center font-semibold text-[#123f88]">{text}</div></main>;
+}
+
+function BookingFlow() {
+  const router = useRouter();
   const mapRef = useRef(null);
-  const [search, setSearch] = useState(initialSearch);
+  const [step, setStep] = useState("map");
+  const [search, setSearch] = useState({
+    address: "",
+    placeId: "",
+    lat: DEFAULT_CENTER.lat,
+    lng: DEFAULT_CENTER.lng,
+  });
+  const [vehicleType, setVehicleType] = useState("manual");
   const [teachers, setTeachers] = useState([]);
-  const [selectedTeacherId, setSelectedTeacherId] = useState("");
-  const [availableSlots, setAvailableSlots] = useState([]);
-  const [bookings, setBookings] = useState([]);
-  const [searched, setSearched] = useState(false);
-  const [searching, setSearching] = useState(false);
-  const [loadingSlots, setLoadingSlots] = useState(false);
-  const [loadingBookings, setLoadingBookings] = useState(true);
+  const [selectedTeacher, setSelectedTeacher] = useState(null);
+  const [reviews, setReviews] = useState([]);
+  const [favorite, setFavorite] = useState(false);
+  const [duration, setDuration] = useState(60);
+  const [schedule, setSchedule] = useState([]);
+  const [openDate, setOpenDate] = useState("");
+  const [selectedSlot, setSelectedSlot] = useState(null);
+  const [loadingTeachers, setLoadingTeachers] = useState(false);
+  const [loadingSchedule, setLoadingSchedule] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [cancellingId, setCancellingId] = useState("");
+  const [confirmation, setConfirmation] = useState(null);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
 
-  const endTime = useMemo(
-    () => calculateEndTime(search.startTime, search.duration),
-    [search.startTime, search.duration],
+  const center = useMemo(
+    () => ({ lat: Number(search.lat), lng: Number(search.lng) }),
+    [search.lat, search.lng],
   );
 
-  const searchPoint = useMemo(() => {
-    if (!hasCoordinate(search.lat) || !hasCoordinate(search.lng)) {
-      return DEFAULT_CENTER;
-    }
-
-    return { lat: Number(search.lat), lng: Number(search.lng) };
-  }, [search.lat, search.lng]);
-
-  const selectedTeacher = useMemo(
-    () =>
-      teachers.find((teacher) => teacher?.user?._id === selectedTeacherId) ||
-      null,
-    [teachers, selectedTeacherId],
-  );
-
-  const selectedVehicle = useMemo(() => {
-    const matchingVehicles = (selectedTeacher?.vehicles || []).filter(
-      (vehicle) =>
-        vehicle?._id &&
-        vehicle.approvalStatus === "approved" &&
-        vehicle.status === "active" &&
-        vehicle.vehicleType === search.vehicleType,
-    );
-    return (
-      matchingVehicles.find((vehicle) => vehicle.isDefault) ||
-      matchingVehicles[0] ||
-      null
-    );
-  }, [search.vehicleType, selectedTeacher]);
-
-  const loadBookings = useCallback(async () => {
-    setLoadingBookings(true);
-
+  const loadTeachers = useCallback(async (location, type) => {
+    setLoadingTeachers(true);
+    setError("");
     try {
-      const response = await getLocationBookings();
-      const data = unwrap(response, []);
-      setBookings(Array.isArray(data) ? data : []);
+      const response = await getNearbyTeachers({
+        lat: location.lat,
+        lng: location.lng,
+        radius: 20,
+        vehicleType: type,
+      });
+      const list = unwrap(response, []);
+      setTeachers(Array.isArray(list) ? list : []);
+      setSelectedTeacher(null);
     } catch (requestError) {
-      setError(
-        getErrorMessage(requestError, "Your bookings could not be loaded."),
-      );
+      setTeachers([]);
+      setError(requestError.response?.data?.message || "Nearby instructors could not be loaded.");
     } finally {
-      setLoadingBookings(false);
+      setLoadingTeachers(false);
     }
   }, []);
 
   useEffect(() => {
-    loadBookings();
-  }, [loadBookings]);
+    loadTeachers(search, vehicleType);
+  }, [vehicleType]); // Search location changes are handled by place selection.
 
-  useEffect(() => {
-    if (!success) return undefined;
-    const timer = window.setTimeout(() => setSuccess(""), 5000);
-    return () => window.clearTimeout(timer);
-  }, [success]);
-
-  useEffect(() => {
-    const teacherId = selectedTeacher?.user?._id;
-
-    if (!teacherId || !search.date || !search.duration) {
-      setAvailableSlots([]);
-      return undefined;
-    }
-
-    let active = true;
-
-    const loadSlots = async () => {
-      setLoadingSlots(true);
-
-      try {
-        const response = await getAvailableBookingSlots({
-          teacher: teacherId,
-          date: search.date,
-          duration: search.duration,
-        });
-        const data = unwrap(response, {});
-
-        if (active) {
-          setAvailableSlots(
-            Array.isArray(data?.availableSlots) ? data.availableSlots : [],
-          );
-        }
-      } catch {
-        if (active) setAvailableSlots([]);
-      } finally {
-        if (active) setLoadingSlots(false);
-      }
-    };
-
-    loadSlots();
-
-    return () => {
-      active = false;
-    };
-  }, [selectedTeacher, search.date, search.duration]);
-
-  const reverseGeocode = useCallback((lat, lng) => {
-    if (!window.google?.maps) return;
-
-    const geocoder = new window.google.maps.Geocoder();
-    geocoder.geocode({ location: { lat, lng } }, (results, status) => {
-      if (status !== "OK" || !results?.[0]) return;
-
-      const result = results[0];
-      setSearch((current) => ({
-        ...current,
-        address: result.formatted_address || current.address,
-        placeId: result.place_id || current.placeId,
-      }));
-    });
-  }, []);
-
-  const setSearchPoint = useCallback(
-    (lat, lng, shouldReverse = true) => {
-      setSearch((current) => ({ ...current, lat, lng }));
-      mapRef.current?.panTo({ lat, lng });
-      mapRef.current?.setZoom(14);
-
-      if (shouldReverse) reverseGeocode(lat, lng);
-    },
-    [reverseGeocode],
-  );
-
-  const handlePlaceSelect = (place) => {
-    setSearch((current) => ({
-      ...current,
+  const selectPlace = (place) => {
+    const location = {
       address: place.address,
       placeId: place.placeId,
       lat: place.lat,
       lng: place.lng,
-    }));
-
+    };
+    setSearch(location);
     mapRef.current?.panTo({ lat: place.lat, lng: place.lng });
-    mapRef.current?.setZoom(14);
-    setError("");
+    mapRef.current?.setZoom(13);
+    loadTeachers(location, vehicleType);
   };
 
-  const useCurrentLocation = () => {
+  const openTeacher = async (teacher) => {
+    setSelectedTeacher(teacher);
     setError("");
-
-    if (!navigator.geolocation) {
-      setError("This browser does not support location access.");
-      return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-      ({ coords }) => setSearchPoint(coords.latitude, coords.longitude, true),
-      (geoError) =>
-        setError(geoError.message || "Location permission was denied."),
-      { enableHighAccuracy: true, timeout: 12000 },
-    );
-  };
-
-  const selectTeacher = (teacher) => {
-    const teacherId = teacher?.user?._id;
-    if (!teacherId) return;
-
-    setSelectedTeacherId(teacherId);
-    const point = teacherPoint(teacher);
-
-    if (point) {
-      mapRef.current?.panTo(point);
-      mapRef.current?.setZoom(15);
-    }
-  };
-
-  const runSearch = async (event) => {
-    event?.preventDefault();
-    setError("");
-    setSuccess("");
-
-    if (!hasCoordinate(search.lat) || !hasCoordinate(search.lng)) {
-      setError("Select an address from Google suggestions first.");
-      return;
-    }
-
-    if (!search.date || !search.startTime || !endTime) {
-      setError("Choose a valid date, time and lesson duration.");
-      return;
-    }
-
-    setSearching(true);
-
+    setReviews([]);
     try {
-      const response = await getNearbyTeachers({
-        lat: Number(search.lat),
-        lng: Number(search.lng),
-        radius: Number(search.radius),
-        vehicleType: search.vehicleType,
-        date: search.date,
-        startTime: search.startTime,
-        endTime,
-      });
-
-      const data = unwrap(response, []);
-      const list = Array.isArray(data) ? data : [];
-
-      setTeachers(list);
-      setSelectedTeacherId(list[0]?.user?._id || "");
-      setSearched(true);
-
-      if (list.length && window.google?.maps) {
-        const bounds = new window.google.maps.LatLngBounds();
-        bounds.extend(searchPoint);
-
-        list.forEach((teacher) => {
-          const point = teacherPoint(teacher);
-          if (point) bounds.extend(point);
-        });
-
-        mapRef.current?.fitBounds(bounds, 70);
-      } else {
-        mapRef.current?.panTo(searchPoint);
-        mapRef.current?.setZoom(12);
-      }
-    } catch (requestError) {
-      setTeachers([]);
-      setSelectedTeacherId("");
-      setSearched(true);
-      setError(
-        getErrorMessage(requestError, "Nearby teachers could not be searched."),
-      );
-    } finally {
-      setSearching(false);
+      const response = await getTeacherReviews(teacher.user._id);
+      setReviews(unwrap(response, []));
+    } catch {
+      setReviews([]);
     }
+    setStep("teacher");
   };
 
-  const submitBooking = async () => {
+  const loadSchedule = useCallback(async () => {
+    if (!selectedTeacher?.user?._id) return;
+    setLoadingSchedule(true);
     setError("");
-    setSuccess("");
-
-    if (!selectedTeacher) {
-      setError("Select a teacher first.");
-      return;
+    setSelectedSlot(null);
+    try {
+      const dates = futureDates(7);
+      const responses = await Promise.all(
+        dates.map((date) =>
+          getAvailableBookingSlots({
+            teacher: selectedTeacher.user._id,
+            date,
+            duration,
+          }).catch(() => null),
+        ),
+      );
+      const rows = dates.map((date, index) => ({
+        date,
+        slots: unwrap(responses[index], {})?.availableSlots || [],
+      }));
+      setSchedule(rows);
+      setOpenDate(rows.find((row) => row.slots.length)?.date || rows[0]?.date || "");
+    } finally {
+      setLoadingSchedule(false);
     }
+  }, [duration, selectedTeacher]);
 
-    if (!selectedVehicle) {
-      setError("The selected teacher has no approved active vehicle for this lesson type.");
-      return;
-    }
+  useEffect(() => {
+    if (step === "schedule") loadSchedule();
+  }, [loadSchedule, step]);
 
-    const location = selectedTeacher.nearestLocation;
-    if (!location?._id) {
-      setError("The selected teacher has no usable location.");
+  const book = async () => {
+    const location = selectedTeacher?.nearestLocation;
+    const vehicle = vehicleFor(selectedTeacher, vehicleType);
+    if (!selectedSlot || !location?._id || !vehicle?._id) {
+      setError("Select an available lesson time.");
       return;
     }
 
     setSubmitting(true);
-
+    setError("");
     try {
       const response = await createLocationBooking({
         teacher: selectedTeacher.user._id,
         locationId: location._id,
-        teacherVehicleId: selectedVehicle._id,
-        vehicleType: selectedVehicle.vehicleType,
-        bookingDate: search.date,
-        startTime: search.startTime,
-        endTime,
-        studentLocation: {
-          address: search.address,
-          placeId: search.placeId,
-          lat: Number(search.lat),
-          lng: Number(search.lng),
-        },
+        teacherVehicleId: vehicle._id,
+        vehicleType,
+        bookingDate: selectedSlot.date,
+        startTime: selectedSlot.startTime,
+        endTime: selectedSlot.endTime,
+        meetingPreference: "teacher_location",
+        studentLocation: search,
       });
-
       const booking = unwrap(response, null);
-      if (booking?._id) {
-        setBookings((current) => [booking, ...current]);
-      } else {
-        await loadBookings();
-      }
-
-      await runSearch();
-      setSuccess(
-        "Booking request submitted. The lesson will be created after the teacher confirms it.",
-      );
+      setConfirmation(booking);
+      setStep("confirmation");
     } catch (requestError) {
-      setError(
-        getErrorMessage(requestError, "Booking request could not be created."),
-      );
+      setError(requestError.response?.data?.message || "This slot could not be booked. Please choose another one.");
+      await loadSchedule();
     } finally {
       setSubmitting(false);
     }
   };
 
-  const cancelBooking = async (booking) => {
-    const reason = window.prompt("Why do you want to cancel this booking?");
-    if (!reason?.trim()) return;
-
-    setCancellingId(booking._id);
+  const back = () => {
     setError("");
-
-    try {
-      const response = await cancelLocationBooking(booking._id, {
-        reason: reason.trim(),
-      });
-      const updated = unwrap(response, null);
-
-      setBookings((current) =>
-        current.map((item) =>
-          item._id === booking._id
-            ? updated || { ...item, status: "cancelled" }
-            : item,
-        ),
-      );
-      setSuccess("Booking cancelled successfully.");
-    } catch (requestError) {
-      setError(
-        getErrorMessage(requestError, "Booking could not be cancelled."),
-      );
-    } finally {
-      setCancellingId("");
-    }
+    if (step === "confirmation") return router.push("/student/lessons?tab=upcoming");
+    if (step === "schedule") return setStep("teacher");
+    if (step === "teacher") return setStep("map");
+    router.back();
   };
 
   return (
-    <main className="space-y-6 pb-10">
-      <section className="rounded-3xl bg-gradient-to-r from-[#123D7A] to-[#1E63B7] p-6 text-white shadow-lg">
-        <p className="text-sm font-bold text-blue-100">
-          Location-based booking
-        </p>
-        <h1 className="mt-1 text-3xl font-black">
-          Find a driving teacher near you
-        </h1>
-        <p className="mt-2 max-w-3xl text-sm leading-6 text-blue-100">
-          Select a real Google address, choose your vehicle and time, then book
-          an available verified teacher.
-        </p>
-      </section>
-
-      {error && (
-        <div className="rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm font-semibold text-red-700">
-          {error}
-        </div>
+    <main className="min-h-screen bg-white px-3 py-6 sm:px-6">
+      <BackHeader onBack={back} />
+      <Notice error={error} />
+      {step === "map" && (
+        <MapStep
+          search={search}
+          selectPlace={selectPlace}
+          vehicleType={vehicleType}
+          setVehicleType={setVehicleType}
+          teachers={teachers}
+          selectedTeacher={selectedTeacher}
+          setSelectedTeacher={setSelectedTeacher}
+          openTeacher={openTeacher}
+          loading={loadingTeachers}
+          center={center}
+          mapRef={mapRef}
+        />
       )}
-
-      {success && (
-        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm font-semibold text-emerald-700">
-          {success}
-        </div>
+      {step === "teacher" && (
+        <TeacherStep
+          teacher={selectedTeacher}
+          reviews={reviews}
+          favorite={favorite}
+          setFavorite={setFavorite}
+          vehicleType={vehicleType}
+          onSlots={() => setStep("schedule")}
+        />
       )}
-
-      <section className="grid gap-6 xl:grid-cols-[430px_minmax(0,1fr)]">
-        <form
-          onSubmit={runSearch}
-          className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm"
-        >
-          <h2 className="text-xl font-black text-slate-900">Search details</h2>
-
-          <div className="mt-5 space-y-4">
-            <div>
-              <label className="mb-2 block text-sm font-black text-slate-700">
-                Your location
-              </label>
-              <GooglePlaceAutocomplete
-                value={search.address}
-                placeholder="Type a street, city or landmark"
-                onPlaceSelect={handlePlaceSelect}
-                onError={setError}
-              />
-              {search.address && (
-                <p className="mt-2 rounded-xl bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-800">
-                  <FaMapMarkerAlt className="mr-1 inline" /> {search.address}
-                </p>
-              )}
-            </div>
-
-            <button
-              type="button"
-              onClick={useCurrentLocation}
-              className="flex w-full items-center justify-center gap-2 rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm font-black text-blue-700 hover:bg-blue-100"
-            >
-              <FaLocationArrow /> Use current location
-            </button>
-
-            <SelectField
-              label="Vehicle"
-              value={search.vehicleType}
-              onChange={(value) =>
-                setSearch((current) => ({
-                  ...current,
-                  vehicleType: value,
-                }))
-              }
-              options={[
-                { value: "manual", label: "Manual" },
-                { value: "automatic", label: "Automatic" },
-              ]}
-            />
-
-            <div className="grid grid-cols-2 gap-3">
-              <InputField
-                label="Date"
-                type="date"
-                value={search.date}
-                min={getToday()}
-                onChange={(value) =>
-                  setSearch((current) => ({ ...current, date: value }))
-                }
-              />
-              <InputField
-                label="Start time"
-                type="time"
-                value={search.startTime}
-                onChange={(value) =>
-                  setSearch((current) => ({ ...current, startTime: value }))
-                }
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <SelectField
-                label="Duration"
-                value={search.duration}
-                onChange={(value) =>
-                  setSearch((current) => ({
-                    ...current,
-                    duration: Number(value),
-                  }))
-                }
-                options={[
-                  { value: 30, label: "30 minutes" },
-                  { value: 60, label: "1 hour" },
-                  { value: 90, label: "1.5 hours" },
-                  { value: 120, label: "2 hours" },
-                ]}
-              />
-              <SelectField
-                label="Search radius"
-                value={search.radius}
-                onChange={(value) =>
-                  setSearch((current) => ({
-                    ...current,
-                    radius: Number(value),
-                  }))
-                }
-                options={[3, 5, 10, 15, 20, 30, 50].map((value) => ({
-                  value,
-                  label: `${value} km`,
-                }))}
-              />
-            </div>
-
-            <div className="rounded-2xl bg-slate-50 px-4 py-3 text-sm font-bold text-slate-600">
-              Requested time: {search.startTime || "--"} - {endTime || "--"}
-            </div>
-
-            <button
-              type="submit"
-              disabled={searching}
-              className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#174A9B] px-5 py-3.5 text-sm font-black text-white shadow-md hover:bg-[#123D7A] disabled:opacity-60"
-            >
-              <FaSearch /> {searching ? "Searching..." : "Search teachers"}
-            </button>
-          </div>
-        </form>
-
-        <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white p-3 shadow-sm">
-          <GoogleMap
-            mapContainerStyle={MAP_STYLE}
-            center={searchPoint}
-            zoom={hasCoordinate(search.lat) ? 13 : 11}
-            onLoad={(map) => {
-              mapRef.current = map;
-            }}
-            onClick={(event) => {
-              if (!event.latLng) return;
-              setSearchPoint(event.latLng.lat(), event.latLng.lng(), true);
-            }}
-            options={{
-              streetViewControl: false,
-              mapTypeControl: false,
-              fullscreenControl: true,
-              clickableIcons: false,
-            }}
-          >
-            {hasCoordinate(search.lat) && hasCoordinate(search.lng) && (
-              <>
-                <MarkerF
-                  position={searchPoint}
-                  draggable
-                  onDragEnd={(event) => {
-                    if (!event.latLng) return;
-                    setSearchPoint(
-                      event.latLng.lat(),
-                      event.latLng.lng(),
-                      true,
-                    );
-                  }}
-                />
-                <CircleF
-                  center={searchPoint}
-                  radius={Number(search.radius) * 1000}
-                  options={{
-                    fillOpacity: 0.08,
-                    strokeOpacity: 0.45,
-                    strokeWeight: 1.5,
-                  }}
-                />
-              </>
-            )}
-
-            {teachers.map((teacher) => {
-              const point = teacherPoint(teacher);
-              if (!point) return null;
-
-              return (
-                <MarkerF
-                  key={teacher.user?._id}
-                  position={point}
-                  onClick={() => selectTeacher(teacher)}
-                />
-              );
-            })}
-          </GoogleMap>
-          <p className="px-2 pb-1 pt-3 text-xs font-semibold text-slate-500">
-            You can also click the map or drag your marker to correct the exact
-            search point.
-          </p>
-        </div>
-      </section>
-
-      <section className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
-        <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <p className="text-xs font-black uppercase tracking-wider text-blue-600">
-                Nearby teachers
-              </p>
-              <h2 className="mt-1 text-xl font-black text-slate-900">
-                Available for your request
-              </h2>
-            </div>
-            <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-black text-blue-700">
-              {teachers.length} found
-            </span>
-          </div>
-
-          {teachers.length ? (
-            <div className="mt-5 grid gap-4 md:grid-cols-2">
-              {teachers.map((teacher) => (
-                <TeacherCard
-                  key={teacher.user?._id}
-                  teacher={teacher}
-                  vehicleType={search.vehicleType}
-                  selected={teacher.user?._id === selectedTeacherId}
-                  onSelect={() => selectTeacher(teacher)}
-                />
-              ))}
-            </div>
-          ) : searched ? (
-            <div className="mt-5 rounded-2xl bg-slate-50 py-12 text-center">
-              <FaUserTie className="mx-auto text-3xl text-slate-300" />
-              <p className="mt-3 font-black text-slate-700">No teacher found</p>
-              <p className="mt-1 text-sm text-slate-500">
-                Try a larger radius, a different time, or another vehicle type.
-              </p>
-            </div>
-          ) : (
-            <div className="mt-5 rounded-2xl bg-slate-50 py-12 text-center text-sm font-bold text-slate-500">
-              Select your location and search to see available teachers.
-            </div>
-          )}
-
-          {selectedTeacher && (
-            <div className="mt-6 rounded-2xl border border-blue-100 bg-blue-50 p-4">
-              <h3 className="font-black text-slate-900">
-                Available times on {formatDate(search.date)}
-              </h3>
-              <p className="mt-1 text-xs font-semibold text-slate-500">
-                Select a slot to update the requested start time.
-              </p>
-
-              <div className="mt-4 flex flex-wrap gap-2">
-                {loadingSlots ? (
-                  <p className="text-sm font-bold text-slate-500">
-                    Loading available slots...
-                  </p>
-                ) : availableSlots.length ? (
-                  availableSlots.slice(0, 24).map((slot) => (
-                    <button
-                      key={`${slot.startTime}-${slot.endTime}`}
-                      type="button"
-                      onClick={() =>
-                        setSearch((current) => ({
-                          ...current,
-                          startTime: slot.startTime,
-                        }))
-                      }
-                      className={`rounded-xl px-3 py-2 text-xs font-black transition ${
-                        search.startTime === slot.startTime
-                          ? "bg-[#174A9B] text-white"
-                          : "bg-white text-slate-700 hover:text-blue-700"
-                      }`}
-                    >
-                      {slot.startTime} - {slot.endTime}
-                    </button>
-                  ))
-                ) : (
-                  <p className="text-sm font-bold text-slate-500">
-                    No free slot is available for this duration.
-                  </p>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
-
-        <div className="space-y-6">
-          {selectedTeacher ? (
-            <BookingSummary
-              teacher={selectedTeacher}
-              search={search}
-              endTime={endTime}
-              submitting={submitting}
-              onSubmit={submitBooking}
-            />
-          ) : (
-            <div className="rounded-3xl border border-slate-200 bg-white p-6 text-center shadow-sm">
-              <FaCarSide className="mx-auto text-3xl text-slate-300" />
-              <p className="mt-3 font-black text-slate-700">Select a teacher</p>
-              <p className="mt-1 text-sm text-slate-500">
-                The booking summary will appear here.
-              </p>
-            </div>
-          )}
-        </div>
-      </section>
-
-      <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <p className="text-xs font-black uppercase tracking-wider text-blue-600">
-              My requests
-            </p>
-            <h2 className="mt-1 text-xl font-black text-slate-900">
-              Driving lesson bookings
-            </h2>
-          </div>
-          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-700">
-            {bookings.length}
-          </span>
-        </div>
-
-        {loadingBookings ? (
-          <p className="py-10 text-center font-bold text-slate-500">
-            Loading bookings...
-          </p>
-        ) : bookings.length ? (
-          <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {bookings.map((booking) => (
-              <BookingCard
-                key={booking._id}
-                booking={booking}
-                cancelling={cancellingId === booking._id}
-                onCancel={() => cancelBooking(booking)}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="mt-5 rounded-2xl bg-slate-50 py-10 text-center text-sm font-bold text-slate-500">
-            You have no driving lesson booking yet.
-          </div>
-        )}
-      </section>
+      {step === "schedule" && (
+        <ScheduleStep
+          teacher={selectedTeacher}
+          duration={duration}
+          setDuration={setDuration}
+          schedule={schedule}
+          loading={loadingSchedule}
+          openDate={openDate}
+          setOpenDate={setOpenDate}
+          selectedSlot={selectedSlot}
+          setSelectedSlot={setSelectedSlot}
+          submitting={submitting}
+          book={book}
+        />
+      )}
+      {step === "confirmation" && (
+        <ConfirmationStep booking={confirmation} teacher={selectedTeacher} router={router} />
+      )}
     </main>
   );
 }
 
-function TeacherCard({ teacher, vehicleType, selected, onSelect }) {
-  const user = teacher?.user || {};
-  const location = teacher?.nearestLocation || {};
-  const vehicle = (teacher?.vehicles || []).find(
-    (item) => item.vehicleType === vehicleType,
-  );
-
+function MapStep({
+  search,
+  selectPlace,
+  vehicleType,
+  setVehicleType,
+  teachers,
+  selectedTeacher,
+  setSelectedTeacher,
+  openTeacher,
+  loading,
+  center,
+  mapRef,
+}) {
   return (
-    <button
-      type="button"
-      onClick={onSelect}
-      className={`rounded-2xl border p-4 text-left transition ${
-        selected
-          ? "border-blue-500 bg-blue-50 ring-4 ring-blue-100"
-          : "border-slate-200 bg-white hover:border-blue-300"
-      }`}
-    >
-      <div className="flex items-start gap-3">
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#174A9B] font-black text-white">
-          {(user.name || "T").charAt(0).toUpperCase()}
+    <section className="rounded-xl bg-[#e8eef7] p-4 sm:p-5">
+      <div className="mb-4 grid gap-4 lg:grid-cols-[310px_1fr]">
+        <GooglePlaceAutocomplete value={search.address} placeholder="Search a location" onPlaceSelect={selectPlace} />
+        <div className="flex justify-end">
+          <div className="inline-flex rounded-full bg-white p-1">
+            {["manual", "automatic"].map((type) => (
+              <button key={type} type="button" onClick={() => setVehicleType(type)} className={`rounded-full px-5 py-2 text-xs font-bold capitalize ${vehicleType === type ? "bg-[#16499a] text-white" : "text-slate-700"}`}>{type} transmission</button>
+            ))}
+          </div>
         </div>
-        <div className="min-w-0 flex-1">
-          <h3 className="truncate font-black text-slate-900">
-            {user.name || "Driving teacher"}
-          </h3>
-          <p className="mt-1 text-xs font-bold text-slate-500">
-            {teacher.experienceYears || 0} years experience
-          </p>
-        </div>
-        <span className="rounded-full bg-white px-2.5 py-1 text-xs font-black text-blue-700">
-          {Number(teacher.distanceKm || 0).toFixed(1)} km
-        </span>
       </div>
 
-      <div className="mt-4 flex flex-wrap gap-2 text-xs font-black">
-        <span className="rounded-lg bg-amber-50 px-2.5 py-1.5 text-amber-700">
-          <FaStar className="mr-1 inline" />
-          {Number(teacher?.rating?.average || 0).toFixed(1)}
-        </span>
-        <span className="rounded-lg bg-slate-100 px-2.5 py-1.5 text-slate-700">
-          <FaCarSide className="mr-1 inline" />
-          {vehicle?.vehicleName || vehicleType}
-        </span>
-        <span className="rounded-lg bg-emerald-50 px-2.5 py-1.5 text-emerald-700">
-          €{Number(teacher.hourlyRate || 0).toFixed(0)}/hour
-        </span>
-      </div>
+      <div className="grid min-h-[620px] overflow-hidden rounded-xl lg:grid-cols-[310px_1fr]">
+        <aside className="max-h-[620px] space-y-3 overflow-y-auto bg-[#eef2f8] p-3">
+          <p className="px-1 text-xs text-slate-500">The {teachers.length} closest meeting points to this address</p>
+          {loading ? Array.from({ length: 5 }).map((_, index) => <div key={index} className="h-24 animate-pulse rounded-xl bg-white" />) : teachers.length ? teachers.map((teacher) => {
+            const location = teacher.nearestLocation;
+            return (
+              <button key={teacher.user._id} type="button" onClick={() => {
+                setSelectedTeacher(teacher);
+                const point = teacherPoint(teacher);
+                if (point) {
+                  mapRef.current?.panTo(point);
+                  mapRef.current?.setZoom(14);
+                }
+              }} className="w-full rounded-xl bg-white p-4 text-left shadow-sm transition hover:ring-2 hover:ring-[#174a9b]">
+                <p className="flex items-center gap-2 text-sm font-bold"><FaMapMarkerAlt className="text-[#174a9b]" />{location?.title || location?.address || teacherName(teacher)}</p>
+                <p className="ml-5 mt-1 text-xs text-slate-500">{teacher.distanceKm || 0} km</p>
+                <div className="mt-4 flex items-center justify-between text-xs"><span>Next availability</span><span className="rounded bg-[#e7edf6] px-2 py-1 font-bold text-[#174a9b]">View slots</span></div>
+              </button>
+            );
+          }) : <div className="rounded-xl bg-white p-6 text-center text-sm text-slate-500">No available instructor found near this location.</div>}
+        </aside>
 
-      <p className="mt-4 text-xs font-semibold leading-5 text-slate-500">
-        <FaMapMarkerAlt className="mr-1 inline text-blue-600" />
-        {[location.address, location.city].filter(Boolean).join(", ") ||
-          "Lesson meeting point"}
-      </p>
-    </button>
+        <div className="relative min-h-[500px]">
+          <GoogleMap mapContainerStyle={{ width: "100%", height: "100%" }} center={center} zoom={12} options={MAP_OPTIONS} onLoad={(map) => { mapRef.current = map; }}>
+            {teachers.map((teacher) => {
+              const position = teacherPoint(teacher);
+              return position ? <MarkerF key={teacher.user._id} position={position} onClick={() => setSelectedTeacher(teacher)} /> : null;
+            })}
+            {selectedTeacher && teacherPoint(selectedTeacher) && (
+              <InfoWindowF position={teacherPoint(selectedTeacher)} onCloseClick={() => setSelectedTeacher(null)}>
+                <div className="w-[250px] p-2 text-slate-900">
+                  <div className="flex items-center gap-3"><Avatar teacher={selectedTeacher} /><div><h3 className="font-bold text-[#123f88]">{teacherName(selectedTeacher)}</h3><p className="text-xs">Experience {selectedTeacher.experienceYears || 0} Years+</p></div></div>
+                  <div className="mt-3 flex gap-1 text-amber-400">{Array.from({ length: 5 }).map((_, i) => <FaStar key={i} />)}</div>
+                  <button type="button" onClick={() => openTeacher(selectedTeacher)} className="mt-4 w-full rounded-md bg-[#df2339] py-2 text-xs font-bold text-white">View Details</button>
+                </div>
+              </InfoWindowF>
+            )}
+          </GoogleMap>
+        </div>
+      </div>
+    </section>
   );
 }
 
-function BookingSummary({ teacher, search, endTime, submitting, onSubmit }) {
-  const location = teacher.nearestLocation || {};
-  const price =
-    (Number(teacher.hourlyRate || 0) * Number(search.duration || 0)) / 60;
-
+function TeacherStep({ teacher, reviews, favorite, setFavorite, vehicleType, onSlots }) {
+  const location = teacher.nearestLocation;
+  const vehicle = vehicleFor(teacher, vehicleType);
+  const rating = Number(teacher.rating?.average || 0);
   return (
-    <aside className="sticky top-5 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
-      <h2 className="text-xl font-black text-slate-900">Booking summary</h2>
+    <section className="rounded-xl bg-[#e8eef7] p-4 sm:p-5">
+      <div className="grid gap-5 xl:grid-cols-[390px_1fr]">
+        <div className="rounded-xl bg-[#174a9b] p-4 text-white">
+          <div className="relative rounded-xl bg-white p-4 text-center text-[#123f88]">
+            <button type="button" onClick={() => setFavorite(!favorite)} className="absolute right-4 top-4 text-slate-800">{favorite ? <FaHeart className="text-red-500" /> : <FaRegHeart />}</button>
+            <Avatar teacher={teacher} className="mx-auto h-16 w-16" />
+            <h2 className="mt-2 text-lg font-bold">{teacherName(teacher)}</h2>
+          </div>
+          <div className="mt-3 grid grid-cols-2 gap-3">
+            <div className="rounded-lg bg-white/15 p-5 text-center"><p className="font-bold"><FaStar className="mr-1 inline text-white" />{rating.toFixed(1)}</p><p className="mt-2 text-xs">{teacher.rating?.totalReviews || 0} reviews</p></div>
+            <div className="rounded-lg bg-white/15 p-5 text-center"><p className="font-bold">{teacher.experienceYears || 0} Years</p><p className="mt-2 text-xs">Experience</p></div>
+          </div>
+          <div className="mt-3 rounded-lg bg-white p-4 text-sm text-slate-800"><FaMapMarkerAlt className="mr-2 inline text-slate-500" /><b>Meeting point</b><p className="mt-2 text-xs text-slate-500">{location?.address || "Address unavailable"}</p></div>
+          <div className="mt-3 rounded-lg bg-white p-4 text-sm text-slate-800"><FaCarSide className="mr-2 inline text-slate-500" /><b>{vehicleType} transmission</b><p className="mt-2 text-xs text-slate-500">{[vehicle?.brand, vehicle?.model].filter(Boolean).join(" ") || "Approved instructor vehicle"}</p></div>
+          <button type="button" onClick={onSlots} className="mt-4 rounded-lg bg-[#df2339] px-5 py-3 text-xs font-bold text-white">View Available Slot</button>
+        </div>
 
-      <div className="mt-5 space-y-3">
-        <SummaryRow label="Teacher" value={teacher.user?.name} />
-        <SummaryRow label="Date" value={formatDate(search.date)} />
-        <SummaryRow
-          label="Time"
-          value={`${search.startTime || "--"} - ${endTime || "--"}`}
-        />
-        <SummaryRow label="Vehicle" value={search.vehicleType} />
-        <SummaryRow label="Duration" value={`${search.duration} minutes`} />
-        <SummaryRow
-          label="Meeting point"
-          value={
-            [location.address, location.city].filter(Boolean).join(", ") ||
-            "Not set"
-          }
-        />
-        <SummaryRow
-          label="Estimated price"
-          value={`€${price.toFixed(2)}`}
-          strong
-        />
-      </div>
-
-      <button
-        type="button"
-        onClick={onSubmit}
-        disabled={submitting}
-        className="mt-5 w-full rounded-2xl bg-[#174A9B] px-5 py-3.5 text-sm font-black text-white hover:bg-[#123D7A] disabled:opacity-60"
-      >
-        {submitting ? "Submitting..." : "Request booking"}
-      </button>
-
-      <p className="mt-3 text-center text-xs font-semibold leading-5 text-slate-500">
-        The request remains pending until the teacher confirms it.
-      </p>
-    </aside>
-  );
-}
-
-function BookingCard({ booking, cancelling, onCancel }) {
-  const canCancel = ["pending", "confirmed"].includes(booking.status);
-
-  return (
-    <article className="rounded-2xl border border-slate-200 p-4">
-      <div className="flex items-start justify-between gap-3">
         <div>
-          <h3 className="font-black text-slate-900">
-            {booking.teacher?.name || "Driving teacher"}
-          </h3>
-          <p className="mt-1 text-xs font-bold text-slate-500">
-            {formatDate(booking.bookingDate)}
-          </p>
+          <div className="mb-5 flex items-center justify-between"><h2 className="text-xl font-bold text-[#123f88]">Clients’ Review</h2></div>
+          {reviews.length ? <div className="grid gap-5 md:grid-cols-2">{reviews.slice(0, 4).map((review) => (
+            <article key={review._id} className="rounded-xl bg-white p-5">
+              <p className="min-h-[54px] text-sm leading-6 text-slate-700">{review.comment || "The student rated this instructor."}</p>
+              <div className="mt-3 flex gap-2 text-amber-400">{Array.from({ length: 5 }).map((_, index) => <FaStar key={index} className={index < review.rating ? "" : "opacity-20"} />)}</div>
+              <div className="mt-4 flex items-center gap-3"><div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#dbe7f7] font-bold text-[#123f88]">{review.student?.name?.charAt(0) || "S"}</div><div><p className="text-sm font-bold">{review.student?.name || "Student"}</p><p className="text-xs text-slate-500">Learner driver</p></div></div>
+            </article>
+          ))}</div> : <div className="rounded-xl bg-white p-10 text-center text-sm text-slate-500">No client review yet.</div>}
         </div>
-        <span
-          className={`rounded-full px-2.5 py-1 text-[11px] font-black ${statusClasses(
-            booking.status,
-          )}`}
-        >
-          {booking.status}
-        </span>
       </div>
+    </section>
+  );
+}
 
-      <div className="mt-4 grid grid-cols-2 gap-2">
-        <MiniInfo
-          icon={<FaClock />}
-          label="Time"
-          value={`${booking.startTime} - ${booking.endTime}`}
-        />
-        <MiniInfo
-          icon={<FaCarSide />}
-          label="Vehicle"
-          value={booking.vehicleType}
-        />
-        <MiniInfo
-          icon={<FaCalendarAlt />}
-          label="Duration"
-          value={`${booking.duration} min`}
-        />
-        <MiniInfo
-          icon={<FaMapMarkerAlt />}
-          label="Location"
-          value={booking.location?.city || "Set"}
-        />
+function ScheduleStep({
+  teacher,
+  duration,
+  setDuration,
+  schedule,
+  loading,
+  openDate,
+  setOpenDate,
+  selectedSlot,
+  setSelectedSlot,
+  submitting,
+  book,
+}) {
+  return (
+    <section className="flex min-h-[620px] items-center justify-center rounded-xl bg-[#e8eef7] p-4 sm:p-8">
+      <div className="w-full max-w-[430px]">
+        <div className="rounded-xl bg-white p-5">
+          <div className="rounded-xl bg-[#174a9b] p-5 text-center text-white"><Avatar teacher={teacher} className="mx-auto h-14 w-14" /><h2 className="mt-2 font-bold">{teacherName(teacher)}</h2><p className="mt-1 text-xs">Book a lesson</p></div>
+          <h3 className="mt-5 text-sm font-bold text-[#123f88]">Choose the duration</h3>
+          <p className="mt-3 rounded-xl border border-[#174a9b] bg-[#eef2f8] p-4 text-xs leading-6 text-slate-600">For your first lesson with this instructor, we recommend a one-hour session. This allows us to properly assess your level and personalize your future lessons.</p>
+          <div className="mt-3 flex gap-2">{[60, 120].map((value) => <button key={value} type="button" onClick={() => setDuration(value)} className={`rounded-full px-4 py-2 text-xs font-bold ${duration === value ? "bg-[#174a9b] text-white" : "bg-[#eef2f8]"}`}>{value / 60} hour{value > 60 ? "s" : ""}</button>)}</div>
+          <h3 className="mt-5 text-sm font-bold text-[#123f88]">Choose the Date</h3>
+          <div className="mt-3 space-y-3">
+            {loading ? Array.from({ length: 3 }).map((_, index) => <div key={index} className="h-14 animate-pulse rounded-xl bg-[#eef2f8]" />) : schedule.slice(0, 4).map((row) => (
+              <div key={row.date} className="overflow-hidden rounded-xl bg-[#eef2f8]">
+                <button type="button" onClick={() => setOpenDate(openDate === row.date ? "" : row.date)} className="flex w-full items-center justify-between p-4 text-left text-sm font-semibold"><span>{formatDate(row.date)}</span>{openDate === row.date ? <FaChevronUp /> : <FaChevronDown />}</button>
+                {openDate === row.date && <div className="flex flex-wrap gap-2 px-4 pb-4">{row.slots.length ? row.slots.slice(0, 8).map((slot) => {
+                  const active = selectedSlot?.date === row.date && selectedSlot?.startTime === slot.startTime;
+                  return <button key={slot.startTime} type="button" onClick={() => setSelectedSlot({ ...slot, date: row.date })} className={`rounded-full border px-4 py-2 text-xs font-bold ${active ? "border-[#174a9b] bg-[#174a9b] text-white" : "border-slate-300 bg-white"}`}>{slot.startTime}</button>;
+                }) : <p className="text-xs text-slate-500">No available slots.</p>}</div>}
+              </div>
+            ))}
+          </div>
+        </div>
+        <button type="button" disabled={!selectedSlot || submitting} onClick={book} className="mt-4 w-full rounded-lg bg-[#df2339] py-3 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-50">{submitting ? "Booking..." : "Book Now"}</button>
       </div>
-
-      {canCancel && (
-        <button
-          type="button"
-          onClick={onCancel}
-          disabled={cancelling}
-          className="mt-4 w-full rounded-xl bg-red-50 px-3 py-2.5 text-xs font-black text-red-700 hover:bg-red-100 disabled:opacity-60"
-        >
-          <FaTimesCircle className="mr-1 inline" />
-          {cancelling ? "Cancelling..." : "Cancel request"}
-        </button>
-      )}
-    </article>
+    </section>
   );
 }
 
-function InputField({ label, type, value, onChange, min }) {
+function ConfirmationStep({ booking, teacher, router }) {
+  const lessonId = booking?.lesson?._id || booking?.lesson;
   return (
-    <label className="block">
-      <span className="mb-2 block text-sm font-black text-slate-700">
-        {label}
-      </span>
-      <input
-        type={type}
-        value={value}
-        min={min}
-        onChange={(event) => onChange(event.target.value)}
-        className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
-      />
-    </label>
-  );
-}
-
-function SelectField({ label, value, onChange, options }) {
-  return (
-    <label className="block">
-      <span className="mb-2 block text-sm font-black text-slate-700">
-        {label}
-      </span>
-      <select
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
-      >
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-    </label>
-  );
-}
-
-function SummaryRow({ label, value, strong = false }) {
-  return (
-    <div className="flex items-start justify-between gap-4 border-b border-slate-100 pb-3 text-sm">
-      <span className="font-bold text-slate-500">{label}</span>
-      <span
-        className={`max-w-[60%] text-right ${
-          strong
-            ? "text-base font-black text-blue-700"
-            : "font-black text-slate-800"
-        }`}
-      >
-        {value || "--"}
-      </span>
-    </div>
-  );
-}
-
-function MiniInfo({ icon, label, value }) {
-  return (
-    <div className="rounded-xl bg-slate-50 p-2.5">
-      <p className="text-[10px] font-black uppercase tracking-wider text-slate-400">
-        {icon} {label}
-      </p>
-      <p className="mt-1 truncate text-xs font-black capitalize text-slate-700">
-        {value || "--"}
-      </p>
-    </div>
+    <section className="flex min-h-[500px] items-start justify-center rounded-xl bg-[#e8eef7] p-6 pt-16">
+      <div className="w-full max-w-[390px] rounded-xl bg-white p-5">
+        <h2 className="font-bold text-[#123f88]">Confirmation Message</h2>
+        <div className="mt-4 rounded-xl border border-green-400 bg-green-50 p-4 text-sm leading-6 text-slate-600">
+          Your {booking?.duration ? `${booking.duration / 60}-hour` : "driving"} lesson with Mr. {teacherName(teacher)} has been successfully booked for {booking?.bookingDate ? formatBookingDate(booking.bookingDate) : "the selected date"} at {booking?.startTime}. Your lesson is confirmed.
+        </div>
+        <button type="button" onClick={() => router.push(lessonId ? `/student/lessons/${lessonId}` : "/student/lessons?tab=upcoming")} className="mt-4 w-full rounded-lg border border-[#174a9b] bg-white py-3 text-sm font-bold text-[#df2339]">Go to lesson page</button>
+        <p className="mt-3 text-center text-xs text-slate-500"><FaClock className="mr-1 inline" />Students cannot cancel a confirmed booking.</p>
+      </div>
+    </section>
   );
 }

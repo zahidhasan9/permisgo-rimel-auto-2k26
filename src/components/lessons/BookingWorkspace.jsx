@@ -549,17 +549,6 @@ export default function BookingWorkspace({ role, onLessonCreated }) {
                       </>
                     )}
 
-                    {role === "student" && status === "pending" && (
-                      <button
-                        type="button"
-                        onClick={() => cancelBooking(booking)}
-                        disabled={busy}
-                        className="ml-auto rounded-xl border border-rose-300 px-4 py-2 text-xs font-bold text-rose-700 disabled:opacity-50"
-                      >
-                        {busy ? "Cancelling..." : "Cancel request"}
-                      </button>
-                    )}
-
                     {canApprove && status === "confirmed" && (
                       <button
                         type="button"
