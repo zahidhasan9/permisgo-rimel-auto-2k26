@@ -12,7 +12,7 @@ import {
   IoVolumeMute,
 } from "react-icons/io5";
 
-import { getCodeQuizAttemptReview, getMyQuizAttempts } from "@/features/API";
+import { getMyQuizMistakes } from "@/features/API";
 import { mediaUrl } from "@/utils/mediaUrl";
 
 const optionLetter = (index) => String.fromCharCode(65 + index);
@@ -31,37 +31,8 @@ export default function MyMistakesPage() {
 
     const load = async () => {
       try {
-        const attemptResponse = await getMyQuizAttempts();
-        const attempts = (attemptResponse.data?.data || []).filter(
-          (attempt) =>
-            attempt.status === "completed" && Number(attempt.wrongCount) > 0,
-        );
-        const rows = [];
-
-        // Deliberately sequential: a student with a long history must not
-        // trigger a burst of review requests and receive HTTP 429.
-        for (const attempt of attempts) {
-          try {
-            const response = await getCodeQuizAttemptReview(attempt._id);
-            const review = response.data?.data;
-
-            review?.answers?.forEach((answer) => {
-              if (answer.isCorrect || !answer.question) return;
-              rows.push({
-                id: `${review._id}-${answer.question._id}`,
-                attemptId: review._id,
-                quizTitle: review.quiz?.title || "Quiz",
-                question: answer.question,
-                selectedIndex: Number(answer.selectedOptionIndex),
-                correctIndex: Number(answer.correctOptionIndex),
-              });
-            });
-          } catch {
-            // One unavailable old attempt must not hide the remaining mistakes.
-          }
-        }
-
-        if (active) setMistakes(rows);
+        const response = await getMyQuizMistakes();
+        if (active) setMistakes(response.data?.data?.items || []);
       } catch (requestError) {
         if (active) {
           setError(

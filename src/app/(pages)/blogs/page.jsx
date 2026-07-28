@@ -1,159 +1,165 @@
 import Image from "next/image";
 import Link from "next/link";
+import {
+  FaCalendarAlt,
+  FaCommentAlt,
+  FaFolderOpen,
+  FaUser,
+} from "react-icons/fa";
 
-// Image
 import blogPage from "../../../../public/image/blog-page.jpg";
+import carDriver from "../../../../public/image/car-driver.jpg";
+import car from "../../../../public/image/car.jpg";
+import drivingInstructor from "../../../../public/image/driving-instructor.webp";
+import roadQuestion from "../../../../public/image/road-question.png";
 
-// Icons
-import { FaArrowRight } from "react-icons/fa6";
+const posts = [
+  {
+    id: 1,
+    title: "10 Tips to Pass Your Driving Test on the First Try",
+    image: blogPage,
+    excerpt:
+      "Passing your driving test on the first attempt is a goal for many learners. With the right preparation, mindset, and guidance, you can significantly increase your chances of success.",
+  },
+  {
+    id: 2,
+    title: "Step-by-Step Guide to Passing Your Driving Test",
+    image: carDriver,
+    excerpt:
+      "From your first lesson to test day, discover the practical steps that help new drivers build confidence, develop safe habits, and stay calm behind the wheel.",
+  },
+  {
+    id: 3,
+    title: "Common Traffic Mistakes and How to Avoid Them",
+    image: car,
+    excerpt:
+      "Small mistakes can quickly become unsafe habits. Learn the errors instructors see most often and the simple techniques you can use to correct them early.",
+  },
+  {
+    id: 4,
+    title: "Your Complete Guide to Becoming a Confident Driver",
+    image: blogPage,
+    excerpt:
+      "Confidence comes from preparation and consistent practice. Use this guide to strengthen your observation, decision-making, and vehicle control skills.",
+  },
+  {
+    id: 5,
+    title: "How to Start Driving: The First Time Learner's Guide",
+    image: drivingInstructor,
+    excerpt:
+      "Starting your driving journey can feel overwhelming. We explain what to expect from your first lesson and how to make every minute of training count.",
+  },
+  {
+    id: 6,
+    title: "Essential Road Signs Every Learner Should Know",
+    image: roadQuestion,
+    excerpt:
+      "Recognising road signs quickly is essential for safe driving and theory test success. Review the signs and signals every learner should understand.",
+  },
+];
 
-export async function getPost() {
-  const res = await fetch("https://jsonplaceholder.typicode.com/posts", {
-    next: { revalidate: 3600 },
-  });
+const recentPosts = posts.slice(1, 6);
 
-  if (!res.ok) {
-    throw new Error("Failed to fetch blog posts");
-  }
-
-  return await res.json();
+function PostMeta() {
+  return (
+    <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-[12px] font-medium text-slate-700 sm:text-[13px]">
+      <span className="flex items-center gap-1.5">
+        <FaUser className="text-[#174a9b]" /> Ahmed Sadi
+      </span>
+      <span className="flex items-center gap-1.5">
+        <FaCalendarAlt className="text-[#174a9b]" /> 2023-08-03
+      </span>
+      <span className="flex items-center gap-1.5">
+        <FaFolderOpen className="text-[#174a9b]" /> Driving school
+      </span>
+      <span className="flex items-center gap-1.5">
+        <FaCommentAlt className="text-[#174a9b]" /> No comments
+      </span>
+    </div>
+  );
 }
 
-const Blog = async () => {
-  const posts = await getPost();
-
-  const featuredPost = posts[0];
-  const blogPosts = posts.slice(1, 13);
-
+export default function BlogsPage() {
   return (
-    <main className="min-h-screen bg-[#f5f5f7] px-4 py-10 sm:px-6 lg:px-10">
-      <div className="mx-auto max-w-[1180px]">
-        {/* Header */}
-        <header className="mx-auto mb-12 max-w-[760px] text-center">
-          <span className="mb-4 inline-flex rounded-full bg-white px-4 py-2 text-[12px] font-semibold tracking-wide text-slate-500 shadow-sm">
-            Driving School Blog
-          </span>
-
-          <h1 className="text-[38px] font-semibold leading-[1.08] tracking-[-0.04em] text-[#1d1d1f] sm:text-[52px] lg:text-[64px]">
-            Guides, tips, and stories for smarter learners.
-          </h1>
-
-          <p className="mx-auto mt-5 max-w-[620px] text-[16px] leading-7 text-[#6e6e73] sm:text-[18px]">
-            Explore simple, useful, and practical driving school articles
-            created to help students learn with confidence.
-          </p>
-        </header>
-
-        {/* Featured Post */}
-        {featuredPost && (
-          <section className="mb-10">
-            <Link
-              href={`/blogs/${featuredPost.id}`}
-              className="group grid overflow-hidden rounded-[28px] bg-white transition duration-300 hover:shadow-[0_20px_60px_rgba(0,0,0,0.08)] lg:grid-cols-2"
-            >
-              <div className="relative min-h-[260px] overflow-hidden sm:min-h-[340px] lg:min-h-[420px]">
-                <Image
-                  src={blogPage}
-                  alt={featuredPost.title}
-                  fill
-                  priority
-                  placeholder="blur"
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                  className="object-cover transition duration-700 group-hover:scale-[1.03]"
-                />
-              </div>
-
-              <div className="flex flex-col justify-center p-7 sm:p-10 lg:p-12">
-                <span className="mb-4 text-[13px] font-semibold text-[#0071e3]">
-                  Featured Article
-                </span>
-
-                <h2 className="text-[30px] font-semibold capitalize leading-[1.12] tracking-[-0.03em] text-[#1d1d1f] sm:text-[42px]">
-                  {featuredPost.title}
-                </h2>
-
-                <p className="mt-5 line-clamp-3 text-[15px] leading-7 text-[#6e6e73] sm:text-[16px]">
-                  {featuredPost.body}
-                </p>
-
-                <div className="mt-7 inline-flex items-center gap-2 text-[15px] font-semibold text-[#0071e3]">
-                  Read article
-                  <FaArrowRight className="text-[12px] transition group-hover:translate-x-1" />
-                </div>
-              </div>
-            </Link>
-          </section>
-        )}
-
-        {/* Section Title */}
-        <div className="mb-6 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
-          <div>
-            <h2 className="text-[28px] font-semibold tracking-[-0.03em] text-[#1d1d1f] sm:text-[36px]">
-              Latest articles
-            </h2>
-            <p className="mt-2 text-[15px] text-[#6e6e73]">
-              Organized learning resources for students.
-            </p>
-          </div>
-
-          <Link
-            href="#"
-            className="text-[15px] font-semibold text-[#0071e3] hover:underline"
-          >
-            View all
-          </Link>
-        </div>
-
-        {/* Blog Grid */}
-        <section className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {blogPosts.map((post) => (
+    <section className="bg-white px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-[72px]">
+      <div className="mx-auto grid max-w-[1180px] items-start gap-6 lg:grid-cols-[minmax(0,1fr)_270px]">
+        <div className="space-y-7">
+          {posts.map((post, index) => (
             <article
               key={post.id}
-              className="group overflow-hidden rounded-[24px] bg-white transition duration-300 hover:-translate-y-1 hover:shadow-[0_18px_45px_rgba(0,0,0,0.07)]"
+              className="rounded-[12px] bg-[#dfe7f3] p-4 shadow-[0_2px_4px_rgba(15,54,119,0.06)] sm:p-[18px]"
             >
-              <Link href={`/blogs/${post.id}`} className="block">
-                <div className="relative aspect-[16/10] overflow-hidden">
-                  <Image
-                    src={blogPage}
-                    alt={post.title}
-                    fill
-                    placeholder="blur"
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    className="object-cover transition duration-700 group-hover:scale-[1.04]"
-                  />
-                </div>
+              <h2 className="text-[17px] font-extrabold leading-snug text-[#161d2a] sm:text-[19px]">
+                <Link
+                  href={`/blogs/${post.id}`}
+                  className="transition hover:text-[#174a9b]"
+                >
+                  {post.title}
+                </Link>
+              </h2>
 
-                <div className="p-6">
-                  <div className="mb-3 flex items-center justify-between gap-3">
-                    <span className="text-[12px] font-semibold text-[#0071e3]">
-                      Driving Tips
-                    </span>
+              <PostMeta />
 
-                    <span className="text-[12px] text-[#86868b]">
-                      Aug 03, 2023
-                    </span>
-                  </div>
+              <Link
+                href={`/blogs/${post.id}`}
+                className="relative mt-4 block aspect-[2.55/1] overflow-hidden rounded-[9px] bg-slate-200"
+              >
+                <Image
+                  src={post.image}
+                  alt={post.title}
+                  fill
+                  priority={index === 0}
+                  placeholder="blur"
+                  sizes="(max-width: 1024px) 100vw, 850px"
+                  className="object-cover transition duration-500 hover:scale-[1.02]"
+                />
+              </Link>
 
-                  <h3 className="line-clamp-2 text-[21px] font-semibold capitalize leading-[1.18] tracking-[-0.02em] text-[#1d1d1f]">
-                    {post.title}
-                  </h3>
+              <p className="mt-4 line-clamp-2 text-[13px] leading-[1.65] text-slate-700 sm:text-[14px]">
+                {post.excerpt} Here are practical tips to help you pass your
+                driving test and become a safer driver.
+              </p>
 
-                  <p className="mt-3 line-clamp-3 text-[14px] leading-6 text-[#6e6e73]">
-                    {post.body}
-                  </p>
-
-                  <div className="mt-5 inline-flex items-center gap-2 text-[14px] font-semibold text-[#0071e3]">
-                    Read more
-                    <FaArrowRight className="text-[11px] transition group-hover:translate-x-1" />
-                  </div>
-                </div>
+              <Link
+                href={`/blogs/${post.id}`}
+                className="mt-3 inline-flex rounded-[7px] bg-[#e2233d] px-5 py-2.5 text-[12px] font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[#174a9b]"
+              >
+                Read More
               </Link>
             </article>
           ))}
-        </section>
-      </div>
-    </main>
-  );
-};
+        </div>
 
-export default Blog;
+        <aside className="rounded-[12px] bg-[#dfe7f3] p-4 lg:sticky lg:top-5">
+          <h2 className="rounded-[8px] bg-[#174a9b] px-4 py-3 text-center text-[15px] font-extrabold text-white">
+            Our Recent Blog Post
+          </h2>
+
+          <div className="mt-4 space-y-3">
+            {recentPosts.map((post) => (
+              <Link
+                key={post.id}
+                href={`/blogs/${post.id}`}
+                className="group grid grid-cols-[76px_1fr] items-center gap-3 rounded-[9px] bg-white p-2.5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+              >
+                <div className="relative h-[56px] overflow-hidden rounded-[7px]">
+                  <Image
+                    src={post.image}
+                    alt=""
+                    fill
+                    placeholder="blur"
+                    sizes="76px"
+                    className="object-cover transition duration-500 group-hover:scale-105"
+                  />
+                </div>
+                <h3 className="line-clamp-2 text-[12px] font-semibold leading-[1.45] text-slate-800 transition group-hover:text-[#174a9b]">
+                  {post.title}
+                </h3>
+              </Link>
+            ))}
+          </div>
+        </aside>
+      </div>
+    </section>
+  );
+}

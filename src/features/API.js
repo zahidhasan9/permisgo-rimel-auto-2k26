@@ -332,6 +332,7 @@ export const finishQuizAttempt = (attemptId) =>
 export const finishCodeQuizAttempt = finishQuizAttempt;
 
 export const getMyQuizAttempts = () => axios.get("/quizzes/attempts/me");
+export const getMyQuizMistakes = () => axios.get("/quizzes/mistakes/me");
 export const getMyTopicResults = () => axios.get("/quizzes/results/topics/me");
 
 export const getMyCodeQuizAttempts = getMyQuizAttempts;
@@ -467,8 +468,10 @@ export const getAdminEbookLesson = (id) => axios.get(`/learning/admin/ebook/less
 export const createEbookLesson = (data) => axios.post("/learning/admin/ebook/lessons", data, { headers: { "Content-Type": "multipart/form-data" } });
 export const updateEbookLesson = (id, data) => axios.patch(`/learning/admin/ebook/lessons/${id}`, data, { headers: { "Content-Type": "multipart/form-data" } });
 export const deleteEbookLesson = (id) => axios.delete(`/learning/admin/ebook/lessons/${id}`);
+export const permanentlyDeleteEbookLesson = (id) => axios.delete(`/learning/admin/ebook/lessons/${id}/permanent`);
 export const getStudentEbookLessons = (courseId, topicId) => axios.get(`/learning/ebook/courses/${courseId}/topics/${topicId}/lessons`);
 export const getStudentEbookLesson = (id) => axios.get(`/learning/ebook/lessons/${id}`);
+export const updateStudentEbookLessonProgress = (id, data) => axios.patch(`/learning/ebook/lessons/${id}/progress`, data);
 
 // =======================
 // Admin Controlled Quiz Retake

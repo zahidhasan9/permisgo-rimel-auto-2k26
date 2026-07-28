@@ -145,7 +145,7 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="relative z-50 w-full bg-white">
+      <nav className="fixed inset-x-0 top-0 z-[997] w-full bg-white shadow-sm">
         {/* TOP BAR */}
         <div className="border-b border-slate-200 bg-slate-50">
           <div className="mx-auto flex h-[38px] max-w-[1320px] items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -277,6 +277,8 @@ const Navbar = () => {
           </div>
         </div>
       </nav>
+
+      <div className="h-[110px] w-full" aria-hidden="true" />
 
       {/* MOBILE AND TABLET OVERLAY */}
       {openMenu && (

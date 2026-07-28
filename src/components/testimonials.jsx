@@ -213,11 +213,11 @@ const Testimonials = () => {
         {/* Bottom Button */}
         <div className="mt-8 text-center sm:text-left">
           <Link
-            href="#"
-            className="inline-flex items-center justify-center rounded-full bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-950"
-          >
-            View All Reviews
-          </Link>
+              href="/reviews"
+              className="inline-flex min-h-[42px] items-center justify-center rounded-[8px] bg-[#E2233D] px-7 text-[13px] font-extrabold text-white shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-white hover:text-[#174A9B]"
+            >
+              View All Reviews
+            </Link>
         </div>
       </div>
     </section>

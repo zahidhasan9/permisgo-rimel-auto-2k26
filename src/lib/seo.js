@@ -78,3 +78,106 @@ export function createMetadata({
 
   return metadata;
 }
+
+const routeTitles = {
+  "/": "Professional Driving School",
+  "/blogs": "Driving School Blog",
+  "/reviews": "Student Reviews",
+  "/services": "Driving Lessons & Services",
+  "/offers": "Driving Licence Offers",
+  "/pricing": "Driving Lesson Pricing",
+  "/where-are-we": "Where Are We?",
+  "/monitor-faqs": "Instructor FAQs",
+  "/highway-code-glossary": "Highway Code Glossary",
+  "/driving-licence-glossary": "Driving Licence Glossary",
+  "/person-with-a-disability": "Driving with a Disability",
+  "/frequently-asked-questions": "Frequently Asked Questions",
+  "/contact-us": "Contact Us",
+  "/who-are-we": "Who Are We?",
+  "/about": "About Us",
+  "/user-login": "Student Login",
+  "/user-registration": "Student Registration",
+};
+
+const segmentLabels = {
+  admin: "Admin",
+  student: "Student",
+  teacher: "Instructor",
+  faq: "FAQs",
+  faqs: "FAQs",
+  cpf: "CPF",
+  b2b: "B2B",
+  ebooks: "eBooks",
+  ebook: "eBook",
+  quizzes: "Quizzes",
+  "code-learning": "Code Learning",
+  "academic-info": "Academic Information",
+};
+
+function titleFromSegment(segment) {
+  return segment
+    .split("-")
+    .map(
+      (word) =>
+        segmentLabels[word] ||
+        `${word.charAt(0).toUpperCase()}${word.slice(1)}`,
+    )
+    .join(" ");
+}
+
+export function createRouteMetadata(pathname = "/") {
+  const cleanPath = `/${pathname
+    .split("?")[0]
+    .split("#")[0]
+    .split("/")
+    .filter(Boolean)
+    .join("/")}`;
+  const normalizedPath = cleanPath === "/" ? "/" : cleanPath.replace(/\/$/, "");
+  const segments = normalizedPath.split("/").filter(Boolean);
+  const isPrivate = ["admin", "student", "teacher", "chat"].includes(
+    segments[0],
+  );
+  const isAuth = [
+    "/login",
+    "/register",
+    "/user-login",
+    "/user-registration",
+    "/inscription",
+    "/forget-password",
+    "/reset-password",
+    "/verify-account",
+    "/login-to-my-partner-area",
+  ].includes(normalizedPath);
+
+  let title = routeTitles[normalizedPath];
+
+  if (!title) {
+    const lastSegment = segments.at(-1);
+    const isIdentifier =
+      !lastSegment ||
+      /^\d+$/.test(lastSegment) ||
+      /^[a-f\d]{24}$/i.test(lastSegment) ||
+      ["create", "edit"].includes(lastSegment);
+    const meaningfulSegment = isIdentifier ? segments.at(-2) : lastSegment;
+
+    title = meaningfulSegment
+      ? titleFromSegment(meaningfulSegment)
+      : routeTitles["/"];
+
+    if (segments[0] === "blogs" && isIdentifier) {
+      title = "Driving School Article";
+    }
+  }
+
+  const area = segments[0] ? titleFromSegment(segments[0]) : "PermisGo";
+  const description = isPrivate
+    ? `Manage ${title.toLowerCase()} securely in your PermisGo ${area.toLowerCase()} area.`
+    : `${title} from PermisGo — professional driving lessons, qualified instructors and practical support for confident learners.`;
+
+  return createMetadata({
+    title,
+    description,
+    path: normalizedPath,
+    noIndex: isPrivate || isAuth,
+  });
+}

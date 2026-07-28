@@ -420,30 +420,30 @@ export default function VehiclesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-6xl">
+    <div className="min-h-full bg-white px-0 pb-8">
+      <div className="min-h-screen bg-[#f8fafc] px-4 py-5 sm:px-6 lg:px-8">
         {success && (
           <div className="fixed right-5 top-5 z-[80] rounded-2xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-xl">
             {success}
           </div>
         )}
 
-        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={() => router.back()}
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-[#16458f] shadow-sm transition hover:bg-blue-50"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#e8edf5] text-lg text-slate-950 transition hover:bg-[#dce4f0]"
               aria-label="Go back"
             >
               <FaChevronLeft />
             </button>
 
             <div>
-              <h1 className="text-2xl font-bold text-[#16458f] sm:text-3xl">
+              <h1 className="text-[25px] font-extrabold text-[#16458f]">
                 List of Vehicles
               </h1>
-              <p className="mt-1 text-sm text-slate-500">
+              <p className="sr-only">
                 {vehicles.length}/{MAX_VEHICLES} vehicles added ·{" "}
                 {approvedCount} approved
               </p>
@@ -454,10 +454,9 @@ export default function VehiclesPage() {
             type="button"
             onClick={openCreateModal}
             disabled={!canAddVehicle}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-rose-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-rose-700 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 sm:w-auto"
+            className="inline-flex min-h-[48px] w-full items-center justify-center rounded-xl bg-[#dc263d] px-6 text-[15px] font-extrabold text-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#c91e34] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 sm:w-auto"
           >
-            <FaPlus />
-            {canAddVehicle ? "Add New Vehicle" : "Maximum 2 Vehicles"}
+            {canAddVehicle ? "Add new vehicles" : "Maximum 2 Vehicles"}
           </button>
         </div>
 
@@ -469,11 +468,11 @@ export default function VehiclesPage() {
         )}
 
         {loading ? (
-          <div className="flex min-h-64 items-center justify-center rounded-3xl border border-slate-200 bg-white shadow-sm">
+          <div className="flex min-h-64 items-center justify-center rounded-xl bg-[#e8edf5]">
             <FaSpinner className="animate-spin text-3xl text-[#16458f]" />
           </div>
         ) : vehicles.length === 0 ? (
-          <div className="flex min-h-72 flex-col items-center justify-center rounded-3xl border border-dashed border-slate-300 bg-white p-8 text-center shadow-sm">
+          <div className="flex min-h-72 flex-col items-center justify-center rounded-xl bg-[#e8edf5] p-8 text-center">
             <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-50 text-2xl text-[#16458f]">
               <FaCar />
             </div>
@@ -493,7 +492,7 @@ export default function VehiclesPage() {
             </button>
           </div>
         ) : (
-          <div className="grid gap-5 lg:grid-cols-2">
+          <div className="space-y-5 rounded-xl bg-[#e8edf5] p-4">
             {vehicles.map((vehicle) => (
               <VehicleCard
                 key={vehicle._id}
@@ -504,7 +503,7 @@ export default function VehiclesPage() {
           </div>
         )}
 
-        <div className="mt-6 rounded-2xl border border-blue-100 bg-blue-50 p-4 text-sm text-blue-800">
+        <div className="sr-only">
           <div className="flex gap-3">
             <IoInformationCircle className="mt-0.5 shrink-0 text-xl" />
             <div>
@@ -537,73 +536,61 @@ function VehicleCard({ vehicle, onEdit }) {
   const canEdit = vehicle.approvalStatus !== "approved";
 
   return (
-    <article className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
-      <div className="relative h-52 bg-slate-100">
-        <img
-          src={getMediaUrl(vehicle.vehicleImage)}
-          alt={vehicle.vehicleName || "Teacher vehicle"}
-          className="h-full w-full object-cover"
-        />
+    <article className="relative rounded-[20px] border border-[#a9c0e5] bg-white px-5 py-[22px] transition hover:shadow-sm sm:px-6">
+      {canEdit && (
+        <button
+          type="button"
+          onClick={onEdit}
+          className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-lg bg-[#e8edf5] text-xs text-[#16458f] transition hover:bg-[#16458f] hover:text-white"
+          aria-label="Edit vehicle"
+          title="Edit vehicle"
+        >
+          <FaPen />
+        </button>
+      )}
 
-        <div className="absolute left-4 top-4 flex flex-wrap gap-2">
-          <span
-            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold ${status.className}`}
-          >
-            <StatusIcon /> {status.label}
-          </span>
-          {vehicle.isDefault && (
-            <span className="rounded-full border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-bold text-blue-700">
-              Default
-            </span>
-          )}
-        </div>
-      </div>
+      <div className="grid items-center gap-5 md:grid-cols-[200px_minmax(0,1fr)]">
+        <div className="relative h-[94px] overflow-hidden rounded-[8px] bg-slate-100">
+          <img
+            src={getMediaUrl(vehicle.vehicleImage)}
+            alt={vehicle.vehicleName || "Teacher vehicle"}
+            className="h-full w-full object-cover"
+          />
 
-      <div className="p-5 sm:p-6">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">
-              {vehicle.brand || "Vehicle"}
-            </p>
-            <h2 className="mt-1 text-xl font-bold text-slate-900">
-              {vehicle.model || vehicle.vehicleName || "Unnamed vehicle"}
-            </h2>
-          </div>
-
-          {canEdit ? (
-            <button
-              type="button"
-              onClick={onEdit}
-              className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-blue-200 px-3 text-sm font-bold text-[#16458f] transition hover:bg-blue-50"
+          <div className="absolute bottom-2 left-2 flex gap-1">
+            <span
+              className={`inline-flex items-center gap-1 rounded-md border px-2 py-1 text-[9px] font-bold ${status.className}`}
             >
-              <FaPen className="text-xs" /> Edit
-            </button>
-          ) : (
-            <span className="rounded-xl bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-500">
-              Edit locked
+              <StatusIcon /> {status.label}
             </span>
-          )}
+            {vehicle.isDefault && (
+              <span className="rounded-md border border-blue-200 bg-blue-50 px-2 py-1 text-[9px] font-bold text-blue-700">
+                Default
+              </span>
+            )}
+          </div>
         </div>
 
-        <div className="mt-5 grid grid-cols-2 gap-x-4 gap-y-5 border-t border-slate-100 pt-5 sm:grid-cols-4">
-          <InfoItem label="Model Year" value={vehicle.modelYear || "N/A"} />
+        <div className="grid grid-cols-2 gap-x-5 gap-y-5 sm:grid-cols-3 lg:grid-cols-[0.8fr_1.4fr_0.7fr_1.25fr_0.9fr] lg:items-center">
+          <InfoItem label="Brand" value={vehicle.brand || "N/A"} />
+          <InfoItem
+            label="Model"
+            value={vehicle.model || vehicle.vehicleName || "N/A"}
+          />
+          <InfoItem label="Year" value={vehicle.modelYear || "N/A"} />
           <InfoItem
             label="Vehicle Number"
             value={vehicle.registrationNumber || "N/A"}
           />
           <InfoItem label="Vehicle Type" value={vehicle.vehicleType || "N/A"} />
-          <InfoItem
-            label="Status"
-            value={vehicle.status === "active" ? "Active" : "Inactive"}
-          />
         </div>
-
-        {vehicle.approvalStatus === "rejected" && vehicle.adminNote && (
-          <div className="mt-5 rounded-2xl border border-rose-100 bg-rose-50 p-3 text-sm text-rose-700">
-            <span className="font-bold">Admin note:</span> {vehicle.adminNote}
-          </div>
-        )}
       </div>
+
+      {vehicle.approvalStatus === "rejected" && vehicle.adminNote && (
+        <div className="mt-4 rounded-xl border border-rose-100 bg-rose-50 p-3 text-sm text-rose-700">
+          <span className="font-bold">Admin note:</span> {vehicle.adminNote}
+        </div>
+      )}
     </article>
   );
 }
@@ -913,10 +900,10 @@ function FormSelect({ label, options, required = false, ...selectProps }) {
 function InfoItem({ label, value }) {
   return (
     <div className="min-w-0">
-      <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+      <p className="text-[14px] font-medium text-[#606060]">
         {label}
       </p>
-      <p className="mt-1 truncate text-sm font-bold capitalize text-slate-800">
+      <p className="mt-2 truncate text-[15px] font-extrabold capitalize text-[#161616]">
         {value}
       </p>
     </div>

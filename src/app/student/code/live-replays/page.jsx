@@ -19,6 +19,19 @@ function youtubeId(value) {
   }
 }
 
+function youtubeStart(value) {
+  try {
+    const url = new URL(value);
+    const raw = url.searchParams.get("t") || url.searchParams.get("start") || "";
+    if (/^\d+$/.test(raw)) return Number(raw);
+    const match = raw.match(/^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?$/);
+    if (!match) return 0;
+    return Number(match[1] || 0) * 3600 + Number(match[2] || 0) * 60 + Number(match[3] || 0);
+  } catch {
+    return 0;
+  }
+}
+
 export default function LiveReplaysPage() {
   const router = useRouter();
   const [replays, setReplays] = useState([]);
@@ -68,7 +81,13 @@ export default function LiveReplaysPage() {
                 return (
                   <button
                     key={replay._id}
-                    onClick={() => setSelected({ ...replay, youtubeId: id })}
+                    onClick={() =>
+                      setSelected({
+                        ...replay,
+                        youtubeId: id,
+                        youtubeStart: youtubeStart(replay.videoUrl),
+                      })
+                    }
                     className="group flex min-w-0 items-center gap-4 rounded-xl bg-white p-3 text-left transition hover:-translate-y-0.5 hover:shadow-md"
                   >
                     <div className="relative h-20 w-24 shrink-0 overflow-hidden rounded-xl bg-slate-200">
@@ -126,7 +145,7 @@ export default function LiveReplaysPage() {
             <div className="aspect-video bg-black">
               <iframe
                 className="h-full w-full"
-                src={`https://www.youtube-nocookie.com/embed/${selected.youtubeId}?autoplay=1&rel=0`}
+                src={`https://www.youtube-nocookie.com/embed/${selected.youtubeId}?autoplay=1&rel=0&start=${selected.youtubeStart || 0}`}
                 title={selected.title}
                 allow="autoplay; encrypted-media; picture-in-picture"
                 allowFullScreen

@@ -446,7 +446,7 @@ const menu = [
   // },
   {
     name: "Referral",
-    href: "/student/referral",
+    href: "/student/references",
     icon: BsBook,
   },
   {

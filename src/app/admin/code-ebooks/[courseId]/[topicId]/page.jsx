@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { use, useCallback, useEffect, useState } from "react";
-import { deleteEbookLesson, getAdminEbookLessons, getEbookTopics } from "@/features/API";
+import { deleteEbookLesson, getAdminEbookLessons, getEbookTopics, permanentlyDeleteEbookLesson } from "@/features/API";
 import { mediaUrl } from "@/utils/mediaUrl";
 
 export default function TopicLessonsPage({ params }) {
@@ -16,6 +16,7 @@ export default function TopicLessonsPage({ params }) {
   const [status, setStatus] = useState("");
   const [notice, setNotice] = useState("");
   const [loading, setLoading] = useState(true);
+  const [actionId, setActionId] = useState("");
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -40,9 +41,9 @@ export default function TopicLessonsPage({ params }) {
     <div className="mt-6 flex flex-col gap-3 rounded-xl border bg-white p-4 sm:flex-row"><input value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} placeholder="Search lessons..." className="flex-1 rounded-lg border px-3 py-2.5 text-sm"/><select value={status} onChange={(e) => { setStatus(e.target.value); setPage(1); }} className="rounded-lg border px-3 py-2.5 text-sm"><option value="">All statuses</option><option value="active">Published</option><option value="draft">Draft</option><option value="inactive">Inactive</option></select></div>
     {notice && <p className="mt-3 rounded-lg bg-red-50 p-3 text-sm text-red-700">{notice}</p>}
     <section className="mt-4 overflow-hidden rounded-xl border bg-white shadow-sm">
-      <div className="hidden grid-cols-[70px_1fr_130px_120px_160px] gap-4 border-b bg-slate-50 px-5 py-3 text-xs font-bold uppercase text-slate-500 md:grid"><span>Image</span><span>Lesson</span><span>Content</span><span>Status</span><span>Actions</span></div>
-      {loading ? <div className="p-10 text-center text-sm text-slate-500">Loading lessons...</div> : items.map((lesson) => <article key={lesson._id} className="grid gap-4 border-b px-5 py-4 last:border-0 md:grid-cols-[70px_1fr_130px_120px_160px] md:items-center">
-        <img src={mediaUrl(lesson.coverImage)} alt="" className="h-14 w-16 rounded-lg bg-slate-100 object-cover"/><div><h2 className="font-bold">{lesson.title}</h2><p className="mt-1 text-xs text-slate-500">Order #{lesson.order || 0}</p></div><span className="text-xs text-slate-600">{lesson.contentBlocks?.length || 0} blocks<br/>{lesson.videos?.length || 0} videos</span><span className={`w-fit rounded-full px-2.5 py-1 text-[10px] font-bold ${lesson.status === "active" ? "bg-emerald-50 text-emerald-700" : lesson.status === "draft" ? "bg-amber-50 text-amber-700" : "bg-slate-100 text-slate-500"}`}>{lesson.status}</span><div className="flex gap-2"><Link href={`/admin/code-ebooks/lesson-editor?lessonId=${lesson._id}`} className="rounded-lg bg-blue-50 px-3 py-2 text-xs font-bold text-blue-700">Edit</Link><button onClick={async () => { if (!confirm(`Deactivate "${lesson.title}"?`)) return; await deleteEbookLesson(lesson._id); await load(); }} className="rounded-lg bg-red-50 px-3 py-2 text-xs font-bold text-red-600">Deactivate</button></div>
+      <div className="hidden grid-cols-[70px_1fr_130px_120px_250px] gap-4 border-b bg-slate-50 px-5 py-3 text-xs font-bold uppercase text-slate-500 md:grid"><span>Image</span><span>Lesson</span><span>Content</span><span>Status</span><span>Actions</span></div>
+      {loading ? <div className="p-10 text-center text-sm text-slate-500">Loading lessons...</div> : items.map((lesson) => <article key={lesson._id} className="grid gap-4 border-b px-5 py-4 last:border-0 md:grid-cols-[70px_1fr_130px_120px_250px] md:items-center">
+        <img src={mediaUrl(lesson.coverImage)} alt="" className="h-14 w-16 rounded-lg bg-slate-100 object-cover"/><div><h2 className="font-bold">{lesson.title}</h2><p className="mt-1 text-xs text-slate-500">Order #{lesson.order || 0}</p></div><span className="text-xs text-slate-600">{lesson.contentBlocks?.length || 0} blocks<br/>{lesson.videos?.length || 0} videos</span><span className={`w-fit rounded-full px-2.5 py-1 text-[10px] font-bold ${lesson.status === "active" ? "bg-emerald-50 text-emerald-700" : lesson.status === "draft" ? "bg-amber-50 text-amber-700" : "bg-slate-100 text-slate-500"}`}>{lesson.status}</span><div className="flex flex-wrap gap-2"><Link href={`/admin/code-ebooks/lesson-editor?lessonId=${lesson._id}`} className="rounded-lg bg-blue-50 px-3 py-2 text-xs font-bold text-blue-700">Edit</Link><button disabled={actionId === lesson._id} onClick={async () => { if (!confirm(`Deactivate "${lesson.title}"? Students will no longer see it.`)) return; setActionId(lesson._id); setNotice(""); try { await deleteEbookLesson(lesson._id); await load(); } catch (error) { setNotice(error.response?.data?.message || "Lesson could not be deactivated."); } finally { setActionId(""); } }} className="rounded-lg bg-amber-50 px-3 py-2 text-xs font-bold text-amber-700 disabled:opacity-50">Deactivate</button><button disabled={actionId === lesson._id} onClick={async () => { if (!confirm(`Permanently delete "${lesson.title}"? This will remove the lesson and its uploaded files. This action cannot be undone.`)) return; setActionId(lesson._id); setNotice(""); try { await permanentlyDeleteEbookLesson(lesson._id); await load(); } catch (error) { setNotice(error.response?.data?.message || "Lesson could not be deleted."); } finally { setActionId(""); } }} className="rounded-lg bg-red-600 px-3 py-2 text-xs font-bold text-white disabled:opacity-50">Delete</button></div>
       </article>)}
       {!loading && !items.length && <div className="p-12 text-center text-sm text-slate-500">No lessons found.</div>}
     </section>

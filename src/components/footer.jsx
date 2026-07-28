@@ -213,7 +213,7 @@ const Footer = () => {
                         <li
                           key={index}
                           onClick={() => setOpenTime(false)}
-                          className="cursor-pointer px-4 py-2.5 transition-all duration-300 hover:bg-white/10 hover:text-white"
+                          className="cursor-pointer px-2 py-2.5 transition-all duration-300 text-[14.5px] hover:bg-white/10 hover:text-white"
                         >
                           {time}
                         </li>

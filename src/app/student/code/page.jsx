@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { getMyQuizAttempts, getMyTopicResults } from "@/features/API";
+import { getMyQuizAttempts, getMyQuizMistakes, getMyTopicResults } from "@/features/API";
 
 const practiceCards = [
   ["Simple series", "/image/simpleseries.png", "/student/code/simple-series-list"],
@@ -115,23 +115,26 @@ export default function CodePracticePage() {
         if (!active) return;
         const attempts = response.data?.data || [];
         setLatestSeries(attempts.slice(0, 5));
-        setMistakeCount(
-          attempts
-            .filter((attempt) => attempt.status === "completed")
-            .reduce(
-              (total, attempt) => total + Number(attempt.wrongCount || 0),
-              0,
-            ),
-        );
       })
       .catch(() => {
         if (active) {
           setLatestSeries([]);
-          setMistakeCount(0);
         }
       })
       .finally(() => {
         if (active) setLatestLoading(false);
+      });
+    return () => { active = false; };
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    getMyQuizMistakes()
+      .then((response) => {
+        if (active) setMistakeCount(Number(response.data?.data?.count || 0));
+      })
+      .catch(() => {
+        if (active) setMistakeCount(0);
       });
     return () => { active = false; };
   }, []);

@@ -1,5 +1,5 @@
-import LearningContentForm from "../_components/LearningContentForm";
+import { redirect } from "next/navigation";
 
-export default function CreateLearningContentPage() {
-  return <LearningContentForm mode="create" />;
+export default function LegacyCreateLearningContentPage() {
+  redirect("/admin/knowledge-sheets");
 }

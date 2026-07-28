@@ -34,6 +34,7 @@ const INITIAL_FORM = {
   city: "",
   gender: "",
   postalCode: "",
+  nephNumber: "",
   licenseType: "",
   currentLevel: "",
   preferredVehicleType: "automatic",
@@ -129,6 +130,7 @@ function createFormFromApi(studentProfile, loggedInUser) {
     city: studentProfile?.city || user.city || "",
     gender: studentProfile?.gender || user.gender || "",
     postalCode: studentProfile?.postalCode || "",
+    nephNumber: studentProfile?.nephNumber || "",
     licenseType: drivingInfo.licenseType || "",
     currentLevel: drivingInfo.currentLevel || "",
     preferredVehicleType: drivingInfo.preferredVehicleType || "automatic",
@@ -293,6 +295,7 @@ export default function StudentProfilePage() {
       address: form.address.trim(),
       city: form.city.trim(),
       postalCode: form.postalCode.trim(),
+      nephNumber: form.nephNumber.trim(),
 
       drivingInfo: {
         licenseType: form.licenseType.trim(),
@@ -496,6 +499,14 @@ export default function StudentProfilePage() {
                 onChange={handleChange}
                 placeholder="Enter postal code"
                 autoComplete="postal-code"
+              />
+
+              <Field
+                label="NEPH Number"
+                name="nephNumber"
+                value={form.nephNumber}
+                onChange={handleChange}
+                placeholder="Enter your NEPH number"
               />
 
               <Field

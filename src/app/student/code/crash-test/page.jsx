@@ -15,9 +15,15 @@ export default function CrashTestPage() {
       .then((response) => {
         if (!active) return;
         const quiz = (response.data?.data || [])
-          .filter((item) => item?.status === "active" && item.type === "crash_test")
+          .filter(
+            (item) =>
+              item?.status === "active" &&
+              item.type === "crash_test" &&
+              Number(item.totalQuestions || 0) > 0,
+          )
           .sort(
             (a, b) =>
+              Number(b.totalQuestions || 0) - Number(a.totalQuestions || 0) ||
               Number(a.order || 0) - Number(b.order || 0) ||
               new Date(a.createdAt) - new Date(b.createdAt),
           )[0];

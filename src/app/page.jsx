@@ -1190,6 +1190,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -1388,8 +1389,18 @@ function Stars({ center = true }) {
 }
 
 export default function Home() {
+  const router = useRouter();
   const swiperRefOne = useRef(null);
   const swiperRefThree = useRef(null);
+
+  const handleOfferNavigation = (event) => {
+    event.preventDefault();
+
+    const isLoggedIn =
+      typeof window !== "undefined" && Boolean(localStorage.getItem("token"));
+
+    router.push(isLoggedIn ? "/student/offers" : "/user-login");
+  };
 
   const instructorInfo = [
     {
@@ -1478,7 +1489,8 @@ export default function Home() {
               {/* Main button */}
               <div className="mt-4">
                 <Link
-                  href="#"
+                  href="/user-login"
+                  onClick={handleOfferNavigation}
                   className="inline-flex h-[39px] items-center justify-center rounded-[7px] bg-[#ef233c] px-[19px] text-[11px] font-extrabold text-white shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#d71934] hover:shadow-lg"
                 >
                   Start the courses
@@ -1536,7 +1548,8 @@ export default function Home() {
                       </div>
 
                       <Link
-                        href="#"
+                        href="/user-login"
+                        onClick={handleOfferNavigation}
                         className="inline-flex h-[31px] items-center justify-center rounded-[7px] bg-[#ef233c] px-[14px] text-[10px] font-extrabold text-white shadow-sm transition-all duration-300 hover:bg-[#d71934] hover:shadow-md"
                       >
                         Permit Offer
@@ -1558,6 +1571,7 @@ export default function Home() {
               />
             </div>
           </div>
+
         </div>
       </section>
 
@@ -1597,6 +1611,7 @@ export default function Home() {
               </div>
             ))}
           </div>
+
         </div>
       </section>
 
@@ -1650,7 +1665,7 @@ export default function Home() {
 
                   {/* Button */}
                   <Link
-                    href={service.href || "#"}
+                    href={service.href || "/contact-us"}
                     className={cn(
                       "mt-5 inline-flex min-h-[38px] items-center justify-center rounded-[7px]",
                       "border border-[#064CB5] px-[18px]",
@@ -1665,6 +1680,15 @@ export default function Home() {
                 </div>
               ))}
             </div>
+          </div>
+
+          <div className="mt-10 flex justify-center">
+            <Link
+              href="/services"
+              className="inline-flex min-h-[42px] items-center justify-center rounded-[8px] bg-[#E2233D] px-7 text-[13px] font-extrabold text-white shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#174A9B]"
+            >
+              View Other Services
+            </Link>
           </div>
         </div>
       </section>
@@ -2040,6 +2064,8 @@ export default function Home() {
               </div>
             ))}
           </div>
+
+         
         </div>
       </section>
 
@@ -2075,7 +2101,7 @@ export default function Home() {
 
                 <div className="mt-3 flex justify-center sm:mt-5 md:mt-6">
                   <Link
-                    href="#"
+                    href="/becoming-an-independent-instructor"
                     className="inline-flex min-h-[38px] items-center justify-center rounded-full bg-blue-600 px-4 py-2 text-[11px] font-bold text-white shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#2BBF3A] hover:text-white hover:shadow-lg sm:min-h-[42px] sm:px-6 sm:text-sm"
                   >
                     Join us as a driving instructor
@@ -2389,7 +2415,7 @@ export default function Home() {
                   </p>
 
                   <div className="mt-4">
-                    <Link href="#" className={outlineBtn}>
+                    <Link href="/blogs/1" className={outlineBtn}>
                       Read More
                     </Link>
                   </div>
@@ -2400,7 +2426,7 @@ export default function Home() {
 
           <div className="mt-8 text-center">
             <Link href="/blogs" className={primaryBtn}>
-              Learn More
+              View All Blogs
             </Link>
           </div>
         </div>

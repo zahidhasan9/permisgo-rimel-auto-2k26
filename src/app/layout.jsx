@@ -90,8 +90,9 @@ import "../globals.css";
 
 import ReduxProvider from "@/provider/provider";
 import AppToast from "@/components/common/AppToast";
+import { headers } from "next/headers";
 
-import { createMetadata, siteConfig } from "@/lib/seo";
+import { createMetadata, createRouteMetadata, siteConfig } from "@/lib/seo";
 
 const globalMetadata = createMetadata({
   title: "PermisGo | Professional Driving School",
@@ -104,7 +105,7 @@ const globalMetadata = createMetadata({
   // Global metadata-তে path দেবেন না
 });
 
-export const metadata = {
+const legacyMetadata = {
   metadataBase: new URL(siteConfig.url),
 
   ...globalMetadata,
@@ -134,6 +135,32 @@ export const metadata = {
     icon: "/image/favicon.png",
   },
 };
+
+export async function generateMetadata() {
+  const headerStore = await headers();
+  const pathname = headerStore.get("x-permisgo-pathname") || "/";
+  const routeMetadata = createRouteMetadata(pathname);
+
+  return {
+    metadataBase: new URL(siteConfig.url),
+    ...routeMetadata,
+    title: {
+      default: routeMetadata.title,
+      template: "%s | PermisGo",
+    },
+    applicationName: "PermisGo",
+    authors: [{ name: "PermisGo" }],
+    creator: "PermisGo",
+    publisher: "PermisGo",
+    openGraph: {
+      ...routeMetadata.openGraph,
+      locale: "en_GB",
+    },
+    icons: {
+      icon: "/image/favicon.png",
+    },
+  };
+}
 
 export const viewport = {
   width: "device-width",

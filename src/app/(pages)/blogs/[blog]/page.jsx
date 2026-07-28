@@ -1,248 +1,197 @@
 import Image from "next/image";
 import Link from "next/link";
+import {
+  FaCalendarAlt,
+  FaCommentAlt,
+  FaFolderOpen,
+  FaUser,
+} from "react-icons/fa";
 
-// Image
 import blogPage from "../../../../../public/image/blog-page.jpg";
+import carDriver from "../../../../../public/image/car-driver.jpg";
+import car from "../../../../../public/image/car.jpg";
+import drivingInstructor from "../../../../../public/image/driving-instructor.webp";
+import roadQuestion from "../../../../../public/image/road-question.png";
 
-// Icon
-import { FaArrowRight, FaRegCommentDots, FaUser } from "react-icons/fa";
-import { MdOutlineDateRange } from "react-icons/md";
+const posts = [
+  {
+    id: 1,
+    title: "10 Tips to Pass Your Driving Test on the First Try",
+    image: blogPage,
+  },
+  {
+    id: 2,
+    title: "Step-by-Step Guide to Passing Your Driving Test",
+    image: carDriver,
+  },
+  {
+    id: 3,
+    title: "Common Traffic Mistakes and How to Avoid Them",
+    image: car,
+  },
+  {
+    id: 4,
+    title: "Your Complete Guide to Becoming a Confident Driver",
+    image: blogPage,
+  },
+  {
+    id: 5,
+    title: "How to Start Driving: The First Time Learner's Guide",
+    image: drivingInstructor,
+  },
+  {
+    id: 6,
+    title: "Essential Road Signs Every Learner Should Know",
+    image: roadQuestion,
+  },
+];
 
-const getPost = async (blog) => {
-  const res = await fetch(
-    `https://jsonplaceholder.typicode.com/posts/${blog}`,
-    {
-      next: { revalidate: 3600 },
-    },
+const articleSections = [
+  {
+    title: "Know the Test Requirements",
+    text: "Before taking your test, make sure you understand what the examiner expects. Learn about the test format, scoring system, and common evaluation criteria. This will help you stay prepared and avoid surprises.",
+  },
+  {
+    title: "Practice Regularly",
+    text: "Consistent practice is key to becoming a confident driver. Try to practise in different environments such as busy roads, highways, and residential areas to gain real-world experience.",
+  },
+  {
+    title: "Master the Basics",
+    text: "Focus on essential driving skills like steering control, braking smoothly, and proper lane positioning. Strong fundamentals make a big difference during the test.",
+  },
+  {
+    title: "Always Check Mirrors",
+    text: "Examiners pay close attention to mirror usage. Make sure you check your mirrors frequently, especially before turning, stopping, or changing lanes.",
+  },
+  {
+    title: "Follow Traffic Rules Strictly",
+    text: "Obey all traffic signs, signals, and road markings. Even a small mistake like missing a stop sign can result in failure. Stay calm, take deep breaths, and focus on your driving instead of worrying about the result.",
+  },
+  {
+    title: "Maintain Proper Speed",
+    text: "Drive within the speed limit at all times. Avoid driving too fast or too slow, as both can create a negative impression.",
+  },
+  {
+    title: "Practice Parking and Manoeuvres",
+    text: "Make sure you are confident with parking techniques such as parallel parking, reverse parking, and three-point turns. These are often part of the test.",
+  },
+  {
+    title: "Listen Carefully to the Examiner",
+    text: "Pay close attention to the examiner’s instructions. If you don’t understand something, politely ask for clarification instead of guessing.",
+  },
+  {
+    title: "Conclusion",
+    text: "Before your actual test, take a mock driving test with your instructor. This helps you identify weaknesses and improves your confidence.",
+  },
+];
+
+function PostMeta() {
+  return (
+    <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-[12px] font-medium text-slate-700 sm:text-[13px]">
+      <span className="flex items-center gap-1.5">
+        <FaUser className="text-[#174a9b]" /> Ahmed Sadi
+      </span>
+      <span className="flex items-center gap-1.5">
+        <FaCalendarAlt className="text-[#174a9b]" /> 2023-08-03
+      </span>
+      <span className="flex items-center gap-1.5">
+        <FaFolderOpen className="text-[#174a9b]" /> Driving school
+      </span>
+      <span className="flex items-center gap-1.5">
+        <FaCommentAlt className="text-[#174a9b]" /> No comments
+      </span>
+    </div>
   );
+}
 
-  if (!res.ok) {
-    throw new Error("Failed to fetch blog post");
-  }
-
-  return await res.json();
-};
-
-const getRecentPosts = async () => {
-  const res = await fetch("https://jsonplaceholder.typicode.com/posts", {
-    next: { revalidate: 3600 },
-  });
-
-  if (!res.ok) {
-    throw new Error("Failed to fetch recent posts");
-  }
-
-  return await res.json();
-};
-
-const SingleBlog = async ({ params }) => {
+export async function generateMetadata({ params }) {
   const { blog } = await params;
+  const post = posts.find((item) => item.id === Number(blog)) || posts[0];
+  return {
+    title: post.title,
+    description:
+      "Practical driving advice from PermisGo to help learners prepare for their driving test.",
+  };
+}
 
-  const post = await getPost(blog);
-  const recentPosts = await getRecentPosts();
-  const relatedPosts = recentPosts
-    .filter((item) => item.id !== Number(blog))
-    .slice(0, 3);
+export default async function BlogDetailsPage({ params }) {
+  const { blog } = await params;
+  const post = posts.find((item) => item.id === Number(blog)) || posts[0];
+  const recentPosts = posts.filter((item) => item.id !== post.id).slice(0, 5);
 
   return (
-    <main className="min-h-screen bg-[#f5f5f7] px-4 py-10 sm:px-6 lg:px-10">
-      <div className="mx-auto max-w-[980px]">
-        {/* Back Link */}
-        <div className="mb-6">
-          <Link
-            href="/blogs"
-            className="inline-flex items-center text-[14px] font-medium text-[#0071e3] hover:underline"
-          >
-            ← Back to Blogs
-          </Link>
-        </div>
+    <section className="bg-white px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-[72px]">
+      <div className="mx-auto grid max-w-[1180px] items-start gap-6 lg:grid-cols-[minmax(0,1fr)_270px]">
+        <article className="rounded-[12px] bg-[#dfe7f3] p-4 shadow-[0_2px_4px_rgba(15,54,119,0.06)] sm:p-[18px]">
+          <h1 className="text-[19px] font-extrabold leading-snug text-[#161d2a] sm:text-[21px]">
+            {post.title}
+          </h1>
 
-        {/* Article */}
-        <article className="overflow-hidden rounded-[28px] bg-white shadow-[0_18px_50px_rgba(0,0,0,0.06)]">
-          {/* Article Header */}
-          <div className="px-6 pb-6 pt-8 sm:px-10 sm:pt-10">
-            <span className="mb-4 inline-flex rounded-full bg-[#f5f5f7] px-4 py-2 text-[12px] font-semibold text-[#0071e3]">
-              Driving School
-            </span>
+          <PostMeta />
 
-            <h1 className="max-w-[820px] text-[34px] font-semibold capitalize leading-[1.08] tracking-[-0.04em] text-[#1d1d1f] sm:text-[46px] lg:text-[54px]">
-              {post.title}
-            </h1>
-
-            <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-[13px] font-medium text-[#6e6e73]">
-              <span className="flex items-center gap-1.5">
-                <FaUser className="text-[#0071e3]" />
-                Ahmed Sadi
-              </span>
-
-              <span className="flex items-center gap-1.5">
-                <MdOutlineDateRange className="text-[#0071e3]" />
-                Aug 03, 2023
-              </span>
-
-              <span className="flex items-center gap-1.5">
-                <FaRegCommentDots className="text-[#0071e3]" />3 Comments
-              </span>
-            </div>
-          </div>
-
-          {/* Image */}
-          <div className="relative aspect-[16/8.5] w-full overflow-hidden">
+          <div className="relative mt-4 aspect-[2.55/1] overflow-hidden rounded-[9px] bg-slate-200">
             <Image
-              src={blogPage}
+              src={post.image}
               alt={post.title}
               fill
               priority
               placeholder="blur"
-              sizes="(max-width: 1024px) 100vw, 980px"
+              sizes="(max-width: 1024px) 100vw, 850px"
               className="object-cover"
             />
           </div>
 
-          {/* Article Body */}
-          <div className="px-6 py-8 sm:px-10 sm:py-10">
-            <p className="text-[17px] leading-8 text-[#424245] sm:text-[18px]">
-              {post.body}
+          <div className="pb-1 pt-5 text-[14px] leading-[1.65] text-slate-700 sm:text-[15px] sm:leading-[1.7]">
+            <p>
+              Passing your driving test on the first attempt is a goal for many
+              learners. With the right preparation, mindset, and guidance, you
+              can significantly increase your chances of success. Here are
+              essential tips to help you pass your driving test confidently.
             </p>
 
-            <p className="mt-6 text-[16px] leading-8 text-[#6e6e73]">
-              Learning to drive becomes easier when students understand the
-              basic rules, safe habits, and common mistakes before starting
-              practical lessons. This article is designed to guide learners with
-              simple and useful information.
-            </p>
+            <div className="mt-7 space-y-7">
+              {articleSections.map((section) => (
+                <section key={section.title}>
+                  <h2 className="text-[17px] font-extrabold text-[#20252d] sm:text-[18px]">
+                    {section.title}
+                  </h2>
+                  <p className="mt-3">{section.text}</p>
+                </section>
+              ))}
+            </div>
           </div>
         </article>
 
-        {/* Comment Form */}
-        <section className="mt-8 rounded-[28px] bg-white p-6 shadow-[0_14px_40px_rgba(0,0,0,0.05)] sm:p-8">
-          <h2 className="text-[26px] font-semibold tracking-[-0.03em] text-[#1d1d1f]">
-            Leave a Comment
+        <aside className="rounded-[12px] bg-[#dfe7f3] p-4 lg:sticky lg:top-5">
+          <h2 className="rounded-[8px] bg-[#174a9b] px-4 py-3 text-center text-[15px] font-extrabold text-white">
+            Our Recent Blog Post
           </h2>
 
-          <p className="mt-2 text-[14px] text-[#6e6e73]">
-            Share your thoughts about this article.
-          </p>
-
-          <form action="" className="mt-6 space-y-4">
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <input
-                type="text"
-                placeholder="Enter your name"
-                className="h-12 rounded-2xl border border-transparent bg-[#f5f5f7] px-4 text-[14px] font-medium text-[#1d1d1f] outline-none transition focus:border-[#0071e3] focus:bg-white focus:ring-4 focus:ring-[#0071e3]/10"
-              />
-
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="h-12 rounded-2xl border border-transparent bg-[#f5f5f7] px-4 text-[14px] font-medium text-[#1d1d1f] outline-none transition focus:border-[#0071e3] focus:bg-white focus:ring-4 focus:ring-[#0071e3]/10"
-              />
-            </div>
-
-            <textarea
-              placeholder="Write your comment"
-              rows={5}
-              className="w-full resize-none rounded-2xl border border-transparent bg-[#f5f5f7] px-4 py-4 text-[14px] font-medium text-[#1d1d1f] outline-none transition focus:border-[#0071e3] focus:bg-white focus:ring-4 focus:ring-[#0071e3]/10"
-            />
-
-            <button
-              type="submit"
-              className="rounded-full bg-[#0071e3] px-6 py-3 text-[14px] font-semibold text-white transition hover:bg-[#0066cc]"
-            >
-              Post Comment
-            </button>
-          </form>
-        </section>
-
-        {/* Comments */}
-        <section className="mt-8 rounded-[28px] bg-white p-6 shadow-[0_14px_40px_rgba(0,0,0,0.05)] sm:p-8">
-          <h2 className="text-[26px] font-semibold tracking-[-0.03em] text-[#1d1d1f]">
-            2 Comments
-          </h2>
-
-          <div className="mt-6 space-y-4">
-            {[1, 2].map((comment) => (
-              <div
-                key={comment}
-                className="rounded-2xl bg-[#f5f5f7] p-5 transition hover:bg-[#eeeeef]"
-              >
-                <small className="text-[12px] font-medium text-[#86868b]">
-                  December 21, 2021 at 8:11 pm
-                </small>
-
-                <h3 className="mt-2 text-[17px] font-semibold text-[#1d1d1f]">
-                  John Madword
-                </h3>
-
-                <p className="mt-2 text-[14px] leading-6 text-[#6e6e73]">
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro
-                  assumenda accusamus quis corporis unde dolor, saepe maxime
-                  earum.
-                </p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Related Posts */}
-        <section className="mt-10">
-          <div className="mb-5 flex items-end justify-between gap-4">
-            <div>
-              <h2 className="text-[30px] font-semibold tracking-[-0.03em] text-[#1d1d1f]">
-                Related articles
-              </h2>
-              <p className="mt-1 text-[14px] text-[#6e6e73]">
-                More useful posts for learners.
-              </p>
-            </div>
-
-            <Link
-              href="/blogs"
-              className="hidden text-[14px] font-semibold text-[#0071e3] hover:underline sm:inline-block"
-            >
-              View all
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
-            {relatedPosts.map((item) => (
+          <div className="mt-4 space-y-3">
+            {recentPosts.map((item) => (
               <Link
                 key={item.id}
                 href={`/blogs/${item.id}`}
-                className="group overflow-hidden rounded-[22px] bg-white transition duration-300 hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(0,0,0,0.07)]"
+                className="group grid grid-cols-[76px_1fr] items-center gap-3 rounded-[9px] bg-white p-2.5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
               >
-                <div className="relative aspect-[16/10] overflow-hidden">
+                <div className="relative h-[56px] overflow-hidden rounded-[7px]">
                   <Image
-                    src={blogPage}
-                    alt={item.title}
+                    src={item.image}
+                    alt=""
                     fill
                     placeholder="blur"
-                    sizes="(max-width: 640px) 100vw, 33vw"
-                    className="object-cover transition duration-700 group-hover:scale-[1.04]"
+                    sizes="76px"
+                    className="object-cover transition duration-500 group-hover:scale-105"
                   />
                 </div>
-
-                <div className="p-5">
-                  <span className="text-[12px] font-semibold text-[#0071e3]">
-                    Driving Tips
-                  </span>
-
-                  <h3 className="mt-2 line-clamp-2 text-[17px] font-semibold capitalize leading-6 tracking-[-0.02em] text-[#1d1d1f]">
-                    {item.title}
-                  </h3>
-
-                  <div className="mt-4 inline-flex items-center gap-2 text-[13px] font-semibold text-[#0071e3]">
-                    Read more
-                    <FaArrowRight className="text-[11px] transition group-hover:translate-x-1" />
-                  </div>
-                </div>
+                <h3 className="line-clamp-2 text-[12px] font-semibold leading-[1.45] text-slate-800 transition group-hover:text-[#174a9b]">
+                  {item.title}
+                </h3>
               </Link>
             ))}
           </div>
-        </section>
+        </aside>
       </div>
-    </main>
+    </section>
   );
-};
-
-export default SingleBlog;
+}

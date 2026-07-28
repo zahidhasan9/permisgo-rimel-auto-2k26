@@ -1,8 +1,5 @@
-import LearningContentForm from "../../_components/LearningContentForm";
+import { redirect } from "next/navigation";
 
-export default async function EditLearningContentPage({ params }) {
-  const resolvedParams = await params;
-  const id = resolvedParams?.id;
-
-  return <LearningContentForm mode="edit" contentId={id} />;
+export default function LegacyEditLearningContentPage() {
+  redirect("/admin/knowledge-sheets");
 }
