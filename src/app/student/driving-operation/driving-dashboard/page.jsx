@@ -57,7 +57,7 @@ const lessonItems = [
     id: 2,
     title: "Se my lessons",
     image: "/image/my-lessons.png",
-    link: "/student/driving-operation/my-lessons",
+    link: "/student/lessons",
   },
   {
     id: 3,

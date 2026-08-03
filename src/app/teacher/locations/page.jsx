@@ -4,7 +4,6 @@ import GooglePlaceAutocomplete from "@/components/maps/GooglePlaceAutocomplete";
 import { GoogleMap, MarkerF, useJsApiLoader } from "@react-google-maps/api";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  FaClock,
   FaEdit,
   FaLocationArrow,
   FaMapMarkerAlt,
@@ -15,24 +14,13 @@ import {
 import {
   createTeacherLocation,
   deleteTeacherLocation,
-  getTeacherAvailability,
   getTeacherLocations,
-  updateTeacherAvailability,
   updateTeacherLocation,
 } from "@/features/API";
 
 const GOOGLE_MAP_LIBRARIES = ["places"];
 const MAP_STYLE = { width: "100%", height: "430px" };
 const DEFAULT_CENTER = { lat: 48.8566, lng: 2.3522 };
-const DAYS = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-];
 
 const emptyLocation = () => ({
   id: "",
@@ -47,14 +35,6 @@ const emptyLocation = () => ({
   meetingType: "teacher_location",
   status: "active",
 });
-
-const defaultSchedule = () =>
-  DAYS.map((_, dayOfWeek) => ({
-    dayOfWeek,
-    enabled: dayOfWeek >= 1 && dayOfWeek <= 5,
-    startTime: "09:00",
-    endTime: "18:00",
-  }));
 
 const unwrap = (response, fallback = null) =>
   response?.data?.data ?? response?.data ?? fallback;
@@ -92,24 +72,6 @@ const locationToForm = (location) => {
     meetingType: location?.meetingType || "teacher_location",
     status: location?.status || "active",
   };
-};
-
-const availabilityToSchedule = (availability) => {
-  if (!Array.isArray(availability?.weeklySchedule)) return defaultSchedule();
-
-  return DAYS.map((_, dayOfWeek) => {
-    const day = availability.weeklySchedule.find(
-      (item) => Number(item.dayOfWeek) === dayOfWeek,
-    );
-    const firstSlot = day?.slots?.[0];
-
-    return {
-      dayOfWeek,
-      enabled: Boolean(day?.enabled),
-      startTime: firstSlot?.startTime || "09:00",
-      endTime: firstSlot?.endTime || "18:00",
-    };
-  });
 };
 
 function MapError({ message }) {
@@ -166,16 +128,8 @@ function LocationsContent() {
   const mapRef = useRef(null);
   const [locations, setLocations] = useState([]);
   const [form, setForm] = useState(emptyLocation);
-  const [schedule, setSchedule] = useState(defaultSchedule);
-  const [availabilitySettings, setAvailabilitySettings] = useState({
-    timezone:
-      Intl.DateTimeFormat().resolvedOptions().timeZone || "Europe/Paris",
-    bufferMinutes: 15,
-    slotIntervalMinutes: 30,
-  });
   const [loading, setLoading] = useState(true);
   const [savingLocation, setSavingLocation] = useState(false);
-  const [savingAvailability, setSavingAvailability] = useState(false);
   const [deletingId, setDeletingId] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -193,31 +147,16 @@ function LocationsContent() {
     setError("");
 
     try {
-      const [locationResponse, availabilityResponse] = await Promise.all([
-        getTeacherLocations(),
-        getTeacherAvailability(),
-      ]);
+      const locationResponse = await getTeacherLocations();
 
       const locationData = unwrap(locationResponse, []);
-      const availabilityData = unwrap(availabilityResponse, null);
 
       setLocations(Array.isArray(locationData) ? locationData : []);
-      setSchedule(availabilityToSchedule(availabilityData));
-      setAvailabilitySettings({
-        timezone:
-          availabilityData?.timezone ||
-          Intl.DateTimeFormat().resolvedOptions().timeZone ||
-          "Europe/Paris",
-        bufferMinutes: Number(availabilityData?.bufferMinutes ?? 15),
-        slotIntervalMinutes: Number(
-          availabilityData?.slotIntervalMinutes ?? 30,
-        ),
-      });
     } catch (requestError) {
       setError(
         getErrorMessage(
           requestError,
-          "Locations and availability could not be loaded.",
+          "Locations could not be loaded.",
         ),
       );
     } finally {
@@ -405,63 +344,13 @@ function LocationsContent() {
     }
   };
 
-  const updateScheduleDay = (dayOfWeek, field, value) => {
-    setSchedule((current) =>
-      current.map((day) =>
-        day.dayOfWeek === dayOfWeek ? { ...day, [field]: value } : day,
-      ),
-    );
-  };
-
-  const saveAvailability = async () => {
-    setError("");
-    setSuccess("");
-
-    const invalidDay = schedule.find(
-      (day) => day.enabled && day.endTime <= day.startTime,
-    );
-
-    if (invalidDay) {
-      setError(
-        `${DAYS[invalidDay.dayOfWeek]} end time must be after start time.`,
-      );
-      return;
-    }
-
-    setSavingAvailability(true);
-
-    try {
-      await updateTeacherAvailability({
-        timezone: availabilitySettings.timezone,
-        bufferMinutes: Number(availabilitySettings.bufferMinutes),
-        slotIntervalMinutes: Number(availabilitySettings.slotIntervalMinutes),
-        lessonDurationOptions: [30, 60, 90, 120],
-        weeklySchedule: schedule.map((day) => ({
-          dayOfWeek: day.dayOfWeek,
-          enabled: day.enabled,
-          slots: day.enabled
-            ? [{ startTime: day.startTime, endTime: day.endTime }]
-            : [],
-        })),
-      });
-      setSuccess("Availability saved successfully.");
-    } catch (requestError) {
-      setError(
-        getErrorMessage(requestError, "Availability could not be saved."),
-      );
-    } finally {
-      setSavingAvailability(false);
-    }
-  };
-
   return (
     <main className="space-y-6 pb-10">
       <section className="rounded-3xl bg-gradient-to-r from-[#123D7A] to-[#1E63B7] p-6 text-white shadow-lg">
         <p className="text-sm font-bold text-blue-100">Teacher settings</p>
-        <h1 className="mt-1 text-3xl font-black">Locations & availability</h1>
+        <h1 className="mt-1 text-3xl font-black">Lesson locations</h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-blue-100">
-          Add accurate lesson meeting points and define when students can book
-          you.
+          Add and manage accurate lesson meeting points for your students.
         </p>
       </section>
 
@@ -738,130 +627,6 @@ function LocationsContent() {
         )}
       </section>
 
-      <section
-        id="availability"
-        className="scroll-mt-6 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm"
-      >
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <p className="text-xs font-black uppercase tracking-wider text-blue-600">
-              Weekly schedule
-            </p>
-            <h2 className="mt-1 text-xl font-black text-slate-900">
-              Booking availability
-            </h2>
-          </div>
-          <FaClock className="text-2xl text-blue-600" />
-        </div>
-
-        <div className="mt-5 grid gap-3">
-          {schedule.map((day) => (
-            <div
-              key={day.dayOfWeek}
-              className="grid items-center gap-3 rounded-2xl border border-slate-200 p-3 md:grid-cols-[150px_110px_1fr_1fr]"
-            >
-              <p className="font-black text-slate-800">{DAYS[day.dayOfWeek]}</p>
-
-              <label className="flex items-center gap-2 text-sm font-bold text-slate-600">
-                <input
-                  type="checkbox"
-                  checked={day.enabled}
-                  onChange={(event) =>
-                    updateScheduleDay(
-                      day.dayOfWeek,
-                      "enabled",
-                      event.target.checked,
-                    )
-                  }
-                  className="h-4 w-4 accent-blue-600"
-                />
-                Available
-              </label>
-
-              <input
-                type="time"
-                value={day.startTime}
-                disabled={!day.enabled}
-                onChange={(event) =>
-                  updateScheduleDay(
-                    day.dayOfWeek,
-                    "startTime",
-                    event.target.value,
-                  )
-                }
-                className="rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-bold outline-none focus:border-blue-500 disabled:bg-slate-100"
-              />
-
-              <input
-                type="time"
-                value={day.endTime}
-                disabled={!day.enabled}
-                onChange={(event) =>
-                  updateScheduleDay(
-                    day.dayOfWeek,
-                    "endTime",
-                    event.target.value,
-                  )
-                }
-                className="rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-bold outline-none focus:border-blue-500 disabled:bg-slate-100"
-              />
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-5 grid gap-4 md:grid-cols-3">
-          <TextField
-            label="Timezone"
-            value={availabilitySettings.timezone}
-            onChange={(value) =>
-              setAvailabilitySettings((current) => ({
-                ...current,
-                timezone: value,
-              }))
-            }
-          />
-
-          <SelectField
-            label="Buffer between lessons"
-            value={availabilitySettings.bufferMinutes}
-            onChange={(value) =>
-              setAvailabilitySettings((current) => ({
-                ...current,
-                bufferMinutes: Number(value),
-              }))
-            }
-            options={[0, 10, 15, 20, 30, 45, 60].map((value) => ({
-              value,
-              label: `${value} minutes`,
-            }))}
-          />
-
-          <SelectField
-            label="Slot interval"
-            value={availabilitySettings.slotIntervalMinutes}
-            onChange={(value) =>
-              setAvailabilitySettings((current) => ({
-                ...current,
-                slotIntervalMinutes: Number(value),
-              }))
-            }
-            options={[15, 30, 45, 60].map((value) => ({
-              value,
-              label: `${value} minutes`,
-            }))}
-          />
-        </div>
-
-        <button
-          type="button"
-          onClick={saveAvailability}
-          disabled={savingAvailability}
-          className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#174A9B] px-5 py-3.5 text-sm font-black text-white hover:bg-[#123D7A] disabled:opacity-60 md:w-auto md:min-w-56"
-        >
-          <FaSave />
-          {savingAvailability ? "Saving..." : "Save availability"}
-        </button>
-      </section>
     </main>
   );
 }

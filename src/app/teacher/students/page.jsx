@@ -141,11 +141,12 @@ export default function Students() {
                   <TableHead>Course</TableHead>
                   <TableHead>Progress</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Action</TableHead>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {loading ? (
-                  <tr><td colSpan={6} className="px-4 py-10 text-center text-sm text-slate-500">Loading students...</td></tr>
+                  <tr><td colSpan={7} className="px-4 py-10 text-center text-sm text-slate-500">Loading students...</td></tr>
                 ) : students.length ? (
                   students.map((student) => (
                     <tr
@@ -181,11 +182,12 @@ export default function Students() {
                         </div>
                       </TableData>
                       <TableData><StatusBadge status={student.status} /></TableData>
+                      <TableData><button type="button" onClick={(event) => { event.stopPropagation(); router.push(`/teacher/students/${student._id}/booklet`); }} className="rounded-lg bg-[#e2233d] px-3 py-2 text-xs font-bold text-white">Set Booklet</button></TableData>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={6} className="px-4 py-10 text-center">
+                    <td colSpan={7} className="px-4 py-10 text-center">
                       <h3 className="text-base font-bold text-slate-800">No students found</h3>
                       <p className="mt-1 text-sm text-slate-500">Try changing your search filters.</p>
                     </td>

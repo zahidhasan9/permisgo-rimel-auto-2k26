@@ -29,10 +29,36 @@ const toMinutes = (value) => {
 };
 const minutesToTime = (value) =>
   `${pad(Math.floor(value / 60))}:${pad(value % 60)}`;
+const mergeSlots = (slots) => {
+  const sorted = [...slots]
+    .filter((slot) => toMinutes(slot.endTime) > toMinutes(slot.startTime))
+    .sort((a, b) => toMinutes(a.startTime) - toMinutes(b.startTime));
+  return sorted.reduce((result, slot) => {
+    const previous = result[result.length - 1];
+    if (!previous || toMinutes(slot.startTime) > toMinutes(previous.endTime)) {
+      result.push({ ...slot });
+    } else if (toMinutes(slot.endTime) > toMinutes(previous.endTime)) {
+      previous.endTime = slot.endTime;
+    }
+    return result;
+  }, []);
+};
+const removeRangeFromSlots = (slots, startTime, endTime) =>
+  slots.flatMap((slot) => {
+    const start = toMinutes(slot.startTime);
+    const end = toMinutes(slot.endTime);
+    const removeStart = toMinutes(startTime);
+    const removeEnd = toMinutes(endTime);
+    if (removeEnd <= start || removeStart >= end) return [slot];
+    return [
+      start < removeStart ? { startTime: slot.startTime, endTime: startTime } : null,
+      removeEnd < end ? { startTime: endTime, endTime: slot.endTime } : null,
+    ].filter(Boolean);
+  });
 const displayTime = (value) => {
   const [hours, minutes] = value.split(":").map(Number);
   const hour = hours % 12 || 12;
-  return minutes ? `${hour}.${pad(minutes)}` : `${hour}.00`;
+  return `${hour}:${pad(minutes)} ${hours >= 12 ? "PM" : "AM"}`;
 };
 const dateKey = (date) =>
   `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
@@ -66,6 +92,20 @@ const formatRange = (start) => {
   })}`;
 };
 const getInitial = (name = "Student") => name.trim().charAt(0).toUpperCase();
+const FULL_DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const toEditorSchedule = (availability) =>
+  FULL_DAYS.map((_, dayOfWeek) => {
+    const day = availability?.weeklySchedule?.find(
+      (item) => Number(item.dayOfWeek) === dayOfWeek,
+    );
+    const slot = day?.slots?.[0];
+    return {
+      dayOfWeek,
+      enabled: Boolean(day?.enabled),
+      startTime: slot?.startTime || "09:00",
+      endTime: slot?.endTime || "18:00",
+    };
+  });
 
 export default function AvailabilityCalendar() {
   const [search, setSearch] = useState("");
@@ -77,6 +117,8 @@ export default function AvailabilityCalendar() {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [showAvailabilityEditor, setShowAvailabilityEditor] = useState(false);
+  const [editorSchedule, setEditorSchedule] = useState([]);
   const [notice, setNotice] = useState("");
   const router = useRouter();
 
@@ -158,7 +200,7 @@ export default function AvailabilityCalendar() {
     lessons.filter(
       (lesson) =>
         lessonDateKey(lesson.lessonDate) === dateKey(day) &&
-        lesson.startTime === time &&
+        Math.floor(toMinutes(lesson.startTime) / 30) * 30 === toMinutes(time) &&
         !["cancelled", "no_show"].includes(lesson.status),
     );
 
@@ -166,28 +208,38 @@ export default function AvailabilityCalendar() {
     bookings.filter(
       (booking) =>
         lessonDateKey(booking.bookingDate) === dateKey(day) &&
-        booking.startTime === time,
+        Math.floor(toMinutes(booking.startTime) / 30) * 30 === toMinutes(time),
     );
 
   const timeValues = useMemo(() => {
     const values = [];
-    const allTimes = [
-      ...lessons.flatMap((item) => [item.startTime, item.endTime]),
-      ...bookings.flatMap((item) => [item.startTime, item.endTime]),
-      ...(availability?.weeklySchedule || []).flatMap((day) =>
-        (day.slots || []).flatMap((slot) => [slot.startTime, slot.endTime]),
-      ),
+    const effectiveSlots = (availability?.weeklySchedule || [])
+      .filter((day) => day.enabled)
+      .flatMap((day) => day.slots || []);
+    const availabilityTimes = effectiveSlots
+      .flatMap((slot) => [slot.startTime, slot.endTime])
+      .filter(Boolean);
+    const eventStarts = [
+      ...lessons.map((item) => item.startTime),
+      ...bookings.map((item) => item.startTime),
     ].filter(Boolean);
-    const minimum = allTimes.length
-      ? Math.max(0, Math.floor(Math.min(...allTimes.map(toMinutes)) / 30) * 30)
+    const eventStartMinutes = eventStarts.map(
+      (value) => Math.floor(toMinutes(value) / 30) * 30,
+    );
+    const allStartTimes = [
+      ...effectiveSlots.map((slot) => slot.startTime),
+      ...eventStartMinutes.map(minutesToTime),
+    ].filter(Boolean);
+    const minimum = allStartTimes.length
+      ? Math.max(0, Math.floor(Math.min(...allStartTimes.map(toMinutes)) / 30) * 30)
       : 9 * 60;
-    const maximum = allTimes.length
-      ? Math.min(
-          24 * 60,
-          Math.ceil(Math.max(...allTimes.map(toMinutes)) / 30) * 30,
-        )
-      : 18 * 60;
-    for (let value = minimum; value < maximum; value += 30) {
+    const availabilityLastStarts = availabilityTimes.length
+      ? effectiveSlots.map((slot) => Math.max(toMinutes(slot.startTime), toMinutes(slot.endTime) - 30))
+      : [];
+    const maximumStart = [...availabilityLastStarts, ...eventStartMinutes].length
+      ? Math.min(23 * 60 + 30, Math.max(...availabilityLastStarts, ...eventStartMinutes))
+      : 17 * 60 + 30;
+    for (let value = minimum; value <= maximumStart; value += 30) {
       values.push(minutesToTime(value));
     }
     return values;
@@ -294,6 +346,111 @@ export default function AvailabilityCalendar() {
     }
   };
 
+  const openAvailabilityEditor = () => {
+    setEditorSchedule(toEditorSchedule(availability));
+    setNotice("");
+    setShowAvailabilityEditor(true);
+  };
+
+  const updateEditorDay = (dayOfWeek, field, value) => {
+    setEditorSchedule((current) =>
+      current.map((day) =>
+        day.dayOfWeek === dayOfWeek ? { ...day, [field]: value } : day,
+      ),
+    );
+  };
+
+  const saveWeeklyAvailability = async () => {
+    const invalidDay = editorSchedule.find(
+      (day) => day.enabled && day.endTime <= day.startTime,
+    );
+    if (invalidDay) {
+      setNotice(`${FULL_DAYS[invalidDay.dayOfWeek]} end time must be after start time.`);
+      return;
+    }
+
+    setSaving(true);
+    setNotice("");
+    try {
+      const response = await updateTeacherAvailability({
+        timezone: availability?.timezone || "Europe/Paris",
+        bufferMinutes: availability?.bufferMinutes ?? 15,
+        slotIntervalMinutes: availability?.slotIntervalMinutes ?? 30,
+        lessonDurationOptions: availability?.lessonDurationOptions || [30, 60, 90, 120],
+        // A newly saved weekly schedule becomes the single source of truth.
+        // Remove older copied/custom overrides that could keep stale hours visible.
+        dateExceptions: [],
+        weeklySchedule: editorSchedule.map((day) => ({
+          dayOfWeek: day.dayOfWeek,
+          enabled: day.enabled,
+          slots: day.enabled
+            ? [{ startTime: day.startTime, endTime: day.endTime }]
+            : [],
+        })),
+      });
+      setAvailability(unwrap(response, availability));
+      setShowAvailabilityEditor(false);
+      setNotice("Weekly availability saved successfully.");
+    } catch (error) {
+      setNotice(getErrorMessage(error, "Availability could not be saved."));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const setCellAvailability = async (day, time, makeFree) => {
+    if (!availability || saving) return;
+    const endTime = minutesToTime(toMinutes(time) + 30);
+    const key = dateKey(day);
+    const existingException = (availability.dateExceptions || []).find(
+      (item) => lessonDateKey(item.date) === key,
+    );
+    const recurring = (availability.weeklySchedule || []).find(
+      (item) => Number(item.dayOfWeek) === day.getDay(),
+    );
+    const effectiveSlots = existingException
+      ? existingException.unavailable
+        ? []
+        : existingException.slots || []
+      : recurring?.enabled
+        ? recurring.slots || []
+        : [];
+    const nextSlots = makeFree
+      ? mergeSlots([...effectiveSlots, { startTime: time, endTime }])
+      : removeRangeFromSlots(effectiveSlots, time, endTime);
+    const retained = (availability.dateExceptions || []).filter(
+      (item) => lessonDateKey(item.date) !== key,
+    );
+    const nextExceptions = [
+      ...retained,
+      {
+        date: key,
+        unavailable: nextSlots.length === 0,
+        slots: nextSlots,
+        note: "Updated from teacher calendar",
+      },
+    ];
+
+    setSaving(true);
+    setNotice("");
+    try {
+      const response = await updateTeacherAvailability({
+        timezone: availability.timezone || "Europe/Paris",
+        bufferMinutes: availability.bufferMinutes ?? 15,
+        slotIntervalMinutes: availability.slotIntervalMinutes ?? 30,
+        lessonDurationOptions: availability.lessonDurationOptions || [30, 60, 90, 120],
+        weeklySchedule: availability.weeklySchedule,
+        dateExceptions: nextExceptions,
+      });
+      setAvailability(unwrap(response, availability));
+      setNotice(`${key} at ${displayTime(time)} marked ${makeFree ? "free" : "busy"}.`);
+    } catch (error) {
+      setNotice(getErrorMessage(error, "This time slot could not be updated."));
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const moveMonth = (amount) => {
     const next = new Date(
       selectedDate.getFullYear(),
@@ -331,7 +488,8 @@ export default function AvailabilityCalendar() {
           </button>
           <button
             type="button"
-            onClick={() => router.push("/teacher/locations#availability")}
+            onClick={openAvailabilityEditor}
+            disabled={loading || !availability}
             className="rounded-xl bg-rose-600 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-rose-700"
           >
             Set availability
@@ -474,11 +632,13 @@ export default function AvailabilityCalendar() {
                   {weekDays.map((day) => {
                     const items = lessonsForCell(time, day);
                     const requests = bookingsForCell(time, day);
+                    const available = isAvailableCell(time, day);
+                    const occupied = items.length > 0 || requests.length > 0;
                     return (
                       <div
                         key={dateKey(day)}
-                        className={`relative flex h-[84px] items-center justify-center border-r border-slate-200 last:border-r-0 ${
-                          isAvailableCell(time, day) ? "bg-emerald-50/50" : ""
+                        className={`group relative flex h-[84px] items-center justify-center border-r border-slate-200 last:border-r-0 ${
+                          available ? "bg-emerald-50/50" : "bg-slate-50/60"
                         }`}
                       >
                         {items.map((lesson) => (
@@ -523,6 +683,36 @@ export default function AvailabilityCalendar() {
                             Request
                           </button>
                         ))}
+                        {!occupied && (
+                          <>
+                            {!available && (
+                              <span className="rounded-lg bg-slate-800 px-3 py-2 text-xs font-extrabold text-white shadow-sm transition group-hover:opacity-0">
+                                Busy
+                              </span>
+                            )}
+                            <div className="absolute inset-0 z-30 hidden items-center justify-center bg-white/90 px-1 group-hover:flex">
+                              {available ? (
+                                <button
+                                  type="button"
+                                  onClick={() => setCellAvailability(day, time, false)}
+                                  disabled={saving}
+                                  className="rounded-md bg-slate-800 px-3 py-1.5 text-[10px] font-extrabold text-white disabled:opacity-40"
+                                >
+                                  Mark Busy
+                                </button>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={() => setCellAvailability(day, time, true)}
+                                  disabled={saving}
+                                  className="rounded-md bg-emerald-600 px-3 py-1.5 text-[10px] font-extrabold text-white disabled:opacity-40"
+                                >
+                                  Mark Free
+                                </button>
+                              )}
+                            </div>
+                          </>
+                        )}
                       </div>
                     );
                   })}
@@ -545,7 +735,68 @@ export default function AvailabilityCalendar() {
           }
         />
       )}
+      {showAvailabilityEditor && (
+        <AvailabilityEditor
+          schedule={editorSchedule}
+          saving={saving}
+          onChange={updateEditorDay}
+          onClose={() => setShowAvailabilityEditor(false)}
+          onSave={saveWeeklyAvailability}
+        />
+      )}
     </section>
+  );
+}
+
+function AvailabilityEditor({ schedule, saving, onChange, onClose, onSave }) {
+  const firstEnabled = schedule.find((day) => day.enabled) || schedule[0];
+  const applyTimeToEnabledDays = (field, value) => {
+    schedule.forEach((day) => {
+      if (day.enabled) onChange(day.dayOfWeek, field, value);
+    });
+  };
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4">
+      <div className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white p-5 shadow-2xl sm:p-6">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h2 className="text-xl font-extrabold text-blue-900">Set weekly availability</h2>
+            <p className="mt-1 text-sm text-slate-500">Students can only book inside these saved hours.</p>
+          </div>
+          <button type="button" onClick={onClose} className="rounded-xl bg-slate-100 p-3 text-slate-600"><FaTimes /></button>
+        </div>
+        <div className="mt-5 rounded-xl border border-blue-200 bg-blue-50 p-4">
+          <p className="text-sm font-extrabold text-blue-900">Apply time to all available days</p>
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            <label className="text-xs font-bold text-slate-600">
+              Start time
+              <input type="time" value={firstEnabled?.startTime || "09:00"} onChange={(event) => applyTimeToEnabledDays("startTime", event.target.value)} className="mt-1 block w-full rounded-xl border border-blue-200 bg-white px-3 py-2.5 text-sm" />
+            </label>
+            <label className="text-xs font-bold text-slate-600">
+              End time
+              <input type="time" value={firstEnabled?.endTime || "18:00"} onChange={(event) => applyTimeToEnabledDays("endTime", event.target.value)} className="mt-1 block w-full rounded-xl border border-blue-200 bg-white px-3 py-2.5 text-sm" />
+            </label>
+          </div>
+        </div>
+        <div className="mt-5 space-y-3">
+          {schedule.map((day) => (
+            <div key={day.dayOfWeek} className="grid items-center gap-3 rounded-xl border border-slate-200 p-3 sm:grid-cols-[130px_110px_1fr_1fr]">
+              <strong className="text-sm text-slate-800">{FULL_DAYS[day.dayOfWeek]}</strong>
+              <label className="flex items-center gap-2 text-sm font-semibold text-slate-600">
+                <input type="checkbox" checked={day.enabled} onChange={(event) => onChange(day.dayOfWeek, "enabled", event.target.checked)} className="h-4 w-4 accent-blue-900" />
+                Available
+              </label>
+              <input type="time" value={day.startTime} disabled={!day.enabled} onChange={(event) => onChange(day.dayOfWeek, "startTime", event.target.value)} className="rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-semibold disabled:bg-slate-100" />
+              <input type="time" value={day.endTime} disabled={!day.enabled} onChange={(event) => onChange(day.dayOfWeek, "endTime", event.target.value)} className="rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-semibold disabled:bg-slate-100" />
+            </div>
+          ))}
+        </div>
+        <div className="mt-6 flex justify-end gap-3">
+          <button type="button" onClick={onClose} disabled={saving} className="rounded-xl border border-slate-300 px-5 py-2.5 text-sm font-bold text-slate-700">Cancel</button>
+          <button type="button" onClick={onSave} disabled={saving} className="rounded-xl bg-rose-600 px-5 py-2.5 text-sm font-bold text-white disabled:opacity-50">{saving ? "Saving..." : "Save availability"}</button>
+        </div>
+      </div>
+    </div>
   );
 }
 

@@ -560,6 +560,11 @@ export const deleteTeacherLocation = (locationId) =>
 
 export const getTeacherAvailability = () => axios.get("/teachers/availability");
 
+export const getTeacherStudentBooklet = (studentId) => axios.get(`/teachers/students/${studentId}/booklet`);
+export const updateTeacherStudentBookletSkill = (studentId, payload) => axios.put(`/teachers/students/${studentId}/booklet`, payload);
+export const updateTeacherStudentBookletSkills = (studentId, assessments) => axios.put(`/teachers/students/${studentId}/booklet/bulk`, { assessments });
+export const getMyBookletSkills = () => axios.get("/students/booklet/skills");
+
 export const updateTeacherAvailability = (payload) =>
   axios.put("/teachers/availability", payload);
 
