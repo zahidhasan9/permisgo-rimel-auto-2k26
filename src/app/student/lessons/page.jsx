@@ -1,788 +1,84 @@
-// "use client";
-
-// import Link from "next/link";
-// import { useCallback, useEffect, useState } from "react";
-// import { FaEye, FaSearch } from "react-icons/fa";
-
-// import Pagination from "@/components/Pagination";
-// import {
-//   confirmAttendance,
-//   confirmLessonCompletion,
-//   getLessons,
-// } from "@/features/API";
-// import {
-//   formatLessonDate,
-//   getErrorMessage,
-//   getLessonLocation,
-//   getVehicleType,
-//   statusClass,
-//   statusLabel,
-//   unwrap,
-// } from "@/features/lessonHelpers";
-// import useDebouncedValue from "@/hooks/useDebouncedValue";
-
-// const INITIAL_META = {
-//   page: 1,
-//   limit: 20,
-//   total: 0,
-//   totalPages: 1,
-// };
-
-// const STATUSES = [
-//   "all",
-//   "scheduled",
-//   "in_progress",
-//   "awaiting_confirmation",
-//   "completed",
-//   "cancelled",
-//   "no_show",
-// ];
-
-// const studentPresent = (lesson) =>
-//   lesson.attendance?.studentStatus === "present" ||
-//   lesson.attendance?.studentConfirmed === true;
-
-// export default function StudentLessonsPage() {
-//   const [lessons, setLessons] = useState([]);
-//   const [meta, setMeta] = useState(INITIAL_META);
-//   const [loading, setLoading] = useState(true);
-//   const [busyId, setBusyId] = useState("");
-//   const [notice, setNotice] = useState(null);
-
-//   const [page, setPage] = useState(1);
-//   const [limit, setLimit] = useState(20);
-//   const [status, setStatus] = useState("all");
-//   const [search, setSearch] = useState("");
-//   const [sortOrder, setSortOrder] = useState("desc");
-//   const debouncedSearch = useDebouncedValue(search, 500);
-
-//   const loadLessons = useCallback(async () => {
-//     setLoading(true);
-
-//     try {
-//       const response = await getLessons({
-//         page,
-//         limit,
-//         status,
-//         search: debouncedSearch,
-//         sortOrder,
-//       });
-
-//       setLessons(
-//         Array.isArray(unwrap(response, [])) ? unwrap(response, []) : [],
-//       );
-//       setMeta({
-//         ...INITIAL_META,
-//         ...(response?.data?.meta || {}),
-//       });
-//     } catch (error) {
-//       setLessons([]);
-//       setNotice({
-//         type: "error",
-//         text: getErrorMessage(error, "Lessons could not be loaded."),
-//       });
-//     } finally {
-//       setLoading(false);
-//     }
-//   }, [debouncedSearch, limit, page, sortOrder, status]);
-
-//   useEffect(() => {
-//     loadLessons();
-//   }, [loadLessons]);
-
-//   useEffect(() => {
-//     setPage(1);
-//   }, [debouncedSearch, limit, sortOrder, status]);
-
-//   const runAction = async (lesson, action, message) => {
-//     setBusyId(lesson._id);
-//     setNotice(null);
-
-//     try {
-//       await action();
-//       setNotice({ type: "success", text: message });
-//       await loadLessons();
-//     } catch (error) {
-//       setNotice({
-//         type: "error",
-//         text: getErrorMessage(error, "Action could not be completed."),
-//       });
-//     } finally {
-//       setBusyId("");
-//     }
-//   };
-
-//   return (
-//     <main className="min-h-screen bg-slate-50 p-4 md:p-6">
-//       <div className="mx-auto max-w-7xl space-y-5">
-//         <header>
-//           <p className="text-sm font-bold uppercase tracking-wider text-blue-600">
-//             Student dashboard
-//           </p>
-//           <h1 className="mt-1 text-3xl font-bold text-slate-900">My lessons</h1>
-//           <p className="mt-2 text-sm text-slate-600">
-//             Lessons are loaded page by page, so the page remains fast even after
-//             many years of lesson history.
-//           </p>
-//         </header>
-
-//         {notice?.text && (
-//           <div
-//             className={`flex justify-between rounded-xl border px-4 py-3 text-sm ${
-//               notice.type === "error"
-//                 ? "border-rose-200 bg-rose-50 text-rose-700"
-//                 : "border-emerald-200 bg-emerald-50 text-emerald-700"
-//             }`}
-//           >
-//             <span>{notice.text}</span>
-//             <button type="button" onClick={() => setNotice(null)}>
-//               ×
-//             </button>
-//           </div>
-//         )}
-
-//         <section className="grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 md:grid-cols-[1fr_220px_180px]">
-//           <label className="relative">
-//             <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-//             <input
-//               value={search}
-//               onChange={(event) => setSearch(event.target.value)}
-//               placeholder="Search teacher name, email or phone"
-//               className="w-full rounded-xl border border-slate-300 py-2.5 pl-10 pr-3 text-sm"
-//             />
-//           </label>
-
-//           <select
-//             value={status}
-//             onChange={(event) => setStatus(event.target.value)}
-//             className="rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm"
-//           >
-//             {STATUSES.map((item) => (
-//               <option key={item} value={item}>
-//                 {item === "all" ? "All statuses" : statusLabel(item)}
-//               </option>
-//             ))}
-//           </select>
-
-//           <select
-//             value={sortOrder}
-//             onChange={(event) => setSortOrder(event.target.value)}
-//             className="rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm"
-//           >
-//             <option value="desc">Newest first</option>
-//             <option value="asc">Oldest first</option>
-//           </select>
-//         </section>
-
-//         <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-//           <div className="overflow-x-auto">
-//             <table className="min-w-[900px] w-full text-left text-sm">
-//               <thead className="bg-slate-100 text-xs uppercase text-slate-600">
-//                 <tr>
-//                   <th className="px-4 py-3">Date & time</th>
-//                   <th className="px-4 py-3">Teacher</th>
-//                   <th className="px-4 py-3">Vehicle / location</th>
-//                   <th className="px-4 py-3">Attendance</th>
-//                   <th className="px-4 py-3">Status</th>
-//                   <th className="px-4 py-3 text-right">Action</th>
-//                 </tr>
-//               </thead>
-
-//               <tbody className="divide-y divide-slate-100">
-//                 {loading ? (
-//                   <tr>
-//                     <td
-//                       colSpan={6}
-//                       className="px-4 py-14 text-center text-slate-500"
-//                     >
-//                       Loading lessons...
-//                     </td>
-//                   </tr>
-//                 ) : lessons.length === 0 ? (
-//                   <tr>
-//                     <td
-//                       colSpan={6}
-//                       className="px-4 py-14 text-center text-slate-500"
-//                     >
-//                       No lessons found.
-//                     </td>
-//                   </tr>
-//                 ) : (
-//                   lessons.map((lesson) => {
-//                     const present = studentPresent(lesson);
-//                     const busy = busyId === lesson._id;
-
-//                     return (
-//                       <tr key={lesson._id} className="hover:bg-slate-50">
-//                         <td className="px-4 py-4">
-//                           <p className="font-bold text-slate-900">
-//                             {formatLessonDate(lesson.lessonDate)}
-//                           </p>
-//                           <p className="mt-1 text-xs text-slate-500">
-//                             {lesson.startTime}–{lesson.endTime}
-//                           </p>
-//                         </td>
-
-//                         <td className="px-4 py-4">
-//                           <p className="font-semibold text-slate-800">
-//                             {lesson.teacher?.name || "Teacher"}
-//                           </p>
-//                           <p className="mt-1 text-xs text-slate-500">
-//                             {lesson.teacher?.email ||
-//                               lesson.teacher?.phone ||
-//                               ""}
-//                           </p>
-//                         </td>
-
-//                         <td className="px-4 py-4">
-//                           <p className="font-semibold text-slate-800">
-//                             {getVehicleType(lesson)}
-//                           </p>
-//                           <p className="mt-1 max-w-56 truncate text-xs text-slate-500">
-//                             {getLessonLocation(lesson)}
-//                           </p>
-//                         </td>
-
-//                         <td className="px-4 py-4 capitalize">
-//                           {lesson.attendance?.studentStatus ||
-//                             (present ? "present" : "pending")}
-//                         </td>
-
-//                         <td className="px-4 py-4">
-//                           <span
-//                             className={`rounded-full px-3 py-1 text-xs font-bold ${statusClass(
-//                               lesson.status,
-//                             )}`}
-//                           >
-//                             {statusLabel(lesson.status)}
-//                           </span>
-//                         </td>
-
-//                         <td className="px-4 py-4">
-//                           <div className="flex justify-end gap-2">
-//                             <Link
-//                               href={`/student/lessons/${lesson._id}`}
-//                               className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-3 py-2 text-xs font-bold text-white"
-//                             >
-//                               <FaEye /> View
-//                             </Link>
-
-//                             {lesson.status === "in_progress" && !present && (
-//                               <button
-//                                 type="button"
-//                                 disabled={busy}
-//                                 onClick={() =>
-//                                   runAction(
-//                                     lesson,
-//                                     () =>
-//                                       confirmAttendance(lesson._id, {
-//                                         status: "present",
-//                                       }),
-//                                     "Attendance confirmed.",
-//                                   )
-//                                 }
-//                                 className="rounded-lg bg-blue-600 px-3 py-2 text-xs font-bold text-white disabled:opacity-50"
-//                               >
-//                                 Confirm attendance
-//                               </button>
-//                             )}
-
-//                             {lesson.status === "awaiting_confirmation" && (
-//                               <button
-//                                 type="button"
-//                                 disabled={busy || !present}
-//                                 onClick={() =>
-//                                   runAction(
-//                                     lesson,
-//                                     () => confirmLessonCompletion(lesson._id),
-//                                     "Lesson completion confirmed.",
-//                                   )
-//                                 }
-//                                 className="rounded-lg bg-emerald-600 px-3 py-2 text-xs font-bold text-white disabled:opacity-50"
-//                               >
-//                                 Confirm completion
-//                               </button>
-//                             )}
-//                           </div>
-//                         </td>
-//                       </tr>
-//                     );
-//                   })
-//                 )}
-//               </tbody>
-//             </table>
-//           </div>
-
-//           <Pagination
-//             page={meta.page}
-//             limit={meta.limit}
-//             total={meta.total}
-//             totalPages={meta.totalPages}
-//             loading={loading}
-//             onPageChange={setPage}
-//             onLimitChange={(value) => {
-//               setLimit(value);
-//               setPage(1);
-//             }}
-//           />
-//         </section>
-//       </div>
-//     </main>
-//   );
-// }
-
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
-import { FaEye, FaSearch } from "react-icons/fa";
+import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { FaMapMarkerAlt } from "react-icons/fa";
+import { IoChevronBack } from "react-icons/io5";
 
-import BookingWorkspace from "@/components/lessons/BookingWorkspace";
-import Pagination from "@/components/Pagination";
-import {
-  confirmAttendance,
-  confirmLessonCompletion,
-  getLessonStats,
-  getLessons,
-  getLocationBookings,
-} from "@/features/API";
-import {
-  formatLessonDate,
-  getErrorMessage,
-  getLessonLocation,
-  getVehicleType,
-  statusClass,
-  statusLabel,
-  unwrap,
-} from "@/features/lessonHelpers";
-import useDebouncedValue from "@/hooks/useDebouncedValue";
+import { getLessons } from "@/features/API";
+import { getErrorMessage, getLessonLocation, getVehicleType, unwrap } from "@/features/lessonHelpers";
 
-const INITIAL_META = {
-  page: 1,
-  limit: 20,
-  total: 0,
-  totalPages: 1,
-};
-
-const studentPresent = (lesson) =>
-  lesson.attendance?.studentStatus === "present" ||
-  lesson.attendance?.studentConfirmed === true;
-
-const TABS = [
-  { key: "action", label: "Action required" },
-  { key: "upcoming", label: "Upcoming lessons" },
-  { key: "requests", label: "Booking requests" },
-  { key: "history", label: "History" },
+const FILTERS = [
+  { key: "awaiting", label: "Exams awaiting monitor validation", statuses: ["awaiting_confirmation"] },
+  { key: "past", label: "Past", statuses: ["completed"] },
+  { key: "confirmed", label: "Confirmed", statuses: ["scheduled", "in_progress"] },
+  { key: "cancelled", label: "Canceled", statuses: ["cancelled", "no_show"] },
 ];
 
-const TAB_STATUSES = {
-  action: ["in_progress", "awaiting_confirmation"],
-  upcoming: ["scheduled"],
-  history: ["completed", "cancelled", "no_show"],
+const formatDate = (value) => value ? new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric", year: "numeric" }).format(new Date(value)) : "Date unavailable";
+const formatTime = (value) => {
+  if (!value) return "—";
+  const [hour, minute] = value.split(":").map(Number);
+  const suffix = hour >= 12 ? "pm" : "am";
+  return `${hour % 12 || 12}${minute ? `:${String(minute).padStart(2, "0")}` : ""} ${suffix}`;
 };
-
-const INITIAL_STATS = {
-  scheduled: 0,
-  in_progress: 0,
-  awaiting_confirmation: 0,
-  completed: 0,
-};
+const statusText = (status) => ({ scheduled: "Confirmed", in_progress: "In progress", awaiting_confirmation: "Awaiting validation", completed: "Completed", cancelled: "Canceled", no_show: "No show" }[status] || status);
+const statusColor = (status) => ({ completed: "text-[#26bd3d]", scheduled: "text-[#174a9b]", in_progress: "text-amber-600", awaiting_confirmation: "text-violet-600", cancelled: "text-[#df2339]", no_show: "text-slate-500" }[status] || "text-slate-600");
 
 export default function StudentLessonsPage() {
+  const router = useRouter();
   const [lessons, setLessons] = useState([]);
-  const [meta, setMeta] = useState(INITIAL_META);
+  const [selected, setSelected] = useState(["past"]);
   const [loading, setLoading] = useState(true);
-  const [busyId, setBusyId] = useState("");
-  const [notice, setNotice] = useState(null);
-  const [activeTab, setActiveTab] = useState("action");
-  const [stats, setStats] = useState(INITIAL_STATS);
-  const [pendingRequests, setPendingRequests] = useState(0);
+  const [error, setError] = useState("");
 
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(20);
-  const [status, setStatus] = useState("all");
-  const [search, setSearch] = useState("");
-  const [sortOrder, setSortOrder] = useState("desc");
-  const debouncedSearch = useDebouncedValue(search, 500);
-  const lessonView = activeTab === "requests" ? "" : activeTab;
-
-  const loadSummary = useCallback(async () => {
-    try {
-      const [statsResponse, bookingsResponse] = await Promise.all([
-        getLessonStats(),
-        getLocationBookings({ status: "pending", page: 1, limit: 1 }),
-      ]);
-      setStats({
-        ...INITIAL_STATS,
-        ...(unwrap(statsResponse, {}) || {}),
-      });
-      setPendingRequests(Number(bookingsResponse?.data?.meta?.total) || 0);
-    } catch {
-      setStats(INITIAL_STATS);
-      setPendingRequests(0);
-    }
+  useEffect(() => {
+    let active = true;
+    getLessons({ page: 1, limit: 100, status: "all", sortOrder: "desc" })
+      .then((response) => { if (active) setLessons(Array.isArray(unwrap(response, [])) ? unwrap(response, []) : []); })
+      .catch((requestError) => { if (active) setError(getErrorMessage(requestError, "Lessons could not be loaded.")); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
   }, []);
 
-  const loadLessons = useCallback(async () => {
-    setLoading(true);
+  const visibleLessons = useMemo(() => {
+    if (!selected.length) return lessons;
+    const statuses = new Set(FILTERS.filter((filter) => selected.includes(filter.key)).flatMap((filter) => filter.statuses));
+    return lessons.filter((lesson) => statuses.has(lesson.status));
+  }, [lessons, selected]);
+  const totalHours = visibleLessons.reduce((sum, lesson) => sum + Number(lesson.duration || 0), 0) / 60;
 
-    try {
-      const response = await getLessons({
-        page,
-        limit,
-        status,
-        view: lessonView || undefined,
-        search: debouncedSearch,
-        sortOrder,
-      });
+  const toggle = (key) => setSelected((current) => current.includes(key) ? current.filter((item) => item !== key) : [...current, key]);
 
-      setLessons(
-        Array.isArray(unwrap(response, [])) ? unwrap(response, []) : [],
-      );
-      setMeta({
-        ...INITIAL_META,
-        ...(response?.data?.meta || {}),
-      });
-    } catch (error) {
-      setLessons([]);
-      setNotice({
-        type: "error",
-        text: getErrorMessage(error, "Lessons could not be loaded."),
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, [debouncedSearch, lessonView, limit, page, sortOrder, status]);
+  return <main className="min-h-screen bg-[#edf1f8] p-2 sm:p-4">
+    <div className="mx-auto rounded-xl bg-white p-4 sm:p-5">
+      <header className="flex items-center gap-3"><button type="button" onClick={() => router.back()} className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#e8edf5]"><IoChevronBack size={23} /></button><h1 className="text-[24px] font-bold text-[#123f88]">Driving Lesson</h1></header>
 
-  useEffect(() => {
-    if (activeTab !== "requests") loadLessons();
-  }, [activeTab, loadLessons]);
+      {error && <div className="mt-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700">{error}</div>}
 
-  useEffect(() => {
-    loadSummary();
-    const requestedTab = new URLSearchParams(window.location.search).get("tab");
-    if (TABS.some((tab) => tab.key === requestedTab)) {
-      setActiveTab(requestedTab);
-    }
-  }, [loadSummary]);
-
-  useEffect(() => {
-    setPage(1);
-  }, [activeTab, debouncedSearch, limit, sortOrder, status]);
-
-  useEffect(() => {
-    setStatus("all");
-  }, [activeTab]);
-
-  const runAction = async (lesson, action, message) => {
-    setBusyId(lesson._id);
-    setNotice(null);
-
-    try {
-      await action();
-      setNotice({ type: "success", text: message });
-      await Promise.all([loadLessons(), loadSummary()]);
-    } catch (error) {
-      setNotice({
-        type: "error",
-        text: getErrorMessage(error, "Action could not be completed."),
-      });
-    } finally {
-      setBusyId("");
-    }
-  };
-
-  return (
-    <main className="min-h-screen bg-slate-50 p-4 md:p-6">
-      <div className="mx-auto  space-y-5">
-        <header>
-          <p className="text-sm font-bold uppercase tracking-wider text-blue-600">
-            Student dashboard
-          </p>
-          <h1 className="mt-1 text-3xl font-bold text-slate-900">My lessons</h1>
-          <p className="mt-2 text-sm text-slate-600">
-            Lessons are loaded page by page, so the page remains fast even after
-            many years of lesson history.
-          </p>
-        </header>
-
-        {notice?.text && (
-          <div
-            className={`flex justify-between rounded-xl border px-4 py-3 text-sm ${
-              notice.type === "error"
-                ? "border-rose-200 bg-rose-50 text-rose-700"
-                : "border-emerald-200 bg-emerald-50 text-emerald-700"
-            }`}
-          >
-            <span>{notice.text}</span>
-            <button type="button" onClick={() => setNotice(null)}>
-              ×
-            </button>
+      <section className="mt-6 grid min-h-[660px] gap-4 rounded-xl bg-[#e8eef7] p-4 lg:grid-cols-[245px_minmax(0,1fr)]">
+        <aside className="self-start">
+          <div className="rounded-xl bg-white p-4">
+            <h2 className="text-xs font-bold">Lessons</h2>
+            <div className="mt-3 space-y-3">{FILTERS.map((filter) => <label key={filter.key} className="flex cursor-pointer items-start gap-2 text-xs"><input type="checkbox" checked={selected.includes(filter.key)} onChange={() => toggle(filter.key)} className="peer sr-only" /><span className="flex h-4 w-4 shrink-0 items-center justify-center rounded border border-slate-500 bg-white text-[10px] font-black text-white peer-checked:border-[#28c53f] peer-checked:bg-[#28c53f]">✓</span><span>{filter.label}</span></label>)}</div>
           </div>
-        )}
+          <Link href="/student/driving-operation/book-lesson" className="mt-4 flex h-10 items-center justify-center rounded-lg bg-[#df2339] text-xs font-bold text-white">New lesson</Link>
+        </aside>
 
-        <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          {[
-            {
-              label: "Action required",
-              value: stats.in_progress + stats.awaiting_confirmation,
-              color: "border-amber-200 bg-amber-50 text-amber-800",
-            },
-            {
-              label: "Pending requests",
-              value: pendingRequests,
-              color: "border-violet-200 bg-violet-50 text-violet-800",
-            },
-            {
-              label: "Upcoming lessons",
-              value: stats.scheduled,
-              color: "border-blue-200 bg-blue-50 text-blue-800",
-            },
-            {
-              label: "Completed lessons",
-              value: stats.completed,
-              color: "border-emerald-200 bg-emerald-50 text-emerald-800",
-            },
-          ].map((card) => (
-            <article
-              key={card.label}
-              className={`rounded-2xl border p-4 ${card.color}`}
-            >
-              <p className="text-xs font-bold uppercase tracking-wider">
-                {card.label}
-              </p>
-              <p className="mt-2 text-3xl font-black">{card.value}</p>
-            </article>
-          ))}
-        </section>
-
-        <nav className="flex gap-2 overflow-x-auto rounded-2xl border border-slate-200 bg-white p-2">
-          {TABS.map((tab) => (
-            <button
-              key={tab.key}
-              type="button"
-              onClick={() => {
-                setActiveTab(tab.key);
-                setPage(1);
-                window.history.replaceState(
-                  null,
-                  "",
-                  `/student/lessons?tab=${tab.key}`,
-                );
-              }}
-              className={`shrink-0 rounded-xl px-4 py-2.5 text-sm font-bold ${
-                activeTab === tab.key
-                  ? "bg-blue-600 text-white"
-                  : "text-slate-600 hover:bg-slate-100"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </nav>
-
-        {activeTab === "requests" ? (
-          <BookingWorkspace role="student" />
-        ) : (
-          <>
-        <section className="grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 md:grid-cols-[1fr_220px_180px]">
-          <label className="relative">
-            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search teacher name, email or phone"
-              className="w-full rounded-xl border border-slate-300 py-2.5 pl-10 pr-3 text-sm"
-            />
-          </label>
-
-          <select
-            value={status}
-            onChange={(event) => setStatus(event.target.value)}
-            className="rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm"
-          >
-            <option value="all">
-              {activeTab === "action"
-                ? "Active actions"
-                : activeTab === "upcoming"
-                  ? "Scheduled"
-                  : "History statuses"}
-            </option>
-            {(TAB_STATUSES[activeTab] || []).map((item) => (
-              <option key={item} value={item}>
-                {statusLabel(item)}
-              </option>
-            ))}
-          </select>
-
-          <select
-            value={sortOrder}
-            onChange={(event) => setSortOrder(event.target.value)}
-            className="rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm"
-          >
-            <option value="desc">Newest first</option>
-            <option value="asc">Oldest first</option>
-          </select>
-        </section>
-
-        <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-          <div className="overflow-x-auto">
-            <table className="min-w-[900px] w-full text-left text-sm">
-              <thead className="bg-slate-100 text-xs uppercase text-slate-600">
-                <tr>
-                  <th className="px-4 py-3">Date & time</th>
-                  <th className="px-4 py-3">Teacher</th>
-                  <th className="px-4 py-3">Vehicle / location</th>
-                  <th className="px-4 py-3">Attendance</th>
-                  <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3 text-right">Action</th>
-                </tr>
-              </thead>
-
-              <tbody className="divide-y divide-slate-100">
-                {loading ? (
-                  <tr>
-                    <td
-                      colSpan={6}
-                      className="px-4 py-14 text-center text-slate-500"
-                    >
-                      Loading lessons...
-                    </td>
-                  </tr>
-                ) : lessons.length === 0 ? (
-                  <tr>
-                    <td
-                      colSpan={6}
-                      className="px-4 py-14 text-center text-slate-500"
-                    >
-                      No lessons found.
-                    </td>
-                  </tr>
-                ) : (
-                  lessons.map((lesson) => {
-                    const present = studentPresent(lesson);
-                    const busy = busyId === lesson._id;
-
-                    return (
-                      <tr key={lesson._id} className="hover:bg-slate-50">
-                        <td className="px-4 py-4">
-                          <p className="font-bold text-slate-900">
-                            {formatLessonDate(lesson.lessonDate)}
-                          </p>
-                          <p className="mt-1 text-xs text-slate-500">
-                            {lesson.startTime}–{lesson.endTime}
-                          </p>
-                        </td>
-
-                        <td className="px-4 py-4">
-                          <p className="font-semibold text-slate-800">
-                            {lesson.teacher?.name || "Teacher"}
-                          </p>
-                          <p className="mt-1 text-xs text-slate-500">
-                            {lesson.teacher?.email ||
-                              lesson.teacher?.phone ||
-                              ""}
-                          </p>
-                        </td>
-
-                        <td className="px-4 py-4">
-                          <p className="font-semibold text-slate-800">
-                            {getVehicleType(lesson)}
-                          </p>
-                          <p className="mt-1 max-w-56 truncate text-xs text-slate-500">
-                            {getLessonLocation(lesson)}
-                          </p>
-                        </td>
-
-                        <td className="px-4 py-4 capitalize">
-                          {lesson.attendance?.studentStatus ||
-                            (present ? "present" : "pending")}
-                        </td>
-
-                        <td className="px-4 py-4">
-                          <span
-                            className={`rounded-full px-3 py-1 text-xs font-bold ${statusClass(
-                              lesson.status,
-                            )}`}
-                          >
-                            {statusLabel(lesson.status)}
-                          </span>
-                        </td>
-
-                        <td className="px-4 py-4">
-                          <div className="flex justify-end gap-2">
-                            <Link
-                              href={`/student/lessons/${lesson._id}`}
-                              className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-3 py-2 text-xs font-bold text-white"
-                            >
-                              <FaEye /> View
-                            </Link>
-
-                            {["in_progress", "awaiting_confirmation"].includes(
-                              lesson.status,
-                            ) &&
-                              !present && (
-                              <button
-                                type="button"
-                                disabled={busy}
-                                onClick={() =>
-                                  runAction(
-                                    lesson,
-                                    () =>
-                                      confirmAttendance(lesson._id, {
-                                        status: "present",
-                                      }),
-                                    "Attendance confirmed.",
-                                  )
-                                }
-                                className="rounded-lg bg-blue-600 px-3 py-2 text-xs font-bold text-white disabled:opacity-50"
-                              >
-                                Confirm attendance
-                              </button>
-                            )}
-
-                            {lesson.status === "awaiting_confirmation" && (
-                              <button
-                                type="button"
-                                disabled={busy || !present}
-                                onClick={() =>
-                                  runAction(
-                                    lesson,
-                                    () => confirmLessonCompletion(lesson._id),
-                                    "Lesson completion confirmed.",
-                                  )
-                                }
-                                className="rounded-lg bg-emerald-600 px-3 py-2 text-xs font-bold text-white disabled:opacity-50"
-                              >
-                                Confirm completion
-                              </button>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
+        <div className="rounded-xl bg-white p-4">
+          <p className="text-sm text-slate-600">{Number.isInteger(totalHours) ? totalHours : totalHours.toFixed(1)} hours in total on this page</p>
+          <div className="mt-4 space-y-4">
+            {loading ? Array.from({ length: 4 }).map((_, index) => <div key={index} className="h-[140px] animate-pulse rounded-xl bg-[#e8eef7]" />) : visibleLessons.length ? visibleLessons.map((lesson) => {
+              const isExam = String(lesson.booking?.offer?.category || lesson.booking?.offer?.title || "").toLowerCase().includes("exam");
+              return <Link href={`/student/lessons/${lesson._id}`} key={lesson._id} className="grid min-h-[140px] gap-4 rounded-xl bg-[#e8eef7] p-4 transition hover:ring-2 hover:ring-[#174a9b]/30 sm:grid-cols-[1fr_220px]">
+                <div><span className={`inline-flex rounded-lg px-3 py-2 text-xs font-bold text-white ${isExam ? "bg-[#267bd7]" : "bg-[#28c53f]"}`}>{isExam ? "Exam" : "Lesson"}</span><p className="mt-4 text-sm text-slate-600">{formatDate(lesson.lessonDate)}</p><p className="mt-2 text-sm text-slate-600">{formatTime(lesson.startTime)} to {formatTime(lesson.endTime)}</p><span className="mt-3 inline-flex rounded-lg bg-white px-2 py-1 text-[11px] font-semibold capitalize text-[#174a9b]">{getVehicleType(lesson)} transmission</span></div>
+                <div className="text-left sm:text-right"><p className={`text-sm font-semibold ${statusColor(lesson.status)}`}>{statusText(lesson.status)}</p><p className="mt-8 flex items-center gap-2 text-sm font-bold text-slate-600 sm:justify-end"><FaMapMarkerAlt />{getLessonLocation(lesson)}</p><p className="mt-2 text-xs text-slate-600">{lesson.teacher?.name || "Teacher"}</p></div>
+              </Link>;
+            }) : <div className="rounded-xl bg-[#e8eef7] p-12 text-center"><p className="text-sm font-bold text-[#123f88]">No lessons found</p><p className="mt-2 text-xs text-slate-500">Choose another lesson filter or book a new lesson.</p></div>}
           </div>
-
-          <Pagination
-            page={meta.page}
-            limit={meta.limit}
-            total={meta.total}
-            totalPages={meta.totalPages}
-            loading={loading}
-            onPageChange={setPage}
-            onLimitChange={(value) => {
-              setLimit(value);
-              setPage(1);
-            }}
-          />
-        </section>
-          </>
-        )}
-      </div>
-    </main>
-  );
+        </div>
+      </section>
+    </div>
+  </main>;
 }

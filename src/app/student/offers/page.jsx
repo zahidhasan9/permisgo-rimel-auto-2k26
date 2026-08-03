@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import useOffers, { CATEGORY_BY_TAB, filterOffers } from "@/hooks/useOffers";
 import {
   FaCheckCircle,
   FaLocationArrow,
@@ -159,14 +160,14 @@ function Tabs({ activeTab, setActiveTab }) {
   );
 }
 
-function TransmissionToggle() {
+function TransmissionToggle({ transmission, setTransmission }) {
   return (
     <div className="flex h-[39px] w-full max-w-[384px] overflow-hidden rounded-full bg-white">
-      <button className="h-full w-[181px] rounded-full bg-[#174A9B] text-[14px] font-[500] text-white">
+      <button onClick={() => setTransmission("manual")} className={`h-full w-[181px] rounded-full text-[14px] font-[500] ${transmission === "manual" ? "bg-[#174A9B] text-white" : "bg-white text-[#111111]"}`}>
         Manual transmission
       </button>
 
-      <button className="h-full flex-1 rounded-full bg-white text-[14px] font-[500] text-[#111111]">
+      <button onClick={() => setTransmission("automatic")} className={`h-full flex-1 rounded-full text-[14px] font-[500] ${transmission === "automatic" ? "bg-[#174A9B] text-white" : "bg-white text-[#111111]"}`}>
         Automatic transmission
       </button>
     </div>
@@ -199,7 +200,7 @@ function PriceBox({ sale, retail, className = "" }) {
   );
 }
 
-function PackageList() {
+function PackageList({ features = [] }) {
   return (
     <div className="mt-[28px]">
       <h3 className="text-[17px] font-[700] leading-none text-[#222222]">
@@ -207,7 +208,7 @@ function PackageList() {
       </h3>
 
       <ul className="mt-[20px] space-y-[17px]">
-        {packageContents.map((content, index) => (
+        {features.map((content, index) => (
           <li key={index} className="flex items-start gap-[10px]">
             <FaCheckCircle className="mt-[2px] h-[13px] w-[13px] shrink-0 text-[#174A9B]" />
             <span className="text-[15.5px] font-[500] leading-[18px] text-[#101010]">
@@ -257,7 +258,7 @@ function CodeCard({ item }) {
         <PriceBox sale={item.sale} retail={item.retail} className="mt-[25px]" />
       </div>
 
-      <PackageList />
+      <PackageList features={item.features} />
       <BuyButton active={item.active} />
     </article>
   );
@@ -298,21 +299,19 @@ function DriveCard({ item }) {
         </p>
 
         <div className="mt-[24px] flex items-center justify-center gap-[8px]">
-          <HourBadge value="01 hr" />
-          <HourBadge value="05 hr" active />
-          <HourBadge value="10 hr" />
+          {(item.hours?.length ? item.hours : ["01 hr", "05 hr", "10 hr"]).map((hour, index) => <HourBadge key={hour} value={hour} active={index === 1} />)}
         </div>
 
         <PriceBox sale={item.sale} retail={item.retail} className="mt-[20px]" />
       </div>
 
-      <PackageList />
+      <PackageList features={item.features} />
       <BuyButton active={item.active} />
     </article>
   );
 }
 
-function CodeTab() {
+function CodeTab({ offers, transmission }) {
   return (
     <section className="mt-[28px] rounded-[10px] bg-[#E8EEF8] px-[24px] pb-[24px] pt-[25px]">
       <div className="flex items-center justify-between gap-[20px] max-md:flex-col max-md:items-start">
@@ -320,19 +319,19 @@ function CodeTab() {
           Permisgo&apos;s Highway Code Packs
         </h2>
 
-        <TransmissionToggle />
+        <TransmissionToggle transmission={transmission.value} setTransmission={transmission.set} />
       </div>
 
       <div className="mt-[32px] grid grid-cols-1 gap-[23px] md:grid-cols-2 xl:grid-cols-3">
-        {codePackages.map((item) => (
-          <CodeCard key={item.title} item={item} />
+        {offers.map((item) => (
+          <CodeCard key={item._id} item={item} />
         ))}
       </div>
     </section>
   );
 }
 
-function ToDriveTab() {
+function ToDriveTab({ offers, transmission }) {
   return (
     <section className="mt-[28px] rounded-[10px] bg-[#E8EEF8] px-[24px] pb-[24px] pt-[24px]">
       <div className="flex items-center justify-between gap-[20px] max-md:flex-col max-md:items-start">
@@ -340,19 +339,19 @@ function ToDriveTab() {
           Our driving license offers
         </h2>
 
-        <TransmissionToggle />
+        <TransmissionToggle transmission={transmission.value} setTransmission={transmission.set} />
       </div>
 
       <div className="mt-[32px] grid grid-cols-1 gap-[24px] md:grid-cols-2 xl:grid-cols-3">
-        {drivePackages.map((item, index) => (
-          <DriveCard key={index} item={item} />
+        {offers.map((item) => (
+          <DriveCard key={item._id} item={item} />
         ))}
       </div>
     </section>
   );
 }
 
-function CpfTab() {
+function CpfTab({ offers, transmission }) {
   return (
     <section className="mt-[28px] rounded-[10px] bg-[#E8EEF8] px-[24px] pb-[24px] pt-[24px]">
       <div className="flex items-center justify-between gap-[20px] max-md:flex-col max-md:items-start">
@@ -360,19 +359,19 @@ function CpfTab() {
           CPF rates
         </h2>
 
-        <TransmissionToggle />
+        <TransmissionToggle transmission={transmission.value} setTransmission={transmission.set} />
       </div>
 
       <div className="mt-[32px] grid grid-cols-1 gap-[24px] md:grid-cols-2 xl:grid-cols-3">
-        {cpfPackages.map((item, index) => (
-          <DriveCard key={index} item={item} />
+        {offers.map((item) => (
+          <DriveCard key={item._id} item={item} />
         ))}
       </div>
     </section>
   );
 }
 
-function AccompanieTab({ item }) {
+function AccompanieTab({ offers, transmission }) {
   return (
     <section className="mt-[28px] rounded-[10px] bg-[#E8EEF8] px-[24px] pb-[24px] pt-[25px]">
       <div className="flex items-center justify-between gap-[20px] max-md:flex-col max-md:items-start">
@@ -380,12 +379,12 @@ function AccompanieTab({ item }) {
           Permisgo&apos;s Highway Code Packs
         </h2>
 
-        <TransmissionToggle />
+        <TransmissionToggle transmission={transmission.value} setTransmission={transmission.set} />
       </div>
 
       <div className="mt-[32px] grid grid-cols-1 gap-[23px] md:grid-cols-2 xl:grid-cols-3">
-        {Accompanied.map((item) => (
-          <CodeCard key={item.title} item={item} />
+        {offers.map((item) => (
+          <CodeCard key={item._id} item={item} />
         ))}
       </div>
     </section>
@@ -533,42 +532,32 @@ function EmptyTab({ title }) {
 
 export default function Page() {
   const [activeTab, setActiveTab] = useState("Code");
+  const [transmission, setTransmission] = useState("manual");
+  const { cards, loading, error } = useOffers();
+  const visibleOffers = filterOffers(cards, CATEGORY_BY_TAB[activeTab], transmission);
+  const transmissionProps = { value: transmission, set: setTransmission };
 
   return (
     <>
-      <style jsx global>{`
-        @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
-
-        * {
-          box-sizing: border-box;
-        }
-
-        html,
-        body {
-          margin: 0;
-          background: #ffffff;
-          font-family: "Poppins", sans-serif;
-          overflow-x: hidden;
-        }
-      `}</style>
-
-      <main className="min-h-screen bg-white">
+      <main className="dashboard-poppins min-h-screen bg-white">
         <div className="mx-auto w-full max-w-[1132px] px-[24px] pb-[28px] pt-[24px]">
           <Header />
 
           <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
-          {activeTab === "Code" && <CodeTab />}
-          {activeTab === "To Drive" && <ToDriveTab />}
-          {activeTab === "CPF" && <CpfTab />}
-          {activeTab === "Accompanied" && <AccompanieTab />}
+          {activeTab === "Code" && <CodeTab offers={visibleOffers} transmission={transmissionProps} />}
+          {activeTab === "To Drive" && <ToDriveTab offers={visibleOffers} transmission={transmissionProps} />}
+          {activeTab === "CPF" && <CpfTab offers={visibleOffers} transmission={transmissionProps} />}
+          {activeTab === "Accompanied" && <AccompanieTab offers={visibleOffers} transmission={transmissionProps} />}
           {activeTab === "Map" && <MapTab />}
 
           {/* {activeTab === "Accompanied" && (
             <EmptyTab title="Accompanied Offers" />
           )} */}
 
-          {activeTab === "Map" && <EmptyTab title="Map Offers" />}
+          {activeTab !== "Map" && loading && <p className="py-8 text-center text-sm text-gray-500">Loading offers...</p>}
+          {activeTab !== "Map" && error && <p className="py-8 text-center text-sm text-red-600">{error}</p>}
+          {activeTab !== "Map" && !loading && !error && visibleOffers.length === 0 && <p className="py-8 text-center text-sm text-gray-500">No offers available for this selection.</p>}
         </div>
       </main>
     </>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import useOffers, { CATEGORY_BY_TAB, filterOffers } from "@/hooks/useOffers";
 
 const tabs = ["Code", "To Drive", "CPF", "Accompanied", "Map"];
 import { useRouter } from "next/navigation";
@@ -41,8 +42,12 @@ const contents = [
 
 export default function OffersPage() {
   const [activeTab, setActiveTab] = useState("Code");
-  const [transmission, setTransmission] = useState("Manual transmission");
+  const [transmission, setTransmission] = useState("manual");
   const router = useRouter();
+  const { cards, loading, error } = useOffers();
+  const visibleOffers = activeTab === "Map"
+    ? []
+    : filterOffers(cards, CATEGORY_BY_TAB[activeTab], transmission);
   return (
     <main className="min-h-screen bg-white px-4 py-5 text-[#111827] sm:px-6">
       <div className="mx-auto ">
@@ -84,17 +89,17 @@ export default function OffersPage() {
             </h2>
 
             <div className="flex w-full max-w-[390px] rounded-full bg-white p-1">
-              {["Manual transmission", "Automatic transmission"].map((item) => (
+              {[{ value: "manual", label: "Manual transmission" }, { value: "automatic", label: "Automatic transmission" }].map((item) => (
                 <button
-                  key={item}
-                  onClick={() => setTransmission(item)}
+                  key={item.value}
+                  onClick={() => setTransmission(item.value)}
                   className={`flex-1 rounded-full px-4 py-2.5 text-sm font-medium transition ${
-                    transmission === item
+                    transmission === item.value
                       ? "bg-[#104392] text-white"
                       : "text-[#111827]"
                   }`}
                 >
-                  {item}
+                  {item.label}
                 </button>
               ))}
             </div>
@@ -102,10 +107,13 @@ export default function OffersPage() {
 
           {/* Cards */}
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {packages.map((item) => (
-              <OfferCard key={item.title} item={item} />
+            {visibleOffers.map((item) => (
+              <OfferCard key={item._id} item={item} />
             ))}
           </div>
+          {loading && <p className="py-8 text-center text-sm text-gray-500">Loading offers...</p>}
+          {error && <p className="py-8 text-center text-sm text-red-600">{error}</p>}
+          {!loading && !error && visibleOffers.length === 0 && <p className="py-8 text-center text-sm text-gray-500">No offers available for this selection.</p>}
         </section>
       </div>
     </main>
@@ -157,7 +165,7 @@ function OfferCard({ item }) {
         </h4>
 
         <ul className="space-y-3.5">
-          {contents.map((text) => (
+          {(item.features || []).map((text) => (
             <li
               key={text}
               className="flex items-center gap-3 text-[15px] text-black"

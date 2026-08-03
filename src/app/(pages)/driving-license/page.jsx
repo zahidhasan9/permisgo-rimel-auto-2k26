@@ -1,5 +1,8 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import Testimonials from "@/components/testimonials";
 import { FaStar, FaTimesCircle } from "react-icons/fa";
 import { FaSquareCheck } from "react-icons/fa6";
 
@@ -16,6 +19,8 @@ import tes2 from "../../../../public/image/tes2.png";
 import tes3 from "../../../../public/image/tes3.png";
 import badge from "../../../../public/image/traffic-two-price-batch.png";
 import trustLogo from "../../../../public/image/trustLogo.png";
+import { useState } from "react";
+import useOffers, { CATEGORY_BY_TAB, filterOffers } from "@/hooks/useOffers";
 
 const licensePackages = [
   {
@@ -94,11 +99,11 @@ const testimonials = [
   { image: tes1, name: "Annette Black" },
 ];
 
-function TransmissionSwitch() {
+function TransmissionSwitch({ value, onChange }) {
   return (
     <div className="flex items-center gap-1 rounded-full bg-[#edf2f9] p-1 !text-[12px] font-semibold">
-      <span className="rounded-full bg-[#174a9b] px-4 py-2 text-white">Manual transmission</span>
-      <span className="px-4 py-2 text-[#5d6671]">Automatic transmission</span>
+      <button type="button" onClick={() => onChange("manual")} className={`rounded-full px-4 py-2 ${value === "manual" ? "bg-[#174a9b] text-white" : "text-[#5d6671]"}`}>Manual transmission</button>
+      <button type="button" onClick={() => onChange("automatic")} className={`rounded-full px-4 py-2 ${value === "automatic" ? "bg-[#174a9b] text-white" : "text-[#5d6671]"}`}>Automatic transmission</button>
     </div>
   );
 }
@@ -135,7 +140,7 @@ function PackageCard({ item }) {
           </li>
         ))}
       </ul>
-      <Link href="/register" className="mx-auto mt-8 inline-flex min-h-[42px] min-w-[150px] items-center justify-center rounded-full border border-[#174a9b] px-6 !text-[13px] font-semibold text-[#e4213c] transition hover:bg-[#174a9b] hover:text-white">
+      <Link href="/inscription" className="mx-auto mt-8 inline-flex min-h-[42px] min-w-[150px] items-center justify-center rounded-full border border-[#174a9b] px-6 !text-[13px] font-semibold text-[#e4213c] transition hover:bg-[#174a9b] hover:text-white">
         Sign up
       </Link>
     </article>
@@ -167,7 +172,7 @@ function CodePackCard({ item }) {
           );
         })}
       </ul>
-      <Link href="/register" className="mx-auto mt-7 inline-flex min-h-[40px] min-w-[150px] items-center justify-center rounded-full bg-[#e4213c] px-6 !text-[12px] font-semibold uppercase text-white transition hover:bg-[#174a9b]">
+      <Link href="/inscription" className="mx-auto mt-7 inline-flex min-h-[40px] min-w-[150px] items-center justify-center rounded-full bg-[#e4213c] px-6 !text-[12px] font-semibold uppercase text-white transition hover:bg-[#174a9b]">
         Sign Up
       </Link>
     </article>
@@ -175,6 +180,11 @@ function CodePackCard({ item }) {
 }
 
 export default function DrivingLicensePage() {
+  const [activeTab, setActiveTab] = useState("Driving License");
+  const [transmission, setTransmission] = useState("manual");
+  const { cards, loading, error } = useOffers();
+  const selectedOffers = filterOffers(cards, CATEGORY_BY_TAB[activeTab], transmission);
+  const codeOffers = filterOffers(cards, "code", transmission);
   return (
     <main className="overflow-hidden bg-white text-[#202124]">
       <section className="bg-[#eaf0f9]">
@@ -196,15 +206,15 @@ export default function DrivingLicensePage() {
         <div className="mx-auto max-w-[1280px]">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
             <h2 className="text-[32px] font-bold">Our Packages</h2>
-            <TransmissionSwitch />
+            <TransmissionSwitch value={transmission} onChange={setTransmission} />
           </div>
           <div className="mt-8 flex flex-wrap gap-3">
-            {["Driving License", "CPF Offers", "Accompanied Driving", "Code", "À la carte"].map((tab, index) => (
-              <span key={tab} className={`rounded-[7px] border px-5 py-2 !text-[12px] font-semibold ${index === 0 ? "border-[#174a9b] bg-[#dce8fb] text-[#174a9b]" : "border-[#d6deea] bg-white text-[#3f454c]"}`}>{tab}</span>
+            {["Driving License", "CPF Offers", "Accompanied Driving", "Code", "À la carte"].map((tab) => (
+              <button type="button" onClick={() => setActiveTab(tab)} key={tab} className={`rounded-[7px] border px-5 py-2 !text-[12px] font-semibold ${activeTab === tab ? "border-[#174a9b] bg-[#dce8fb] text-[#174a9b]" : "border-[#d6deea] bg-white text-[#3f454c]"}`}>{tab}</button>
             ))}
           </div>
           <div className="mt-10 grid grid-cols-[minmax(0,1fr)] gap-8 lg:grid-cols-3">
-            {licensePackages.map((item) => <PackageCard key={item.title} item={item} />)}
+            {selectedOffers.map((item) => activeTab === "Code" || activeTab === "Accompanied Driving" ? <CodePackCard key={item._id} item={item} /> : <PackageCard key={item._id} item={item} />)}
           </div>
           <div className="mt-16 rounded-[10px] bg-[#eaf0f9] px-6 py-9 text-center">
             <h3 className="text-[20px] font-bold">Manage your entire online training at the best price</h3>
@@ -228,14 +238,14 @@ export default function DrivingLicensePage() {
         <div className="mx-auto max-w-[1280px]">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
             <h2 className="text-[30px] font-bold">Our accompanied driving package</h2>
-            <TransmissionSwitch />
+            <TransmissionSwitch value={transmission} onChange={setTransmission} />
           </div>
           <div className="mt-8 grid gap-10 rounded-[10px] bg-[#eaf0f9] p-7 md:grid-cols-[45%_55%] lg:p-12">
             <div className="rounded-[10px] bg-white p-7 text-center">
               <h3 className="text-[24px] font-bold text-[#e4213c]">Accompanied Driving</h3>
               <p className="mt-2 !text-[13px] text-[#757a81]">Code + 20 driving lessons</p>
               <div className="mt-8 flex items-end justify-between"><strong className="text-[25px] text-[#174a9b]">€599*</strong><span className="!text-[12px] text-[#717780] line-through">€699</span></div>
-              <Link href="/register" className="mt-7 inline-flex w-full justify-center rounded-[8px] bg-[#e4213c] px-6 py-3 !text-[13px] font-semibold text-white transition hover:bg-[#174a9b]">Sign up</Link>
+              <Link href="/inscription" className="mt-7 inline-flex w-full justify-center rounded-[8px] bg-[#e4213c] px-6 py-3 !text-[13px] font-semibold text-white transition hover:bg-[#174a9b]">Sign up</Link>
             </div>
             <div>
               <h3 className="text-[18px] font-bold text-[#174a9b]">Package Contents</h3>
@@ -272,7 +282,7 @@ export default function DrivingLicensePage() {
       <section className="bg-[#eaf0f9] px-5 py-20 sm:px-8 lg:py-24">
         <div className="mx-auto max-w-[1280px]">
           <div className="text-center"><h2 className="text-[34px] font-bold">Permisgo&apos;s Highway Code Packs</h2><p className="mt-4 !text-[13px] text-[#73787e]">What is your need?</p></div>
-          <div className="mt-12 grid grid-cols-[minmax(0,1fr)] gap-9 lg:grid-cols-3">{codePacks.map((item) => <CodePackCard key={item.title} item={item} />)}</div>
+          <div className="mt-12 grid grid-cols-[minmax(0,1fr)] gap-9 lg:grid-cols-3">{codeOffers.map((item) => <CodePackCard key={item._id} item={item} />)}</div>
         </div>
       </section>
 
@@ -311,7 +321,7 @@ export default function DrivingLicensePage() {
         </div>
       </section>
 
-      <section className="bg-[#f5f7fa] px-5 py-20 sm:px-8 lg:py-24">
+      <div className="hidden"><section className="bg-[#f5f7fa] px-5 py-20 sm:px-8 lg:py-24">
         <div className="mx-auto max-w-[1280px]">
           <span className="rounded-[5px] bg-[#e7f7ec] px-4 py-2 !text-[12px] font-semibold text-[#20a657]">Testimonials</span><h2 className="mt-5 text-[34px] font-bold">What Our Students Say</h2>
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -325,7 +335,8 @@ export default function DrivingLicensePage() {
           </div>
           <Link href="/reviews" className="mt-10 inline-flex rounded-[8px] bg-[#e4213c] px-6 py-3 !text-[13px] font-semibold text-white transition hover:bg-[#174a9b]">View All</Link>
         </div>
-      </section>
+      </section></div>
+      <Testimonials />
     </main>
   );
 }

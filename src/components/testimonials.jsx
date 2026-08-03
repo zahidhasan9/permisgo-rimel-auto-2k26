@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Swiper, SwiperSlide } from "swiper/react";
 
@@ -14,76 +14,14 @@ import { Autoplay, FreeMode, Navigation } from "swiper/modules";
 
 import { FaQuoteLeft, FaStar } from "react-icons/fa";
 import { FaArrowLeftLong, FaArrowRightLong } from "react-icons/fa6";
-
-import tes1 from "../../public/image/tes1.png";
-import tes2 from "../../public/image/tes2.png";
-import tes3 from "../../public/image/tes3.png";
-
-const testimonials = [
-  {
-    img: tes1,
-    name: "Esther Howard",
-    role: "Web Designer",
-    text: "Thanks to the instructors, I passed my driving test on the first try. The lessons were clear and very helpful! I passed my driving test on the first try.",
-  },
-  {
-    img: tes2,
-    name: "Esther Howard",
-    role: "Web Designer",
-    text: "Thanks to the instructors, I passed my driving test on the first try. The lessons were clear and very helpful! I passed my driving test on the first try.",
-  },
-  {
-    img: tes3,
-    name: "Esther Howard",
-    role: "Web Designer",
-    text: "Thanks to the instructors, I passed my driving test on the first try. The lessons were clear and very helpful! I passed my driving test on the first try.",
-  },
-  {
-    img: tes1,
-    name: "Esther Howard",
-    role: "Web Designer",
-    text: "Thanks to the instructors, I passed my driving test on the first try. The lessons were clear and very helpful! I passed my driving test on the first try.",
-  },
-  {
-    img: tes2,
-    name: "Esther Howard",
-    role: "Web Designer",
-    text: "Thanks to the instructors, I passed my driving test on the first try. The lessons were clear and very helpful! I passed my driving test on the first try.",
-  },
-  {
-    img: tes3,
-    name: "Esther Howard",
-    role: "Web Designer",
-    text: "Thanks to the instructors, I passed my driving test on the first try. The lessons were clear and very helpful! I passed my driving test on the first try.",
-  },
-  {
-    img: tes1,
-    name: "Esther Howard",
-    role: "Web Designer",
-    text: "Thanks to the instructors, I passed my driving test on the first try. The lessons were clear and very helpful! I passed my driving test on the first try.",
-  },
-  {
-    img: tes2,
-    name: "Esther Howard",
-    role: "Web Designer",
-    text: "Thanks to the instructors, I passed my driving test on the first try. The lessons were clear and very helpful! I passed my driving test on the first try.",
-  },
-  {
-    img: tes3,
-    name: "Esther Howard",
-    role: "Web Designer",
-    text: "Thanks to the instructors, I passed my driving test on the first try. The lessons were clear and very helpful! I passed my driving test on the first try.",
-  },
-  {
-    img: tes1,
-    name: "Esther Howard",
-    role: "Web Designer",
-    text: "Thanks to the instructors, I passed my driving test on the first try. The lessons were clear and very helpful! I passed my driving test on the first try.",
-  },
-];
+import { getTestimonials } from "@/features/API";
 
 const Testimonials = () => {
   const swiperRefTwo = useRef(null);
+  const [testimonials, setTestimonials] = useState([]);
+  useEffect(() => { getTestimonials().then(({ data }) => setTestimonials(data?.data || [])).catch(() => setTestimonials([])); }, []);
+
+  if (!testimonials.length) return null;
 
   return (
     <section className="relative overflow-hidden bg-slate-50 px-4 py-12 sm:px-6 lg:px-12">
@@ -164,16 +102,15 @@ const Testimonials = () => {
           className="w-full"
         >
           {testimonials.map((item, index) => (
-            <SwiperSlide key={index} className="!h-auto py-3">
+            <SwiperSlide key={item._id || index} className="!h-auto py-3">
               <article className="flex h-full flex-col rounded-3xl border border-slate-100 bg-white p-5 shadow-sm transition duration-300 hover:border-blue-200 hover:shadow-xl">
                 {/* User Info */}
                 <div className="mb-5 flex items-center gap-4">
                   <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full ring-4 ring-blue-50">
                     <Image
-                      src={item.img}
+                      src={item.image}
                       alt={item.name}
                       fill
-                      placeholder="blur"
                       quality={90}
                       sizes="64px"
                       className="object-cover"
@@ -191,7 +128,7 @@ const Testimonials = () => {
 
                     <div className="mt-1 flex gap-1 text-sm text-yellow-400">
                       {[1, 2, 3, 4, 5].map((star) => (
-                        <FaStar key={star} />
+                        <FaStar key={star} className={star <= item.rating ? "text-yellow-400" : "text-slate-200"} />
                       ))}
                     </div>
                   </div>
@@ -202,7 +139,7 @@ const Testimonials = () => {
                   <FaQuoteLeft className="mb-2 text-blue-600" />
 
                   <p className="text-sm leading-6 text-slate-600">
-                    {item.text}
+                    {item.message}
                   </p>
                 </div>
               </article>

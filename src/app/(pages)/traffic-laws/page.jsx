@@ -1,5 +1,8 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import Testimonials from "@/components/testimonials";
 import { FaArrowLeft, FaArrowRight, FaStar, FaTimesCircle } from "react-icons/fa";
 import { FaLocationDot, FaSquareCheck } from "react-icons/fa6";
 
@@ -14,6 +17,7 @@ import tes2 from "../../../../public/image/tes2.png";
 import tes3 from "../../../../public/image/tes3.png";
 import trafficHero from "../../../../public/image/traffic-hero.png";
 import trustLogo from "../../../../public/image/trustLogo.png";
+import useOffers, { filterOffers } from "@/hooks/useOffers";
 
 const packs = [
   {
@@ -91,6 +95,8 @@ const testimonials = [
 ];
 
 export default function TrafficLawsPage() {
+  const { cards, loading, error } = useOffers();
+  const offers = filterOffers(cards, "code");
   return (
     <main className="overflow-hidden bg-white text-[#202124]">
       <section className="bg-[#eaf0f9]">
@@ -105,7 +111,7 @@ export default function TrafficLawsPage() {
             </p>
             <div className="mt-10 grid max-w-[540px] grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-2">
               <Link
-                href="/register"
+                href="/inscription"
                 className="inline-flex min-h-[48px] items-center justify-center rounded-[9px] bg-[#e4213c] px-6 !text-[15px] font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-[#174a9b] hover:shadow-lg"
               >
                 Register for FREE
@@ -140,9 +146,9 @@ export default function TrafficLawsPage() {
           </div>
 
           <div className="mt-12 grid grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-3">
-            {packs.map((pack) => (
+            {offers.map((pack) => (
               <article
-                key={pack.title}
+                key={pack._id}
                 className="relative flex min-h-[620px] flex-col rounded-[10px] border-2 border-[#174a9b] bg-white px-7 py-10 transition duration-300 hover:-translate-y-1 hover:shadow-xl"
               >
                 {pack.badge && (
@@ -188,7 +194,7 @@ export default function TrafficLawsPage() {
                   })}
                 </ul>
                 <Link
-                  href="/register"
+                  href="/inscription"
                   className="mx-auto mt-8 inline-flex min-h-[42px] min-w-[160px] items-center justify-center rounded-full bg-[#e4213c] px-6 !text-[13px] font-semibold uppercase text-white transition duration-300 hover:bg-[#174a9b] hover:shadow-md"
                 >
                   Sign Up
@@ -196,6 +202,9 @@ export default function TrafficLawsPage() {
               </article>
             ))}
           </div>
+          {loading && <p className="mt-10 text-center text-sm text-gray-500">Loading offers...</p>}
+          {error && <p className="mt-10 text-center text-sm text-red-600">{error}</p>}
+          {!loading && !error && offers.length === 0 && <p className="mt-10 text-center text-sm text-gray-500">No code offers available.</p>}
         </div>
       </section>
 
@@ -300,54 +309,7 @@ export default function TrafficLawsPage() {
         </div>
       </section>
 
-      <section className="bg-[#f5f7fa] px-5 py-20 sm:px-8 lg:py-24">
-        <div className="mx-auto max-w-[1280px]">
-          <div className="flex items-end justify-between gap-5">
-            <div>
-              <span className="inline-flex rounded-[5px] bg-[#e7f7ec] px-4 py-2 !text-[12px] font-semibold text-[#20a657]">
-                Testimonials
-              </span>
-              <h2 className="mt-5 text-[34px] font-bold tracking-[-0.025em] text-[#222] lg:text-[38px]">
-                What Our Students Say
-              </h2>
-            </div>
-            <div className="flex gap-3">
-              <button type="button" aria-label="Previous testimonial" className="flex h-10 w-10 items-center justify-center rounded-[8px] bg-[#e7edf6] text-[#174a9b] transition hover:bg-[#174a9b] hover:text-white">
-                <FaArrowLeft />
-              </button>
-              <button type="button" aria-label="Next testimonial" className="flex h-10 w-10 items-center justify-center rounded-[8px] bg-[#e4213c] text-white transition hover:bg-[#174a9b]">
-                <FaArrowRight />
-              </button>
-            </div>
-          </div>
-
-          <div className="mt-12 grid grid-cols-[minmax(0,1fr)] gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {testimonials.map((testimonial) => (
-              <article key={testimonial.name} className="rounded-[10px] bg-white p-6 transition duration-300 hover:-translate-y-1 hover:shadow-xl">
-                <p className="!text-[14px] leading-6 text-[#50545a]">
-                  Thanks to the instructors, I passed my driving test on the first try. The lessons were clear and very helpful!
-                </p>
-                <div className="mt-5 flex gap-2 text-[#ffc52c]">
-                  {[0, 1, 2, 3, 4].map((star) => (
-                    <FaStar key={star} />
-                  ))}
-                </div>
-                <div className="mt-6 flex items-center gap-3">
-                  <Image src={testimonial.image} alt={testimonial.name} sizes="42px" className="h-10 w-10 rounded-full object-cover" />
-                  <div>
-                    <h3 className="text-[13px] font-bold text-[#303238]">{testimonial.name}</h3>
-                    <p className="!text-[12px] text-[#747981]">Web Designer</p>
-                  </div>
-                </div>
-              </article>
-            ))}
-          </div>
-
-          <Link href="/reviews" className="mt-10 inline-flex rounded-[8px] bg-[#e4213c] px-6 py-3 !text-[14px] font-semibold text-white transition hover:bg-[#174a9b] hover:shadow-md">
-            View All
-          </Link>
-        </div>
-      </section>
+      <Testimonials />
     </main>
   );
 }

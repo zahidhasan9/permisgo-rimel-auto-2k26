@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import Testimonials from "@/components/testimonials";
 import { useMemo, useState } from "react";
 import { FaArrowLeft, FaArrowRight, FaStar } from "react-icons/fa6";
 
@@ -119,7 +120,7 @@ export default function AppointmentPage() {
       </section>
 
       {/* Testimonials */}
-      <section className="bg-white px-5 py-20 sm:px-8 lg:px-10">
+      <div className="hidden"><section className="bg-white px-5 py-20 sm:px-8 lg:px-10">
         <div className="mx-auto w-full max-w-[1280px]">
           <span className="inline-flex rounded-[8px] bg-[#eef9ef] px-4 py-2 !text-[13px] font-bold text-[#43b968]">
             Testimonials
@@ -200,7 +201,8 @@ export default function AppointmentPage() {
             View All
           </Link>
         </div>
-      </section>
+      </section></div>
+      <Testimonials />
 
       {/* Final CTA */}
       <section className="bg-[#eef3fb] px-5 sm:px-8 lg:px-10">

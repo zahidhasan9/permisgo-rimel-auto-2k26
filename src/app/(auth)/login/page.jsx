@@ -344,7 +344,7 @@ const getAuthPayload = (payload) => {
   return payload?.data || payload || {};
 };
 
-const StudentLogin = () => {
+const AdminLogin = () => {
   const dispatch = useDispatch();
   const router = useRouter();
 
@@ -410,6 +410,7 @@ const StudentLogin = () => {
         login({
           email,
           password,
+          expectedRole: "admin",
         }),
       ).unwrap();
 
@@ -457,7 +458,7 @@ const StudentLogin = () => {
               />
 
               <h1 className="mt-[22px] text-center text-[28px] font-bold leading-none text-[#1f1f1f] sm:text-[29px]">
-                Student Login
+                Admin Login
               </h1>
             </div>
 
@@ -546,4 +547,4 @@ const StudentLogin = () => {
   );
 };
 
-export default StudentLogin;
+export default AdminLogin;

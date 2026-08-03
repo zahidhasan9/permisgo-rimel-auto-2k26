@@ -79,7 +79,8 @@ export function createMetadata({
   return metadata;
 }
 
-const routeTitles = {
+// Add or edit a route here to change its metadata without creating another layout file.
+export const routeTitles = {
   "/": "Professional Driving School",
   "/blogs": "Driving School Blog",
   "/reviews": "Student Reviews",
@@ -97,6 +98,11 @@ const routeTitles = {
   "/about": "About Us",
   "/user-login": "Student Login",
   "/user-registration": "Student Registration",
+  "/login": "Admin Login",
+  "/login/student": "Student Login",
+  "/login/teacher": "Instructor Login",
+  "/register/student": "Student Registration",
+  "/register/teacher": "Instructor Registration",
 };
 
 const segmentLabels = {

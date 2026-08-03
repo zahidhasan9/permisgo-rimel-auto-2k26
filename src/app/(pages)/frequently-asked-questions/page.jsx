@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getFaqs } from "@/features/API";
 import { FaChevronDown, FaWhatsappSquare } from "react-icons/fa";
 
-const faqs = [
+const fallbackFaqs = [
   {
     id: 1,
     question: "Accordion Item #1",
@@ -32,7 +33,15 @@ const faqs = [
 ];
 
 const Faq = () => {
+  const [faqs, setFaqs] = useState(fallbackFaqs);
   const [activeFaq, setActiveFaq] = useState(1);
+
+  useEffect(() => {
+    getFaqs({ section: "general" }).then(({ data }) => {
+      const items = data?.data || [];
+      if (items.length) { setFaqs(items); setActiveFaq(items[0]._id); }
+    });
+  }, []);
 
   const toggleFaq = (id) => {
     setActiveFaq(activeFaq === id ? null : id);
@@ -63,16 +72,16 @@ const Faq = () => {
               <div className="overflow-hidden space-y-2   rounded-md border border-gray-200">
                 {faqs.map((item, index) => (
                   <div
-                    key={item.id}
+                    key={item._id || item.id}
                     className={`border-gray-200 bg-white ${
                       index !== faqs.length - 1 ? "border-b" : ""
                     }`}
                   >
                     <button
                       type="button"
-                      onClick={() => toggleFaq(item.id)}
+                      onClick={() => toggleFaq(item._id || item.id)}
                       className={`flex w-full items-center justify-between px-5 py-4 text-left text-base font-medium transition duration-300 ${
-                        activeFaq === item.id
+                        activeFaq === (item._id || item.id)
                           ? "bg-white text-blue-900"
                           : "bg-blue-100 text-gray-900 "
                       }`}
@@ -81,14 +90,14 @@ const Faq = () => {
 
                       <FaChevronDown
                         className={`text-lg transition duration-300 ${
-                          activeFaq === item.id ? "rotate-180" : ""
+                          activeFaq === (item._id || item.id) ? "rotate-180" : ""
                         }`}
                       />
                     </button>
 
                     <div
                       className={`grid transition-all duration-300 ease-in-out ${
-                        activeFaq === item.id
+                        activeFaq === (item._id || item.id)
                           ? "grid-rows-[1fr]"
                           : "grid-rows-[0fr]"
                       }`}

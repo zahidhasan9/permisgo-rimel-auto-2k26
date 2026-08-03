@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getFaqs } from "@/features/API";
 import { IoChevronBack, IoChevronDown } from "react-icons/io5";
 
-const faqs = [
+const fallbackFaqs = [
   {
     id: 1,
     question: "How long does it take to complete a driving course?",
@@ -26,7 +27,15 @@ const faqs = [
 ];
 
 export default function Page() {
+  const [faqs, setFaqs] = useState(fallbackFaqs);
   const [openId, setOpenId] = useState(1);
+
+  useEffect(() => {
+    getFaqs({ section: "driving-code" }).then(({ data }) => {
+      const items = data?.data || [];
+      if (items.length) { setFaqs(items); setOpenId(items[0]._id); }
+    });
+  }, []);
 
   const toggleFaq = (id) => {
     setOpenId((prev) => (prev === id ? null : id));
@@ -58,16 +67,17 @@ export default function Page() {
 
           <div className="mt-7 space-y-3.5">
             {faqs.map((faq) => {
-              const isOpen = openId === faq.id;
+              const faqId = faq._id || faq.id;
+              const isOpen = openId === faqId;
 
               return (
                 <div
-                  key={faq.id}
+                  key={faqId}
                   className="overflow-hidden rounded-[10px] bg-[#F2F5FA]"
                 >
                   <button
                     type="button"
-                    onClick={() => toggleFaq(faq.id)}
+                    onClick={() => toggleFaq(faqId)}
                     className="flex min-h-[64px] w-full items-center justify-between gap-4 rounded-[10px] bg-[#174596] px-5 py-4 text-left text-white transition hover:bg-[#123a7d] sm:px-6"
                   >
                     <span className="text-[14.5px] font-medium leading-[1.4] sm:text-[15px]">

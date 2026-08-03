@@ -344,6 +344,7 @@ import { useDispatch } from "react-redux";
 
 import { logout } from "@/features/userSlice";
 import { logoutUser } from "@/features/API";
+import { getLogoutRedirect } from "@/utils/authRedirects";
 
 import { BsBook } from "react-icons/bs";
 import {
@@ -456,7 +457,7 @@ const menu = [
   },
   {
     name: "Chat",
-    href: "/chat",
+    href: "/student/chat",
     icon: IoIosChatboxes,
   },
   {
@@ -507,7 +508,7 @@ export default function StudentSidebar({ variant = "desktop", onClose }) {
       onClose?.();
 
       // Redirect to login and refresh protected layouts.
-      router.replace("/login");
+      router.replace(getLogoutRedirect("student"));
       router.refresh();
     }
   };

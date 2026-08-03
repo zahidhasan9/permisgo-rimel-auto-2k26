@@ -7,7 +7,9 @@ import {
   Marker,
 } from "@react-google-maps/api";
 import Link from "next/link";
-import { useState } from "react";
+import Testimonials from "@/components/testimonials";
+import { useEffect, useState } from "react";
+import { getFaqs } from "@/features/API";
 
 // Icons
 import { FaChevronDown, FaStar, FaStarHalfAlt } from "react-icons/fa";
@@ -92,7 +94,7 @@ const reviews = [
   },
 ];
 
-const faqs = [
+const fallbackFaqs = [
   {
     id: 1,
     question: "Accordion Item #1",
@@ -137,7 +139,15 @@ const RatingStars = ({ small = false }) => {
 
 const Locations = () => {
   const [activeMarker, setActiveMarker] = useState(null);
+  const [faqs, setFaqs] = useState(fallbackFaqs);
   const [activeFaq, setActiveFaq] = useState(1);
+
+  useEffect(() => {
+    getFaqs({ section: "locations" }).then(({ data }) => {
+      const items = data?.data || [];
+      if (items.length) { setFaqs(items); setActiveFaq(items[0]._id); }
+    });
+  }, []);
 
   const toggleFaq = (id) => {
     setActiveFaq(activeFaq === id ? null : id);
@@ -238,7 +248,7 @@ const Locations = () => {
       </section>
 
       {/* Trust Section */}
-      <section className="bg-slate-50 py-[50px] max-[500px]:py-[30px]">
+      <div className="hidden"><section className="bg-slate-50 py-[50px] max-[500px]:py-[30px]">
         <div className="mx-auto w-full max-w-[1140px] px-4">
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
             {/* Left */}
@@ -298,7 +308,8 @@ const Locations = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section></div>
+      <Testimonials />
 
       {/* FAQ Section */}
       <section className="py-[50px] max-[500px]:py-[30px]">
@@ -316,11 +327,12 @@ const Locations = () => {
           <div className="py-4">
             <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
               {faqs.map((item, index) => {
-                const isActive = activeFaq === item.id;
+                const itemId = item._id || item.id;
+                const isActive = activeFaq === itemId;
 
                 return (
                   <div
-                    key={item.id}
+                    key={itemId}
                     className={
                       index !== faqs.length - 1
                         ? "border-b border-slate-200"
@@ -329,7 +341,7 @@ const Locations = () => {
                   >
                     <button
                       type="button"
-                      onClick={() => toggleFaq(item.id)}
+                      onClick={() => toggleFaq(itemId)}
                       className={`flex w-full items-center justify-between gap-4 px-5 py-4 text-left text-base font-semibold transition duration-300 ${
                         isActive
                           ? "bg-blue-950 text-white"

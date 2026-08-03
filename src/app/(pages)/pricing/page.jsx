@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { FaTimesCircle } from "react-icons/fa";
@@ -5,6 +7,8 @@ import { FaSquareCheck } from "react-icons/fa6";
 
 import offerHero from "../../../../public/image/offer.png";
 import crownBadge from "../../../../public/image/traffic-two-price-batch.png";
+import { useState } from "react";
+import useOffers, { CATEGORY_BY_TAB, filterOffers } from "@/hooks/useOffers";
 
 const codePackages = [
   {
@@ -70,11 +74,11 @@ const singleOffers = [
   ["Support for the practical test", "€70"],
 ];
 
-function TransmissionSwitch() {
+function TransmissionSwitch({ value, onChange }) {
   return (
     <div className="flex items-center gap-1 rounded-full border border-[#cad5e5] bg-white p-1 !text-[12px] font-semibold">
-      <span className="rounded-full bg-[#174a9b] px-4 py-2 text-white">Manual transmission</span>
-      <span className="px-4 py-2 text-[#5f6670]">Automatic transmission</span>
+      <button type="button" onClick={() => onChange("manual")} className={`rounded-full px-4 py-2 ${value === "manual" ? "bg-[#174a9b] text-white" : "text-[#5f6670]"}`}>Manual transmission</button>
+      <button type="button" onClick={() => onChange("automatic")} className={`rounded-full px-4 py-2 ${value === "automatic" ? "bg-[#174a9b] text-white" : "text-[#5f6670]"}`}>Automatic transmission</button>
     </div>
   );
 }
@@ -110,7 +114,7 @@ function CodeCard({ item }) {
       </div>
       <h4 className="mt-7 text-[17px] font-bold text-[#174a9b]">Package Contents</h4>
       <div className="mt-5 flex-1"><FeatureList features={item.features} unavailableLast={item.title === "Zen Code"} /></div>
-      <Link href="/register" className="mx-auto mt-8 inline-flex min-h-[40px] min-w-[160px] items-center justify-center rounded-full bg-[#e4213c] px-6 !text-[12px] font-semibold uppercase text-white transition hover:bg-[#174a9b] hover:shadow-md">Sign Up</Link>
+      <Link href="/inscription" className="mx-auto mt-8 inline-flex min-h-[40px] min-w-[160px] items-center justify-center rounded-full bg-[#e4213c] px-6 !text-[12px] font-semibold uppercase text-white transition hover:bg-[#174a9b] hover:shadow-md">Sign Up</Link>
     </article>
   );
 }
@@ -132,21 +136,28 @@ function RateCard({ item, license = false }) {
       </div>
       <h4 className="mt-7 text-[17px] font-bold text-[#174a9b]">Package Contents</h4>
       <div className="mt-5 flex-1"><FeatureList features={item.features} /></div>
-      <Link href="/register" className="mx-auto mt-8 inline-flex min-h-[40px] min-w-[160px] items-center justify-center rounded-full border border-[#174a9b] px-6 !text-[12px] font-semibold text-[#e4213c] transition hover:bg-[#174a9b] hover:text-white">Sign up</Link>
+      <Link href="/inscription" className="mx-auto mt-8 inline-flex min-h-[40px] min-w-[160px] items-center justify-center rounded-full border border-[#174a9b] px-6 !text-[12px] font-semibold text-[#e4213c] transition hover:bg-[#174a9b] hover:text-white">Sign up</Link>
     </article>
   );
 }
 
-function SectionHeading({ children, switcher = true }) {
+function SectionHeading({ children, switcher = true, transmission, onTransmissionChange }) {
   return (
     <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
       <h2 className="text-[32px] font-bold tracking-[-0.02em]">{children}</h2>
-      {switcher && <TransmissionSwitch />}
+      {switcher && <TransmissionSwitch value={transmission} onChange={onTransmissionChange} />}
     </div>
   );
 }
 
 export default function PricingPage() {
+  const [activeTab, setActiveTab] = useState("Code");
+  const [transmission, setTransmission] = useState("manual");
+  const { cards, loading, error } = useOffers();
+  const selectedOffers = filterOffers(cards, CATEGORY_BY_TAB[activeTab], transmission);
+  const cpfOffers = filterOffers(cards, "cpf", transmission);
+  const drivingOffers = filterOffers(cards, "to drive", transmission);
+  const otherOffers = filterOffers(cards, "other", transmission);
   return (
     <main className="overflow-hidden bg-white text-[#202124]">
       <section className="bg-[#eaf0f9]">
@@ -162,19 +173,20 @@ export default function PricingPage() {
 
       <section id="packages" className="scroll-mt-24 px-5 py-20 sm:px-8 lg:py-24">
         <div className="mx-auto max-w-[1280px]">
-          <SectionHeading>Our Packages</SectionHeading>
-          <div className="mt-8 flex flex-wrap gap-3">{["Code", "Driving License", "CPF Offers", "Accompanied Driving", "À la carte"].map((tab, index) => <span key={tab} className={`rounded-[7px] border px-5 py-2 !text-[12px] font-semibold ${index === 0 ? "border-[#174a9b] bg-[#dce8fb] text-[#174a9b]" : "border-[#d6deea]"}`}>{tab}</span>)}</div>
-          <div className="mt-10 grid gap-9 lg:grid-cols-3">{codePackages.map((item) => <CodeCard key={item.title} item={item} />)}</div>
+          <SectionHeading transmission={transmission} onTransmissionChange={setTransmission}>Our Packages</SectionHeading>
+          <div className="mt-8 flex flex-wrap gap-3">{["Code", "Driving License", "CPF Offers", "Accompanied Driving", "À la carte"].map((tab) => <button type="button" onClick={() => setActiveTab(tab)} key={tab} className={`rounded-[7px] border px-5 py-2 !text-[12px] font-semibold ${activeTab === tab ? "border-[#174a9b] bg-[#dce8fb] text-[#174a9b]" : "border-[#d6deea]"}`}>{tab}</button>)}</div>
+          <div className="mt-10 grid gap-9 lg:grid-cols-3">{selectedOffers.map((item) => activeTab === "Code" || activeTab === "Accompanied Driving" ? <CodeCard key={item._id} item={item} /> : <RateCard key={item._id} item={item} license={activeTab === "Driving License"} />)}</div>
+          {loading && <p className="mt-8 text-center text-sm text-gray-500">Loading offers...</p>}{error && <p className="mt-8 text-center text-sm text-red-600">{error}</p>}
           <div className="mt-16 rounded-[10px] bg-[#eaf0f9] px-6 py-10 text-center"><h3 className="text-[20px] font-bold">Manage your entire online training <span className="text-[#174a9b]">at the best price</span></h3><Link href="/appointment" className="mt-6 inline-flex min-w-[340px] max-w-full justify-center rounded-[8px] bg-[#e4213c] px-7 py-3 !text-[13px] font-semibold text-white transition hover:bg-[#174a9b]">Book Appointment</Link></div>
         </div>
       </section>
 
       <section className="bg-[#eaf0f9] px-5 py-20 sm:px-8 lg:py-24">
-        <div className="mx-auto max-w-[1280px]"><SectionHeading>Permisgo&apos;s CPF rates</SectionHeading><div className="mt-12 grid gap-8 lg:grid-cols-3">{cpfPackages.map((item) => <RateCard key={`${item.title}-${item.price}`} item={item} />)}</div></div>
+        <div className="mx-auto max-w-[1280px]"><SectionHeading transmission={transmission} onTransmissionChange={setTransmission}>Permisgo&apos;s CPF rates</SectionHeading><div className="mt-12 grid gap-8 lg:grid-cols-3">{cpfOffers.map((item) => <RateCard key={item._id} item={item} />)}</div></div>
       </section>
 
       <section className="px-5 py-20 sm:px-8 lg:py-24">
-        <div className="mx-auto max-w-[1280px]"><SectionHeading>Our driving licence offers</SectionHeading><div className="mt-12 grid gap-8 lg:grid-cols-3">{licensePackages.map((item) => <RateCard key={item.title} item={item} license />)}</div></div>
+        <div className="mx-auto max-w-[1280px]"><SectionHeading transmission={transmission} onTransmissionChange={setTransmission}>Our driving licence offers</SectionHeading><div className="mt-12 grid gap-8 lg:grid-cols-3">{drivingOffers.map((item) => <RateCard key={item._id} item={item} license />)}</div></div>
       </section>
 
       <section className="px-5 pb-20 sm:px-8 lg:pb-24">
@@ -183,7 +195,7 @@ export default function PricingPage() {
           <div className="mt-10 rounded-[10px] bg-[#f0f3f8] p-7 lg:p-12">
             <h3 className="text-center text-[25px] font-bold text-[#e4213c]">Accompanied Driving</h3><p className="mt-2 text-center !text-[12px] text-[#757a81]">Code + driving lessons</p>
             <div className="mx-auto mt-8 grid max-w-[900px] gap-10 md:grid-cols-2">
-              <div className="rounded-[10px] bg-[#e3eaf5] p-7"><div className="flex items-end justify-between rounded-[8px] bg-white px-5 py-4"><div><strong className="text-[24px] text-[#174a9b]">€0</strong><p className="!text-[11px]">Super Sale</p></div><div className="text-right"><span className="!text-[12px] line-through">€0</span><p className="!text-[11px]">Retail Price</p></div></div><Link href="/register" className="mt-5 inline-flex w-full justify-center rounded-[8px] bg-[#e4213c] px-6 py-3 !text-[12px] font-semibold text-white transition hover:bg-[#174a9b]">Sign up</Link></div>
+              <div className="rounded-[10px] bg-[#e3eaf5] p-7"><div className="flex items-end justify-between rounded-[8px] bg-white px-5 py-4"><div><strong className="text-[24px] text-[#174a9b]">€0</strong><p className="!text-[11px]">Super Sale</p></div><div className="text-right"><span className="!text-[12px] line-through">€0</span><p className="!text-[11px]">Retail Price</p></div></div><Link href="/inscription" className="mt-5 inline-flex w-full justify-center rounded-[8px] bg-[#e4213c] px-6 py-3 !text-[12px] font-semibold text-white transition hover:bg-[#174a9b]">Sign up</Link></div>
               <div><h4 className="text-[17px] font-bold text-[#174a9b]">Package Contents</h4><div className="mt-5"><FeatureList features={["13 Cours de séances personnalisées", "L'évaluation de départ initiale", "Formation au Code de la route 2025"]} /></div></div>
             </div>
           </div>
@@ -192,7 +204,7 @@ export default function PricingPage() {
 
       <section className="px-5 pb-24 sm:px-8 lg:pb-28">
         <div className="mx-auto max-w-[850px] text-center"><h2 className="text-[34px] font-bold">Discover our à la carte offers</h2><p className="mt-4 !text-[13px] text-[#777c82]">It is possible to choose your training program à la carte.</p>
-          <div className="mt-10 space-y-4 text-left">{singleOffers.map(([name, price]) => <div key={name} className="flex min-h-[62px] items-center rounded-[9px] bg-[#eaf0f9] px-5"><span className="flex-1 !text-[14px] font-semibold">{name}</span><span className="mr-7 !text-[13px] font-bold text-[#20ae55]">{price}</span><button type="button" className="rounded-full bg-[#e4213c] px-5 py-2 !text-[12px] font-semibold text-white transition hover:bg-[#174a9b]">Add</button></div>)}</div>
+          <div className="mt-10 space-y-4 text-left">{otherOffers.map((item) => <div key={item._id} className="flex min-h-[62px] items-center rounded-[9px] bg-[#eaf0f9] px-5"><span className="flex-1 !text-[14px] font-semibold">{item.title}</span><span className="mr-7 !text-[13px] font-bold text-[#20ae55]">{item.price}</span><button type="button" className="rounded-full bg-[#e4213c] px-5 py-2 !text-[12px] font-semibold text-white transition hover:bg-[#174a9b]">Add</button></div>)}</div>
         </div>
       </section>
     </main>

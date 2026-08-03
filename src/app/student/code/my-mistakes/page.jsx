@@ -16,6 +16,7 @@ import { getMyQuizMistakes } from "@/features/API";
 import { mediaUrl } from "@/utils/mediaUrl";
 
 const optionLetter = (index) => String.fromCharCode(65 + index);
+const youtubeEmbed = (value) => { try { const url = new URL(value); const id = url.hostname.includes("youtu.be") ? url.pathname.split("/")[1] : url.searchParams.get("v") || url.pathname.match(/\/(?:embed|shorts)\/([^/?]+)/)?.[1]; return id ? `https://www.youtube-nocookie.com/embed/${id}?rel=0` : ""; } catch { return ""; } };
 
 export default function MyMistakesPage() {
   const router = useRouter();
@@ -55,6 +56,8 @@ export default function MyMistakesPage() {
 
   const item = mistakes[index];
   const question = item?.question;
+  const selectedIndexes = item ? (item.selectedIndexes?.length ? item.selectedIndexes : [item.selectedIndex]).map(Number) : [];
+  const correctIndexes = item ? (item.correctIndexes?.length ? item.correctIndexes : [item.correctIndex]).map(Number) : [];
 
   const speak = () => {
     if (!question || !window.speechSynthesis) return;
@@ -66,6 +69,7 @@ export default function MyMistakesPage() {
 
     const text = [
       question.voiceText || question.questionText,
+      ...(question.secondaryQuestionText ? [question.secondaryQuestionText] : []),
       ...(question.options || []).map((option) => option.text),
     ].join(". ");
     const utterance = new SpeechSynthesisUtterance(text);
@@ -122,7 +126,7 @@ export default function MyMistakesPage() {
             </div>
 
             <div className="overflow-hidden rounded-xl bg-white">
-              {question.questionImage ? (
+              {youtubeEmbed(question.questionVideoUrl) ? <iframe src={youtubeEmbed(question.questionVideoUrl)} title="Question video" className="aspect-video w-full" allow="encrypted-media; picture-in-picture" allowFullScreen /> : question.questionVideoUrl ? <video src={question.questionVideoUrl} controls className="max-h-[439px] w-full bg-black" /> : question.questionImage ? (
                 <img src={mediaUrl(question.questionImage)} alt="Question" className="h-[300px] w-full object-cover sm:h-[439px]" />
               ) : (
                 <div className="flex h-[300px] items-center justify-center text-sm text-slate-500 sm:h-[439px]">No question image available</div>
@@ -132,9 +136,10 @@ export default function MyMistakesPage() {
             <div className="mt-7 grid gap-8 lg:grid-cols-[minmax(0,1fr)_330px]">
               <div>
                 <h2 className="mb-4 text-[16px] font-bold leading-6">{question.questionText}</h2>
+                {Number(question.promptCount) === 2 && <h2 className="mb-4 mt-6 border-t border-slate-300 pt-5 text-[16px] font-bold leading-6">2. {question.secondaryQuestionText}</h2>}
                 <div className="space-y-3 text-[15px] leading-6 text-[#123f88]">
                   {question.options?.map((option, optionIndex) => (
-                    <div key={optionIndex} className={`flex items-center gap-3 rounded-lg px-3 py-2 ${optionIndex === item.correctIndex ? "border border-green-300 bg-green-50" : optionIndex === item.selectedIndex ? "border border-red-300 bg-red-50" : ""}`}>
+                    <div key={optionIndex} className={`flex items-center gap-3 rounded-lg px-3 py-2 ${correctIndexes.includes(optionIndex) ? "border border-green-300 bg-green-50" : selectedIndexes.includes(optionIndex) ? "border border-red-300 bg-red-50" : ""}`}>
                       <p className="min-w-0">– {option.text}</p>
                       <span className="min-w-8 flex-1 border-b border-dashed border-slate-500" />
                       <span className="font-bold text-slate-900">{optionLetter(optionIndex)}</span>
@@ -147,14 +152,14 @@ export default function MyMistakesPage() {
               <aside className="flex flex-col justify-end">
                 <div className="mb-5 rounded-xl bg-white p-4">
                   <p className="text-[11px] font-bold uppercase text-red-600">Your answer</p>
-                  <p className="mt-2 text-sm font-semibold">{question.options?.[item.selectedIndex]?.text || "No answer"}</p>
+                  <p className="mt-2 text-sm font-semibold">{selectedIndexes.map((value) => `${optionLetter(value)}. ${question.options?.[value]?.text || ""}`).join("; ") || "No answer"}</p>
                   <p className="mt-4 text-[11px] font-bold uppercase text-green-700">Correct answer</p>
-                  <p className="mt-2 text-sm font-semibold">{question.options?.[item.correctIndex]?.text || "Not available"}</p>
+                  <p className="mt-2 text-sm font-semibold">{correctIndexes.map((value) => `${optionLetter(value)}. ${question.options?.[value]?.text || ""}`).join("; ") || "Not available"}</p>
                 </div>
 
                 <div className="flex flex-wrap gap-3">
                   {question.options?.map((_, optionIndex) => (
-                    <span key={optionIndex} className={`flex h-11 min-w-[58px] items-center justify-center rounded-lg border-2 px-4 font-bold ${optionIndex === item.correctIndex ? "border-green-500 bg-green-500 text-white" : optionIndex === item.selectedIndex ? "border-red-500 bg-red-500 text-white" : "border-white bg-white text-slate-700"}`}>{optionLetter(optionIndex)}</span>
+                    <span key={optionIndex} className={`flex h-11 min-w-[58px] items-center justify-center rounded-lg border-2 px-4 font-bold ${correctIndexes.includes(optionIndex) ? "border-green-500 bg-green-500 text-white" : selectedIndexes.includes(optionIndex) ? "border-red-500 bg-red-500 text-white" : "border-white bg-white text-slate-700"}`}>{optionLetter(optionIndex)}</span>
                   ))}
                 </div>
               </aside>

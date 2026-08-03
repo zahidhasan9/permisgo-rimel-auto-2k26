@@ -116,7 +116,6 @@ export default function LessonPage({ params }) {
           </div>
         </div>
       </>}
-      <style jsx global>{`.ebook-content h2{margin:0 0 .75rem;color:#173f87;font-size:1.1rem;font-weight:700;line-height:1.5}.ebook-content h3{margin:1.35rem 0 .55rem;color:#1d2939;font-size:1rem;font-weight:700}.ebook-content p{margin:.7rem 0}.ebook-content ul,.ebook-content ol{margin:.75rem 0;padding-left:1.5rem}.ebook-content li{margin:.3rem 0}.ebook-content img{display:block;max-width:100%;height:auto;margin:1rem auto;border-radius:.75rem}.ebook-content a{color:#173f87;text-decoration:underline}`}</style>
     </div>
   </main>;
 }

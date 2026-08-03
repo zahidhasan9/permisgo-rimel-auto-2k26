@@ -7,6 +7,7 @@ import { useDispatch } from "react-redux";
 
 import { logout } from "@/features/userSlice";
 import { logoutUser } from "@/features/API";
+import { getLogoutRedirect } from "@/utils/authRedirects";
 
 import {
   FaBlog,
@@ -269,7 +270,7 @@ export default function AdminSidebar({ variant = "desktop", onClose }) {
       onClose?.();
 
       // Send the admin to login and refresh protected layouts.
-      router.replace("/login");
+      router.replace(getLogoutRedirect("admin"));
       router.refresh();
     }
   };

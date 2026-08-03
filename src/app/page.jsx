@@ -1191,7 +1191,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Swiper, SwiperSlide } from "swiper/react";
 
@@ -1204,6 +1204,7 @@ import { Autoplay, FreeMode, Navigation } from "swiper/modules";
 import Footer from "@/components/footer";
 import Navbar from "@/components/navbar";
 import Testimonials from "@/components/testimonials";
+import { getBlogs, getFaqs } from "@/features/API";
 
 import blogImg from "../../public/image/blog.jpg";
 import heroBg from "../../public/image/hero-bg.jpg";
@@ -1327,7 +1328,7 @@ const mapTabs = [
   { key: "motorcycle", title: "Motorcycle" },
 ];
 
-const faqs = [
+const fallbackFaqs = [
   {
     q: "Accordion Item #1",
     a: "This is the first item's accordion body. It is shown by default, until the collapse plugin adds the appropriate classes that we use to style each element.",
@@ -1425,31 +1426,24 @@ export default function Home() {
 
   const [activeTab, setActiveTab] = useState("manual");
   const [openFaq, setOpenFaq] = useState(0);
+  const [homeBlogs, setHomeBlogs] = useState([]);
+  const [homeFaqs, setHomeFaqs] = useState(fallbackFaqs);
+
+  useEffect(() => {
+    getBlogs({ limit: 4 })
+      .then(({ data }) => setHomeBlogs(data?.data || []))
+      .catch(() => setHomeBlogs([]));
+  }, []);
+
+  useEffect(() => {
+    getFaqs({ section: "home" }).then(({ data }) => {
+      const items = (data?.data || []).map((item) => ({ q: item.question, a: item.answer, id: item._id }));
+      if (items.length) setHomeFaqs(items);
+    });
+  }, []);
 
   return (
     <div className="permisgo-page">
-      <style jsx global>{`
-        .permisgo-page button,
-        .permisgo-page a[class*="inline-flex"],
-        .permisgo-page
-          a[class*="flex"][class*="items-center"][class*="justify-center"] {
-          transition-property:
-            background-color, border-color, color, transform, box-shadow;
-          transition-duration: 300ms;
-          transition-timing-function: ease;
-        }
-
-        .permisgo-page button:hover,
-        .permisgo-page a[class*="inline-flex"]:hover,
-        .permisgo-page
-          a[class*="flex"][class*="items-center"][class*="justify-center"]:hover {
-          background-color: #2bbf3a !important;
-          border-color: #2bbf3a !important;
-          color: #ffffff !important;
-          box-shadow: 0 8px 20px rgba(43, 191, 58, 0.28) !important;
-        }
-      `}</style>
-
       <Navbar />
 
       {/* Hero Section */}
@@ -2257,7 +2251,7 @@ export default function Home() {
 
             {/* Right accordion */}
             <div className="space-y-[20px]">
-              {faqs.map((faq, index) => {
+              {homeFaqs.map((faq, index) => {
                 const isOpen = openFaq === index;
 
                 return (
@@ -2387,35 +2381,34 @@ export default function Home() {
           <SectionHeading small="Blog" title="News and Insights" />
 
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
-            {[1, 2, 3, 4].map((item) => (
+            {homeBlogs.map((item) => (
               <div
-                key={item}
+                key={item._id}
                 className={cn(
                   "overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm",
                   cardHover,
                 )}
               >
                 <Image
-                  src={blogImg}
-                  alt="Blog thumbnail"
+                  src={item.coverImage || blogImg}
+                  alt={item.title}
+                  width={500}
+                  height={260}
                   sizes="(max-width: 768px) 100vw, 25vw"
                   className="h-40 w-full object-cover"
                 />
 
                 <div className="p-4">
                   <h4 className="text-base font-black leading-6 text-blue-900">
-                    <Link href="#">
-                      10 Tips to Pass Your Driving Test on the First Try
-                    </Link>
+                    <Link href={`/blogs/${item.slug}`}>{item.title}</Link>
                   </h4>
 
                   <p className="mt-2 text-sm font-medium leading-6 text-slate-600">
-                    Nervous about your road test? Discover practical tips,
-                    common...
+                    {item.excerpt || item.content}
                   </p>
 
                   <div className="mt-4">
-                    <Link href="/blogs/1" className={outlineBtn}>
+                    <Link href={`/blogs/${item.slug}`} className={outlineBtn}>
                       Read More
                     </Link>
                   </div>

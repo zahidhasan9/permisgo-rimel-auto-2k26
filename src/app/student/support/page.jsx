@@ -48,23 +48,7 @@ function SupportCard({ type, title, primaryText, secondaryText }) {
 export default function Page() {
   return (
     <>
-      <style jsx global>{`
-        @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
-
-        * {
-          box-sizing: border-box;
-        }
-
-        html,
-        body {
-          margin: 0;
-          background: #ffffff;
-          font-family: "Poppins", sans-serif;
-          overflow-x: hidden;
-        }
-      `}</style>
-
-      <main className="min-h-screen bg-white">
+      <main className="dashboard-poppins min-h-screen bg-white">
         <div className="mx-auto w-full max-w-[1132px] px-[24px] pt-[24px]">
           <BackHeader />
 

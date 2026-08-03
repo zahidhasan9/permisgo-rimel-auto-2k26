@@ -57,6 +57,7 @@ export default function AdminProfilePage() {
   const [passwordForm, setPasswordForm] = useState(emptyPassword);
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState("");
+  const [removeAvatar, setRemoveAvatar] = useState(false);
 
   const [loading, setLoading] = useState(true);
   const [savingProfile, setSavingProfile] = useState(false);
@@ -73,8 +74,8 @@ export default function AdminProfilePage() {
 
   const displayImage = useMemo(() => {
     if (avatarPreview) return avatarPreview;
-    return profile.avatar ? mediaUrl(profile.avatar) : "";
-  }, [avatarPreview, profile.avatar]);
+    return !removeAvatar && profile.avatar ? mediaUrl(profile.avatar) : "";
+  }, [avatarPreview, profile.avatar, removeAvatar]);
 
   const initials = useMemo(() => {
     return String(profile.name || profile.email || "A")
@@ -181,6 +182,7 @@ export default function AdminProfilePage() {
 
     setAvatarFile(file);
     setAvatarPreview(URL.createObjectURL(file));
+    setRemoveAvatar(false);
   }
 
   async function handleProfileSubmit(event) {
@@ -218,6 +220,7 @@ export default function AdminProfilePage() {
       if (avatarFile) {
         formData.append("avatar", avatarFile);
       }
+      if (removeAvatar) formData.append("removeAvatar", "true");
 
       const response = await updateProfile(formData);
       const updatedUser = getPayloadUser(response);
@@ -244,6 +247,7 @@ export default function AdminProfilePage() {
       if (avatarPreview) URL.revokeObjectURL(avatarPreview);
       setAvatarFile(null);
       setAvatarPreview("");
+      setRemoveAvatar(false);
 
       localStorage.setItem("user", JSON.stringify(updatedUser));
       window.dispatchEvent(
@@ -361,6 +365,16 @@ export default function AdminProfilePage() {
                 />
               </label>
             </div>
+
+            {profile.avatar && !avatarFile && (
+              <button
+                type="button"
+                onClick={() => setRemoveAvatar((value) => !value)}
+                className={`rounded-lg px-3 py-2 text-xs font-bold ${removeAvatar ? "bg-blue-50 text-blue-700" : "bg-red-50 text-red-600"}`}
+              >
+                {removeAvatar ? "Undo image removal" : "Remove profile image"}
+              </button>
+            )}
 
             <div className="min-w-0">
               <h2 className="truncate text-xl font-bold text-slate-900">

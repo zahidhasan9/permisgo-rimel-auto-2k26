@@ -89,6 +89,7 @@ const StudentLogin = () => {
         login({
           email,
           password,
+          expectedRole: "student",
         }),
       ).unwrap();
 

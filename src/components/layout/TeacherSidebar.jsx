@@ -419,6 +419,7 @@ import { useDispatch } from "react-redux";
 
 import { logout } from "@/features/userSlice";
 import { logoutUser } from "@/features/API";
+import { getLogoutRedirect } from "@/utils/authRedirects";
 
 import {
   FaBookOpen,
@@ -435,6 +436,7 @@ import {
   FaUserFriends,
 } from "react-icons/fa";
 import { FiChevronRight, FiMenu, FiX } from "react-icons/fi";
+import { IoIosChatboxes } from "react-icons/io";
 
 const menu = [
   {
@@ -495,6 +497,11 @@ const menu = [
     name: "Offers",
     href: "/teacher/offers",
     icon: FaFileInvoiceDollar,
+  },
+  {
+    name: "Chat",
+    href: "/teacher/chat",
+    icon: IoIosChatboxes,
   },
   {
     name: "Logout",
@@ -569,7 +576,7 @@ export default function TeacherSidebar({ variant = "desktop", onClose }) {
       onClose?.();
 
       // Prevent returning to protected pages through normal navigation.
-      router.replace("/login");
+      router.replace(getLogoutRedirect("teacher"));
       router.refresh();
     }
   };

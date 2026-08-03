@@ -110,6 +110,11 @@ function Avatar({ teacher, className = "h-12 w-12" }) {
   );
 }
 
+function RatingStars({ value = 0, className = "" }) {
+  const rating = Math.max(0, Math.min(5, Number(value) || 0));
+  return <div className={`flex items-center gap-1 text-amber-400 ${className}`}>{Array.from({ length: 5 }).map((_, index) => <FaStar key={index} className={index < Math.round(rating) ? "" : "text-slate-300"} />)}</div>;
+}
+
 export default function BookLessonPage() {
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY?.trim();
   const { isLoaded, loadError } = useJsApiLoader({
@@ -365,6 +370,7 @@ function MapStep({
           <p className="px-1 text-xs text-slate-500">The {teachers.length} closest meeting points to this address</p>
           {loading ? Array.from({ length: 5 }).map((_, index) => <div key={index} className="h-24 animate-pulse rounded-xl bg-white" />) : teachers.length ? teachers.map((teacher) => {
             const location = teacher.nearestLocation;
+            const vehicle = vehicleFor(teacher, vehicleType);
             return (
               <button key={teacher.user._id} type="button" onClick={() => {
                 setSelectedTeacher(teacher);
@@ -374,9 +380,9 @@ function MapStep({
                   mapRef.current?.setZoom(14);
                 }
               }} className="w-full rounded-xl bg-white p-4 text-left shadow-sm transition hover:ring-2 hover:ring-[#174a9b]">
-                <p className="flex items-center gap-2 text-sm font-bold"><FaMapMarkerAlt className="text-[#174a9b]" />{location?.title || location?.address || teacherName(teacher)}</p>
+                <p className="flex items-center gap-2 text-sm font-bold"><FaMapMarkerAlt className="text-[#174a9b]" />{location?.title || location?.address || "Meeting point"}</p>
                 <p className="ml-5 mt-1 text-xs text-slate-500">{teacher.distanceKm || 0} km</p>
-                <div className="mt-4 flex items-center justify-between text-xs"><span>Next availability</span><span className="rounded bg-[#e7edf6] px-2 py-1 font-bold text-[#174a9b]">View slots</span></div>
+                <div className="mt-3 flex items-center gap-2 border-t border-slate-100 pt-3"><Avatar teacher={teacher} className="h-8 w-8" /><div className="min-w-0 flex-1"><p className="truncate text-xs font-bold text-[#123f88]">{teacherName(teacher)}</p><p className="truncate text-[10px] text-slate-500">{[vehicle?.brand, vehicle?.model].filter(Boolean).join(" ") || `${vehicleType} vehicle`}</p></div><span className="rounded bg-[#e7edf6] px-2 py-1 text-[10px] font-bold text-[#174a9b]">Details</span></div>
               </button>
             );
           }) : <div className="rounded-xl bg-white p-6 text-center text-sm text-slate-500">No available instructor found near this location.</div>}
@@ -391,8 +397,9 @@ function MapStep({
             {selectedTeacher && teacherPoint(selectedTeacher) && (
               <InfoWindowF position={teacherPoint(selectedTeacher)} onCloseClick={() => setSelectedTeacher(null)}>
                 <div className="w-[250px] p-2 text-slate-900">
-                  <div className="flex items-center gap-3"><Avatar teacher={selectedTeacher} /><div><h3 className="font-bold text-[#123f88]">{teacherName(selectedTeacher)}</h3><p className="text-xs">Experience {selectedTeacher.experienceYears || 0} Years+</p></div></div>
-                  <div className="mt-3 flex gap-1 text-amber-400">{Array.from({ length: 5 }).map((_, i) => <FaStar key={i} />)}</div>
+                  <div className="flex items-center gap-3"><Avatar teacher={selectedTeacher} /><div className="min-w-0"><h3 className="truncate font-bold text-[#123f88]">{teacherName(selectedTeacher)}</h3><p className="text-xs">Experience {selectedTeacher.experienceYears || 0} Years</p></div></div>
+                  <div className="mt-3 flex items-center justify-between"><RatingStars value={selectedTeacher.rating?.average} /><span className="text-[10px] text-slate-500">{selectedTeacher.rating?.totalReviews || 0} reviews</span></div>
+                  <div className="mt-3 space-y-1.5 rounded-md bg-[#eef2f8] p-2 text-[10px] text-slate-600"><p className="truncate"><b>Meeting point:</b> {selectedTeacher.nearestLocation?.title || selectedTeacher.nearestLocation?.address || "Not provided"}</p><p><b>Vehicle:</b> {[vehicleFor(selectedTeacher, vehicleType)?.brand, vehicleFor(selectedTeacher, vehicleType)?.model].filter(Boolean).join(" ") || "Not provided"}</p><p className="capitalize"><b>Transmission:</b> {vehicleType}</p></div>
                   <button type="button" onClick={() => openTeacher(selectedTeacher)} className="mt-4 w-full rounded-md bg-[#df2339] py-2 text-xs font-bold text-white">View Details</button>
                 </div>
               </InfoWindowF>
@@ -408,31 +415,35 @@ function TeacherStep({ teacher, reviews, favorite, setFavorite, vehicleType, onS
   const location = teacher.nearestLocation;
   const vehicle = vehicleFor(teacher, vehicleType);
   const rating = Number(teacher.rating?.average || 0);
+  const [showAllReviews, setShowAllReviews] = useState(false);
+  const visibleReviews = showAllReviews ? reviews : reviews.slice(0, 4);
   return (
-    <section className="rounded-xl bg-[#e8eef7] p-4 sm:p-5">
-      <div className="grid gap-5 xl:grid-cols-[390px_1fr]">
-        <div className="rounded-xl bg-[#174a9b] p-4 text-white">
-          <div className="relative rounded-xl bg-white p-4 text-center text-[#123f88]">
-            <button type="button" onClick={() => setFavorite(!favorite)} className="absolute right-4 top-4 text-slate-800">{favorite ? <FaHeart className="text-red-500" /> : <FaRegHeart />}</button>
-            <Avatar teacher={teacher} className="mx-auto h-16 w-16" />
-            <h2 className="mt-2 text-lg font-bold">{teacherName(teacher)}</h2>
+    <section className="rounded-xl bg-[#e8eef7] p-3 sm:p-4">
+      <div className="grid gap-3 lg:grid-cols-[290px_minmax(0,1fr)]">
+        <div>
+          <div className="rounded-xl bg-[#174a9b] p-3 text-white">
+            <div className="relative rounded-lg bg-white px-4 py-3 text-center text-[#123f88]">
+              <button type="button" onClick={() => setFavorite(!favorite)} className="absolute right-4 top-4 text-slate-800">{favorite ? <FaHeart className="text-red-500" /> : <FaRegHeart />}</button>
+              <Avatar teacher={teacher} className="mx-auto h-11 w-11" />
+              <h2 className="mt-1 text-sm font-bold">{teacherName(teacher)}</h2>
+            </div>
+            <div className="mt-2 grid grid-cols-2 gap-2">
+              <div className="rounded-lg bg-white/15 p-3 text-center"><p className="text-sm font-bold"><FaStar className="mr-1 inline" />{rating.toFixed(2)}</p><p className="mt-1 text-[10px] leading-4">Ratings based on<br />{teacher.rating?.totalReviews || 0} reviews</p></div>
+              <div className="rounded-lg bg-white/15 p-3 text-center"><p className="text-sm font-bold">{Number(teacher.hoursWorked || 0).toLocaleString()}</p><p className="mt-1 text-[10px] leading-4">Hours worked</p></div>
+            </div>
+            <div className="mt-2 rounded-lg bg-white p-3 text-xs text-slate-800"><FaMapMarkerAlt className="mr-2 inline text-slate-500" /><b>Meeting point</b><p className="mt-1 text-[10px] text-slate-500">{location?.address || location?.title || "Address unavailable"}</p></div>
+            <div className="mt-2 rounded-lg bg-white p-3 text-xs text-slate-800"><FaCarSide className="mr-2 inline text-slate-500" /><b>Vehicle</b><p className="mt-1 text-[10px] capitalize text-slate-500">{vehicleType} transmission ({[vehicle?.brand, vehicle?.model].filter(Boolean).join(" ") || vehicle?.vehicleName || "vehicle unavailable"})</p></div>
           </div>
-          <div className="mt-3 grid grid-cols-2 gap-3">
-            <div className="rounded-lg bg-white/15 p-5 text-center"><p className="font-bold"><FaStar className="mr-1 inline text-white" />{rating.toFixed(1)}</p><p className="mt-2 text-xs">{teacher.rating?.totalReviews || 0} reviews</p></div>
-            <div className="rounded-lg bg-white/15 p-5 text-center"><p className="font-bold">{teacher.experienceYears || 0} Years</p><p className="mt-2 text-xs">Experience</p></div>
-          </div>
-          <div className="mt-3 rounded-lg bg-white p-4 text-sm text-slate-800"><FaMapMarkerAlt className="mr-2 inline text-slate-500" /><b>Meeting point</b><p className="mt-2 text-xs text-slate-500">{location?.address || "Address unavailable"}</p></div>
-          <div className="mt-3 rounded-lg bg-white p-4 text-sm text-slate-800"><FaCarSide className="mr-2 inline text-slate-500" /><b>{vehicleType} transmission</b><p className="mt-2 text-xs text-slate-500">{[vehicle?.brand, vehicle?.model].filter(Boolean).join(" ") || "Approved instructor vehicle"}</p></div>
-          <button type="button" onClick={onSlots} className="mt-4 rounded-lg bg-[#df2339] px-5 py-3 text-xs font-bold text-white">View Available Slot</button>
+          <button type="button" onClick={onSlots} className="mt-3 rounded-lg bg-[#df2339] px-4 py-2.5 text-xs font-bold text-white">View Available Slot</button>
         </div>
 
-        <div>
-          <div className="mb-5 flex items-center justify-between"><h2 className="text-xl font-bold text-[#123f88]">Clients’ Review</h2></div>
-          {reviews.length ? <div className="grid gap-5 md:grid-cols-2">{reviews.slice(0, 4).map((review) => (
-            <article key={review._id} className="rounded-xl bg-white p-5">
-              <p className="min-h-[54px] text-sm leading-6 text-slate-700">{review.comment || "The student rated this instructor."}</p>
-              <div className="mt-3 flex gap-2 text-amber-400">{Array.from({ length: 5 }).map((_, index) => <FaStar key={index} className={index < review.rating ? "" : "opacity-20"} />)}</div>
-              <div className="mt-4 flex items-center gap-3"><div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#dbe7f7] font-bold text-[#123f88]">{review.student?.name?.charAt(0) || "S"}</div><div><p className="text-sm font-bold">{review.student?.name || "Student"}</p><p className="text-xs text-slate-500">Learner driver</p></div></div>
+        <div className="rounded-xl bg-[#e3e9f3] p-3 sm:p-4">
+          <div className="mb-4 flex items-center justify-between"><h2 className="text-lg font-bold text-[#123f88]">Clients’ Review</h2>{reviews.length > 4 && <button type="button" onClick={() => setShowAllReviews(!showAllReviews)} className="text-[10px] font-bold text-[#123f88] underline">{showAllReviews ? "Show Less" : "See All"}</button>}</div>
+          {reviews.length ? <div className="grid gap-3 sm:grid-cols-2">{visibleReviews.map((review) => (
+            <article key={review._id} className="rounded-xl bg-white p-4">
+              <p className="min-h-[48px] text-xs leading-5 text-slate-700">{review.comment || "The student rated this instructor."}</p>
+              <RatingStars value={review.rating} className="mt-3 text-sm" />
+              <div className="mt-3 flex items-center gap-2">{review.student?.avatar ? <img src={mediaUrl(review.student.avatar)} alt="" className="h-8 w-8 rounded-full object-cover" /> : <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#dbe7f7] text-xs font-bold text-[#123f88]">{review.student?.name?.charAt(0) || "S"}</div>}<div><p className="text-xs font-bold">{review.student?.name || "Student"}</p><p className="text-[10px] text-slate-500">Learner driver</p></div></div>
             </article>
           ))}</div> : <div className="rounded-xl bg-white p-10 text-center text-sm text-slate-500">No client review yet.</div>}
         </div>

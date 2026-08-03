@@ -7,6 +7,7 @@ import { FaArrowRight } from "react-icons/fa6";
 import { IoChevronBack } from "react-icons/io5";
 
 import { getMyQuizAttempts, getStudentCodeQuizzes } from "@/features/API";
+import { mediaUrl } from "@/utils/mediaUrl";
 
 const quizIdFrom = (value) => typeof value?.quiz === "string" ? value.quiz : value?.quiz?._id || "";
 
@@ -64,12 +65,16 @@ export default function SeriesListPage({ type, title, emptyText }) {
           const completed = attempt?.status === "completed";
           const progress = completed ? 100 : total ? Math.min(100, Math.round((answered / total) * 100)) : 0;
           const href = `/student/code/code-challenge?quizId=${quiz._id}`;
-          return <article key={quiz._id} className="relative h-[105px] rounded-xl bg-[#e8edf5] px-7 pt-[32px]">
+          const seriesNumber = String(index + 1).padStart(2, "0");
+          const seriesTitle = String(quiz.title || "").trim() || `Series ${seriesNumber}`;
+          return <article key={quiz._id} className="relative h-[105px] overflow-hidden rounded-xl bg-[#e8edf5] pl-[118px] pr-7 pt-[22px]">
+            {quiz.coverImage && <img src={mediaUrl(quiz.coverImage)} alt="" className="absolute inset-y-0 left-0 h-full w-[98px] object-cover" />}
             <div className="w-[252px] max-w-[calc(100%_-_40px)]">
-              <h2 className="truncate text-[16px] font-semibold leading-5 text-[#171717]">Series {String(index + 1).padStart(2, "0")}</h2>
-              <div className="mt-[11px] h-[15px] w-full overflow-hidden rounded-full bg-[#d9e2f0]"><div className="h-full rounded-full bg-[#17479a] transition-[width] duration-300" style={{ width: `${progress}%` }} /></div>
+              <p className="mb-1 text-[10px] font-bold uppercase tracking-wide text-[#17479a]">Series {seriesNumber}</p>
+              <h2 className="truncate text-[16px] font-semibold leading-5 text-[#171717]" title={seriesTitle}>{seriesTitle}</h2>
+              <div className="mt-[8px] h-[10px] w-full overflow-hidden rounded-full bg-[#d9e2f0]"><div className="h-full rounded-full bg-[#17479a] transition-[width] duration-300" style={{ width: `${progress}%` }} /></div>
             </div>
-            <Link href={href} aria-label={`Open Series ${index + 1}`} className="absolute right-[31px] top-[32px] flex h-[34px] w-[34px] items-center justify-center rounded-full bg-[#e9283d] text-white transition hover:scale-105 hover:bg-[#cf2034]"><FaArrowRight size={21} /></Link>
+            <Link href={href} aria-label={`Open ${seriesTitle}`} className="absolute right-[31px] top-[35px] flex h-[34px] w-[34px] items-center justify-center rounded-full bg-[#e9283d] text-white transition hover:scale-105 hover:bg-[#cf2034]"><FaArrowRight size={21} /></Link>
           </article>;
         })}
       </section>

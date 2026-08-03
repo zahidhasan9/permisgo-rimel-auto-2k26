@@ -1675,23 +1675,7 @@ export default function Page() {
 
   return (
     <>
-      <style jsx global>{`
-        @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
-
-        * {
-          box-sizing: border-box;
-        }
-
-        html,
-        body {
-          margin: 0;
-          background: #ffffff;
-          font-family: "Poppins", sans-serif;
-          overflow-x: hidden;
-        }
-      `}</style>
-
-      <main className="min-h-screen w-full min-w-0 overflow-x-hidden bg-white">
+      <main className="dashboard-poppins min-h-screen w-full min-w-0 overflow-x-hidden bg-white">
         <div className="mx-auto w-full  px-4 pb-6 pt-6 sm:px-5 lg:px-6">
           <header>
             <h1 className="text-[24px] font-[700] leading-tight text-[#174A9B] sm:text-[28px]">

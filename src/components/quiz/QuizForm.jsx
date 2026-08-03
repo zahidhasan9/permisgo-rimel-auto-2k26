@@ -37,6 +37,7 @@ export default function QuizForm({
 }) {
   const [form, setForm] = useState(defaultForm);
   const [coverImage, setCoverImage] = useState(null);
+  const [removeCoverImage, setRemoveCoverImage] = useState(false);
 
   useEffect(() => {
     if (!initialValues) return;
@@ -54,8 +55,8 @@ export default function QuizForm({
 
   const previewUrl = useMemo(() => {
     if (coverImage) return URL.createObjectURL(coverImage);
-    return initialValues?.coverImage ? mediaUrl(initialValues.coverImage) : "";
-  }, [coverImage, initialValues?.coverImage]);
+    return !removeCoverImage && initialValues?.coverImage ? mediaUrl(initialValues.coverImage) : "";
+  }, [coverImage, initialValues?.coverImage, removeCoverImage]);
 
   useEffect(() => {
     return () => {
@@ -73,6 +74,7 @@ export default function QuizForm({
     const formData = new FormData();
     Object.entries(form).forEach(([key, value]) => formData.append(key, value));
     if (coverImage) formData.append("coverImage", coverImage);
+    if (removeCoverImage) formData.append("removeCoverImage", "true");
     await onSubmit(formData);
   };
 
@@ -165,13 +167,14 @@ export default function QuizForm({
           <label className="flex min-h-[110px] cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-[#f8f8fb] px-3 py-3 text-center transition hover:border-blue-300 hover:bg-blue-50/40">
             <FaCloudUploadAlt className="mb-2 text-xl text-[#173f87]" />
             <p className="max-w-full truncate text-xs font-bold text-slate-700">{coverImage ? coverImage.name : "Choose cover image"}</p>
-            <input type="file" accept="image/*" onChange={(event) => setCoverImage(event.target.files?.[0] || null)} className="hidden" />
+            <input type="file" accept="image/*" onChange={(event) => { setCoverImage(event.target.files?.[0] || null); setRemoveCoverImage(false); }} className="hidden" />
           </label>
 
           <div className="flex h-[110px] items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
             {previewUrl ? <img src={previewUrl} alt="Cover" className="h-full w-full object-cover" /> : <div className="text-center"><FaImage className="mx-auto mb-1 text-lg text-slate-300" /><p className="text-[11px] font-bold text-slate-400">Preview</p></div>}
           </div>
         </div>
+        {initialValues?.coverImage && !coverImage && <button type="button" onClick={() => setRemoveCoverImage((value) => !value)} className={`mt-3 text-xs font-bold ${removeCoverImage ? "text-blue-700" : "text-red-600"}`}>{removeCoverImage ? "Undo image removal" : "Remove current cover image"}</button>}
       </section>
 
       <footer className="flex flex-col justify-between gap-3 border-t border-slate-200 bg-[#fbfcfe] px-5 py-4 sm:flex-row sm:items-center sm:px-6">

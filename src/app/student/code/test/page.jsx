@@ -99,6 +99,7 @@ export default function StudentCodeTestPage() {
   const [questions, setQuestions] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOptionIndex, setSelectedOptionIndex] = useState(null);
+  const [selectedOptionIndexes, setSelectedOptionIndexes] = useState([]);
   const [answerMap, setAnswerMap] = useState({});
   const [checking, setChecking] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -138,6 +139,7 @@ export default function StudentCodeTestPage() {
       setQuestions(data?.questions || []);
       setCurrentIndex(0);
       setSelectedOptionIndex(null);
+      setSelectedOptionIndexes([]);
       setAnswerMap({});
     } catch (error) {
       setError(
@@ -157,8 +159,8 @@ export default function StudentCodeTestPage() {
   const submitCurrentAnswer = async () => {
     if (!attempt?._id || !currentQuestion?._id) return;
 
-    if (selectedOptionIndex === null) {
-      setError("Please select one option.");
+    if (selectedOptionIndexes.length === 0) {
+      setError(currentQuestion.answerMode === "multiple" ? "Please select all correct options." : "Please select one option.");
       return;
     }
 
@@ -169,6 +171,7 @@ export default function StudentCodeTestPage() {
       const res = await submitQuizAnswer(attempt._id, {
         questionId: currentQuestion._id,
         selectedOptionIndex,
+        selectedOptionIndexes,
         timeSpentSeconds: 0,
       });
 
@@ -202,6 +205,7 @@ export default function StudentCodeTestPage() {
           ? oldAnswer.selectedOptionIndex
           : null,
       );
+      setSelectedOptionIndexes(oldAnswer?.selectedOptionIndexes?.length ? oldAnswer.selectedOptionIndexes : oldAnswer?.selectedOptionIndex !== undefined ? [oldAnswer.selectedOptionIndex] : []);
     }
   };
 
@@ -218,6 +222,7 @@ export default function StudentCodeTestPage() {
           ? oldAnswer.selectedOptionIndex
           : null,
       );
+      setSelectedOptionIndexes(oldAnswer?.selectedOptionIndexes?.length ? oldAnswer.selectedOptionIndexes : oldAnswer?.selectedOptionIndex !== undefined ? [oldAnswer.selectedOptionIndex] : []);
     }
   };
 
@@ -380,7 +385,7 @@ export default function StudentCodeTestPage() {
               </span>
             ) : (
               <span className="inline-flex h-7 items-center rounded-md bg-[#F1F4F8] px-3 text-[10px] font-black text-[#667085]">
-                Select one answer
+                {currentQuestion.answerMode === "multiple" ? "Select multiple answers" : "Select one answer"}
               </span>
             )}
           </div>
@@ -401,14 +406,14 @@ export default function StudentCodeTestPage() {
 
           <div className="mt-4 grid gap-2 md:grid-cols-2">
             {currentQuestion.options?.map((option, index) => {
-              const isSelected = selectedOptionIndex === index;
+              const isSelected = selectedOptionIndexes.includes(index);
 
               const isCorrect =
-                alreadyAnswered?.correctOptionIndex === index &&
+                (alreadyAnswered?.correctOptionIndexes?.includes(index) || alreadyAnswered?.correctOptionIndex === index) &&
                 alreadyAnswered?.isCorrect !== undefined;
 
               const isWrongSelected =
-                alreadyAnswered?.selectedOptionIndex === index &&
+                (alreadyAnswered?.selectedOptionIndexes?.includes(index) || alreadyAnswered?.selectedOptionIndex === index) &&
                 alreadyAnswered?.isCorrect === false;
 
               const optionClass = isCorrect
@@ -425,7 +430,13 @@ export default function StudentCodeTestPage() {
                   type="button"
                   disabled={Boolean(alreadyAnswered)}
                   onClick={() => {
-                    setSelectedOptionIndex(index);
+                    if (currentQuestion.answerMode === "multiple") {
+                      setSelectedOptionIndexes((current) => current.includes(index) ? current.filter((value) => value !== index) : [...current, index].sort());
+                      setSelectedOptionIndex(index);
+                    } else {
+                      setSelectedOptionIndex(index);
+                      setSelectedOptionIndexes([index]);
+                    }
                     setError("");
                   }}
                   className={`rounded-lg border p-3 text-left text-sm font-semibold transition disabled:cursor-not-allowed ${optionClass}`}

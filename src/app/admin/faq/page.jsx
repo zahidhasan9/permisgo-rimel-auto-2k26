@@ -1,7 +1,35 @@
-import React from "react";
+"use client";
 
-const page = () => {
-  return <div>page</div>;
-};
+import { useCallback, useEffect, useState } from "react";
+import { FiEdit2, FiPlus, FiTrash2, FiX } from "react-icons/fi";
+import { createFaq, deleteFaq, getAdminFaqs, updateFaq } from "@/features/API";
+import { showToast } from "@/utils/showToast";
 
-export default page;
+const sections = [
+  ["home", "Homepage"], ["general", "General FAQ page"],
+  ["instructors", "Instructor / Monitor"], ["locations", "Locations"],
+  ["driving-code", "Student driving code"],
+];
+const emptyForm = { question: "", answer: "", section: "home", category: "Driving lessons", order: 0, status: "active" };
+const message = (error) => error?.response?.data?.message || error?.message || "Something went wrong.";
+
+export default function AdminFaqPage() {
+  const [faqs, setFaqs] = useState([]); const [filter, setFilter] = useState("all");
+  const [form, setForm] = useState(emptyForm); const [editing, setEditing] = useState(null);
+  const [open, setOpen] = useState(false); const [loading, setLoading] = useState(true); const [saving, setSaving] = useState(false);
+
+  const load = useCallback(async () => { try { setLoading(true); const { data } = await getAdminFaqs(filter === "all" ? {} : { section: filter }); setFaqs(data?.data || []); } catch (error) { showToast.error(message(error)); } finally { setLoading(false); } }, [filter]);
+  useEffect(() => { load(); }, [load]);
+  const close = () => { setOpen(false); setEditing(null); setForm(emptyForm); };
+  const edit = (faq) => { setEditing(faq); setForm({ question: faq.question, answer: faq.answer, section: faq.section, category: faq.category || "Driving lessons", order: faq.order || 0, status: faq.status }); setOpen(true); };
+  const submit = async (event) => { event.preventDefault(); if (!form.question.trim() || !form.answer.trim()) return showToast.warning("Question and answer are required."); try { setSaving(true); if (editing) { await updateFaq(editing._id, form); showToast.success("FAQ updated."); } else { await createFaq(form); showToast.success("FAQ created."); } close(); await load(); } catch (error) { showToast.error(message(error)); } finally { setSaving(false); } };
+  const remove = async (faq) => { if (!window.confirm(`Delete “${faq.question}”?`)) return; try { await deleteFaq(faq._id); showToast.success("FAQ deleted."); await load(); } catch (error) { showToast.error(message(error)); } };
+  const sectionLabel = (value) => sections.find(([key]) => key === value)?.[1] || value;
+
+  return <div className="mx-auto max-w-7xl space-y-6">
+    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"><div><h1 className="text-2xl font-extrabold text-[#172033]">FAQ Management</h1><p className="mt-1 text-sm text-slate-500">Manage FAQs section-wise across the full website.</p></div><button onClick={() => { setForm({ ...emptyForm, section: filter === "all" ? "home" : filter }); setOpen(true); }} className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#174a9b] px-5 py-3 text-sm font-bold text-white"><FiPlus /> Create FAQ</button></div>
+    <div className="rounded-xl bg-white p-4 shadow-sm"><select value={filter} onChange={(e) => setFilter(e.target.value)} className="rounded-lg border border-slate-200 px-3 py-2 text-sm"><option value="all">All website sections</option>{sections.map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select></div>
+    <div className="overflow-hidden rounded-xl bg-white shadow-sm">{loading ? <p className="p-10 text-center text-slate-500">Loading FAQs...</p> : faqs.length === 0 ? <p className="p-10 text-center text-slate-500">No FAQs found.</p> : <div className="overflow-x-auto"><table className="w-full min-w-[820px] text-left text-sm"><thead className="bg-[#174a9b] text-white"><tr><th className="px-5 py-4">Question & answer</th><th className="px-5 py-4">Section</th><th className="px-5 py-4">Order</th><th className="px-5 py-4">Status</th><th className="px-5 py-4 text-right">Actions</th></tr></thead><tbody className="divide-y divide-slate-100">{faqs.map((faq) => <tr key={faq._id} className="hover:bg-slate-50"><td className="px-5 py-4"><p className="max-w-xl font-bold text-slate-800">{faq.question}</p><p className="mt-1 max-w-xl line-clamp-2 text-xs leading-5 text-slate-500">{faq.answer}</p></td><td className="px-5 py-4"><span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-[#174a9b]">{sectionLabel(faq.section)}</span></td><td className="px-5 py-4">{faq.order}</td><td className="px-5 py-4"><span className={`rounded-full px-3 py-1 text-xs font-bold ${faq.status === "active" ? "bg-green-100 text-green-700" : "bg-slate-100 text-slate-600"}`}>{faq.status}</span></td><td className="px-5 py-4"><div className="flex justify-end gap-2"><button onClick={() => edit(faq)} className="rounded-lg bg-blue-50 p-2.5 text-[#174a9b]"><FiEdit2 /></button><button onClick={() => remove(faq)} className="rounded-lg bg-red-50 p-2.5 text-red-600"><FiTrash2 /></button></div></td></tr>)}</tbody></table></div>}</div>
+    {open && <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/50 p-4 backdrop-blur-sm"><div className="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl"><div className="flex items-center justify-between border-b px-6 py-4"><h2 className="text-xl font-extrabold">{editing ? "Update FAQ" : "Create FAQ"}</h2><button onClick={close} className="rounded-full p-2 hover:bg-slate-100"><FiX /></button></div><form onSubmit={submit} className="space-y-5 p-6"><label className="block"><span className="mb-2 block text-sm font-bold">Website section *</span><select value={form.section} onChange={(e) => setForm({ ...form, section: e.target.value })} className="w-full rounded-lg border border-slate-200 px-4 py-3">{sections.map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select></label><label className="block"><span className="mb-2 block text-sm font-bold">Question *</span><input value={form.question} onChange={(e) => setForm({ ...form, question: e.target.value })} className="w-full rounded-lg border border-slate-200 px-4 py-3" /></label><label className="block"><span className="mb-2 block text-sm font-bold">Answer *</span><textarea rows={6} value={form.answer} onChange={(e) => setForm({ ...form, answer: e.target.value })} className="w-full rounded-lg border border-slate-200 px-4 py-3" /></label><div className="grid gap-4 sm:grid-cols-3"><label><span className="mb-2 block text-sm font-bold">Category</span><input value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="w-full rounded-lg border border-slate-200 px-3 py-3" /></label><label><span className="mb-2 block text-sm font-bold">Display order</span><input type="number" min="0" value={form.order} onChange={(e) => setForm({ ...form, order: Number(e.target.value) })} className="w-full rounded-lg border border-slate-200 px-3 py-3" /></label><label><span className="mb-2 block text-sm font-bold">Status</span><select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })} className="w-full rounded-lg border border-slate-200 px-3 py-3"><option value="active">Active</option><option value="inactive">Inactive</option></select></label></div><div className="flex justify-end gap-3 border-t pt-5"><button type="button" onClick={close} className="rounded-lg border px-5 py-3 font-bold">Cancel</button><button disabled={saving} className="rounded-lg bg-[#e2233d] px-6 py-3 font-bold text-white disabled:opacity-60">{saving ? "Saving..." : editing ? "Update FAQ" : "Create FAQ"}</button></div></form></div></div>}
+  </div>;
+}

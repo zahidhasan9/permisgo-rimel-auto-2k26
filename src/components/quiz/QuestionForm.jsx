@@ -413,7 +413,7 @@ function ImagePreview({ src, alt = "Preview" }) {
   );
 }
 
-function FileUploadBox({ label, currentImage, selectedFile, onChange }) {
+function FileUploadBox({ label, currentImage, selectedFile, onChange, removed = false, onRemove }) {
   return (
     <div>
       <FieldLabel icon={FaImage}>{label}</FieldLabel>
@@ -435,10 +435,11 @@ function FileUploadBox({ label, currentImage, selectedFile, onChange }) {
         </label>
 
         <ImagePreview
-          src={currentImage ? mediaUrl(currentImage) : ""}
+          src={!removed && currentImage ? mediaUrl(currentImage) : ""}
           alt={label}
         />
       </div>
+      {currentImage && !selectedFile && <button type="button" onClick={onRemove} className={`mt-1.5 text-[11px] font-bold ${removed ? "text-blue-700" : "text-red-600"}`}>{removed ? "Undo image removal" : "Remove current image"}</button>}
     </div>
   );
 }
@@ -450,9 +451,14 @@ export default function QuestionForm({
   submitText = "Save Question",
 }) {
   const [questionText, setQuestionText] = useState("");
+  const [promptCount, setPromptCount] = useState(1);
+  const [secondaryQuestionText, setSecondaryQuestionText] = useState("");
+  const [questionVideoUrl, setQuestionVideoUrl] = useState("");
   const [voiceText, setVoiceText] = useState("");
   const [options, setOptions] = useState(emptyOptions);
   const [correctOptionIndex, setCorrectOptionIndex] = useState(0);
+  const [correctOptionIndexes, setCorrectOptionIndexes] = useState([0]);
+  const [multipleAnswers, setMultipleAnswers] = useState(false);
   const [explanationText, setExplanationText] = useState("");
   const [topic, setTopic] = useState("");
   const [difficulty, setDifficulty] = useState("medium");
@@ -463,10 +469,14 @@ export default function QuestionForm({
   const [explanationImage, setExplanationImage] = useState(null);
   const [markedAnswerImage, setMarkedAnswerImage] = useState(null);
   const [optionImages, setOptionImages] = useState([null, null, null, null]);
+  const [removedImages, setRemovedImages] = useState({ question: false, explanation: false, markedAnswer: false, options: [false, false, false, false] });
 
   useEffect(() => {
     if (initialValues) {
       setQuestionText(initialValues.questionText || "");
+      setPromptCount(Number(initialValues.promptCount) === 2 ? 2 : 1);
+      setSecondaryQuestionText(initialValues.secondaryQuestionText || "");
+      setQuestionVideoUrl(initialValues.questionVideoUrl || "");
       setVoiceText(initialValues.voiceText || "");
       setOptions(
         initialValues.options?.length === 4
@@ -474,6 +484,9 @@ export default function QuestionForm({
           : emptyOptions,
       );
       setCorrectOptionIndex(Number(initialValues.correctOptionIndex || 0));
+      const savedCorrectIndexes = initialValues.correctOptionIndexes?.length ? initialValues.correctOptionIndexes.map(Number) : [Number(initialValues.correctOptionIndex || 0)];
+      setCorrectOptionIndexes(savedCorrectIndexes);
+      setMultipleAnswers(savedCorrectIndexes.length > 1);
       setExplanationText(initialValues.explanationText || "");
       setTopic(initialValues.topic || "");
       setDifficulty(initialValues.difficulty || "medium");
@@ -494,6 +507,7 @@ export default function QuestionForm({
     setOptionImages((prev) =>
       prev.map((item, i) => (i === index ? file : item)),
     );
+    if (file) setRemovedImages((current) => ({ ...current, options: current.options.map((value, i) => i === index ? false : value) }));
   };
 
   const handleSubmit = async (event) => {
@@ -501,9 +515,13 @@ export default function QuestionForm({
 
     const formData = new FormData();
     formData.append("questionText", questionText);
+    formData.append("promptCount", String(promptCount));
+    formData.append("secondaryQuestionText", promptCount === 2 ? secondaryQuestionText : "");
+    formData.append("questionVideoUrl", questionVideoUrl);
     formData.append("voiceText", voiceText);
     formData.append("options", JSON.stringify(options));
     formData.append("correctOptionIndex", String(correctOptionIndex));
+    formData.append("correctOptionIndexes", JSON.stringify(correctOptionIndexes));
     formData.append("explanationText", explanationText);
     formData.append("topic", topic);
     formData.append("difficulty", difficulty);
@@ -514,6 +532,10 @@ export default function QuestionForm({
     if (explanationImage) formData.append("explanationImage", explanationImage);
     if (markedAnswerImage)
       formData.append("markedAnswerImage", markedAnswerImage);
+    if (removedImages.question) formData.append("removeQuestionImage", "true");
+    if (removedImages.explanation) formData.append("removeExplanationImage", "true");
+    if (removedImages.markedAnswer) formData.append("removeMarkedAnswerImage", "true");
+    removedImages.options.forEach((removed, index) => { if (removed) formData.append(`removeOptionImage${index}`, "true"); });
 
     optionImages.forEach((file, index) => {
       if (file) formData.append(`optionImage${index}`, file);
@@ -546,7 +568,7 @@ export default function QuestionForm({
 
         <div className="flex flex-wrap gap-1.5">
           <Badge tone="violet">
-            Correct: {String.fromCharCode(65 + Number(correctOptionIndex || 0))}
+            Correct: {correctOptionIndexes.map((index) => String.fromCharCode(65 + index)).join(", ")}
           </Badge>
           <Badge tone={status === "active" ? "green" : "slate"}>{status}</Badge>
         </div>
@@ -555,16 +577,14 @@ export default function QuestionForm({
       <div className="p-3.5">
         <div className="grid gap-3 xl:grid-cols-12">
           <div className="xl:col-span-8">
-            <FieldLabel icon={FaFileAlt}>Question Text</FieldLabel>
-
-            <textarea
-              value={questionText}
-              onChange={(e) => setQuestionText(e.target.value)}
-              rows={3}
-              className={textareaClass}
-              placeholder="Write question text..."
-              required
-            />
+            <div className="mb-4 flex items-center justify-between gap-4 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+              <div><p className="text-sm font-bold text-slate-800">Add second question</p><p className="mt-1 text-[11px] text-slate-500">Turn on for Question 1 (A/B) and Question 2 (C/D).</p></div>
+              <button type="button" role="switch" aria-checked={promptCount === 2} onClick={() => { const enabled = promptCount !== 2; setPromptCount(enabled ? 2 : 1); if (enabled) { setMultipleAnswers(true); setCorrectOptionIndex(0); setCorrectOptionIndexes([0, 2]); } else { setMultipleAnswers(false); setCorrectOptionIndex(0); setCorrectOptionIndexes([0]); setSecondaryQuestionText(""); } }} className={`relative h-7 w-12 shrink-0 rounded-full transition ${promptCount === 2 ? "bg-[#173f87]" : "bg-slate-300"}`}><span className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow transition ${promptCount === 2 ? "left-6" : "left-1"}`}/></button>
+            </div>
+            <div className={`grid gap-3 ${promptCount === 2 ? "md:grid-cols-2" : ""}`}>
+              <div className="rounded-xl border border-slate-200 bg-white p-3"><FieldLabel icon={FaFileAlt}>Question 1 {promptCount === 2 ? "— answers A/B" : ""}</FieldLabel><textarea value={questionText} onChange={(e) => setQuestionText(e.target.value)} rows={3} className={textareaClass} placeholder="Write question 1..." required /></div>
+              {promptCount === 2 && <div className="rounded-xl border border-blue-200 bg-blue-50/40 p-3"><FieldLabel icon={FaFileAlt}>Question 2 — answers C/D</FieldLabel><textarea value={secondaryQuestionText} onChange={(e) => setSecondaryQuestionText(e.target.value)} rows={3} className={textareaClass} placeholder="Write question 2..." required /></div>}
+            </div>
           </div>
 
           <div className="xl:col-span-4">
@@ -584,8 +604,11 @@ export default function QuestionForm({
               label="Question Image"
               currentImage={initialValues?.questionImage}
               selectedFile={questionImage}
-              onChange={(e) => setQuestionImage(e.target.files?.[0] || null)}
+              removed={removedImages.question}
+              onRemove={() => setRemovedImages((current) => ({ ...current, question: !current.question }))}
+              onChange={(e) => { setQuestionImage(e.target.files?.[0] || null); setQuestionVideoUrl(""); setRemovedImages((current) => ({ ...current, question: false })); }}
             />
+            <div className="mt-3"><FieldLabel>Or Video URL</FieldLabel><input value={questionVideoUrl} onChange={(e) => { setQuestionVideoUrl(e.target.value); if (e.target.value) { setQuestionImage(null); setRemovedImages((current) => ({ ...current, question: true })); } }} className={inputClass} placeholder="YouTube or direct MP4/WebM URL" /><p className="mt-1 text-[11px] text-slate-400">Use either an image or a video.</p></div>
           </div>
 
           <div className="xl:col-span-6">
@@ -593,8 +616,10 @@ export default function QuestionForm({
               label="Marked Answer Image"
               currentImage={initialValues?.markedAnswerImage}
               selectedFile={markedAnswerImage}
+              removed={removedImages.markedAnswer}
+              onRemove={() => setRemovedImages((current) => ({ ...current, markedAnswer: !current.markedAnswer }))}
               onChange={(e) =>
-                setMarkedAnswerImage(e.target.files?.[0] || null)
+                { setMarkedAnswerImage(e.target.files?.[0] || null); setRemovedImages((current) => ({ ...current, markedAnswer: false })); }
               }
             />
           </div>
@@ -602,9 +627,9 @@ export default function QuestionForm({
           <div className="xl:col-span-12">
             <div className="mb-2 flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
               <div>
-                <h3 className="text-sm font-bold text-slate-900">4 Options</h3>
+                <h3 className="text-sm font-bold text-slate-900">Answer Options</h3>
                 <p className="mt-0.5 text-[11px] font-medium text-slate-400">
-                  Select the radio button for the correct answer.
+                  {promptCount === 2 ? "Choose one correct answer in A/B and one in C/D." : "Add four options and choose the correct answer."}
                 </p>
               </div>
 
@@ -612,15 +637,17 @@ export default function QuestionForm({
                 <FaListOl />
                 Options
               </Badge>
+              {promptCount === 1 && <button type="button" onClick={() => { setMultipleAnswers((value) => !value); setCorrectOptionIndexes([correctOptionIndex]); }} className={`rounded-full border px-3 py-1 text-[11px] font-bold ${multipleAnswers ? "border-amber-300 bg-amber-50 text-amber-700" : "border-slate-200 bg-white text-slate-600"}`}>{multipleAnswers ? "Multiple answers enabled" : "Enable multiple answers"}</button>}
             </div>
 
             <div className="grid gap-2.5 xl:grid-cols-2">
               {options.map((option, index) => {
-                const isCorrect = correctOptionIndex === index;
+                const isCorrect = correctOptionIndexes.includes(index);
 
                 return (
+                  <div key={index} className="contents">
+                  {promptCount === 2 && (index === 0 || index === 2) && <div className="xl:col-span-2 mt-2 flex items-center justify-between rounded-xl bg-[#eef3fb] px-4 py-2.5"><div><p className="text-xs font-bold text-[#173f87]">Question {index === 0 ? 1 : 2} answers</p><p className="mt-0.5 text-[10px] text-slate-500">Choose one correct option</p></div><span className="rounded-lg bg-white px-3 py-1 text-xs font-black text-[#173f87]">{index === 0 ? "A / B" : "C / D"}</span></div>}
                   <div
-                    key={index}
                     className={`rounded-[14px] border p-2.5 transition ${
                       isCorrect
                         ? "border-violet-200 bg-violet-50"
@@ -671,17 +698,24 @@ export default function QuestionForm({
 
                       <label className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-xl border border-slate-200 bg-white">
                         <input
-                          type="radio"
-                          name="correct"
+                          type={promptCount === 2 ? "radio" : multipleAnswers ? "checkbox" : "radio"}
+                          name={promptCount === 2 ? `correct-group-${index < 2 ? 1 : 2}` : "correct"}
                           checked={isCorrect}
-                          onChange={() => setCorrectOptionIndex(index)}
+                          onChange={() => {
+                            if (promptCount === 2) { setCorrectOptionIndexes((current) => { const group = index < 2 ? [0, 1] : [2, 3]; const next = [...current.filter((value) => !group.includes(value)), index].sort(); setCorrectOptionIndex(next[0]); return next; }); return; }
+                            if (!multipleAnswers) { setCorrectOptionIndex(index); setCorrectOptionIndexes([index]); return; }
+                            setCorrectOptionIndexes((current) => {
+                              if (current.includes(index)) return current.length > 1 ? current.filter((value) => value !== index) : current;
+                              const next = [...current, index].sort(); setCorrectOptionIndex(next[0]); return next;
+                            });
+                          }}
                           className="h-4 w-4 cursor-pointer accent-violet-600"
                           title="Correct answer"
                         />
                       </label>
                     </div>
 
-                    {option.image && (
+                    {option.image && !removedImages.options[index] && (
                       <div className="mt-2 flex items-center gap-2">
                         <ImagePreview
                           src={mediaUrl(option.image)}
@@ -693,6 +727,8 @@ export default function QuestionForm({
                         </p>
                       </div>
                     )}
+                    {option.image && !optionImages[index] && <button type="button" onClick={() => setRemovedImages((current) => ({ ...current, options: current.options.map((value, i) => i === index ? !value : value) }))} className={`mt-2 text-[11px] font-bold ${removedImages.options[index] ? "text-blue-700" : "text-red-600"}`}>{removedImages.options[index] ? "Undo image removal" : "Remove option image"}</button>}
+                  </div>
                   </div>
                 );
               })}
@@ -716,7 +752,9 @@ export default function QuestionForm({
               label="Explanation Image"
               currentImage={initialValues?.explanationImage}
               selectedFile={explanationImage}
-              onChange={(e) => setExplanationImage(e.target.files?.[0] || null)}
+              removed={removedImages.explanation}
+              onRemove={() => setRemovedImages((current) => ({ ...current, explanation: !current.explanation }))}
+              onChange={(e) => { setExplanationImage(e.target.files?.[0] || null); setRemovedImages((current) => ({ ...current, explanation: false })); }}
             />
           </div>
 

@@ -23,7 +23,7 @@ const getAuthPayload = (payload) => {
   return payload?.data || payload || {};
 };
 
-const StudentLogin = () => {
+const TeacherLogin = () => {
   const dispatch = useDispatch();
   const router = useRouter();
 
@@ -89,6 +89,7 @@ const StudentLogin = () => {
         login({
           email,
           password,
+          expectedRole: "teacher",
         }),
       ).unwrap();
 
@@ -225,4 +226,4 @@ const StudentLogin = () => {
   );
 };
 
-export default StudentLogin;
+export default TeacherLogin;

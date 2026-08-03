@@ -72,7 +72,7 @@ export default function LoginPartnerPage() {
             <div className="mt-7 text-center">
               <p className="!text-[16px] text-[#35383c]">You don&apos;t have an account?</p>
               <Link
-                href="/register"
+                href="/inscription"
                 className="mt-6 inline-flex min-h-[48px] items-center justify-center rounded-[9px] border-2 border-[#174a9b] px-7 !text-[16px] font-semibold text-[#174a9b] transition duration-300 hover:-translate-y-0.5 hover:bg-[#174a9b] hover:text-white hover:shadow-lg"
               >
                 Create My Account

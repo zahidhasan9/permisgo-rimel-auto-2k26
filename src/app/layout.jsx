@@ -90,6 +90,7 @@ import "../globals.css";
 
 import ReduxProvider from "@/provider/provider";
 import AppToast from "@/components/common/AppToast";
+import AppShell from "@/components/layout/AppShell";
 import { headers } from "next/headers";
 
 import { createMetadata, createRouteMetadata, siteConfig } from "@/lib/seo";
@@ -172,7 +173,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning>
-        <ReduxProvider>{children}</ReduxProvider>
+        <ReduxProvider><AppShell>{children}</AppShell></ReduxProvider>
 
         <AppToast />
       </body>

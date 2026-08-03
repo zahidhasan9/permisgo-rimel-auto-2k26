@@ -530,6 +530,7 @@ import { FaCog, FaSignOutAlt, FaUser } from "react-icons/fa";
 import { FiChevronDown, FiMenu } from "react-icons/fi";
 import { getLoggedInUser, logoutUser } from "@/features/API";
 import { mediaUrl } from "@/utils/mediaUrl";
+import { getLogoutRedirect } from "@/utils/authRedirects";
 
 const PANEL_CONFIG = {
   student: {
@@ -788,7 +789,7 @@ export default function DashboardTopbar({
       localStorage.removeItem("user");
 
       setOpen(false);
-      window.location.replace("/login");
+      window.location.replace(getLogoutRedirect(activePanelType));
     }
   }
 

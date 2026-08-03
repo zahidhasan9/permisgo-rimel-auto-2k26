@@ -128,7 +128,7 @@ const StudentForgetPassword = () => {
               <p className="mt-4 text-center text-[12.5px] text-slate-600">
                 Don&apos;t have an account?{" "}
                 <Link
-                  href="/register"
+                  href="/inscription"
                   className="font-bold text-[#103677] transition hover:text-[#2563eb] hover:underline"
                 >
                   Register Now
