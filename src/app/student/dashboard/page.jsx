@@ -1257,38 +1257,11 @@ const STATIC_LESSON = {
   progressPercent: 20,
 };
 
-const STATIC_SCHEDULE = [
-  {
-    id: "static-schedule-10",
-    day: "Sat",
-    date: "10",
-    title: "Online code review",
-    startTime: "9:00 AM",
-    endTime: "2:00 PM",
-  },
-  {
-    id: "static-schedule-11",
-    day: "Sat",
-    date: "11",
-    title: "Online code review",
-    startTime: "9:00 AM",
-    endTime: "2:00 PM",
-  },
-  {
-    id: "static-schedule-12",
-    day: "Sat",
-    date: "12",
-    title: "Online code review",
-    startTime: "9:00 AM",
-    endTime: "2:00 PM",
-  },
-];
-
 const DEFAULT_PROGRESS = {
-  completed: 2,
-  inProgress: 1,
-  notCompleted: 1,
-  average: 60,
+  completed: 0,
+  inProgress: 0,
+  notCompleted: 0,
+  average: 0,
 };
 
 const clampPercentage = (value) => {
@@ -1380,7 +1353,7 @@ const fillLessonCards = (items) => {
 };
 
 const fillScheduleRows = (items) => {
-  const safeItems = Array.isArray(items)
+  return Array.isArray(items)
     ? items.slice(0, 3).map((item) => {
         const parts = getScheduleDateParts(item.lessonDate);
 
@@ -1391,12 +1364,6 @@ const fillScheduleRows = (items) => {
         };
       })
     : [];
-
-  while (safeItems.length < 3) {
-    safeItems.push(STATIC_SCHEDULE[safeItems.length]);
-  }
-
-  return safeItems;
 };
 
 const formatStatValue = (value, pad = false) => {
@@ -1495,11 +1462,13 @@ function ScheduleRow({ item }) {
 
       <div className="min-w-0 flex-1 rounded-[10px] bg-white px-[15px] py-[16px]">
         <h4 className="truncate text-[15px] font-[700] leading-none text-black">
-          {item?.title || "Online code review"}
+          {item?.title || "Driving Lesson"}
         </h4>
         <p className="mt-[13px] text-[13px] font-[500] leading-none text-[#55565B]">
-          {formatTime(item?.startTime || "9:00 AM")} -{" "}
-          {formatTime(item?.endTime || "2:00 PM")}
+          {formatTime(item?.startTime)} - {formatTime(item?.endTime)}
+        </p>
+        <p className="mt-2 truncate text-[12px] font-[600] text-[#174A9B]">
+          Instructor: {item?.instructorName || item?.teacher?.name || "Instructor"}
         </p>
       </div>
     </div>
@@ -1518,11 +1487,7 @@ function SemiDonutChart({ statistics }) {
   const chartValues =
     total > 0
       ? [completed, inProgress, notCompleted]
-      : [
-          DEFAULT_PROGRESS.completed,
-          DEFAULT_PROGRESS.inProgress,
-          DEFAULT_PROGRESS.notCompleted,
-        ];
+      : [0, 0, 0];
   const chartTotal = chartValues.reduce((sum, value) => sum + value, 0);
   const chartColors = ["#174A9B", "#2DBE42", "#E5273D"];
 
@@ -1542,7 +1507,7 @@ function SemiDonutChart({ statistics }) {
   };
 
   let currentAngle = 180;
-  const paths = chartValues.map((value, index) => {
+  const paths = chartTotal > 0 ? chartValues.map((value, index) => {
     const startAngle = currentAngle;
     const endAngle =
       index === chartValues.length - 1
@@ -1557,7 +1522,7 @@ function SemiDonutChart({ statistics }) {
       endAngle,
       value,
     };
-  });
+  }) : [];
 
   const average = clampPercentage(
     statistics?.average ?? DEFAULT_PROGRESS.average,
@@ -1570,6 +1535,15 @@ function SemiDonutChart({ statistics }) {
         viewBox="0 0 340 210"
         preserveAspectRatio="xMidYMid meet"
       >
+        {chartTotal === 0 && (
+          <path
+            d={arc(180, 360)}
+            fill="none"
+            stroke="#D7DFEC"
+            strokeWidth={stroke}
+            strokeLinecap="butt"
+          />
+        )}
         {paths.map((path, index) =>
           path.value > 0 ? (
             <path
@@ -1603,9 +1577,9 @@ function LegendItem({ color, label }) {
   );
 }
 
-function TrainingCard({ icon, text }) {
+function TrainingCard({ icon, text, helper, onClick }) {
   return (
-    <div className="flex min-h-[128px] min-w-0 flex-1 flex-col items-center justify-center rounded-[12px] bg-white px-3 py-4">
+    <button type="button" onClick={onClick} className="flex min-h-[128px] min-w-0 flex-1 flex-col items-center justify-center rounded-[12px] bg-white px-3 py-4 transition hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#174A9B]">
       <div className="mb-[16px] flex h-[34px] w-[34px] items-center justify-center rounded-[8px] bg-[#E8EEF8] text-[16px] text-[#174A9B]">
         {icon}
       </div>
@@ -1613,7 +1587,8 @@ function TrainingCard({ icon, text }) {
       <p className="max-w-[105px] text-center text-[13px] font-[500] leading-[20px] text-[#101010]">
         {text}
       </p>
-    </div>
+      {helper && <p className="mt-2 text-center text-[10px] font-semibold text-[#6E7077]">{helper}</p>}
+    </button>
   );
 }
 
@@ -1767,12 +1742,12 @@ export default function Page() {
               </button>
 
               <div className="mt-4 space-y-[10px]">
-                {scheduleRows.map((item, index) => (
+                {scheduleRows.length ? scheduleRows.map((item, index) => (
                   <ScheduleRow
                     key={item.id || item._id || `schedule-${index}`}
                     item={item}
                   />
-                ))}
+                )) : <div className="rounded-[10px] bg-white px-5 py-8 text-center text-sm font-semibold text-slate-500">No upcoming booked lesson.</div>}
               </div>
             </div>
 
@@ -1784,8 +1759,8 @@ export default function Page() {
               <SemiDonutChart statistics={progressStatistics} />
 
               <div className="mt-2 flex flex-wrap justify-center gap-x-4 gap-y-2">
-                <LegendItem color="#174A9B" label="Completed Lessons" />
-                <LegendItem color="#2DBE42" label="In progress" />
+                <LegendItem color="#174A9B" label="Completed Quizzes" />
+                <LegendItem color="#2DBE42" label="Quiz in progress" />
                 <LegendItem color="#E5273D" label="Not completed" />
               </div>
             </div>
@@ -1798,15 +1773,17 @@ export default function Page() {
               </h2>
 
               <h3 className="mt-5 text-[15px] font-[700] leading-none text-[#15233B]">
-                Traffic Law’s
+                Traffic Laws
               </h3>
 
               <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
-                <TrainingCard icon={<MdChecklist />} text="Start Revising" />
-                <TrainingCard icon={<FaCarSide />} text="Take Practice exam" />
+                <TrainingCard icon={<MdChecklist />} text="Start Revising" helper="Continue your code lessons" onClick={() => router.push("/student/code-learning")} />
+                <TrainingCard icon={<FaCarSide />} text="Take Practice Exam" helper={`${progressStatistics.totalAttempts || 0} attempts · ${progressStatistics.average || 0}% average`} onClick={() => router.push("/student/code/simple-series-list")} />
                 <TrainingCard
                   icon={<IoStatsChart />}
                   text="Exam Registration"
+                  helper="Open the reservation portal"
+                  onClick={() => window.open("https://app.klaxo.fr/mon-compte/connecter", "_blank", "noopener,noreferrer")}
                 />
               </div>
             </div>
