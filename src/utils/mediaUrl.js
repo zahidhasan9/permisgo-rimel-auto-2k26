@@ -6,6 +6,7 @@ export const getBackendBaseUrl = () => {
 export const mediaUrl = (path) => {
   if (!path) return "";
   if (path.startsWith("http://") || path.startsWith("https://")) return path;
+  if (path.startsWith("/image/")) return path;
   const baseUrl = getBackendBaseUrl();
   return `${baseUrl}${path.startsWith("/") ? path : `/${path}`}`;
 };

@@ -22,10 +22,13 @@ import {
 import { IoChevronBack } from "react-icons/io5";
 
 import {
+  addFavoriteTeacher,
   createLocationBooking,
   getAvailableBookingSlots,
+  getMyFavoriteTeachers,
   getNearbyTeachers,
   getTeacherReviews,
+  removeFavoriteTeacher,
 } from "@/features/API";
 import { mediaUrl } from "@/utils/mediaUrl";
 
@@ -150,6 +153,8 @@ function BookingFlow() {
   const [selectedTeacher, setSelectedTeacher] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [favorite, setFavorite] = useState(false);
+  const [favoriteTeacherIds, setFavoriteTeacherIds] = useState(new Set());
+  const [savingFavorite, setSavingFavorite] = useState(false);
   const [duration, setDuration] = useState(60);
   const [schedule, setSchedule] = useState([]);
   const [openDate, setOpenDate] = useState("");
@@ -190,6 +195,15 @@ function BookingFlow() {
     loadTeachers(search, vehicleType);
   }, [vehicleType]); // Search location changes are handled by place selection.
 
+  useEffect(() => {
+    getMyFavoriteTeachers()
+      .then((response) => {
+        const list = unwrap(response, []);
+        setFavoriteTeacherIds(new Set((Array.isArray(list) ? list : []).map((item) => String(item.user?._id)).filter(Boolean)));
+      })
+      .catch(() => setFavoriteTeacherIds(new Set()));
+  }, []);
+
   const selectPlace = (place) => {
     const location = {
       address: place.address,
@@ -205,6 +219,7 @@ function BookingFlow() {
 
   const openTeacher = async (teacher) => {
     setSelectedTeacher(teacher);
+    setFavorite(favoriteTeacherIds.has(String(teacher.user._id)));
     setError("");
     setReviews([]);
     try {
@@ -214,6 +229,29 @@ function BookingFlow() {
       setReviews([]);
     }
     setStep("teacher");
+  };
+
+  const toggleFavorite = async () => {
+    const teacherId = selectedTeacher?.user?._id;
+    if (!teacherId || savingFavorite) return;
+    setSavingFavorite(true);
+    setError("");
+    try {
+      if (favorite) await removeFavoriteTeacher(teacherId);
+      else await addFavoriteTeacher(teacherId);
+      const nextFavorite = !favorite;
+      setFavorite(nextFavorite);
+      setFavoriteTeacherIds((current) => {
+        const next = new Set(current);
+        if (nextFavorite) next.add(String(teacherId));
+        else next.delete(String(teacherId));
+        return next;
+      });
+    } catch (requestError) {
+      setError(requestError.response?.data?.message || "Favorite teacher could not be updated.");
+    } finally {
+      setSavingFavorite(false);
+    }
   };
 
   const loadSchedule = useCallback(async () => {
@@ -312,7 +350,8 @@ function BookingFlow() {
           teacher={selectedTeacher}
           reviews={reviews}
           favorite={favorite}
-          setFavorite={setFavorite}
+          toggleFavorite={toggleFavorite}
+          savingFavorite={savingFavorite}
           vehicleType={vehicleType}
           onSlots={() => setStep("schedule")}
         />
@@ -411,7 +450,7 @@ function MapStep({
   );
 }
 
-function TeacherStep({ teacher, reviews, favorite, setFavorite, vehicleType, onSlots }) {
+function TeacherStep({ teacher, reviews, favorite, toggleFavorite, savingFavorite, vehicleType, onSlots }) {
   const location = teacher.nearestLocation;
   const vehicle = vehicleFor(teacher, vehicleType);
   const rating = Number(teacher.rating?.average || 0);
@@ -423,7 +462,7 @@ function TeacherStep({ teacher, reviews, favorite, setFavorite, vehicleType, onS
         <div>
           <div className="rounded-xl bg-[#174a9b] p-3 text-white">
             <div className="relative rounded-lg bg-white px-4 py-3 text-center text-[#123f88]">
-              <button type="button" onClick={() => setFavorite(!favorite)} className="absolute right-4 top-4 text-slate-800">{favorite ? <FaHeart className="text-red-500" /> : <FaRegHeart />}</button>
+              <button type="button" onClick={toggleFavorite} disabled={savingFavorite} aria-label={favorite ? "Remove favorite teacher" : "Add favorite teacher"} title={favorite ? "Remove from favorites" : "Add to favorites"} className="absolute right-4 top-4 text-xl text-slate-800 disabled:opacity-50">{favorite ? <FaHeart className="text-red-500" /> : <FaRegHeart />}</button>
               <Avatar teacher={teacher} className="mx-auto h-11 w-11" />
               <h2 className="mt-1 text-sm font-bold">{teacherName(teacher)}</h2>
             </div>

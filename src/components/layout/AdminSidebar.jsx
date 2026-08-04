@@ -84,6 +84,10 @@ const menu = [
         href: "/admin/road-signs",
       },
       {
+        name: "Exam Questions",
+        href: "/admin/exam-questions",
+      },
+      {
         name: "Code eBooks",
         href: "/admin/code-ebooks",
       },

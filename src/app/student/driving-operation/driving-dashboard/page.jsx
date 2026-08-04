@@ -1,42 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Fragment } from "react";
 import { IoChevronBack, IoChevronForward, IoCheckmark } from "react-icons/io5";
 import { FaCarSide, FaStar, FaWhatsapp } from "react-icons/fa";
-
-const teachers = [
-  {
-    id: 1,
-    name: "Wade Warren",
-    phone: "089636789000",
-    experience: "05 Years+",
-    image: "/image/teacher-1.png",
-  },
-  {
-    id: 2,
-    name: "Marvin McKinney",
-    phone: "089636789000",
-    experience: "05 Years+",
-    image: "/image/teacher-2.png",
-  },
-  {
-    id: 3,
-    name: "Guy Hawkins",
-    phone: "089636789000",
-    experience: "05 Years+",
-    image: "/image/teacher-3.png",
-  },
-  {
-    id: 4,
-    name: "Ronald Richards",
-    phone: "089636789000",
-    experience: "05 Years+",
-    image: "/image/teacher-4.png",
-  },
-];
+import { getMyFavoriteTeachers, getStudentDashboard } from "@/features/API";
 
 const steps = [
   { id: 1, label: "Step 01", type: "done" },
@@ -108,6 +78,39 @@ const learningItems = [
 
 export default function Page() {
   const router = useRouter();
+  const [teachers, setTeachers] = useState([]);
+  const [teachersLoading, setTeachersLoading] = useState(true);
+  const [dashboard, setDashboard] = useState(null);
+
+  useEffect(() => {
+    let active = true;
+    getMyFavoriteTeachers()
+      .then((response) => {
+        const data = response?.data?.data ?? response?.data ?? [];
+        if (active) setTeachers(Array.isArray(data) ? data : []);
+      })
+      .catch(() => { if (active) setTeachers([]); })
+      .finally(() => { if (active) setTeachersLoading(false); });
+    return () => { active = false; };
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    getStudentDashboard()
+      .then((response) => { if (active) setDashboard(response?.data?.data ?? response?.data ?? null); })
+      .catch(() => { if (active) setDashboard(null); });
+    return () => { active = false; };
+  }, []);
+
+  const journey = dashboard?.licenseJourney;
+  const journeySteps = journey?.steps?.length
+    ? journey.steps.map((step, index) => ({
+        id: index + 1,
+        label: step.label,
+        progress: step.progress,
+        type: step.completed ? "done" : index + 1 === journey.currentStep ? "car" : "empty",
+      }))
+    : steps;
 
   function handleBack() {
     router.back();
@@ -141,7 +144,7 @@ export default function Page() {
               </h2>
 
               <p className="mt-2 text-[13px] font-medium text-[#667085]">
-                Step 3: Driver Training
+                Step {journey?.currentStep || 1}: {journey?.currentStepLabel || "Registration"}
               </p>
             </div>
 
@@ -154,14 +157,19 @@ export default function Page() {
               </Link>
 
               <p className="text-[15px] font-bold text-[#20BF3A]">
-                50 hours worked
+                {journey?.completedHours || 0} / {journey?.targetHours || 20} hours completed
               </p>
             </div>
           </div>
 
+          <div className="mt-5">
+            <div className="flex items-center justify-between text-xs font-bold text-[#174596]"><span>Overall progress</span><span>{journey?.overallProgress || 0}%</span></div>
+            <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-white"><div className="h-full rounded-full bg-[#20BF3A] transition-all" style={{ width: `${journey?.overallProgress || 0}%` }} /></div>
+          </div>
+
           <div className="mt-8 overflow-x-auto pb-2">
             <div className="flex min-w-[760px] items-center">
-              {steps.map((step, index) => (
+              {journeySteps.map((step, index) => (
                 <Fragment key={step.id}>
                   <div className="flex shrink-0 flex-col items-center">
                     <div
@@ -182,10 +190,11 @@ export default function Page() {
                     <span className="mt-3 whitespace-nowrap text-[11px] font-bold text-[#667085]">
                       {step.label}
                     </span>
+                    <span className="mt-1 text-[10px] font-semibold text-[#174596]">{step.progress ?? 0}%</span>
                   </div>
 
-                  {index !== steps.length - 1 && (
-                    <div className="mb-7 h-[2px] flex-1 bg-[#174596]" />
+                  {index !== journeySteps.length - 1 && (
+                    <div className={`mb-7 h-[2px] flex-1 ${journeySteps[index + 1]?.type === "done" || journeySteps[index + 1]?.type === "car" ? "bg-[#174596]" : "bg-slate-300"}`} />
                   )}
                 </Fragment>
               ))}
@@ -201,49 +210,51 @@ export default function Page() {
 
           <div className="mt-5 rounded-[13px] bg-[#E8EEF7] p-4 sm:p-5">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {teachers.map((teacher) => (
+              {teachers.map((teacher) => {
+                const user = teacher.user || {};
+                const rating = Math.max(0, Math.min(5, Number(teacher.rating?.average || 0)));
+                return (
                 <article
-                  key={teacher.id}
+                  key={teacher._id}
                   className="rounded-[12px] bg-white p-4 text-center transition hover:-translate-y-1 hover:shadow-[0_12px_28px_rgba(23,69,150,0.13)]"
                 >
-                  <img
-                    src={teacher.image}
-                    alt={teacher.name}
-                    className="mx-auto h-[66px] w-[66px] rounded-full object-cover"
-                  />
+                  {user.avatar ? <img src={user.avatar} alt={user.name || "Teacher"} className="mx-auto h-[66px] w-[66px] rounded-full object-cover" /> : <div className="mx-auto flex h-[66px] w-[66px] items-center justify-center rounded-full bg-[#174596] text-2xl font-bold text-white">{(user.name || "T").charAt(0).toUpperCase()}</div>}
 
                   <h3 className="mt-4 text-[20px] font-bold leading-tight text-[#174596]">
-                    {teacher.name}
+                    {user.name || user.fullName || "Teacher"}
                   </h3>
 
                   <div className="mt-2 flex items-center justify-center gap-1.5 text-[13px] text-[#667085]">
                     <FaWhatsapp className="text-[15px] text-[#19C463]" />
-                    <span>{teacher.phone}</span>
+                    <span>{user.phone || "Phone not provided"}</span>
                   </div>
 
                   <div className="mt-4 rounded-[10px] bg-[#E8EEF7] px-3 py-3">
                     <p className="text-[12px] text-[#667085]">
                       Experience{" "}
                       <span className="font-bold text-[#171717]">
-                        {teacher.experience}
+                        {teacher.experienceYears || 0} Years+
                       </span>
                     </p>
 
                     <div className="mt-3 flex justify-center gap-3 text-[#174596]">
                       {[1, 2, 3, 4, 5].map((star) => (
-                        <FaStar key={star} className="text-[16px]" />
+                        <FaStar key={star} className={`text-[16px] ${star <= Math.round(rating) ? "text-[#174596]" : "text-slate-300"}`} />
                       ))}
                     </div>
                   </div>
 
                   <button
                     type="button"
+                    onClick={() => router.push(`/student/chat?userId=${user._id}`)}
                     className="mt-4 h-10 w-full rounded-[8px] border border-[#DF2339] text-[12px] font-bold text-[#174596] transition hover:bg-[#DF2339] hover:text-white"
                   >
                     Message
                   </button>
                 </article>
-              ))}
+              );})}
+              {!teachersLoading && !teachers.length && <div className="col-span-full rounded-xl bg-white p-8 text-center text-sm font-semibold text-slate-500">You have not added any favorite teacher yet.</div>}
+              {teachersLoading && <div className="col-span-full h-52 animate-pulse rounded-xl bg-white" />}
             </div>
           </div>
         </section>

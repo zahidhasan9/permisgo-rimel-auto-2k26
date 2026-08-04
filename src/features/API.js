@@ -29,6 +29,12 @@ export const changePassword = (data) =>
 // =======================
 export const getStudentDashboard = () => axios.get("/students/dashboard");
 export const getStudentProfile = () => axios.get("/students/profile");
+export const getMyFavoriteTeachers = () => axios.get("/students/favorite-teachers");
+export const getExamQuestions = () => axios.get("/exam-questions");
+export const getAdminExamQuestions = (params = {}) => axios.get("/exam-questions/admin", { params });
+export const createExamQuestion = (data) => axios.post("/exam-questions", data);
+export const updateExamQuestion = (id, data) => axios.patch(`/exam-questions/${id}`, data);
+export const deleteExamQuestion = (id) => axios.delete(`/exam-questions/${id}`);
 export const updateStudentProfile = (data) =>
   axios.patch("/students/profile", data);
 export const addFavoriteTeacher = (teacherId) =>
