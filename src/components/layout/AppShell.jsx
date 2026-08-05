@@ -12,6 +12,7 @@ import AdminSidebar from "@/components/layout/AdminSidebar";
 import DashboardTopbar from "@/components/layout/DashboardTopbar";
 import StudentSidebar from "@/components/layout/StudentSidebar";
 import TeacherSidebar from "@/components/layout/TeacherSidebar";
+import PresenceConnection from "@/components/chat/PresenceConnection";
 
 const authRoots = [
   "/login",
@@ -31,6 +32,7 @@ function DashboardShell({ children, role, Sidebar }) {
   return (
     <ProtectedRoute allowedRoles={[role]}>
       <div className="flex h-screen overflow-hidden bg-gray-100">
+        {role !== "admin" && <PresenceConnection />}
         <Sidebar variant="desktop" />
         <div className="flex min-w-0 flex-1 flex-col">
           <DashboardTopbar onMenuClick={() => setMobileOpen(true)} />
