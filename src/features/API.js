@@ -126,6 +126,7 @@ export const createPackage = (data) =>
 
 // Chat
 export const getChatContacts = () => axios.get("/chat/contacts");
+export const getChatIceConfig = () => axios.get("/chat/ice-config");
 export const getChatMessages = (userId, params = {}) =>
   axios.get(`/chat/messages/${userId}`, { params });
 export const uploadChatAttachment = (formData) =>

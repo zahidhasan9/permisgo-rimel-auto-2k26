@@ -20,6 +20,7 @@ import { HiOutlineDotsHorizontal } from "react-icons/hi";
 import { IoMdAttach } from "react-icons/io";
 import {
   getChatContacts,
+  getChatIceConfig,
   getChatMessages,
   uploadChatAttachment,
 } from "@/features/API";
@@ -112,7 +113,8 @@ export default function RealtimeChat() {
     activeCallRef = useRef(null),
     messagesEndRef = useRef(null),
     typingTimerRef = useRef(null),
-    pendingIceRef = useRef([]);
+    pendingIceRef = useRef([]),
+    iceServersRef = useRef(null);
   useEffect(() => {
     selectedRef.current = selectedId;
   }, [selectedId]);
@@ -230,23 +232,21 @@ export default function RealtimeChat() {
   const ensurePeer = useCallback(
     async (peerId, type) => {
       if (peerRef.current) return peerRef.current;
+      if (!iceServersRef.current) {
+        try {
+          const response = await getChatIceConfig();
+          iceServersRef.current = response.data?.data?.iceServers || null;
+        } catch {
+          iceServersRef.current = null;
+        }
+      }
       const configuration = {
-        iceServers: [
-          {
-            urls:
-              process.env.NEXT_PUBLIC_STUN_URL ||
-              "stun:stun.l.google.com:19302",
-          },
+        iceServers: iceServersRef.current || [
+          { urls: "stun:stun.l.google.com:19302" },
         ],
         bundlePolicy: "max-bundle",
         iceCandidatePoolSize: 10,
       };
-      if (process.env.NEXT_PUBLIC_TURN_URL)
-        configuration.iceServers.push({
-          urls: process.env.NEXT_PUBLIC_TURN_URL,
-          username: process.env.NEXT_PUBLIC_TURN_USERNAME,
-          credential: process.env.NEXT_PUBLIC_TURN_CREDENTIAL,
-        });
       const peer = new RTCPeerConnection(configuration);
       const stream = await ensureMedia(type);
       stream
@@ -293,11 +293,23 @@ export default function RealtimeChat() {
           );
           closePeer();
         }
+        if (peer.connectionState === "disconnected")
+          setCallStatus("Connection interrupted. Reconnecting...");
         if (peer.connectionState === "closed") closePeer();
       };
       peer.oniceconnectionstatechange = () => {
         if (["checking", "new"].includes(peer.iceConnectionState))
           setCallStatus("Connecting media...");
+        if (["connected", "completed"].includes(peer.iceConnectionState)) {
+          setCallStatus("Connected");
+          playRemoteMedia();
+        }
+        if (peer.iceConnectionState === "disconnected")
+          setCallStatus("Connection interrupted. Reconnecting...");
+      };
+      peer.onicecandidateerror = (event) => {
+        if (event.errorCode >= 700)
+          setError("TURN server could not be reached. Please check the TURN URL and credentials.");
       };
       peerRef.current = peer;
       return peer;
