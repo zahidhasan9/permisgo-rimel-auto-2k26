@@ -249,14 +249,7 @@ export default function RealtimeChat() {
       };
       const peer = new RTCPeerConnection(configuration);
       const stream = await ensureMedia(type);
-      stream
-        .getTracks()
-        .forEach((track) =>
-          peer.addTransceiver(track, {
-            direction: "sendrecv",
-            streams: [stream],
-          }),
-        );
+      stream.getTracks().forEach((track) => peer.addTrack(track, stream));
       const remoteStream = new MediaStream();
       remoteStreamRef.current = remoteStream;
       peer.onicecandidate = (event) => {
@@ -268,11 +261,18 @@ export default function RealtimeChat() {
       };
       peer.ontrack = (event) => {
         const track = event.track;
-        if (!remoteStream.getTracks().some((item) => item.id === track.id))
-          remoteStream.addTrack(track);
-        remoteStreamRef.current = remoteStream;
+        const incomingStream = event.streams?.[0];
+        const activeRemoteStream = incomingStream || remoteStream;
+        if (
+          !incomingStream &&
+          !activeRemoteStream.getTracks().some((item) => item.id === track.id)
+        )
+          activeRemoteStream.addTrack(track);
+        remoteStreamRef.current = activeRemoteStream;
         setRemoteTrackKinds((current) => new Set([...current, track.kind]));
-        const attachAndPlay = () => playRemoteMedia();
+        const attachAndPlay = () => {
+          requestAnimationFrame(() => playRemoteMedia());
+        };
         track.onunmute = attachAndPlay;
         track.onended = () =>
           setRemoteTrackKinds((current) => {
@@ -374,7 +374,10 @@ export default function RealtimeChat() {
         setActiveCall({ peerId: from, type });
         setCallStatus("Connecting...");
         const peer = await ensurePeer(from, type);
-        const offer = await peer.createOffer();
+        const offer = await peer.createOffer({
+          offerToReceiveAudio: true,
+          offerToReceiveVideo: type === "video",
+        });
         await peer.setLocalDescription(offer);
         socket.emit("webrtc:offer", { to: from, description: offer, type });
       } catch (err) {
