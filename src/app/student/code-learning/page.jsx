@@ -8,12 +8,10 @@ import {
   IoTimeOutline,
 } from "react-icons/io5";
 import {
-  getEbookCourses,
-  getEbookTopics,
+  getAllStudentEbookLessons,
   getMyExams,
   getMyQuizAttempts,
   getQuizzes,
-  getStudentEbookLessons,
 } from "@/features/API";
 
 const tabs = ["Learn", "Evaluations", "Exams"];
@@ -28,31 +26,6 @@ const progressValue = (lesson) =>
     ? 100
     : Number(lesson.progress?.readPercent || 0);
 
-const loadEbookLessons = async () => {
-  const courseResponse = await getEbookCourses();
-  const courses = array(courseResponse);
-  const courseGroups = await Promise.all(
-    courses.map(async (course) => {
-      const topicResponse = await getEbookTopics(course._id);
-      const topics = topicResponse.data?.data?.topics || [];
-      const lessonGroups = await Promise.all(
-        topics.map(async (topic) => {
-          const lessonResponse = await getStudentEbookLessons(course._id, topic._id);
-          return array(lessonResponse).map((lesson) => ({
-            ...lesson,
-            courseId: course._id,
-            courseTitle: course.title,
-            topicId: topic._id,
-            category: topic.title,
-          }));
-        }),
-      );
-      return lessonGroups.flat();
-    }),
-  );
-  return { data: { data: courseGroups.flat() } };
-};
-
 export default function CodeLearningPage() {
   const router = useRouter();
   const [tab, setTab] = useState("Learn");
@@ -63,20 +36,18 @@ export default function CodeLearningPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   useEffect(() => {
-    Promise.allSettled([
-      loadEbookLessons(),
-      getQuizzes(),
-      getMyQuizAttempts(),
-      getMyExams(),
-    ])
-      .then(([learning, quiz, attempt, exam]) => {
-        if (learning.status === "fulfilled") setLessons(array(learning.value));
-        else setError("Code eBook lessons could not be loaded.");
-        if (quiz.status === "fulfilled") setQuizzes(array(quiz.value));
-        if (attempt.status === "fulfilled") setAttempts(array(attempt.value));
-        if (exam.status === "fulfilled") setExams(array(exam.value));
-      })
-      .finally(() => setLoading(false));
+    let active = true;
+    getAllStudentEbookLessons()
+      .then((response) => { if (active) setLessons(array(response)); })
+      .catch(() => { if (active) setError("Code eBook lessons could not be loaded."); })
+      .finally(() => { if (active) setLoading(false); });
+    Promise.allSettled([getQuizzes(), getMyQuizAttempts(), getMyExams()]).then(([quiz, attempt, exam]) => {
+      if (!active) return;
+      if (quiz.status === "fulfilled") setQuizzes(array(quiz.value));
+      if (attempt.status === "fulfilled") setAttempts(array(attempt.value));
+      if (exam.status === "fulfilled") setExams(array(exam.value));
+    });
+    return () => { active = false; };
   }, []);
   useEffect(() => {
     const requested = new URLSearchParams(window.location.search).get("tab");

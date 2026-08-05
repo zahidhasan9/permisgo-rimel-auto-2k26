@@ -1592,30 +1592,29 @@ function TrainingCard({ icon, text, helper, onClick }) {
   );
 }
 
-function Avatar() {
+function Avatar({ src, name }) {
+  const initial = String(name || "I").trim().charAt(0).toUpperCase();
   return (
-    <div className="relative h-[38px] w-[38px] shrink-0 overflow-hidden rounded-full bg-[#F4B642]">
-      <div className="absolute left-1/2 top-[7px] h-[18px] w-[20px] -translate-x-1/2 rounded-full bg-[#8B4A25]" />
-      <div className="absolute left-1/2 top-[14px] h-[21px] w-[21px] -translate-x-1/2 rounded-full bg-[#D89C62]" />
-      <div className="absolute bottom-[-9px] left-1/2 h-[24px] w-[38px] -translate-x-1/2 rounded-t-full bg-[#111827]" />
+    <div className="flex h-[38px] w-[38px] shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#174A9B] text-sm font-bold text-white">
+      {src ? <img src={src} alt={name || "Instructor"} className="h-full w-full object-cover" /> : initial}
     </div>
   );
 }
 
-function MessageRow() {
+function MessageRow({ instructor, onClick }) {
   return (
-    <div className="flex h-[52px] items-center gap-[10px] rounded-[12px] bg-white px-[11px]">
-      <Avatar />
+    <button type="button" onClick={onClick} className="flex h-[52px] w-full items-center gap-[10px] rounded-[12px] bg-white px-[11px] text-left transition hover:shadow-sm">
+      <Avatar src={instructor.avatar} name={instructor.name} />
 
       <div className="min-w-0">
         <p className="truncate text-[12px] font-[700] leading-none text-black">
-          Michael Carter
+          {instructor.name}
         </p>
         <p className="mt-[6px] truncate text-[11px] font-[500] leading-none text-[#30323A]">
-          Message text here
+          Click to send a message
         </p>
       </div>
-    </div>
+    </button>
   );
 }
 
@@ -1644,6 +1643,7 @@ export default function Page() {
   const progressStatistics =
     studentDashboard?.progressStatistics || DEFAULT_PROGRESS;
   const practiceDriving = studentDashboard?.practiceDriving;
+  const bookedInstructors = studentDashboard?.bookedInstructors || [];
   const firstScheduleDate = studentDashboard?.upcomingSchedule?.[0]?.lessonDate;
   const studentName =
     user?.name || studentDashboard?.profile?.user?.name || "Robert";
@@ -1819,6 +1819,7 @@ export default function Page() {
 
                 <button
                   type="button"
+                  onClick={() => router.push("/student/chat")}
                   className="shrink-0 text-[12px] font-[700] leading-none text-[#174A9B] underline underline-offset-[2px]"
                 >
                   See All
@@ -1826,9 +1827,17 @@ export default function Page() {
               </div>
 
               <div className="mt-4 space-y-[12px]">
-                <MessageRow />
-                <MessageRow />
-                <MessageRow />
+                {bookedInstructors.length ? bookedInstructors.slice(0, 3).map((instructor) => (
+                  <MessageRow
+                    key={instructor._id}
+                    instructor={instructor}
+                    onClick={() => router.push(`/student/chat?userId=${instructor._id}`)}
+                  />
+                )) : (
+                  <div className="rounded-[12px] bg-white px-4 py-6 text-center text-[12px] font-semibold text-slate-500">
+                    No booked instructor yet.
+                  </div>
+                )}
               </div>
             </div>
           </section>

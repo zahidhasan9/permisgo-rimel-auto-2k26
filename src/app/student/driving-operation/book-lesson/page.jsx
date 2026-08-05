@@ -224,7 +224,15 @@ function BookingFlow() {
     setReviews([]);
     try {
       const response = await getTeacherReviews(teacher.user._id);
-      setReviews(unwrap(response, []));
+      const loadedReviews = unwrap(response, []);
+      setReviews(loadedReviews);
+      const average = loadedReviews.length
+        ? loadedReviews.reduce((total, review) => total + Number(review.rating || 0), 0) / loadedReviews.length
+        : 0;
+      setSelectedTeacher((current) => ({
+        ...current,
+        rating: { average, totalReviews: loadedReviews.length },
+      }));
     } catch {
       setReviews([]);
     }

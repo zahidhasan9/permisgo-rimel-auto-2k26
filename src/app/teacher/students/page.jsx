@@ -21,6 +21,27 @@ const filterFields = [
   { label: "Phone", name: "phone", placeholder: "Search phone", icon: FaPhoneAlt },
 ];
 const INITIAL_META = { page: 1, limit: 10, total: 0, totalPages: 1 };
+const formatDate = (value) =>
+  value
+    ? new Date(value).toLocaleDateString("en-US", {
+        weekday: "short",
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      })
+    : "—";
+const formatTime = (value) => {
+  const match = String(value || "").match(/^(\d{1,2}):(\d{2})/);
+  if (!match) return "";
+  const hour = Number(match[1]);
+  const minute = match[2];
+  return `${String(hour % 12 || 12).padStart(2, "0")}:${minute} ${hour >= 12 ? "PM" : "AM"}`;
+};
+const formatDuration = (startTime, endTime) => {
+  const start = formatTime(startTime);
+  const end = formatTime(endTime);
+  return start && end ? `${start} - ${end}` : "—";
+};
 
 export default function Students() {
   const [filters, setFilters] = useState({ name: "", email: "", phone: "" });
@@ -132,21 +153,19 @@ export default function Students() {
 
         <div className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-100">
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[880px] text-left">
+            <table className="w-full min-w-[720px] text-left">
               <thead>
                 <tr className="bg-[#16458f] text-white">
-                  <TableHead>Student</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Phone</TableHead>
-                  <TableHead>Course</TableHead>
-                  <TableHead>Progress</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead>Student name</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Duration</TableHead>
+                  <TableHead>Vehicle type</TableHead>
                   <TableHead>Action</TableHead>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {loading ? (
-                  <tr><td colSpan={7} className="px-4 py-10 text-center text-sm text-slate-500">Loading students...</td></tr>
+                  <tr><td colSpan={5} className="px-4 py-10 text-center text-sm text-slate-500">Loading students...</td></tr>
                 ) : students.length ? (
                   students.map((student) => (
                     <tr
@@ -170,24 +189,21 @@ export default function Students() {
                           <span className="font-bold text-slate-800">{student.name}</span>
                         </div>
                       </TableData>
-                      <TableData>{student.email || "—"}</TableData>
-                      <TableData>{student.phone || "—"}</TableData>
-                      <TableData><span className="capitalize">{student.course}</span></TableData>
+                      <TableData>{formatDate(student.bookingDate)}</TableData>
+                      <TableData>{formatDuration(student.startTime, student.endTime)}</TableData>
                       <TableData>
-                        <div className="flex min-w-[135px] items-center gap-3">
-                          <div className="h-2 w-24 overflow-hidden rounded-full bg-slate-200">
-                            <div className="h-full rounded-full bg-[#16458f]" style={{ width: `${student.progress}%` }} />
-                          </div>
-                          <span className="text-xs font-black text-[#16458f]">{student.progress}%</span>
-                        </div>
+                        <span className="capitalize">
+                          {student.vehicleType
+                            ? `${student.vehicleType} transmission`
+                            : "—"}
+                        </span>
                       </TableData>
-                      <TableData><StatusBadge status={student.status} /></TableData>
                       <TableData><button type="button" onClick={(event) => { event.stopPropagation(); router.push(`/teacher/students/${student._id}/booklet`); }} className="rounded-lg bg-[#e2233d] px-3 py-2 text-xs font-bold text-white">Set Booklet</button></TableData>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={7} className="px-4 py-10 text-center">
+                    <td colSpan={5} className="px-4 py-10 text-center">
                       <h3 className="text-base font-bold text-slate-800">No students found</h3>
                       <p className="mt-1 text-sm text-slate-500">Try changing your search filters.</p>
                     </td>
@@ -216,15 +232,4 @@ function TableHead({ children }) {
 }
 function TableData({ children }) {
   return <td className="whitespace-nowrap px-4 py-3 text-sm font-medium text-slate-600">{children}</td>;
-}
-function StatusBadge({ status }) {
-  const color =
-    status === "active"
-      ? "bg-emerald-50 text-emerald-700 ring-emerald-100"
-      : status === "completed"
-        ? "bg-blue-50 text-[#16458f] ring-blue-100"
-        : status === "pending"
-          ? "bg-amber-50 text-amber-700 ring-amber-100"
-          : "bg-slate-100 text-slate-600 ring-slate-200";
-  return <span className={`inline-flex rounded-full px-3 py-1 text-xs font-bold capitalize ring-1 ${color}`}>{status}</span>;
 }

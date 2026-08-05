@@ -17,6 +17,7 @@ const categories = [
 ];
 
 const skillGroups = BOOKLET_GROUPS;
+const STATUS_SCORE = { not_acquired: 0, to_work: 50, acquired: 100 };
 
 const formatDate = (value) => {
   const date = new Date(value);
@@ -31,12 +32,20 @@ const formatDate = (value) => {
   }).format(date);
 };
 
+const formatDuration = (minutesValue) => {
+  const minutes = Number(minutesValue || 0);
+  if (minutes < 60) return `${minutes} ${minutes === 1 ? "minute" : "minutes"}`;
+  const hours = minutes / 60;
+  const displayHours = Number.isInteger(hours) ? hours : Number(hours.toFixed(1));
+  return `${displayHours} ${displayHours === 1 ? "hour" : "hours"}`;
+};
+
 export default function LearningBookletPage() {
   const router = useRouter();
   const [lessons, setLessons] = useState([]);
   const [profile, setProfile] = useState(null);
   const [skillAssessments, setSkillAssessments] = useState([]);
-  const [showReports, setShowReports] = useState(false);
+  const [showReports, setShowReports] = useState(true);
   const [openSkillGroup, setOpenSkillGroup] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -85,7 +94,7 @@ export default function LearningBookletPage() {
       return [...standard, ...extras];
     });
   }, [skillAssessments]);
-  const categoryPercentages = useMemo(() => groupedSkills.map((skills) => skills.length ? Math.round((skills.filter((skill) => skillStatus[skill] === "acquired").length / skills.length) * 100) : 0), [groupedSkills, skillStatus]);
+  const categoryPercentages = useMemo(() => groupedSkills.map((skills) => skills.length ? Math.round(skills.reduce((total, skill) => total + (STATUS_SCORE[skillStatus[skill]] || 0), 0) / skills.length) : 0), [groupedSkills, skillStatus]);
 
   return (
     <main className="min-h-screen bg-white px-3 py-6 sm:px-6">
@@ -105,11 +114,23 @@ export default function LearningBookletPage() {
         <h2 className="text-xl font-bold text-[#174a9b]">Tracking Sheet</h2>
         {loading ? <div className="mt-5 h-44 animate-pulse rounded-xl bg-white" /> : latest ? (
           <div className="mt-5 rounded-xl bg-white p-5">
-            <div className="grid gap-3 text-sm text-slate-600"><Row label="Date" value={`${formatDate(latest.lessonDate)} · ${latest.duration || 0} minutes`} /><Row label="Location" value={getLessonLocation(latest)} /><Row label="Teacher" value={latest.teacher?.name || "Instructor"} /><Row label="Lesson summary" value={latest.lessonProgress?.teacherNotes || "No teacher report submitted yet."} /></div>
-            <button type="button" onClick={() => setShowReports(!showReports)} className="mt-5 flex w-full items-center justify-between rounded-xl bg-[#e8eef7] px-5 py-4 font-semibold text-[#174a9b]">Previous reports <FaCaretDown className={`transition ${showReports ? "rotate-180" : ""}`} /></button>
-            {showReports && <div className="mt-3 space-y-3">{completed.slice(1).map((lesson) => <div key={lesson._id} className="rounded-lg border border-slate-200 p-4 text-sm"><b>{formatDate(lesson.lessonDate)}</b><p className="mt-2 text-slate-500">{lesson.lessonProgress?.teacherNotes || `${lesson.duration || 0}-minute driving lesson`}</p></div>)}{completed.length <= 1 && <p className="p-4 text-center text-sm text-slate-500">No previous completed report.</p>}</div>}
+            <div className="grid gap-3 text-sm text-slate-600"><Row label="Date" value={`${formatDate(latest.lessonDate)} · ${formatDuration(latest.duration)}`} /><Row label="Location" value={getLessonLocation(latest)} /><Row label="Teacher" value={latest.teacher?.name || "Instructor"} /><Row label="Lesson summary" value={latest.lessonProgress?.teacherNotes || "No teacher report submitted yet."} /></div>
           </div>
         ) : <div className="mt-5 rounded-xl bg-white p-8 text-center text-sm text-slate-500">No lesson has been booked yet.</div>}
+      </section>
+
+      <section className="mt-5 rounded-[12px] bg-[#E5ECF7] px-[20px] pb-[20px] pt-[18px]">
+        <button type="button" onClick={() => setShowReports((current) => !current)} className="flex w-full items-center justify-between text-left text-[17px] font-[500] leading-[22px] text-[#174A9B]">
+          Previous reports
+          <FaCaretDown className={`text-[17px] text-[#222] transition-transform ${showReports ? "rotate-180" : ""}`} />
+        </button>
+
+        {showReports && (
+          <div className="mt-[10px] space-y-[15px]">
+            {completed.map((lesson) => <ReportCard key={lesson._id} lesson={lesson} />)}
+            {completed.length === 0 && <div className="rounded-[12px] bg-white px-5 py-8 text-center text-sm text-slate-500">No completed report.</div>}
+          </div>
+        )}
       </section>
 
       <section className="mt-5 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
@@ -142,4 +163,21 @@ export default function LearningBookletPage() {
 
 function Row({ label, value }) {
   return <div className="flex flex-wrap gap-2"><b className="min-w-[120px] text-slate-900">{label}:</b><span>{value}</span></div>;
+}
+
+function ReportCard({ lesson }) {
+  const durationLabel = formatDuration(lesson.duration);
+
+  return (
+    <article className="min-h-[164px] rounded-[12px] bg-white px-[20px] py-[19px] text-[14px] leading-[20px] text-[#66666D]">
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+        <strong className="text-[#171717]">Date:</strong>
+        <span>{formatDate(lesson.lessonDate)}</span>
+        <span className="rounded-[4px] bg-[#EEF2F8] px-[6px] py-[2px] text-[#174A9B]">{durationLabel}</span>
+      </div>
+      <p className="mt-[14px]"><strong className="text-[#171717]">Location:</strong> {getLessonLocation(lesson)}</p>
+      <p className="mt-[14px]"><strong className="text-[#171717]">Teacher:</strong> {lesson.teacher?.name || "Instructor"}</p>
+      <p className="mt-[14px]"><strong className="text-[#171717]">Lesson summary:</strong> {lesson.lessonProgress?.teacherNotes || "No teacher report submitted yet."}</p>
+    </article>
+  );
 }

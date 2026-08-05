@@ -62,6 +62,12 @@ const menu = [
   },
 
   {
+    name: "Code de la",
+    href: "/student/code",
+    icon: RiSteering2Fill,
+  },
+
+  {
     name: "Driving Operation",
     icon: FaCar,
     children: [
@@ -81,18 +87,13 @@ const menu = [
         name: "Instructors",
         href: "/student/driving-operation/instructors",
       },
-      // {
-      //   name: "Book Teacher",
-      //   href: "/student/driving-operation/book-lesson",
-      // },
+      {
+        name: "Location",
+        href: "/student/driving-operation/book-lesson",
+      },
     ],
   },
 
-  {
-    name: "Code de la",
-    href: "/student/code",
-    icon: RiSteering2Fill,
-  },
   {
     name: "Offers",
     href: "/student/offers",

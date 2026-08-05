@@ -2,11 +2,13 @@
 
 import { IoCall, IoChevronBack } from "react-icons/io5";
 import { RiMessage2Fill } from "react-icons/ri";
+import { useRouter } from "next/navigation";
 
 function BackHeader() {
+  const router = useRouter();
   return (
     <header className="flex items-center gap-[16px]">
-      <button className="flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-[12px] bg-[#EEF4FB] text-[27px] text-black">
+      <button type="button" onClick={() => router.back()} className="flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-[12px] bg-[#EEF4FB] text-[27px] text-black">
         <IoChevronBack />
       </button>
 
@@ -49,7 +51,7 @@ export default function Page() {
   return (
     <>
       <main className="dashboard-poppins min-h-screen bg-white">
-        <div className="mx-auto w-full max-w-[1132px] px-[24px] pt-[24px]">
+        <div className="mx-auto w-full  px-[24px] pt-[24px]">
           <BackHeader />
 
           <section className="mt-[32px] grid grid-cols-1 gap-[24px] md:grid-cols-2">

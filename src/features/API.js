@@ -32,6 +32,7 @@ export const getStudentProfile = () => axios.get("/students/profile");
 export const getMyFavoriteTeachers = () => axios.get("/students/favorite-teachers");
 export const getExamQuestions = () => axios.get("/exam-questions");
 export const getAdminExamQuestions = (params = {}) => axios.get("/exam-questions/admin", { params });
+export const getAdminExamQuestionById = (id) => axios.get(`/exam-questions/admin/${id}`);
 export const createExamQuestion = (data) => axios.post("/exam-questions", data);
 export const updateExamQuestion = (id, data) => axios.patch(`/exam-questions/${id}`, data);
 export const deleteExamQuestion = (id) => axios.delete(`/exam-questions/${id}`);
@@ -53,6 +54,7 @@ export const getBookedInstructorProfile = (teacherId) =>
 export const getTeacherDashboard = () => axios.get("/teachers/dashboard");
 export const getTeacherStudents = (params = {}) =>
   axios.get("/teachers/students", { params });
+export const getTeacherExams = () => axios.get("/teachers/exams");
 export const getTeacherStudent = (studentId, params = {}) =>
   axios.get(`/teachers/students/${studentId}`, { params });
 export const getTeacherProfile = () => axios.get("/teachers/profile");
@@ -89,6 +91,12 @@ export const updateUserRole = (id, role) => {
   return axios.patch(`/admin/users/${id}/role`, { role });
 };
 
+export const getAdminDrivingSettings = () =>
+  axios.get("/admin/settings/driving");
+
+export const updateAdminDrivingSettings = (requiredHours, requiredSkillsPercentage) =>
+  axios.patch("/admin/settings/driving", { requiredHours, requiredSkillsPercentage });
+
 export const deleteAdminUser = (id) => {
   return axios.delete(`/admin/users/${id}`);
 };
@@ -120,6 +128,12 @@ export const createPackage = (data) =>
 export const getChatContacts = () => axios.get("/chat/contacts");
 export const getChatMessages = (userId, params = {}) =>
   axios.get(`/chat/messages/${userId}`, { params });
+export const uploadChatAttachment = (formData) =>
+  axios.post("/chat/attachments", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 
 // =======================
 // Bookings
@@ -180,6 +194,9 @@ export const confirmLessonCompletion = (id) =>
 
 export const submitLessonFeedback = (id, data) =>
   axios.patch(`/lessons/${id}/feedback`, data);
+
+export const getLatestLessonForFeedback = () =>
+  axios.get("/lessons/latest-feedback");
 
 export const requestLessonReschedule = (id, data) =>
   axios.post(`/lessons/${id}/reschedule-request`, data);
@@ -494,6 +511,7 @@ export const updateEbookLesson = (id, data) => axios.patch(`/learning/admin/eboo
 export const deleteEbookLesson = (id) => axios.delete(`/learning/admin/ebook/lessons/${id}`);
 export const permanentlyDeleteEbookLesson = (id) => axios.delete(`/learning/admin/ebook/lessons/${id}/permanent`);
 export const getStudentEbookLessons = (courseId, topicId) => axios.get(`/learning/ebook/courses/${courseId}/topics/${topicId}/lessons`);
+export const getAllStudentEbookLessons = () => axios.get("/learning/ebook/lessons");
 export const getStudentEbookLesson = (id) => axios.get(`/learning/ebook/lessons/${id}`);
 export const updateStudentEbookLessonProgress = (id, data) => axios.patch(`/learning/ebook/lessons/${id}/progress`, data);
 

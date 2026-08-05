@@ -1,0 +1,6 @@
+"use client";
+import { use, useEffect, useState } from "react";
+import Link from "next/link";
+import { getAdminExamQuestionById } from "@/features/API";
+import ExamQuestionForm from "../../_components/ExamQuestionForm";
+export default function EditExamQuestionPage({ params }) { const { id } = use(params); const [question, setQuestion] = useState(null); const [error, setError] = useState(""); useEffect(() => { getAdminExamQuestionById(id).then(({ data }) => setQuestion(data?.data || null)).catch((requestError) => setError(requestError.response?.data?.message || "Question could not be loaded.")); }, [id]); return <main className="min-h-screen bg-[#f5f7fb] p-4 sm:p-6"><div className="mx-auto max-w-7xl"><div className="mb-6 flex items-center gap-3"><Link href="/admin/exam-questions" className="rounded-lg bg-white px-4 py-2 font-bold text-[#173f87] shadow-sm">← Back</Link><div><h1 className="text-2xl font-bold text-[#173f87]">Edit Exam Question</h1><p className="text-sm text-slate-500">Update question information and media.</p></div></div>{error ? <div className="rounded-xl bg-red-50 p-4 text-red-700">{error}</div> : question ? <ExamQuestionForm question={question} /> : <div className="h-80 animate-pulse rounded-2xl bg-white" />}</div></main>; }

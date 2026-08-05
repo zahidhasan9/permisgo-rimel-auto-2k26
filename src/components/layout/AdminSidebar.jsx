@@ -99,6 +99,10 @@ const menu = [
         name: "Live Replays",
         href: "/admin/live-replays",
       },
+      {
+        name: "E-learning Videos",
+        href: "/admin/e-learning-videos",
+      },
     ],
   },
   {

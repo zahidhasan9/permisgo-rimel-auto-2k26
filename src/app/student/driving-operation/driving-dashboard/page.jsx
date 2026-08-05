@@ -72,7 +72,7 @@ const learningItems = [
     id: 5,
     title: "My Mock exam",
     image: "/image/mock-exam.png",
-    link: "#",
+    link: "/student/code-learning",
   },
 ];
 
@@ -162,12 +162,7 @@ export default function Page() {
             </div>
           </div>
 
-          <div className="mt-5">
-            <div className="flex items-center justify-between text-xs font-bold text-[#174596]"><span>Overall progress</span><span>{journey?.overallProgress || 0}%</span></div>
-            <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-white"><div className="h-full rounded-full bg-[#20BF3A] transition-all" style={{ width: `${journey?.overallProgress || 0}%` }} /></div>
-          </div>
-
-          <div className="mt-8 overflow-x-auto pb-2">
+          <div className="mt-6 overflow-x-auto pb-2">
             <div className="flex min-w-[760px] items-center">
               {journeySteps.map((step, index) => (
                 <Fragment key={step.id}>

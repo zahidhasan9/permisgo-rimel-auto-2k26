@@ -4,9 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import {
   confirmAttendance,
-  confirmLocationBooking,
   getTeacherDashboard,
-  rejectLocationBooking,
   startLesson,
 } from "@/features/API";
 import {
@@ -50,7 +48,7 @@ export default function Dashboard() {
   const profile = dashboard?.profile || {};
   const stats = dashboard?.stats || {};
   const todayLessons = dashboard?.todayLessons || [];
-  const pendingBookings = dashboard?.pendingBookings || [];
+  const lessonsInProgress = dashboard?.lessonsInProgress || [];
   const readiness = dashboard?.readiness || { items: {}, percentage: 0 };
   const steps = STEP_CONFIG.map(([key, text, href], index) => ({
     key,
@@ -59,30 +57,6 @@ export default function Dashboard() {
     step: `Step ${String(index + 1).padStart(2, "0")}`,
     done: Boolean(readiness.items?.[key]),
   }));
-  const actionLessons = todayLessons.filter((lesson) =>
-    ["in_progress", "awaiting_confirmation"].includes(lesson.status),
-  );
-
-  const bookingAction = async (booking, approve) => {
-    setBusyId(booking._id);
-    setNotice("");
-    try {
-      if (approve) {
-        await confirmLocationBooking(booking._id);
-        setNotice("Booking accepted and lesson scheduled.");
-      } else {
-        const reason = window.prompt("Reason for rejecting this booking:");
-        if (!reason?.trim()) return;
-        await rejectLocationBooking(booking._id, { reason: reason.trim() });
-        setNotice("Booking request rejected.");
-      }
-      await loadDashboard();
-    } catch (error) {
-      setNotice(getErrorMessage(error, "Booking action failed."));
-    } finally {
-      setBusyId("");
-    }
-  };
 
   const lessonAction = async (lesson) => {
     setBusyId(lesson._id);
@@ -90,7 +64,7 @@ export default function Dashboard() {
     try {
       if (lesson.status === "scheduled") {
         await startLesson(lesson._id);
-        setNotice("Lesson started.");
+        setNotice("Lesson completed and attendance recorded.");
       } else if (
         lesson.status === "in_progress" &&
         lesson.attendance?.teacherStatus !== "present"
@@ -240,28 +214,19 @@ export default function Dashboard() {
 
         <section className="min-w-0 rounded-xl bg-slate-100 p-3 sm:p-4">
           <h4 className="mb-3 text-lg font-extrabold text-blue-900">
-            Action Required
+            Lesson In Progress
           </h4>
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2 2xl:grid-cols-1">
-            {pendingBookings.slice(0, 2).map((booking) => (
-              <RequestCard
-                key={booking._id}
-                booking={booking}
-                busy={busyId === booking._id}
-                onAccept={() => bookingAction(booking, true)}
-                onReject={() => bookingAction(booking, false)}
-              />
+            {lessonsInProgress.slice(0, 2).map((lesson, index) => (
+              <ProgressLessonCard key={lesson._id} lesson={lesson} number={index + 1} />
             ))}
-            {actionLessons.slice(0, 2).map((lesson, index) => (
-              <LessonCard key={lesson._id} lesson={lesson} number={index + 1} />
-            ))}
-            {!pendingBookings.length && !actionLessons.length && (
+            {!lessonsInProgress.length && (
               <div className="rounded-xl bg-white p-5 text-center text-xs text-slate-500 shadow-sm">
-                No action is required right now.
+                No booked students found.
               </div>
             )}
           </div>
-          <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
+          <div className="hidden">
             <StatChip label="Upcoming" value={stats.upcomingLessons || 0} />
             <StatChip label="Students" value={stats.activeStudents || 0} />
             <StatChip label="Completed" value={stats.completedLessons || 0} />
@@ -368,25 +333,35 @@ function RequestCard({ booking, busy, onAccept, onReject }) {
   );
 }
 
-function LessonCard({ lesson, number }) {
+function ProgressLessonCard({ lesson, number }) {
+  const progress = Math.max(
+    0,
+    Math.min(Number(lesson.bookletProgress || 0), 100),
+  );
   return (
     <Link
-      href={`/teacher/lessons?lessonId=${lesson._id}`}
-      className="block rounded-xl bg-white p-3 shadow-sm"
+      href={`/teacher/students/${lesson.student?._id}/booklet`}
+      className="block rounded-xl bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
     >
       <h6 className="text-sm font-extrabold leading-5 text-slate-900">
         <span>{String(number).padStart(2, "0")}.</span>{" "}
-        {lesson.student?.name || "Student"}
+        {lesson.title || "Driving lesson"}
       </h6>
       <p className="mt-1.5 text-xs leading-5 text-slate-500">
-        {lesson.startTime}–{lesson.endTime} · {statusLabel(lesson.status)}
+        {lesson.student?.name || "Student"} · Focused training based on booklet skills.
       </p>
       <strong className="mt-2 block text-xs font-bold text-blue-900">
-        Open lesson workspace
+        Duration: {lesson.startTime}–{lesson.endTime}
       </strong>
       <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-slate-200">
-        <div className="h-full w-2/3 rounded-full bg-blue-900" />
+        <div
+          className="h-full rounded-full bg-blue-900 transition-all"
+          style={{ width: `${progress}%` }}
+        />
       </div>
+      <p className="mt-1.5 text-xs font-bold text-green-500">
+        {progress}% Progress
+      </p>
     </Link>
   );
 }

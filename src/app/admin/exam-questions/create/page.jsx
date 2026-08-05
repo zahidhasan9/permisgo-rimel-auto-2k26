@@ -1,0 +1,3 @@
+import Link from "next/link";
+import ExamQuestionForm from "../_components/ExamQuestionForm";
+export default function CreateExamQuestionPage() { return <main className="min-h-screen bg-[#f5f7fb] p-4 sm:p-6"><div className="mx-auto max-w-7xl"><div className="mb-6 flex items-center gap-3"><Link href="/admin/exam-questions" className="rounded-lg bg-white px-4 py-2 font-bold text-[#173f87] shadow-sm">← Back</Link><div><h1 className="text-2xl font-bold text-[#173f87]">Create Exam Question</h1><p className="text-sm text-slate-500">Add question content and choose one media type.</p></div></div><ExamQuestionForm /></div></main>; }

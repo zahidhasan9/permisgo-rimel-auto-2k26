@@ -12,6 +12,7 @@ const GROUPS = [
   { code: "C4", title: "Practice", heading: "Practice autonomous, safe and economical driving", color: "#90dda9", border: "#48b873", skills: ["Follow a route independently.", "Prepare and make a safe journey.", "Know the main risk factors while driving.", "Understand vehicle maintenance and safety checks.", "Drive economically and reduce environmental impact.", "Apply safe driving behaviour in unfamiliar areas.", "Share the road responsibly with vulnerable users.", "Assess personal limitations and driving fitness.", "Plan continuous improvement after each lesson."] },
 ];
 const STATUSES = [{ key: "not_acquired", label: "Not acquired" }, { key: "to_work", label: "To work" }, { key: "acquired", label: "Acquired" }];
+const STATUS_SCORE = { not_acquired: 0, to_work: 50, acquired: 100 };
 const unwrap = (response, fallback = null) => response?.data?.data ?? response?.data ?? fallback;
 
 export default function EvaluateStudentPage() {
@@ -26,7 +27,7 @@ export default function EvaluateStudentPage() {
   const [error, setError] = useState("");
 
   useEffect(() => { getTeacherStudentBooklet(id).then((response) => { const data = unwrap(response, {}); const values = Object.fromEntries((data.assessments || []).map((item) => [item.skill, item.status])); setStudent(data.student); setSaved(values); setMarks(values); }).catch((requestError) => setError(requestError.response?.data?.message || "Booklet could not be loaded.")); }, [id]);
-  const percentages = useMemo(() => GROUPS.map((group) => group.skills.length ? Math.round((group.skills.filter((skill) => marks[skill] === "acquired").length / group.skills.length) * 100) : 0), [marks]);
+  const percentages = useMemo(() => GROUPS.map((group) => group.skills.length ? Math.round(group.skills.reduce((total, skill) => total + (STATUS_SCORE[marks[skill]] || 0), 0) / group.skills.length) : 0), [marks]);
   const group = GROUPS[active];
 
   const submit = async () => {

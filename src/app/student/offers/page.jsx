@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import useOffers, { CATEGORY_BY_TAB, filterOffers } from "@/hooks/useOffers";
 import {
   FaCheckCircle,
   FaLocationArrow,
+  FaMapMarkedAlt,
   FaMapMarkerAlt,
   FaSearch,
 } from "react-icons/fa";
@@ -519,6 +521,41 @@ function MapTab() {
   );
 }
 
+function MapPromoTab({ transmission, onViewMap }) {
+  return (
+    <section className="mt-[28px] min-h-[558px] rounded-[10px] bg-[#E8EEF8] px-[24px] pb-[24px] pt-[22px] sm:px-[28px]">
+      <div className="flex items-center justify-between gap-5 max-sm:flex-col max-sm:items-start">
+        <h2 className="text-[21px] font-[700] leading-none text-[#174A9B]">
+          Permisgo&apos;s Highway Code Packs
+        </h2>
+        <TransmissionToggle
+          transmission={transmission.value}
+          setTransmission={transmission.set}
+        />
+      </div>
+
+      <div className="mt-[28px] flex min-h-[376px] items-center justify-center rounded-[11px] bg-white px-5 py-12">
+        <div className="flex flex-col items-center text-center">
+          <FaMapMarkedAlt className="text-[70px] text-[#174A9B]" />
+          <h3 className="mt-[20px] text-[20px] font-[700] leading-none text-[#174A9B]">
+            Find Us in Your Area
+          </h3>
+          <p className="mt-[14px] text-[13px] font-[500] leading-[19px] text-[#777777]">
+            Visit one of our 854 meeting points or 73 local agencies near you.
+          </p>
+          <button
+            type="button"
+            onClick={onViewMap}
+            className="mt-[28px] h-[48px] rounded-[11px] bg-[#E5273D] px-[25px] text-[15px] font-[700] text-white transition hover:bg-[#cc1f34]"
+          >
+            View the map
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function EmptyTab({ title }) {
   return (
     <section className="mt-[28px] rounded-[10px] bg-[#E8EEF8] px-[24px] py-[60px] text-center">
@@ -531,6 +568,7 @@ function EmptyTab({ title }) {
 }
 
 export default function Page() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState("Code");
   const [transmission, setTransmission] = useState("manual");
   const { cards, loading, error } = useOffers();
@@ -540,7 +578,7 @@ export default function Page() {
   return (
     <>
       <main className="dashboard-poppins min-h-screen bg-white">
-        <div className="mx-auto w-full max-w-[1132px] px-[24px] pb-[28px] pt-[24px]">
+        <div className="mx-auto w-full  px-[24px] pb-[28px] pt-[24px]">
           <Header />
 
           <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
@@ -549,7 +587,12 @@ export default function Page() {
           {activeTab === "To Drive" && <ToDriveTab offers={visibleOffers} transmission={transmissionProps} />}
           {activeTab === "CPF" && <CpfTab offers={visibleOffers} transmission={transmissionProps} />}
           {activeTab === "Accompanied" && <AccompanieTab offers={visibleOffers} transmission={transmissionProps} />}
-          {activeTab === "Map" && <MapTab />}
+          {activeTab === "Map" && (
+            <MapPromoTab
+              transmission={transmissionProps}
+              onViewMap={() => router.push("/student/driving-operation/book-lesson")}
+            />
+          )}
 
           {/* {activeTab === "Accompanied" && (
             <EmptyTab title="Accompanied Offers" />

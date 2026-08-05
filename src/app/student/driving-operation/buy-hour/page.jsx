@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useState } from "react";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
+import { useRouter } from "next/navigation";
+
 
 const offers = [
   {
@@ -44,19 +46,20 @@ const offers = [
 
 export default function Page() {
   const [activeTab, setActiveTab] = useState("manual");
-
+const router = useRouter();
   return (
     <main className="min-h-screen bg-white px-4 py-5 font-sans text-[#171717] sm:px-6 lg:px-8">
-      <div className="mx-auto w-full max-w-[1100px]">
+      <div className="mx-auto w-full ">
         {/* Header */}
         <header className="flex items-center gap-3 sm:gap-4">
-          <Link
-            href="#"
+          <button
+            type="button"
+            onClick={() => router.back()}
             aria-label="Go back"
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[11px] bg-[#E8EEF7] text-[23px] text-black transition hover:bg-[#dfe7f2] sm:h-11 sm:w-11"
           >
             <IoChevronBack />
-          </Link>
+          </button>
 
           <h1 className="text-[22px] font-bold leading-none text-[#173F8F] sm:text-[24px]">
             Our offers
