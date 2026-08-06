@@ -14,114 +14,6 @@ import { IoChevronBack } from "react-icons/io5";
 
 const tabs = ["Code", "To Drive", "CPF", "Accompanied", "Map"];
 
-const codePackages = [
-  {
-    title: "Traffic Laws",
-    description:
-      "An economical and comprehensive solution to effectively prepare you for the Highway Code, 100% online.",
-    sale: "30 USD",
-    retail: "20 USD",
-    active: false,
-  },
-  {
-    title: "Accelerated Code Pack",
-    description:
-      "A comprehensive and intensive training program to quickly pass your driving theory test!",
-    sale: "30 USD",
-    retail: "20 USD",
-    active: true,
-  },
-  {
-    title: "Fast Track Package + Sworn Translator",
-    description:
-      "A complete and suitable package for non-French-speaking candidates, with support in Bengali by a translator",
-    sale: "30 USD",
-    retail: "500 USD",
-    active: false,
-  },
-];
-
-const drivePackages = [
-  {
-    title: "Pack for License B",
-    subtitle: "Theory Test + 1 Hour of driving",
-    sale: "200 USD",
-    retail: "500 USD",
-    active: false,
-  },
-  {
-    title: "Pack for License B",
-    subtitle: "Theory Test + 1 Hour of driving",
-    sale: "200 USD",
-    retail: "500 USD",
-    active: true,
-  },
-  {
-    title: "Pack for License B",
-    subtitle: "Theory Test + 1 Hour of driving",
-    sale: "200 USD",
-    retail: "500 USD",
-    active: false,
-  },
-];
-
-const cpfPackages = [
-  {
-    title: "Permis B Boîte Manuelle",
-    subtitle: "Theory Test + 1 Hour of driving",
-    sale: "300 USD",
-    retail: "500 USD",
-    active: false,
-  },
-  {
-    title: "Permis B Boîte Manuelle",
-    subtitle: "Theory Test + 1 Hour of driving",
-    sale: "300 USD",
-    retail: "500 USD",
-    active: true,
-  },
-  {
-    title: "Permis B Boîte Manuelle",
-    subtitle: "Theory Test + 1 Hour of driving",
-    sale: "300 USD",
-    retail: "500 USD",
-    active: false,
-  },
-];
-
-const Accompanied = [
-  {
-    title: "Accompanied Driving",
-    description: "Code + Driving Lesson.",
-    sale: "200 USD",
-    retail: "500 USD",
-    active: false,
-  },
-  {
-    title: "Accelerated Code Pack",
-    description:
-      "A comprehensive and intensive training program to quickly pass your driving theory test!",
-    sale: "30 USD",
-    retail: "20 USD",
-    active: true,
-  },
-  {
-    title: "Fast Track Package + Sworn Translator",
-    description:
-      "A complete and suitable package for non-French-speaking candidates, with support in Bengali by a translator",
-    sale: "30 USD",
-    retail: "500 USD",
-    active: false,
-  },
-];
-
-const packageContents = [
-  "Duel- control training cars",
-  "Duel- control training cars trainin",
-  "Duel- control training cars",
-  "Duel- control training cars",
-];
-
 function Header() {
   return (
     <header className="flex items-center gap-[16px]">
@@ -165,11 +57,17 @@ function Tabs({ activeTab, setActiveTab }) {
 function TransmissionToggle({ transmission, setTransmission }) {
   return (
     <div className="flex h-[39px] w-full max-w-[384px] overflow-hidden rounded-full bg-white">
-      <button onClick={() => setTransmission("manual")} className={`h-full w-[181px] rounded-full text-[14px] font-[500] ${transmission === "manual" ? "bg-[#174A9B] text-white" : "bg-white text-[#111111]"}`}>
+      <button
+        onClick={() => setTransmission("manual")}
+        className={`h-full w-[181px] rounded-full text-[14px] font-[500] ${transmission === "manual" ? "bg-[#174A9B] text-white" : "bg-white text-[#111111]"}`}
+      >
         Manual transmission
       </button>
 
-      <button onClick={() => setTransmission("automatic")} className={`h-full flex-1 rounded-full text-[14px] font-[500] ${transmission === "automatic" ? "bg-[#174A9B] text-white" : "bg-white text-[#111111]"}`}>
+      <button
+        onClick={() => setTransmission("automatic")}
+        className={`h-full flex-1 rounded-full text-[14px] font-[500] ${transmission === "automatic" ? "bg-[#174A9B] text-white" : "bg-white text-[#111111]"}`}
+      >
         Automatic transmission
       </button>
     </div>
@@ -204,15 +102,16 @@ function PriceBox({ sale, retail, className = "" }) {
 
 function PackageList({ features = [] }) {
   return (
-    <div className="mt-[28px]">
+    <div className="mt-[28px] min-h-0 ">
       <h3 className="text-[17px] font-[700] leading-none text-[#222222]">
         Package Contents
       </h3>
 
-      <ul className="mt-[20px] space-y-[17px]">
+      <ul className="mt-[20px] max-h-[210px] space-y-[17px] overflow-y-auto pr-[8px] pb-10">
         {features.map((content, index) => (
           <li key={index} className="flex items-start gap-[10px]">
             <FaCheckCircle className="mt-[2px] h-[13px] w-[13px] shrink-0 text-[#174A9B]" />
+
             <span className="text-[15.5px] font-[500] leading-[18px] text-[#101010]">
               {content}
             </span>
@@ -242,13 +141,13 @@ function CodeCard({ item }) {
   return (
     <article
       className={[
-        "relative min-h-[566px] rounded-[11px] bg-white px-[20px] pb-[20px] pt-[20px]",
+        "relative flex min-h-[566px] flex-col rounded-[11px] bg-white px-[20px] pb-[20px] pt-[20px]",
         item.active
           ? "shadow-[0_24px_42px_rgba(23,74,155,0.20)] after:absolute after:bottom-0 after:left-0 after:h-[6px] after:w-full after:rounded-b-[11px] after:bg-[#174A9B]"
           : "",
       ].join(" ")}
     >
-      <div className="rounded-[11px] bg-[#E8EEF8] px-[16px] pb-[26px] pt-[28px]">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[11px] bg-[#E8EEF8] px-[16px] pb-[18px] pt-[28px]">
         <h2 className="mx-auto max-w-[250px] text-center text-[21px] font-[700] leading-[29px] text-[#E5273D]">
           {item.title}
         </h2>
@@ -258,9 +157,12 @@ function CodeCard({ item }) {
         </p>
 
         <PriceBox sale={item.sale} retail={item.retail} className="mt-[25px]" />
+
+        <div className="min-h-0 flex-1 overflow-hidden">
+          <PackageList features={item.features} />
+        </div>
       </div>
 
-      <PackageList features={item.features} />
       <BuyButton active={item.active} />
     </article>
   );
@@ -285,13 +187,13 @@ function DriveCard({ item }) {
   return (
     <article
       className={[
-        "relative min-h-[568px] rounded-[11px] bg-white px-[20px] pb-[20px] pt-[20px]",
+        "relative flex min-h-[568px] flex-col rounded-[11px] bg-white px-[20px] pb-[20px] pt-[20px]",
         item.active
           ? "shadow-[0_28px_46px_rgba(23,74,155,0.25)] after:absolute after:bottom-0 after:left-0 after:h-[6px] after:w-full after:rounded-b-[11px] after:bg-[#174A9B]"
           : "",
       ].join(" ")}
     >
-      <div className="rounded-[11px] bg-[#E8EEF8] px-[16px] pb-[14px] pt-[17px]">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[11px] bg-[#E8EEF8] px-[16px] pb-[14px] pt-[17px]">
         <h2 className="text-center text-[21px] font-[700] leading-[25px] text-[#E5273D]">
           {item.title}
         </h2>
@@ -301,13 +203,20 @@ function DriveCard({ item }) {
         </p>
 
         <div className="mt-[24px] flex items-center justify-center gap-[8px]">
-          {(item.hours?.length ? item.hours : ["01 hr", "05 hr", "10 hr"]).map((hour, index) => <HourBadge key={hour} value={hour} active={index === 1} />)}
+          {(item.hours?.length ? item.hours : ["01 hr", "05 hr", "10 hr"]).map(
+            (hour, index) => (
+              <HourBadge key={hour} value={hour} active={index === 1} />
+            ),
+          )}
         </div>
 
         <PriceBox sale={item.sale} retail={item.retail} className="mt-[20px]" />
+
+        <div className="min-h-0 flex-1 overflow-hidden">
+          <PackageList features={item.features} />
+        </div>
       </div>
 
-      <PackageList features={item.features} />
       <BuyButton active={item.active} />
     </article>
   );
@@ -321,7 +230,10 @@ function CodeTab({ offers, transmission }) {
           Permisgo&apos;s Highway Code Packs
         </h2>
 
-        <TransmissionToggle transmission={transmission.value} setTransmission={transmission.set} />
+        <TransmissionToggle
+          transmission={transmission.value}
+          setTransmission={transmission.set}
+        />
       </div>
 
       <div className="mt-[32px] grid grid-cols-1 gap-[23px] md:grid-cols-2 xl:grid-cols-3">
@@ -341,7 +253,10 @@ function ToDriveTab({ offers, transmission }) {
           Our driving license offers
         </h2>
 
-        <TransmissionToggle transmission={transmission.value} setTransmission={transmission.set} />
+        <TransmissionToggle
+          transmission={transmission.value}
+          setTransmission={transmission.set}
+        />
       </div>
 
       <div className="mt-[32px] grid grid-cols-1 gap-[24px] md:grid-cols-2 xl:grid-cols-3">
@@ -361,7 +276,10 @@ function CpfTab({ offers, transmission }) {
           CPF rates
         </h2>
 
-        <TransmissionToggle transmission={transmission.value} setTransmission={transmission.set} />
+        <TransmissionToggle
+          transmission={transmission.value}
+          setTransmission={transmission.set}
+        />
       </div>
 
       <div className="mt-[32px] grid grid-cols-1 gap-[24px] md:grid-cols-2 xl:grid-cols-3">
@@ -381,7 +299,10 @@ function AccompanieTab({ offers, transmission }) {
           Permisgo&apos;s Highway Code Packs
         </h2>
 
-        <TransmissionToggle transmission={transmission.value} setTransmission={transmission.set} />
+        <TransmissionToggle
+          transmission={transmission.value}
+          setTransmission={transmission.set}
+        />
       </div>
 
       <div className="mt-[32px] grid grid-cols-1 gap-[23px] md:grid-cols-2 xl:grid-cols-3">
@@ -572,7 +493,11 @@ export default function Page() {
   const [activeTab, setActiveTab] = useState("Code");
   const [transmission, setTransmission] = useState("manual");
   const { cards, loading, error } = useOffers();
-  const visibleOffers = filterOffers(cards, CATEGORY_BY_TAB[activeTab], transmission);
+  const visibleOffers = filterOffers(
+    cards,
+    CATEGORY_BY_TAB[activeTab],
+    transmission,
+  );
   const transmissionProps = { value: transmission, set: setTransmission };
 
   return (
@@ -583,14 +508,30 @@ export default function Page() {
 
           <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
-          {activeTab === "Code" && <CodeTab offers={visibleOffers} transmission={transmissionProps} />}
-          {activeTab === "To Drive" && <ToDriveTab offers={visibleOffers} transmission={transmissionProps} />}
-          {activeTab === "CPF" && <CpfTab offers={visibleOffers} transmission={transmissionProps} />}
-          {activeTab === "Accompanied" && <AccompanieTab offers={visibleOffers} transmission={transmissionProps} />}
+          {activeTab === "Code" && (
+            <CodeTab offers={visibleOffers} transmission={transmissionProps} />
+          )}
+          {activeTab === "To Drive" && (
+            <ToDriveTab
+              offers={visibleOffers}
+              transmission={transmissionProps}
+            />
+          )}
+          {activeTab === "CPF" && (
+            <CpfTab offers={visibleOffers} transmission={transmissionProps} />
+          )}
+          {activeTab === "Accompanied" && (
+            <AccompanieTab
+              offers={visibleOffers}
+              transmission={transmissionProps}
+            />
+          )}
           {activeTab === "Map" && (
             <MapPromoTab
               transmission={transmissionProps}
-              onViewMap={() => router.push("/student/driving-operation/book-lesson")}
+              onViewMap={() =>
+                router.push("/student/driving-operation/book-lesson")
+              }
             />
           )}
 
@@ -598,9 +539,22 @@ export default function Page() {
             <EmptyTab title="Accompanied Offers" />
           )} */}
 
-          {activeTab !== "Map" && loading && <p className="py-8 text-center text-sm text-gray-500">Loading offers...</p>}
-          {activeTab !== "Map" && error && <p className="py-8 text-center text-sm text-red-600">{error}</p>}
-          {activeTab !== "Map" && !loading && !error && visibleOffers.length === 0 && <p className="py-8 text-center text-sm text-gray-500">No offers available for this selection.</p>}
+          {activeTab !== "Map" && loading && (
+            <p className="py-8 text-center text-sm text-gray-500">
+              Loading offers...
+            </p>
+          )}
+          {activeTab !== "Map" && error && (
+            <p className="py-8 text-center text-sm text-red-600">{error}</p>
+          )}
+          {activeTab !== "Map" &&
+            !loading &&
+            !error &&
+            visibleOffers.length === 0 && (
+              <p className="py-8 text-center text-sm text-gray-500">
+                No offers available for this selection.
+              </p>
+            )}
         </div>
       </main>
     </>

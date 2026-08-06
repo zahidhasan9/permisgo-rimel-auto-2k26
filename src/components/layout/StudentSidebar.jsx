@@ -252,12 +252,14 @@ export default function StudentSidebar({ variant = "desktop", onClose }) {
               Explore Premium Features
             </p>
 
-            <button
-              type="button"
-              className="w-full rounded-lg bg-red-500 py-2 text-sm"
-            >
-              Upgrade Now
-            </button>
+            <Link href="/student/offers">
+              <button
+                type="button"
+                className="w-full rounded-lg bg-red-500 py-2 text-sm"
+              >
+                Upgrade Now
+              </button>
+            </Link>
           </div>
         </div>
       )}

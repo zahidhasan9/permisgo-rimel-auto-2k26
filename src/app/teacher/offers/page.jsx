@@ -6,32 +6,6 @@ import useOffers, { CATEGORY_BY_TAB, filterOffers } from "@/hooks/useOffers";
 const tabs = ["Code", "To Drive", "CPF", "Accompanied", "Map"];
 import { useRouter } from "next/navigation";
 import { FaChevronLeft } from "react-icons/fa";
-const packages = [
-  {
-    title: "Traffic Laws",
-    description:
-      "An economical and comprehensive solution to effectively prepare you for the Highway Code, 100% online.",
-    price: "30 USD",
-    oldPrice: "20 USD",
-    featured: false,
-  },
-  {
-    title: "Accelerated Code Pack",
-    description:
-      "A comprehensive and intensive training program to quickly pass your driving theory test!",
-    price: "30 USD",
-    oldPrice: "20 USD",
-    featured: true,
-  },
-  {
-    title: "Fast Track Package + Sworn Translator",
-    description:
-      "A complete and suitable package for non-French-speaking candidates, with support in Bengali by a translator.",
-    price: "30 USD",
-    oldPrice: "500 USD",
-    featured: false,
-  },
-];
 
 const contents = [
   "Dual-control training cars",
@@ -45,9 +19,10 @@ export default function OffersPage() {
   const [transmission, setTransmission] = useState("manual");
   const router = useRouter();
   const { cards, loading, error } = useOffers();
-  const visibleOffers = activeTab === "Map"
-    ? []
-    : filterOffers(cards, CATEGORY_BY_TAB[activeTab], transmission);
+  const visibleOffers =
+    activeTab === "Map"
+      ? []
+      : filterOffers(cards, CATEGORY_BY_TAB[activeTab], transmission);
   return (
     <main className="min-h-screen bg-white px-4 py-5 text-[#111827] sm:px-6">
       <div className="mx-auto ">
@@ -89,7 +64,10 @@ export default function OffersPage() {
             </h2>
 
             <div className="flex w-full max-w-[390px] rounded-full bg-white p-1">
-              {[{ value: "manual", label: "Manual transmission" }, { value: "automatic", label: "Automatic transmission" }].map((item) => (
+              {[
+                { value: "manual", label: "Manual transmission" },
+                { value: "automatic", label: "Automatic transmission" },
+              ].map((item) => (
                 <button
                   key={item.value}
                   onClick={() => setTransmission(item.value)}
@@ -111,9 +89,19 @@ export default function OffersPage() {
               <OfferCard key={item._id} item={item} />
             ))}
           </div>
-          {loading && <p className="py-8 text-center text-sm text-gray-500">Loading offers...</p>}
-          {error && <p className="py-8 text-center text-sm text-red-600">{error}</p>}
-          {!loading && !error && visibleOffers.length === 0 && <p className="py-8 text-center text-sm text-gray-500">No offers available for this selection.</p>}
+          {loading && (
+            <p className="py-8 text-center text-sm text-gray-500">
+              Loading offers...
+            </p>
+          )}
+          {error && (
+            <p className="py-8 text-center text-sm text-red-600">{error}</p>
+          )}
+          {!loading && !error && visibleOffers.length === 0 && (
+            <p className="py-8 text-center text-sm text-gray-500">
+              No offers available for this selection.
+            </p>
+          )}
         </section>
       </div>
     </main>

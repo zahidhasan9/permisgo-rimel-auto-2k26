@@ -112,9 +112,11 @@ export default function RealtimeChat() {
     contactsRef = useRef([]),
     activeCallRef = useRef(null),
     messagesEndRef = useRef(null),
+    messagesScrollRef = useRef(null),
     typingTimerRef = useRef(null),
     pendingIceRef = useRef([]),
     iceServersRef = useRef(null);
+  const shouldStickToBottomRef = useRef(true);
   useEffect(() => {
     selectedRef.current = selectedId;
   }, [selectedId]);
@@ -125,8 +127,13 @@ export default function RealtimeChat() {
     activeCallRef.current = activeCall;
   }, [activeCall]);
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, typingUser]);
+    const container = messagesScrollRef.current;
+    if (!container) return;
+
+    if (shouldStickToBottomRef.current) {
+      container.scrollTop = container.scrollHeight;
+    }
+  }, [messages, typingUser, selectedId]);
 
   const loadContacts = useCallback(async () => {
     try {
@@ -168,6 +175,7 @@ export default function RealtimeChat() {
       .catch((err) =>
         setError(err.response?.data?.message || "Unable to load messages."),
       );
+    shouldStickToBottomRef.current = true;
   }, [selectedId]);
 
   const closePeer = useCallback(() => {
@@ -236,8 +244,9 @@ export default function RealtimeChat() {
         try {
           const response = await getChatIceConfig();
           iceServersRef.current = response.data?.data?.iceServers || null;
-        } catch {
+        } catch (configError) {
           iceServersRef.current = null;
+          setError(configError.response?.data?.message || "TURN configuration could not be loaded.");
         }
       }
       const configuration = {
@@ -733,7 +742,15 @@ export default function RealtimeChat() {
             {error}
           </button>
         )}
-        <div className="min-h-0 flex-1 overflow-y-auto bg-[#F8FAFF] p-3 space-y-3 md:p-5">
+        <div
+          ref={messagesScrollRef}
+          onScroll={(e) => {
+            const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+            shouldStickToBottomRef.current =
+              scrollHeight - scrollTop - clientHeight < 120;
+          }}
+          className="min-h-0 flex-1 overflow-y-auto bg-[#F8FAFF] p-3 space-y-3 md:p-5"
+        >
           {messages.map((message) => {
             const mine = idOf(message.sender) === myId;
             const attachment = message.attachment;
