@@ -14,6 +14,8 @@ export default function AdminSettingsPage() {
   const [savedSkillsPercentage, setSavedSkillsPercentage] = useState(60);
   const [contactRecipientEmail, setContactRecipientEmail] = useState("");
   const [savedContactRecipientEmail, setSavedContactRecipientEmail] = useState("");
+  const [whatsappNumber, setWhatsappNumber] = useState("");
+  const [savedWhatsappNumber, setSavedWhatsappNumber] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -31,6 +33,9 @@ export default function AdminSettingsPage() {
         const recipientEmail = response?.data?.data?.contactRecipientEmail || "";
         setContactRecipientEmail(recipientEmail);
         setSavedContactRecipientEmail(recipientEmail);
+        const savedWhatsApp = response?.data?.data?.whatsappNumber || "";
+        setWhatsappNumber(savedWhatsApp);
+        setSavedWhatsappNumber(savedWhatsApp);
       })
       .catch((requestError) => setError(errorMessage(requestError)))
       .finally(() => setLoading(false));
@@ -51,12 +56,16 @@ export default function AdminSettingsPage() {
       setError("Please enter a valid contact recipient email.");
       return;
     }
+    if (whatsappNumber && !/^\+?[0-9\s()-]{7,25}$/.test(whatsappNumber)) {
+      setError("Please enter a valid WhatsApp number with country code.");
+      return;
+    }
 
     try {
       setSaving(true);
       setError("");
       setSuccess("");
-      const response = await updateAdminDrivingSettings(value, skillsValue, contactRecipientEmail.trim());
+      const response = await updateAdminDrivingSettings(value, skillsValue, contactRecipientEmail.trim(), whatsappNumber.trim());
       const updated = Number(response?.data?.data?.requiredHours || value);
       const updatedSkills = Number(response?.data?.data?.requiredSkillsPercentage || skillsValue);
       setRequiredHours(String(updated));
@@ -66,6 +75,9 @@ export default function AdminSettingsPage() {
       const updatedRecipient = response?.data?.data?.contactRecipientEmail || "";
       setContactRecipientEmail(updatedRecipient);
       setSavedContactRecipientEmail(updatedRecipient);
+      const updatedWhatsApp = response?.data?.data?.whatsappNumber || "";
+      setWhatsappNumber(updatedWhatsApp);
+      setSavedWhatsappNumber(updatedWhatsApp);
       setSuccess("Global driving requirements updated for all students.");
     } catch (requestError) {
       setError(errorMessage(requestError));
@@ -143,7 +155,7 @@ export default function AdminSettingsPage() {
               </div>
             </div>
 
-            <button type="button" onClick={handleSave} disabled={loading || saving || (Number(requiredHours) === savedHours && Number(requiredSkillsPercentage) === savedSkillsPercentage && contactRecipientEmail.trim() === savedContactRecipientEmail)} className="mt-5 inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-[#174A9B] px-5 text-sm font-bold text-white transition hover:bg-[#123d82] disabled:cursor-not-allowed disabled:opacity-50">
+            <button type="button" onClick={handleSave} disabled={loading || saving || (Number(requiredHours) === savedHours && Number(requiredSkillsPercentage) === savedSkillsPercentage && contactRecipientEmail.trim() === savedContactRecipientEmail && whatsappNumber.trim() === savedWhatsappNumber)} className="mt-5 inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-[#174A9B] px-5 text-sm font-bold text-white transition hover:bg-[#123d82] disabled:cursor-not-allowed disabled:opacity-50">
               {loading || saving ? <FaSpinner className="animate-spin" /> : <FaSave />} Save settings
             </button>
           </div>
@@ -151,7 +163,7 @@ export default function AdminSettingsPage() {
 
         <section className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
           <div className="flex items-center gap-4 border-b border-slate-100 px-5 py-5 sm:px-6"><span className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-xl text-[#174A9B]"><FaEnvelope /></span><div><h2 className="font-bold text-slate-900">Contact form notification</h2><p className="mt-1 text-sm text-slate-500">New website contact requests will be emailed to this address.</p></div></div>
-          <div className="p-5 sm:p-6"><label htmlFor="contact-recipient-email" className="block text-sm font-bold text-slate-800">Recipient email</label><input id="contact-recipient-email" type="email" value={contactRecipientEmail} disabled={loading || saving} onChange={(event) => setContactRecipientEmail(event.target.value)} placeholder="admin@permisgo.com" className="mt-3 h-12 w-full max-w-xl rounded-xl border border-slate-200 px-4 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" /><p className="mt-2 text-xs text-slate-500">SMTP must also be configured on the backend for email delivery. Submissions are always saved in Admin → Support.</p><button type="button" onClick={handleSave} disabled={loading || saving || contactRecipientEmail.trim() === savedContactRecipientEmail} className="mt-5 inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-[#174A9B] px-5 text-sm font-bold text-white disabled:opacity-50">{saving ? <FaSpinner className="animate-spin" /> : <FaSave />} Save email</button></div>
+          <div className="grid gap-5 p-5 sm:p-6 md:grid-cols-2"><div><label htmlFor="contact-recipient-email" className="block text-sm font-bold text-slate-800">Recipient email</label><input id="contact-recipient-email" type="email" value={contactRecipientEmail} disabled={loading || saving} onChange={(event) => setContactRecipientEmail(event.target.value)} placeholder="admin@permisgo.com" className="mt-3 h-12 w-full rounded-xl border border-slate-200 px-4 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" /><p className="mt-2 text-xs text-slate-500">Contact form notifications are delivered here.</p></div><div><label htmlFor="whatsapp-number" className="block text-sm font-bold text-slate-800">WhatsApp number</label><input id="whatsapp-number" type="tel" value={whatsappNumber} disabled={loading || saving} onChange={(event) => setWhatsappNumber(event.target.value)} placeholder="+33 6 12 34 56 78" className="mt-3 h-12 w-full rounded-xl border border-slate-200 px-4 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" /><p className="mt-2 text-xs text-slate-500">Include the country code. This controls the public floating button.</p></div><div className="md:col-span-2"><p className="text-xs text-slate-500">SMTP must be configured for email delivery. Contact submissions are always saved in Admin → Support.</p><button type="button" onClick={handleSave} disabled={loading || saving || (contactRecipientEmail.trim() === savedContactRecipientEmail && whatsappNumber.trim() === savedWhatsappNumber)} className="mt-4 inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-[#174A9B] px-5 text-sm font-bold text-white disabled:opacity-50">{saving ? <FaSpinner className="animate-spin" /> : <FaSave />} Save contact settings</button></div></div>
         </section>
       </div>
     </main>

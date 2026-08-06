@@ -4,12 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 
-// Components
-import BottomMenu from "./bottom-menu";
-
 // Icons
 import {
-  FaComments,
   FaInstagram,
   FaLinkedin,
   FaPhoneSquareAlt,
@@ -98,8 +94,6 @@ const Footer = () => {
 
   return (
     <>
-      <BottomMenu />
-
       {/* Car Image */}
       <section className="bg-[#eef3fb]">
         <div className="mx-auto flex  max-w-[1320px] justify-end px-4 pt-8 sm:px-6 lg:px-8 lg:pt-[72px]">
@@ -113,14 +107,6 @@ const Footer = () => {
       </section>
 
       <footer className="relative overflow-hidden bg-[#103677]">
-        <Link
-          href="/contact-us"
-          aria-label="Chat with PermisGo"
-          className="absolute right-4 top-[45%] z-20 flex h-16 w-16 items-center justify-center rounded-full bg-[#22c93b] text-[28px] text-white shadow-lg transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:bg-[#e2233d] sm:right-6"
-        >
-          <FaComments />
-        </Link>
-
         {/* Main Footer */}
         <div className="relative px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
           {/* Soft background effect */}

@@ -13,6 +13,8 @@ import DashboardTopbar from "@/components/layout/DashboardTopbar";
 import StudentSidebar from "@/components/layout/StudentSidebar";
 import TeacherSidebar from "@/components/layout/TeacherSidebar";
 import PresenceConnection from "@/components/chat/PresenceConnection";
+import BottomMenu from "@/components/bottom-menu";
+import FloatingWhatsApp from "@/components/FloatingWhatsApp";
 
 const authRoots = [
   "/login",
@@ -71,8 +73,9 @@ export default function AppShell({ children }) {
   if (authRoots.some((root) => isPathWithin(pathname, root))) {
     return <><StudentAuthNavbar /><PublicOnlyRoute>{children}</PublicOnlyRoute></>;
   }
-  if (pathname === "/" || isPathWithin(pathname, "/chat")) {
-    return children;
+  if (pathname === "/") {
+    return <div className="max-[500px]:pb-[68px]">{children}<FloatingWhatsApp /><BottomMenu /></div>;
   }
-  return <><Navbar /><main>{children}</main><Footer /></>;
+  if (isPathWithin(pathname, "/chat")) return children;
+  return <div className="max-[500px]:pb-[68px]"><Navbar /><main>{children}</main><Footer /><FloatingWhatsApp /><BottomMenu /></div>;
 }

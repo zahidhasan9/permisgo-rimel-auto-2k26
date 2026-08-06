@@ -1,110 +1,93 @@
-// import Link from "next/link";
-
-// // Icon
-// import { FaCar } from "react-icons/fa";
-// import { MdLocalOffer, MdOutlineDirections } from "react-icons/md";
-// import { RiProfileLine } from "react-icons/ri";
-
-// // Style
-// import bottomMenu from "../../styles/bottom-menu.module.css";
-
-// const BottomMenu = () => {
-//   return (
-//     <>
-//       <div id={bottomMenu.mobile_menu}>
-//         <div className="d-flex justify-content-between align-items-center">
-//           <div>
-//             <div className="text-center">
-//               <Link href="">
-//                 <MdOutlineDirections />
-//                 <p className="mb-0">Code</p>
-//               </Link>
-//             </div>
-//           </div>
-//           <div>
-//             <div className="text-center">
-//               <Link href="">
-//                 <FaCar />
-//                 <p className="mb-0">Conduite</p>
-//               </Link>
-//             </div>
-//           </div>
-//           <div>
-//             <div className="text-center">
-//               <Link href="">
-//                 <MdLocalOffer />
-//                 <p className="mb-0">Offer</p>
-//               </Link>
-//             </div>
-//           </div>
-//           <div>
-//             <div className="text-center">
-//               <Link href="">
-//                 <RiProfileLine />
-//                 <p className="mb-0">Profile</p>
-//               </Link>
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-//     </>
-//   );
-// };
-
-// export default BottomMenu;
+"use client";
 
 import Link from "next/link";
-
-// Icons
-import { FaCar } from "react-icons/fa";
-import { MdLocalOffer, MdOutlineDirections } from "react-icons/md";
+import { usePathname } from "next/navigation";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { FaCar, FaChalkboardTeacher, FaUsers } from "react-icons/fa";
+import {
+  MdDashboard,
+  MdLocalOffer,
+  MdOutlineDirections,
+  MdSettings,
+} from "react-icons/md";
 import { RiProfileLine } from "react-icons/ri";
+import { fetchLoggedInUser } from "@/features/userSlice";
 
-const menuItems = [
-  {
-    title: "Code",
-    href: "#",
-    icon: MdOutlineDirections,
-  },
-  {
-    title: "Conduite",
-    href: "#",
-    icon: FaCar,
-  },
-  {
-    title: "Offer",
-    href: "#",
-    icon: MdLocalOffer,
-  },
-  {
-    title: "Profile",
-    href: "#",
-    icon: RiProfileLine,
-  },
-];
+const menus = {
+  student: [
+    { title: "Code", href: "/student/code", icon: MdOutlineDirections },
+    {
+      title: "Conduite",
+      href: "/student/driving-operation/driving-dashboard",
+      icon: FaCar,
+    },
+    { title: "Offer", href: "/student/offers", icon: MdLocalOffer },
+    { title: "Profile", href: "/student/profile", icon: RiProfileLine },
+  ],
+  teacher: [
+    { title: "Dashboard", href: "/teacher/dashboard", icon: MdDashboard },
+    { title: "Lessons", href: "/teacher/lessons", icon: FaChalkboardTeacher },
+    { title: "Offers", href: "/teacher/offers", icon: MdLocalOffer },
+    { title: "Profile", href: "/teacher/profile", icon: RiProfileLine },
+  ],
+  admin: [
+    { title: "Dashboard", href: "/admin/dashboard", icon: MdDashboard },
+    { title: "Users", href: "/admin/users", icon: FaUsers },
+    { title: "Settings", href: "/admin/settings", icon: MdSettings },
+    { title: "Profile", href: "/admin/profile", icon: RiProfileLine },
+  ],
+  guest: [
+    { title: "Code", href: "/traffic-laws", icon: MdOutlineDirections },
+    { title: "Conduite", href: "/appointment", icon: FaCar },
+    { title: "Offer", href: "/pricing", icon: MdLocalOffer },
+    { title: "Profile", href: "/login/student", icon: RiProfileLine },
+  ],
+};
 
-const BottomMenu = () => {
+const isActiveRoute = (pathname, href) =>
+  pathname === href || pathname.startsWith(`${href}/`);
+
+export default function BottomMenu() {
+  const pathname = usePathname() || "/";
+  const dispatch = useDispatch();
+  const { token, user, role, authLoading } = useSelector((state) => state.user);
+  const resolvedRole = user?.role || role;
+  const menuItems = menus[resolvedRole] || menus.guest;
+  const rolePending = Boolean(token && !resolvedRole && authLoading);
+
+  useEffect(() => {
+    if (token && !resolvedRole && !authLoading) dispatch(fetchLoggedInUser());
+  }, [token, resolvedRole, authLoading, dispatch]);
+
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-[999] hidden rounded-t-xl bg-white px-5 py-2 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] max-[500px]:block">
-      <div className="flex items-center justify-between">
-        {menuItems.map((item) => {
-          const Icon = item.icon;
-
+    <nav
+      aria-label="Mobile navigation"
+      className="fixed inset-x-0 bottom-0 z-[999] hidden rounded-t-2xl border-t border-slate-200/80 bg-white/95 px-3 pt-2 shadow-[0_-5px_22px_rgba(15,23,42,0.12)] backdrop-blur-md max-[500px]:block"
+      style={{ paddingBottom: "max(0.5rem, env(safe-area-inset-bottom))" }}
+    >
+      <div className="mx-auto flex max-w-md items-center justify-between">
+        {menuItems.map(({ title, href, icon: Icon }) => {
+          const active = isActiveRoute(pathname, href);
           return (
             <Link
-              key={item.title}
-              href={item.href}
-              className="flex flex-1 flex-col items-center justify-center gap-1 text-black no-underline transition-all duration-200 hover:text-blue-600"
+              key={title}
+              href={href}
+              aria-label={title}
+              aria-current={active ? "page" : undefined}
+              className={`relative flex min-h-[50px] flex-1 flex-col items-center justify-center gap-1 rounded-xl px-1 no-underline transition-colors ${active ? "text-[#174a9b]" : "text-slate-800 hover:text-[#174a9b]"} ${rolePending ? "opacity-60" : ""}`}
             >
-              <Icon className="text-[22px]" />
-
-              <p className="mb-0 text-[14px] leading-none">{item.title}</p>
+              {active && (
+                <span className="absolute top-0 h-0.5 w-7 rounded-full bg-[#174a9b]" />
+              )}
+              <Icon aria-hidden="true" className="text-[20px]" />
+              <span className="max-w-full truncate text-[11px] font-semibold leading-none">
+                {title}
+              </span>
             </Link>
           );
         })}
       </div>
     </nav>
   );
-};
-
-export default BottomMenu;
+}
