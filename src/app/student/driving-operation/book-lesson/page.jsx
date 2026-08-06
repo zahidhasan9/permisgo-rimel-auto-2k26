@@ -164,6 +164,24 @@ function BookingFlow() {
   const [submitting, setSubmitting] = useState(false);
   const [confirmation, setConfirmation] = useState(null);
   const [error, setError] = useState("");
+  const [requestedTeacherId, setRequestedTeacherId] = useState("");
+
+  useEffect(() => {
+    setRequestedTeacherId(
+      new URLSearchParams(window.location.search).get("teacherId") || "",
+    );
+  }, []);
+
+  useEffect(() => {
+    if (!requestedTeacherId || !teachers.length) return;
+    const requestedTeacher = teachers.find(
+      (teacher) => String(teacher.user?._id) === requestedTeacherId,
+    );
+    if (requestedTeacher) {
+      setSelectedTeacher(requestedTeacher);
+      setStep("teacher");
+    }
+  }, [requestedTeacherId, teachers]);
 
   const center = useMemo(
     () => ({ lat: Number(search.lat), lng: Number(search.lng) }),

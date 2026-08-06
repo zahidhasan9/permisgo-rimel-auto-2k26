@@ -1191,7 +1191,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useSelector } from "react-redux";
+import { toast } from "sonner";
 
 import { Swiper, SwiperSlide } from "swiper/react";
 
@@ -1204,7 +1206,8 @@ import { Autoplay, FreeMode, Navigation } from "swiper/modules";
 import Footer from "@/components/footer";
 import Navbar from "@/components/navbar";
 import Testimonials from "@/components/testimonials";
-import { getBlogs, getFaqs } from "@/features/API";
+import { getBlogs, getFaqs, getPublicTeachers } from "@/features/API";
+import { mediaUrl } from "@/utils/mediaUrl";
 
 import blogImg from "../../public/image/blog.jpg";
 import heroBg from "../../public/image/hero-bg.jpg";
@@ -1391,6 +1394,7 @@ function Stars({ center = true }) {
 
 export default function Home() {
   const router = useRouter();
+  const { token, user, role } = useSelector((state) => state.user);
   const swiperRefOne = useRef(null);
   const swiperRefThree = useRef(null);
 
@@ -1428,11 +1432,110 @@ export default function Home() {
   const [openFaq, setOpenFaq] = useState(0);
   const [homeBlogs, setHomeBlogs] = useState([]);
   const [homeFaqs, setHomeFaqs] = useState(fallbackFaqs);
+  const [teacherSearch, setTeacherSearch] = useState("");
+  const [nearbyTeachers, setNearbyTeachers] = useState([]);
+  const [selectedNearbyTeacher, setSelectedNearbyTeacher] = useState(null);
+  const [teacherSearchLoading, setTeacherSearchLoading] = useState(false);
+  const [teacherSearchDone, setTeacherSearchDone] = useState(false);
+  const [homeInstructors, setHomeInstructors] = useState([]);
+  const [homeInstructorsLoading, setHomeInstructorsLoading] = useState(true);
+
+  const dynamicMapSrc = useMemo(() => {
+    const location = selectedNearbyTeacher?.locations?.[0];
+    const latitude = Number(
+      location?.coordinates?.lat ?? location?.geoLocation?.coordinates?.[1],
+    );
+    const longitude = Number(
+      location?.coordinates?.lng ?? location?.geoLocation?.coordinates?.[0],
+    );
+    const mapQuery =
+      Number.isFinite(latitude) && Number.isFinite(longitude)
+        ? `${latitude},${longitude}`
+        : [location?.address, location?.city, location?.postalCode]
+            .filter(Boolean)
+            .join(", ");
+    return mapQuery
+      ? `https://www.google.com/maps?q=${encodeURIComponent(mapQuery)}&z=14&output=embed`
+      : mapSrc;
+  }, [selectedNearbyTeacher]);
+
+  const findNearbyTeachers = async () => {
+    setTeacherSearchLoading(true);
+    setTeacherSearchDone(true);
+    try {
+      const vehicleType =
+        activeTab === "manual"
+          ? "manual"
+          : activeTab === "auto"
+            ? "automatic"
+            : undefined;
+      const response = await getPublicTeachers(
+        vehicleType ? { vehicleType } : {},
+      );
+      const query = teacherSearch.trim().toLowerCase();
+      const teachers = (response.data?.data || []).filter((teacher) => {
+        if (!query) return true;
+        const searchable = [
+          teacher.user?.name,
+          teacher.user?.city,
+          teacher.user?.address,
+          ...(teacher.locations || []).flatMap((location) => [
+            location.title,
+            location.address,
+            location.city,
+            location.postalCode,
+          ]),
+        ]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase();
+        return searchable.includes(query);
+      });
+      setNearbyTeachers(teachers);
+      setSelectedNearbyTeacher(teachers[0] || null);
+    } catch (error) {
+      setNearbyTeachers([]);
+      setSelectedNearbyTeacher(null);
+      toast.error(
+        error.response?.data?.message || "Instructors could not be loaded.",
+      );
+    } finally {
+      setTeacherSearchLoading(false);
+    }
+  };
+
+  const bookTeacherFromHome = (teacher = selectedNearbyTeacher) => {
+    const teacherId = teacher?.user?._id;
+    if (!teacherId) return;
+    const bookingPath = `/student/driving-operation/book-lesson?teacherId=${teacherId}`;
+    if (!token) {
+      sessionStorage.setItem("postLoginRedirect", bookingPath);
+      router.push("/login/student");
+      return;
+    }
+    const currentRole = user?.role || role;
+    if (currentRole !== "student") {
+      toast.error("Only student accounts can book an instructor.");
+      return;
+    }
+    router.push(bookingPath);
+  };
 
   useEffect(() => {
     getBlogs({ limit: 4 })
       .then(({ data }) => setHomeBlogs(data?.data || []))
       .catch(() => setHomeBlogs([]));
+  }, []);
+
+  useEffect(() => {
+    getPublicTeachers()
+      .then((response) =>
+        setHomeInstructors(
+          Array.isArray(response.data?.data) ? response.data.data : [],
+        ),
+      )
+      .catch(() => setHomeInstructors([]))
+      .finally(() => setHomeInstructorsLoading(false));
   }, []);
 
   useEffect(() => {
@@ -1737,6 +1840,11 @@ export default function Home() {
 
                 <input
                   type="text"
+                  value={teacherSearch}
+                  onChange={(event) => setTeacherSearch(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") findNearbyTeachers();
+                  }}
                   placeholder="Search by address, city..."
                   className="h-[50px] w-full rounded-[10px] border-0 bg-[#E8EBF0] pl-12 pr-4 text-[13px] font-medium text-[#30343B] outline-none placeholder:text-[#707782] focus:ring-2 focus:ring-[#174FA5]/20"
                 />
@@ -1779,10 +1887,23 @@ export default function Home() {
                 <div className="rounded-[10px] bg-[#E9EDF5] p-4">
                   <button
                     type="button"
+                    onClick={findNearbyTeachers}
+                    disabled={teacherSearchLoading}
                     className="flex h-[42px] w-full items-center justify-center rounded-[8px] border border-[#174FA5] bg-[#B8C9E5] px-4 text-[13px] font-bold text-[#123F7A] transition duration-300 hover:bg-[#174FA5] hover:text-white"
                   >
-                    Start Searching
+                    {teacherSearchLoading ? "Searching..." : "Start Searching"}
                   </button>
+                  {teacherSearchDone && (
+                    <div className="mt-3 max-h-[190px] space-y-2 overflow-y-auto">
+                      {nearbyTeachers.map((teacher) => (
+                        <button key={teacher.user?._id} type="button" onClick={() => setSelectedNearbyTeacher(teacher)} className={cn("flex w-full items-center gap-3 rounded-[8px] border bg-white p-2 text-left transition", selectedNearbyTeacher?.user?._id === teacher.user?._id ? "border-[#174FA5] ring-2 ring-[#174FA5]/10" : "border-transparent hover:border-[#b8c9e5]")}>
+                          {teacher.user?.avatar ? <img src={mediaUrl(teacher.user.avatar)} alt={teacher.user.name || "Instructor"} className="h-9 w-9 rounded-full object-cover" /> : <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#d9e5f4] text-xs font-black text-[#174fa5]">{(teacher.user?.name || "I").charAt(0)}</span>}
+                          <span className="min-w-0"><span className="block truncate text-xs font-extrabold text-[#174fa5]">{teacher.user?.name || "Driving Instructor"}</span><span className="block truncate text-[10px] text-slate-500">{teacher.locations?.[0]?.address || teacher.locations?.[0]?.city || "Location available"}</span></span>
+                        </button>
+                      ))}
+                      {!nearbyTeachers.length && !teacherSearchLoading && <p className="rounded-lg bg-white p-3 text-center text-xs text-slate-500">No available instructor found.</p>}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -1791,7 +1912,8 @@ export default function Home() {
             <div className="lg:col-span-7">
               <div className="relative min-h-[430px] overflow-hidden rounded-[8px] bg-[#DDE8EC]">
                 <iframe
-                  src={mapSrc}
+                  key={dynamicMapSrc}
+                  src={dynamicMapSrc}
                   width="100%"
                   height="430"
                   allowFullScreen
@@ -1802,17 +1924,15 @@ export default function Home() {
                 />
 
                 {/* Teacher information card */}
-                <div className="absolute bottom-5 right-5 w-[300px] max-w-[calc(100%-40px)] rounded-[12px] border-2 border-[#174FA5] bg-white p-3 shadow-[0_12px_35px_rgba(15,44,88,0.24)]">
+                {selectedNearbyTeacher && <div className="absolute bottom-5 right-5 w-[300px] max-w-[calc(100%-40px)] rounded-[12px] border-2 border-[#174FA5] bg-white p-3 shadow-[0_12px_35px_rgba(15,44,88,0.24)]">
                   {/* Card top */}
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-[46px] w-[46px] shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#D9E5F4] text-[12px] font-extrabold text-[#174FA5]">
-                        RF
-                      </div>
+                      {selectedNearbyTeacher.user?.avatar ? <img src={mediaUrl(selectedNearbyTeacher.user.avatar)} alt={selectedNearbyTeacher.user?.name || "Instructor"} className="h-[46px] w-[46px] shrink-0 rounded-full object-cover" /> : <div className="flex h-[46px] w-[46px] shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#D9E5F4] text-[12px] font-extrabold text-[#174FA5]">{(selectedNearbyTeacher.user?.name || "I").charAt(0)}</div>}
 
                       <div>
                         <h4 className="text-[13px] font-extrabold text-[#174FA5]">
-                          Robert Fox
+                          {selectedNearbyTeacher.user?.name || "Driving Instructor"}
                         </h4>
                       </div>
                     </div>
@@ -1820,7 +1940,7 @@ export default function Home() {
                     <div className="flex items-start gap-3">
                       <div className="text-right">
                         <p className="text-[10px] font-semibold text-[#555B65]">
-                          Experience 05 Years+
+                          Experience {Number(selectedNearbyTeacher.experienceYears || 0)} Years+
                         </p>
 
                         <div className="mt-1 text-[12px] leading-none tracking-[2px] text-[#174FA5]">
@@ -1830,6 +1950,7 @@ export default function Home() {
 
                       <button
                         type="button"
+                        onClick={() => setSelectedNearbyTeacher(null)}
                         aria-label="Close teacher card"
                         className="flex h-5 w-5 items-center justify-center text-[18px] font-medium leading-none text-[#272B30]"
                       >
@@ -1838,46 +1959,23 @@ export default function Home() {
                     </div>
                   </div>
 
-                  {/* Availability */}
+                  {/* Instructor details */}
                   <div className="mt-3 rounded-[8px] bg-[#EEF1F6] px-3 py-3">
                     <p className="mb-3 text-[10px] font-medium text-[#7B828D]">
-                      Available Time
+                      Available location and vehicle
                     </p>
-
-                    <div className="grid grid-cols-2 gap-x-4 gap-y-[7px]">
-                      <p className="text-[9px] font-semibold text-[#333840]">
-                        Mar&nbsp; 08h00 - 10h30
-                      </p>
-
-                      <p className="text-[9px] font-semibold text-[#333840]">
-                        Apr&nbsp; 08h00 - 10h30
-                      </p>
-
-                      <p className="text-[9px] font-semibold text-[#333840]">
-                        May&nbsp; 08h00 - 10h30
-                      </p>
-
-                      <p className="text-[9px] font-semibold text-[#333840]">
-                        Jun&nbsp; 08h00 - 10h30
-                      </p>
-
-                      <p className="text-[9px] font-semibold text-[#333840]">
-                        Nov&nbsp; 08h00 - 10h30
-                      </p>
-
-                      <p className="text-[9px] font-semibold text-[#333840]">
-                        Dec&nbsp; 08h00 - 10h30
-                      </p>
-                    </div>
+                    <p className="text-[10px] font-semibold text-[#333840]">{selectedNearbyTeacher.locations?.[0]?.address || selectedNearbyTeacher.locations?.[0]?.city || "Location available during booking"}</p>
+                    <p className="mt-2 text-[10px] font-semibold capitalize text-[#333840]">{selectedNearbyTeacher.vehicles?.map((vehicle) => vehicle.vehicleType).filter((value, index, list) => list.indexOf(value) === index).join(" · ") || "Vehicle available"}</p>
                   </div>
 
                   <button
                     type="button"
+                    onClick={bookTeacherFromHome}
                     className="mt-3 flex h-[40px] w-full items-center justify-center rounded-[7px] bg-[#E9243F] px-4 text-[10px] font-extrabold text-white transition duration-300 hover:bg-[#C91831]"
                   >
                     Book Now
                   </button>
-                </div>
+                </div>}
               </div>
             </div>
           </div>
@@ -1904,7 +2002,7 @@ export default function Home() {
             spaceBetween={24}
             speed={600}
             watchOverflow={true}
-            loop={instructors.length > 4}
+            loop={homeInstructors.length > 4}
             autoplay={{
               delay: 3000,
               disableOnInteraction: false,
@@ -1933,12 +2031,13 @@ export default function Home() {
             }}
             className="w-full"
           >
-            {instructors.map((img, index) => {
-              const info = instructorInfo[index % instructorInfo.length];
+            {homeInstructors.map((teacher, index) => {
+              const teacherName = teacher.user?.name || "Driving Instructor";
+              const rating = Math.max(0, Math.min(5, Number(teacher.rating?.average || 0)));
               const isActive = activeInstructor === index;
 
               return (
-                <SwiperSlide key={index} className="h-auto">
+                <SwiperSlide key={teacher.user?._id || index} className="h-auto">
                   <div
                     className={cn(
                       "box-border flex h-[308px] w-full flex-col items-center",
@@ -1950,19 +2049,12 @@ export default function Home() {
                   >
                     {/* Fixed avatar wrapper */}
                     <div className="relative h-[64px] w-[64px] shrink-0 overflow-hidden rounded-full">
-                      <Image
-                        src={img}
-                        alt={info.name}
-                        fill
-                        sizes="64px"
-                        priority={index < 4}
-                        className="!h-full !w-full rounded-full object-cover"
-                      />
+                      {teacher.user?.avatar ? <img src={mediaUrl(teacher.user.avatar)} alt={teacherName} className="h-full w-full rounded-full object-cover" /> : <span className="flex h-full w-full items-center justify-center bg-[#d9e5f4] text-lg font-black text-[#174fa5]">{teacherName.charAt(0)}</span>}
                     </div>
 
                     {/* Name */}
                     <h4 className="mt-[22px] text-[15px] font-extrabold leading-[20px] text-[#123E8C]">
-                      {info.name}
+                      {teacherName}
                     </h4>
 
                     {/* Experience box */}
@@ -1970,40 +2062,40 @@ export default function Home() {
                       <p className="text-[11px] font-normal leading-[16px] text-[#70747B]">
                         Experience{" "}
                         <span className="font-extrabold text-[#20242A]">
-                          {info.experience}
+                          {Number(teacher.experienceYears || 0)} Years+
                         </span>
                       </p>
 
                       <div className="mt-[10px] flex items-center justify-center gap-[7px] text-[12px] leading-none text-[#123E8C]">
-                        <FaStar />
-                        <FaStar />
-                        <FaStar />
-                        <FaStar />
-                        <FaStar />
+                        {[0, 1, 2, 3, 4].map((star) => <FaStar key={star} className={star < Math.round(rating) ? "" : "text-slate-300"} />)}
                       </div>
                     </div>
 
                     {/* Buttons */}
                     <div className="mt-[15px] grid w-full grid-cols-2 gap-[13px]">
-                      <Link
-                        href="#"
+                      <button
+                        type="button"
+                        onClick={() => bookTeacherFromHome(teacher)}
                         className="flex h-[38px] items-center justify-center rounded-[6px] border border-[#D72638] bg-[#D72638] px-2 text-[10px] font-bold leading-none text-white transition-colors duration-300 hover:bg-[#B91F30]"
                       >
                         Book Now
-                      </Link>
+                      </button>
 
-                      <Link
-                        href="#"
+                      <button
+                        type="button"
+                        onClick={() => toast.info("Please message your instructor from the Student Dashboard.")}
                         className="flex h-[38px] items-center justify-center rounded-[6px] border border-[#D72638] bg-transparent px-2 text-[10px] font-bold leading-none text-[#123E8C] transition-colors duration-300 hover:bg-[#D72638] hover:text-white"
                       >
                         Message
-                      </Link>
+                      </button>
                     </div>
                   </div>
                 </SwiperSlide>
               );
             })}
           </Swiper>
+          {homeInstructorsLoading && <p className="py-12 text-center text-sm font-semibold text-slate-500">Loading instructors...</p>}
+          {!homeInstructorsLoading && !homeInstructors.length && <p className="rounded-xl bg-[#e7ecf4] py-12 text-center text-sm font-semibold text-slate-500">No available instructors found.</p>}
 
           {/* Navigation */}
           <div className="mt-[48px] flex items-center justify-center gap-[12px]">

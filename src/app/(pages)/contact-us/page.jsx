@@ -1,5 +1,9 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
+import { createContactSubmission } from "@/features/API";
 
 import {
   FaEnvelope,
@@ -10,32 +14,34 @@ import {
   FaPhone,
   FaPinterestP,
   FaWhatsapp,
+  FaCheck,
+  FaXmark,
   FaYoutube,
 } from "react-icons/fa6";
 
 const fields = [
   {
-    id: "first-name",
+    id: "firstName",
     label: "First name",
     placeholder: "Write name here",
     type: "text",
   },
   {
-    id: "last-name",
-    label: "First name",
-    placeholder: "Write name here",
+    id: "lastName",
+    label: "Last name",
+    placeholder: "Write last name here",
     type: "text",
   },
   {
     id: "email",
-    label: "First name",
-    placeholder: "Write name here",
+    label: "Email",
+    placeholder: "Write email here",
     type: "email",
   },
   {
     id: "phone",
-    label: "First name",
-    placeholder: "Write name here",
+    label: "Phone",
+    placeholder: "Write phone number here",
     type: "tel",
   },
 ];
@@ -60,6 +66,26 @@ function InfoIcon({ children }) {
 }
 
 export default function ContactUsPage() {
+  const initialForm = { firstName: "", lastName: "", email: "", phone: "", subject: "", location: "", description: "" };
+  const [form, setForm] = useState(initialForm);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
+  const [successOpen, setSuccessOpen] = useState(false);
+  const updateField = (event) => setForm((current) => ({ ...current, [event.target.name]: event.target.value }));
+  const submitContact = async (event) => {
+    event.preventDefault();
+    setSubmitting(true);
+    setError("");
+    try {
+      await createContactSubmission(form);
+      setForm(initialForm);
+      setSuccessOpen(true);
+    } catch (requestError) {
+      setError(requestError.response?.data?.message || "Your message could not be sent. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
   return (
     <div className="bg-[#eef3fb] text-[#1d1d1f]">
       <section className="mx-auto w-full max-w-[1360px] px-5 pb-20 pt-20 sm:px-8 lg:px-10 lg:pt-20">
@@ -78,7 +104,7 @@ export default function ContactUsPage() {
         {/* Form and contact details */}
         <div className="mt-9 grid gap-10 lg:grid-cols-[1.28fr_0.92fr] lg:gap-20 xl:grid-cols-[650px_460px] xl:gap-[86px]">
           <form
-            action=""
+            onSubmit={submitContact}
             className="rounded-[12px] bg-white px-6 py-8 sm:px-10 sm:py-10 lg:min-h-[585px] lg:py-9"
           >
             <div className="grid gap-x-16 gap-y-6 sm:grid-cols-2">
@@ -93,6 +119,9 @@ export default function ContactUsPage() {
                   <input
                     id={field.id}
                     name={field.id}
+                    value={form[field.id]}
+                    onChange={updateField}
+                    required
                     type={field.type}
                     placeholder={field.placeholder}
                     className={inputClass}
@@ -106,38 +135,52 @@ export default function ContactUsPage() {
                 htmlFor="subject"
                 className="mb-2.5 block !text-[14px] font-medium text-[#333]"
               >
-                First name
+                Subject
               </label>
               <input
                 id="subject"
                 name="subject"
+                value={form.subject}
+                onChange={updateField}
+                required
                 type="text"
-                placeholder="Write name here"
+                placeholder="Write subject here"
                 className={inputClass}
               />
             </div>
 
             <div className="mt-5">
+              <label htmlFor="location" className="mb-2.5 block !text-[14px] font-medium text-[#333]">Location</label>
+              <input id="location" name="location" type="text" value={form.location} onChange={updateField} required placeholder="Write your location here" className={inputClass} />
+            </div>
+
+            <div className="mt-5">
               <label
-                htmlFor="message"
+                htmlFor="description"
                 className="mb-2.5 block !text-[14px] font-medium text-[#333]"
               >
-                First name
+                Description
               </label>
               <textarea
-                id="message"
-                name="message"
+                id="description"
+                name="description"
+                value={form.description}
+                onChange={updateField}
+                required
+                maxLength={3000}
                 rows={7}
-                placeholder="Write name here"
+                placeholder="Write your message here"
                 className="min-h-[200px] w-full resize-none rounded-[11px] border border-[#b9c9e4] bg-[#f6f8fc] px-4 py-3 !text-[14px] font-medium text-[#222] outline-none transition-all duration-300 placeholder:text-[#969696] focus:border-[#174a9b] focus:bg-white focus:ring-4 focus:ring-[#174a9b]/10"
               />
             </div>
 
+            {error && <p className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{error}</p>}
             <button
               type="submit"
+              disabled={submitting}
               className="mt-5 inline-flex min-h-12 items-center justify-center rounded-[11px] bg-[#e2233d] px-5 !text-[14px] font-extrabold text-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:bg-[#174a9b] hover:shadow-lg"
             >
-              Send Message
+              {submitting ? "Sending..." : "Send Message"}
             </button>
           </form>
 
@@ -221,6 +264,7 @@ export default function ContactUsPage() {
           </aside>
         </div>
       </section>
+      {successOpen && <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/55 p-4"><div className="relative w-full max-w-md rounded-2xl bg-white p-8 text-center shadow-2xl"><button type="button" onClick={() => setSuccessOpen(false)} aria-label="Close" className="absolute right-4 top-4 text-slate-400 hover:text-slate-700"><FaXmark /></button><span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-2xl text-emerald-600"><FaCheck /></span><h2 className="mt-5 text-xl font-extrabold text-slate-900">Message sent successfully</h2><p className="mt-2 text-sm leading-6 text-slate-500">Thank you for contacting us. Our team will review your message and get back to you.</p><button type="button" onClick={() => setSuccessOpen(false)} className="mt-6 rounded-xl bg-[#174a9b] px-6 py-3 text-sm font-bold text-white">Done</button></div></div>}
 
       {/* Full-width location map */}
       <section

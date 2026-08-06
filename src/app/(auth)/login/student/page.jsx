@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 import { FiEye, FiEyeOff } from "react-icons/fi";
@@ -38,6 +38,15 @@ const StudentLogin = () => {
   } = useSelector((state) => state.user);
 
   const currentRole = user?.role || role;
+  const handlingLoginRedirect = useRef(false);
+
+  const takePostLoginRedirect = () => {
+    const destination = sessionStorage.getItem("postLoginRedirect") || "";
+    sessionStorage.removeItem("postLoginRedirect");
+    return destination.startsWith("/student/")
+      ? destination
+      : getDashboardPath("student");
+  };
 
   const [showPassword, setShowPassword] = useState(false);
 
@@ -54,7 +63,12 @@ const StudentLogin = () => {
 
   useEffect(() => {
     if (isAuthenticated && currentRole) {
-      router.replace(getDashboardPath(currentRole));
+      if (handlingLoginRedirect.current) return;
+      router.replace(
+        currentRole === "student"
+          ? takePostLoginRedirect()
+          : getDashboardPath(currentRole),
+      );
     }
   }, [isAuthenticated, currentRole, router]);
 
@@ -85,6 +99,7 @@ const StudentLogin = () => {
     }
 
     try {
+      handlingLoginRedirect.current = true;
       const result = await dispatch(
         login({
           email,
@@ -98,8 +113,13 @@ const StudentLogin = () => {
 
       toast.success(result?.message || "Login successful.");
 
-      router.replace(getDashboardPath(loggedInUser?.role));
+      router.replace(
+        loggedInUser?.role === "student"
+          ? takePostLoginRedirect()
+          : getDashboardPath(loggedInUser?.role),
+      );
     } catch (errorMessage) {
+      handlingLoginRedirect.current = false;
       toast.error(errorMessage || "Login failed. Please try again.");
     }
   };

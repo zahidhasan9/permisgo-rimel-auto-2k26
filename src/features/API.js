@@ -94,8 +94,12 @@ export const updateUserRole = (id, role) => {
 export const getAdminDrivingSettings = () =>
   axios.get("/admin/settings/driving");
 
-export const updateAdminDrivingSettings = (requiredHours, requiredSkillsPercentage) =>
-  axios.patch("/admin/settings/driving", { requiredHours, requiredSkillsPercentage });
+export const updateAdminDrivingSettings = (requiredHours, requiredSkillsPercentage, contactRecipientEmail = "") =>
+  axios.patch("/admin/settings/driving", { requiredHours, requiredSkillsPercentage, contactRecipientEmail });
+
+export const createContactSubmission = (data) => axios.post("/contact", data);
+export const getContactSubmissions = (params = {}) => axios.get("/contact", { params });
+export const updateContactSubmissionStatus = (id, status) => axios.patch(`/contact/${id}/status`, { status });
 
 export const deleteAdminUser = (id) => {
   return axios.delete(`/admin/users/${id}`);
