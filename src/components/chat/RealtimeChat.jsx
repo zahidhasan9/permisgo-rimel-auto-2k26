@@ -99,7 +99,8 @@ export default function RealtimeChat() {
     [muted, setMuted] = useState(false),
     [cameraOff, setCameraOff] = useState(false),
     [playbackBlocked, setPlaybackBlocked] = useState(false),
-    [remoteTrackKinds, setRemoteTrackKinds] = useState(new Set());
+    [remoteTrackKinds, setRemoteTrackKinds] = useState(new Set()),
+    [callDiagnostics, setCallDiagnostics] = useState([]);
   const socketRef = useRef(null),
     peerRef = useRef(null),
     localStreamRef = useRef(null),
@@ -140,11 +141,19 @@ export default function RealtimeChat() {
       const response = await getChatContacts();
       const list = response.data?.data || [];
       setContacts(list);
-      setSelectedId(
-        requestedUserId && list.some((contact) => idOf(contact) === requestedUserId)
-          ? requestedUserId
-          : "",
-      );
+      setSelectedId((current) => {
+        const currentId = current || selectedRef.current;
+        if (currentId && list.some((contact) => idOf(contact) === currentId)) {
+          return currentId;
+        }
+        if (
+          requestedUserId &&
+          list.some((contact) => idOf(contact) === requestedUserId)
+        ) {
+          return requestedUserId;
+        }
+        return "";
+      });
       socketRef.current?.emit(
         "presence:check",
         { userIds: list.map(idOf) },
@@ -195,6 +204,7 @@ export default function RealtimeChat() {
     setCameraOff(false);
     setPlaybackBlocked(false);
     setRemoteTrackKinds(new Set());
+    setCallDiagnostics([]);
   }, []);
   const ensureMedia = useCallback(async (type) => {
     const existing = localStreamRef.current;
@@ -226,26 +236,66 @@ export default function RealtimeChat() {
   const playRemoteMedia = useCallback(async () => {
     const stream = remoteStreamRef.current;
     if (!stream) return;
-    if (remoteVideoRef.current) remoteVideoRef.current.srcObject = stream;
+    if (remoteVideoRef.current) {
+      remoteVideoRef.current.srcObject = stream;
+      remoteVideoRef.current.muted = true;
+      remoteVideoRef.current.playsInline = true;
+    }
     if (remoteAudioRef.current) {
       remoteAudioRef.current.srcObject = stream;
+      remoteAudioRef.current.muted = false;
+      remoteAudioRef.current.volume = 1;
       try {
         await remoteAudioRef.current.play();
         setPlaybackBlocked(false);
+        return;
       } catch {
         setPlaybackBlocked(true);
       }
     }
+  }, []);
+  const enableRemoteAudio = useCallback(async () => {
+    const stream = remoteStreamRef.current;
+    if (!stream) return;
+
+    try {
+      if (remoteAudioRef.current) {
+        remoteAudioRef.current.srcObject = stream;
+        remoteAudioRef.current.muted = false;
+        remoteAudioRef.current.volume = 1;
+        await remoteAudioRef.current.play();
+        setPlaybackBlocked(false);
+        return;
+      }
+    } catch {}
+
+    try {
+      if (remoteVideoRef.current) {
+        remoteVideoRef.current.srcObject = stream;
+        remoteVideoRef.current.muted = false;
+        await remoteVideoRef.current.play();
+        setPlaybackBlocked(false);
+        return;
+      }
+    } catch {}
+
+    setPlaybackBlocked(true);
   }, []);
   const ensurePeer = useCallback(
     async (peerId, type) => {
       if (peerRef.current) return peerRef.current;
       if (!iceServersRef.current) {
         try {
+          setCallDiagnostics((current) => [...current.slice(-5), "Loading ICE/TURN configuration..."]);
           const response = await getChatIceConfig();
           iceServersRef.current = response.data?.data?.iceServers || null;
+          setCallDiagnostics((current) => [
+            ...current.slice(-5),
+            `ICE config loaded: ${Array.isArray(iceServersRef.current) ? iceServersRef.current.length : 0} server(s)`,
+          ]);
         } catch (configError) {
           iceServersRef.current = null;
+          setCallDiagnostics((current) => [...current.slice(-5), "ICE config failed, falling back to STUN only"]);
           setError(configError.response?.data?.message || "TURN configuration could not be loaded.");
         }
       }
@@ -257,12 +307,17 @@ export default function RealtimeChat() {
         iceCandidatePoolSize: 10,
       };
       const peer = new RTCPeerConnection(configuration);
+      setCallDiagnostics((current) => [...current.slice(-5), "PeerConnection created"]);
       const stream = await ensureMedia(type);
+      peer.addTransceiver("audio", { direction: "sendrecv" });
+      if (type === "video") peer.addTransceiver("video", { direction: "sendrecv" });
       stream.getTracks().forEach((track) => peer.addTrack(track, stream));
+      setCallDiagnostics((current) => [...current.slice(-5), `Local ${type} track(s) attached`]);
       const remoteStream = new MediaStream();
       remoteStreamRef.current = remoteStream;
       peer.onicecandidate = (event) => {
         if (event.candidate)
+          setCallDiagnostics((current) => [...current.slice(-5), `ICE candidate: ${event.candidate.type || "candidate"}`]);
           socketRef.current?.emit("webrtc:ice", {
             to: peerId,
             candidate: event.candidate,
@@ -278,6 +333,7 @@ export default function RealtimeChat() {
         )
           activeRemoteStream.addTrack(track);
         remoteStreamRef.current = activeRemoteStream;
+        setCallDiagnostics((current) => [...current.slice(-5), `Remote ${track.kind} track received`]);
         setRemoteTrackKinds((current) => new Set([...current, track.kind]));
         const attachAndPlay = () => {
           requestAnimationFrame(() => playRemoteMedia());
@@ -292,6 +348,7 @@ export default function RealtimeChat() {
         attachAndPlay();
       };
       peer.onconnectionstatechange = () => {
+        setCallDiagnostics((current) => [...current.slice(-5), `Peer state: ${peer.connectionState}`]);
         if (peer.connectionState === "connected") {
           setCallStatus("Connected");
           playRemoteMedia();
@@ -307,6 +364,7 @@ export default function RealtimeChat() {
         if (peer.connectionState === "closed") closePeer();
       };
       peer.oniceconnectionstatechange = () => {
+        setCallDiagnostics((current) => [...current.slice(-5), `ICE state: ${peer.iceConnectionState}`]);
         if (["checking", "new"].includes(peer.iceConnectionState))
           setCallStatus("Connecting media...");
         if (["connected", "completed"].includes(peer.iceConnectionState)) {
@@ -317,6 +375,7 @@ export default function RealtimeChat() {
           setCallStatus("Connection interrupted. Reconnecting...");
       };
       peer.onicecandidateerror = (event) => {
+        setCallDiagnostics((current) => [...current.slice(-5), `ICE candidate error ${event.errorCode || ""}: ${event.errorText || "unknown"}`]);
         if (event.errorCode >= 700)
           setError("TURN server could not be reached. Please check the TURN URL and credentials.");
       };
@@ -383,10 +442,7 @@ export default function RealtimeChat() {
         setActiveCall({ peerId: from, type });
         setCallStatus("Connecting...");
         const peer = await ensurePeer(from, type);
-        const offer = await peer.createOffer({
-          offerToReceiveAudio: true,
-          offerToReceiveVideo: type === "video",
-        });
+        const offer = await peer.createOffer();
         await peer.setLocalDescription(offer);
         socket.emit("webrtc:offer", { to: from, description: offer, type });
       } catch (err) {
@@ -935,7 +991,6 @@ export default function RealtimeChat() {
               ref={remoteVideoRef}
               autoPlay
               playsInline
-              muted
               className="h-full w-full object-cover"
             />
             {activeCall.type === "video" &&
@@ -959,9 +1014,16 @@ export default function RealtimeChat() {
               </h3>
               <p className="text-xs text-white/70">{callStatus}</p>
             </div>
+            {callDiagnostics.length > 0 && (
+              <div className="absolute bottom-20 left-4 max-w-[92%] rounded-xl bg-black/60 px-3 py-2 text-[11px] leading-5 text-white/80 backdrop-blur">
+                {callDiagnostics.slice(-4).map((line, index) => (
+                  <div key={`${line}-${index}`}>{line}</div>
+                ))}
+              </div>
+            )}
             {playbackBlocked && (
               <button
-                onClick={playRemoteMedia}
+                onClick={enableRemoteAudio}
                 className="absolute left-1/2 top-1/2 -translate-x-1/2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-slate-900 shadow-xl"
               >
                 Tap to enable sound
