@@ -1232,7 +1232,7 @@
 
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -1379,16 +1379,16 @@ const formatStatValue = (value, pad = false) => {
 
 function StatCard({ icon, title, value }) {
   return (
-    <div className="min-h-[142px] rounded-[12px] bg-[#E8EEF8] px-4 py-5">
-      <div className="mx-auto flex h-[38px] w-[38px] items-center justify-center rounded-[11px] bg-white text-[18px] text-[#174A9B]">
+    <div className="min-w-0 rounded-[12px] bg-[#E8EEF8] px-3 py-4 sm:min-h-[142px] sm:px-4 sm:py-5">
+      <div className="mx-auto flex h-9 w-9 items-center justify-center rounded-[10px] bg-white text-[16px] text-[#174A9B] sm:h-[38px] sm:w-[38px] sm:text-[18px]">
         {icon}
       </div>
 
-      <h3 className="mt-4 text-center text-[14px] font-[700] text-black">
+      <h3 className="mt-3 truncate text-center text-[12px] font-[700] text-black sm:mt-4 sm:text-[14px]">
         {title}
       </h3>
 
-      <p className="mt-2 text-center text-[25px] font-[700] leading-none text-[#2DBE42]">
+      <p className="mt-2 text-center text-[21px] font-[700] leading-none text-[#2DBE42] sm:text-[25px]">
         {value}
       </p>
     </div>
@@ -1399,34 +1399,34 @@ function LessonCard({ lesson }) {
   const progress = clampPercentage(lesson?.progressPercent ?? 20);
 
   return (
-    <div className="rounded-[12px] bg-white p-4 sm:p-[18px]">
-      <h3 className="mb-4 text-[14px] font-[700] leading-[18px] text-[#174A9B] underline underline-offset-[3px]">
+    <div className="min-w-0 rounded-[12px] bg-white p-3.5 sm:p-[18px]">
+      <h3 className="mb-3 break-words text-[13px] font-[700] leading-[18px] text-[#174A9B] underline underline-offset-[3px] sm:mb-4 sm:text-[14px]">
         {lesson?.title || "City Driving Practice"}
       </h3>
 
-      <div className="space-y-[8px] text-[12px] leading-[17px]">
-        <div className="grid grid-cols-[82px_1fr] gap-2">
+      <div className="space-y-2 text-[11px] leading-[16px] sm:text-[12px] sm:leading-[17px]">
+        <div className="grid grid-cols-[70px_minmax(0,1fr)] gap-2 sm:grid-cols-[82px_minmax(0,1fr)]">
           <span className="font-[500] text-[#6E7077]">Start Date</span>
-          <span className="font-[700] text-[#25272D]">
+          <span className="min-w-0 break-words font-[700] text-[#25272D]">
             {formatLessonDate(lesson?.lessonDate, lesson?.startTime)}
           </span>
         </div>
 
-        <div className="grid grid-cols-[82px_1fr] gap-2">
+        <div className="grid grid-cols-[70px_minmax(0,1fr)] gap-2 sm:grid-cols-[82px_minmax(0,1fr)]">
           <span className="font-[500] text-[#6E7077]">Duration</span>
           <span className="font-[700] text-[#25272D]">
             {lesson?.duration ?? 60} Minutes
           </span>
         </div>
 
-        <div className="grid grid-cols-[82px_1fr] gap-2">
+        <div className="grid grid-cols-[70px_minmax(0,1fr)] gap-2 sm:grid-cols-[82px_minmax(0,1fr)]">
           <span className="font-[500] text-[#6E7077]">Vehicle</span>
-          <span className="font-[700] text-[#25272D]">
+          <span className="min-w-0 break-words font-[700] text-[#25272D]">
             {capitalize(lesson?.vehicleType)} – Toyota Corolla
           </span>
         </div>
 
-        <div className="grid grid-cols-[82px_1fr] gap-2">
+        <div className="grid grid-cols-[70px_minmax(0,1fr)] gap-2 sm:grid-cols-[82px_minmax(0,1fr)]">
           <span className="font-[500] text-[#6E7077]">Instructor</span>
           <span className="font-[700] text-[#174A9B]">
             {lesson?.instructorName || "Michael Carter"}
@@ -1450,24 +1450,24 @@ function LessonCard({ lesson }) {
 
 function ScheduleRow({ item }) {
   return (
-    <div className="flex min-h-[72px] gap-[10px]">
-      <div className="flex min-h-[72px] w-[62px] shrink-0 flex-col items-center justify-center rounded-[10px] bg-white">
-        <p className="text-[14px] font-[700] leading-none text-[#858585]">
+    <div className="flex min-h-[68px] min-w-0 gap-2.5 sm:min-h-[72px]">
+      <div className="flex min-h-[68px] w-14 shrink-0 flex-col items-center justify-center rounded-[10px] bg-white sm:min-h-[72px] sm:w-[62px]">
+        <p className="text-[12px] font-[700] leading-none text-[#858585] sm:text-[14px]">
           {item?.day || "Sat"}
         </p>
-        <p className="mt-[10px] text-[23px] font-[700] leading-none text-[#E5273D]">
+        <p className="mt-2 text-[20px] font-[700] leading-none text-[#E5273D] sm:mt-[10px] sm:text-[23px]">
           {item?.date || "10"}
         </p>
       </div>
 
-      <div className="min-w-0 flex-1 rounded-[10px] bg-white px-[15px] py-[16px]">
-        <h4 className="truncate text-[15px] font-[700] leading-none text-black">
+      <div className="min-w-0 flex-1 rounded-[10px] bg-white px-3 py-3 sm:px-[15px] sm:py-[16px]">
+        <h4 className="truncate text-[13px] font-[700] leading-tight text-black sm:text-[15px]">
           {item?.title || "Driving Lesson"}
         </h4>
-        <p className="mt-[13px] text-[13px] font-[500] leading-none text-[#55565B]">
+        <p className="mt-2.5 text-[11px] font-[500] leading-none text-[#55565B] sm:mt-[13px] sm:text-[13px]">
           {formatTime(item?.startTime)} - {formatTime(item?.endTime)}
         </p>
-        <p className="mt-2 truncate text-[12px] font-[600] text-[#174A9B]">
+        <p className="mt-2 truncate text-[10px] font-[600] text-[#174A9B] sm:text-[12px]">
           Instructor: {item?.instructorName || item?.teacher?.name || "Instructor"}
         </p>
       </div>
@@ -1529,7 +1529,7 @@ function SemiDonutChart({ statistics }) {
   );
 
   return (
-    <div className="relative mx-auto mt-[22px] h-[175px] w-full max-w-[310px]">
+    <div className="relative mx-auto mt-3 h-[145px] w-full max-w-[270px] sm:mt-[22px] sm:h-[175px] sm:max-w-[310px]">
       <svg
         className="h-full w-full"
         viewBox="0 0 340 210"
@@ -1558,7 +1558,7 @@ function SemiDonutChart({ statistics }) {
         )}
       </svg>
 
-      <p className="absolute bottom-[28px] left-0 right-0 text-center text-[18px] font-[700] text-[#174A9B]">
+      <p className="absolute bottom-[22px] left-0 right-0 text-center text-[15px] font-[700] text-[#174A9B] sm:bottom-[28px] sm:text-[18px]">
         {average}% Average
       </p>
     </div>
@@ -1579,15 +1579,15 @@ function LegendItem({ color, label }) {
 
 function TrainingCard({ icon, text, helper, onClick }) {
   return (
-    <button type="button" onClick={onClick} className="flex min-h-[128px] min-w-0 flex-1 flex-col items-center justify-center rounded-[12px] bg-white px-3 py-4 transition hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#174A9B]">
-      <div className="mb-[16px] flex h-[34px] w-[34px] items-center justify-center rounded-[8px] bg-[#E8EEF8] text-[16px] text-[#174A9B]">
+    <button type="button" onClick={onClick} className="flex min-h-[112px] min-w-0 flex-1 flex-col items-center justify-center rounded-[12px] bg-white px-2 py-3 transition hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#174A9B] sm:min-h-[128px] sm:px-3 sm:py-4">
+      <div className="mb-2.5 flex h-8 w-8 items-center justify-center rounded-[8px] bg-[#E8EEF8] text-[15px] text-[#174A9B] sm:mb-[16px] sm:h-[34px] sm:w-[34px] sm:text-[16px]">
         {icon}
       </div>
 
-      <p className="max-w-[105px] text-center text-[13px] font-[500] leading-[20px] text-[#101010]">
+      <p className="max-w-[105px] text-center text-[11px] font-[600] leading-4 text-[#101010] sm:text-[13px] sm:font-[500] sm:leading-[20px]">
         {text}
       </p>
-      {helper && <p className="mt-2 text-center text-[10px] font-semibold text-[#6E7077]">{helper}</p>}
+      {helper && <p className="mt-1.5 line-clamp-2 text-center text-[9px] font-semibold leading-3 text-[#6E7077] sm:mt-2 sm:text-[10px]">{helper}</p>}
     </button>
   );
 }
@@ -1621,7 +1621,23 @@ function MessageRow({ instructor, onClick }) {
 export default function Page() {
   const dispatch = useDispatch();
   const router = useRouter();
+  const lessonCarouselRef = useRef(null);
   const { user, token, studentDashboard } = useSelector((state) => state.user);
+
+  const scrollLessonCarousel = (direction) => {
+    const carousel = lessonCarouselRef.current;
+
+    if (!carousel) return;
+
+    const firstCard = carousel.firstElementChild;
+    const cardWidth = firstCard?.getBoundingClientRect().width || carousel.clientWidth;
+    const gap = 12;
+
+    carousel.scrollBy({
+      left: direction * (cardWidth + gap),
+      behavior: "smooth",
+    });
+  };
 
   useEffect(() => {
     dispatch(fetchStudentDashboard());
@@ -1651,18 +1667,18 @@ export default function Page() {
   return (
     <>
       <main className="dashboard-poppins min-h-screen w-full min-w-0 overflow-x-hidden bg-white">
-        <div className="mx-auto w-full  px-4 pb-6 pt-6 sm:px-5 lg:px-6">
+        <div className="mx-auto w-full px-2.5 pb-24 pt-4 sm:px-5 sm:pb-8 sm:pt-6 lg:px-6">
           <header>
-            <h1 className="text-[24px] font-[700] leading-tight text-[#174A9B] sm:text-[28px]">
+            <h1 className="break-words text-[21px] font-[700] leading-tight text-[#174A9B] sm:text-[28px]">
               Welcome, {studentName}
             </h1>
-            <p className="mt-[10px] text-[12px] font-[500] leading-[19px] text-[#6D6F76] sm:text-[13px]">
+            <p className="mt-2 text-[11px] font-[500] leading-[17px] text-[#6D6F76] sm:mt-[10px] sm:text-[13px] sm:leading-[19px]">
               Track your lessons, attendance, payments, and progress easily from
               one dashboard
             </p>
           </header>
 
-          <section className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <section className="mt-4 grid grid-cols-2 gap-2.5 sm:mt-6 sm:gap-4 xl:grid-cols-4">
             <StatCard
               icon={<FaClipboardCheck />}
               title="Time Taken"
@@ -1685,42 +1701,51 @@ export default function Page() {
             />
           </section>
 
-          <section className="mt-5 rounded-[14px] bg-[#E8EEF8] p-4 sm:p-5">
+          <section className="mt-4 rounded-[14px] bg-[#E8EEF8] p-3 sm:mt-5 sm:p-5">
             <div className="flex items-start justify-between gap-4">
-              <h2 className="text-[18px] font-[700] leading-none text-[#174A9B]">
+              <h2 className="text-[16px] font-[700] leading-tight text-[#174A9B] sm:text-[18px] sm:leading-none">
                 Lesson Progress
               </h2>
 
               <div className="flex shrink-0 gap-[10px]">
                 <button
                   type="button"
-                  className="flex h-[36px] w-[36px] items-center justify-center rounded-[11px] bg-[#DEE7F3] text-[14px] text-[#E5273D]"
+                  onClick={() => scrollLessonCarousel(-1)}
+                  aria-label="Previous lesson"
+                  className="flex h-[36px] w-[36px] items-center justify-center rounded-[11px] bg-[#DEE7F3] text-[14px] text-[#E5273D] transition active:scale-95"
                 >
                   <FaArrowLeft />
                 </button>
                 <button
                   type="button"
-                  className="flex h-[36px] w-[36px] items-center justify-center rounded-[11px] bg-[#E5273D] text-[14px] text-white"
+                  onClick={() => scrollLessonCarousel(1)}
+                  aria-label="Next lesson"
+                  className="flex h-[36px] w-[36px] items-center justify-center rounded-[11px] bg-[#E5273D] text-[14px] text-white transition active:scale-95"
                 >
                   <FaArrowRight />
                 </button>
               </div>
             </div>
 
-            <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <div
+              ref={lessonCarouselRef}
+              className="mt-3 flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mt-5 sm:gap-4"
+            >
               {lessonCards.map((lesson, index) => (
-                <LessonCard
+                <div
                   key={lesson.id || lesson._id || `lesson-${index}`}
-                  lesson={lesson}
-                />
+                  className="w-[88%] shrink-0 snap-start sm:w-[calc(50%_-_8px)] xl:w-[calc(33.333%_-_11px)]"
+                >
+                  <LessonCard lesson={lesson} />
+                </div>
               ))}
             </div>
           </section>
 
-          <section className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-2">
-            <div className="rounded-[14px] bg-[#E8EEF8] p-4 sm:p-5">
+          <section className="mt-4 grid grid-cols-1 gap-4 sm:mt-5 sm:gap-5 xl:grid-cols-2">
+            <div className="min-w-0 rounded-[14px] bg-[#E8EEF8] p-3 sm:p-5">
               <div className="flex items-start justify-between gap-4">
-                <h2 className="text-[18px] font-[700] leading-none text-[#174A9B]">
+                <h2 className="text-[16px] font-[700] leading-tight text-[#174A9B] sm:text-[18px] sm:leading-none">
                   Upcoming Schedule
                 </h2>
 
@@ -1735,7 +1760,7 @@ export default function Page() {
 
               <button
                 type="button"
-                className="mt-5 flex h-[28px] w-[104px] items-center justify-center gap-[7px] rounded-[6px] bg-white text-[11px] font-[500] text-[#30323A]"
+                className="mt-3 flex h-7 w-[104px] items-center justify-center gap-[7px] rounded-[6px] bg-white text-[11px] font-[500] text-[#30323A] sm:mt-5"
               >
                 {getMonthLabel(firstScheduleDate)}
                 <FaCalendarAlt className="text-[#174A9B]" />
@@ -1751,14 +1776,14 @@ export default function Page() {
               </div>
             </div>
 
-            <div className="min-w-0 rounded-[14px] bg-[#E8EEF8] p-4 sm:p-5">
-              <h2 className="text-[18px] font-[700] leading-none text-[#174A9B]">
+            <div className="min-w-0 rounded-[14px] bg-[#E8EEF8] p-3 sm:p-5">
+              <h2 className="text-[16px] font-[700] leading-tight text-[#174A9B] sm:text-[18px] sm:leading-none">
                 Total Progress Statistics
               </h2>
 
               <SemiDonutChart statistics={progressStatistics} />
 
-              <div className="mt-2 flex flex-wrap justify-center gap-x-4 gap-y-2">
+              <div className="mt-1 flex flex-wrap justify-center gap-x-3 gap-y-2 sm:mt-2 sm:gap-x-4">
                 <LegendItem color="#174A9B" label="Completed Quizzes" />
                 <LegendItem color="#2DBE42" label="Quiz in progress" />
                 <LegendItem color="#E5273D" label="Not completed" />
@@ -1766,17 +1791,17 @@ export default function Page() {
             </div>
           </section>
 
-          <section className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-2 xl:grid-cols-[minmax(0,1.55fr)_minmax(150px,0.55fr)_minmax(270px,1fr)]">
-            <div className="rounded-[14px] bg-[#E8EEF8] p-4 sm:p-5">
-              <h2 className="text-[18px] font-[700] leading-none text-[#174A9B]">
+          <section className="mt-4 grid grid-cols-1 gap-4 sm:mt-5 sm:gap-5 lg:grid-cols-2 xl:grid-cols-[minmax(0,1.55fr)_minmax(150px,0.55fr)_minmax(270px,1fr)]">
+            <div className="min-w-0 rounded-[14px] bg-[#E8EEF8] p-3 sm:p-5">
+              <h2 className="text-[16px] font-[700] leading-none text-[#174A9B] sm:text-[18px]">
                 Training
               </h2>
 
-              <h3 className="mt-5 text-[15px] font-[700] leading-none text-[#15233B]">
+              <h3 className="mt-3 text-[13px] font-[700] leading-none text-[#15233B] sm:mt-5 sm:text-[15px]">
                 Traffic Laws
               </h3>
 
-              <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+              <div className="mt-3 grid grid-cols-3 gap-2 sm:mt-4 sm:gap-4">
                 <TrainingCard icon={<MdChecklist />} text="Start Revising" helper="Continue your code lessons" onClick={() => router.push("/student/code-learning")} />
                 <TrainingCard icon={<FaCarSide />} text="Take Practice Exam" helper={`${progressStatistics.totalAttempts || 0} attempts · ${progressStatistics.average || 0}% average`} onClick={() => router.push("/student/code/simple-series-list")} />
                 <TrainingCard
@@ -1788,9 +1813,9 @@ export default function Page() {
               </div>
             </div>
 
-            <div className="rounded-[14px] bg-[#E8EEF8] p-4 sm:p-5">
-              <h2 className="text-[18px] font-[700] leading-[25px] text-[#174A9B]">
-                Practice <br /> Driving
+            <div className="rounded-[14px] bg-[#E8EEF8] p-3 sm:p-5">
+              <h2 className="text-[16px] font-[700] leading-[22px] text-[#174A9B] sm:text-[18px] sm:leading-[25px]">
+                Practice <span className="sm:block">Driving</span>
               </h2>
 
               <p className="mt-4 text-[12px] font-[500] leading-[18px] text-[#30323A]">
@@ -1805,15 +1830,15 @@ export default function Page() {
               <button
                 type="button"
                 onClick={() => router.push("/student/book-driving")}
-                className="mt-6 h-[32px] w-full max-w-[120px] rounded-[7px] bg-[#E5273D] text-[11px] font-[700] text-white"
+                className="mt-4 h-9 w-full rounded-[7px] bg-[#E5273D] text-[11px] font-[700] text-white sm:mt-6 sm:h-[32px] sm:max-w-[120px]"
               >
                 Book Now
               </button>
             </div>
 
-            <div className="rounded-[14px] bg-[#E8EEF8] p-4 sm:p-5 lg:col-span-2 xl:col-span-1">
+            <div className="min-w-0 rounded-[14px] bg-[#E8EEF8] p-3 sm:p-5 lg:col-span-2 xl:col-span-1">
               <div className="flex items-start justify-between gap-4">
-                <h2 className="text-[18px] font-[700] leading-none text-[#174A9B]">
+                <h2 className="text-[16px] font-[700] leading-tight text-[#174A9B] sm:text-[18px] sm:leading-none">
                   Message Instructor
                 </h2>
 

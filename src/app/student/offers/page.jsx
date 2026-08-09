@@ -15,13 +15,14 @@ import { IoChevronBack } from "react-icons/io5";
 const tabs = ["Code", "To Drive", "CPF", "Accompanied", "Map"];
 
 function Header() {
+  const router = useRouter();
   return (
-    <header className="flex items-center gap-[16px]">
-      <button className="flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-[12px] bg-[#EEF4FB] text-[27px] text-black">
+    <header className="flex items-center gap-3 sm:gap-[16px]">
+      <button type="button" onClick={() => router.back()} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] bg-[#EEF4FB] text-xl text-black sm:h-[44px] sm:w-[44px] sm:text-[27px]">
         <IoChevronBack />
       </button>
 
-      <h1 className="text-[25px] font-[700] leading-none text-[#174A9B]">
+      <h1 className="text-xl font-[700] leading-none text-[#174A9B] sm:text-[25px]">
         Offers
       </h1>
     </header>
@@ -30,7 +31,7 @@ function Header() {
 
 function Tabs({ activeTab, setActiveTab }) {
   return (
-    <nav className="mt-[33px] flex flex-wrap gap-[12px]">
+    <nav className="mt-5 flex max-w-full gap-2 overflow-x-auto pb-1 sm:mt-[33px] sm:flex-wrap sm:gap-[12px] sm:overflow-visible sm:pb-0">
       {tabs.map((tab) => {
         const active = activeTab === tab;
 
@@ -40,7 +41,7 @@ function Tabs({ activeTab, setActiveTab }) {
             type="button"
             onClick={() => setActiveTab(tab)}
             className={[
-              "h-[40px] rounded-[10px] border px-[25px] text-[14px] font-[700] leading-none transition",
+              "h-9 shrink-0 whitespace-nowrap rounded-[10px] border px-4 text-xs font-[700] leading-none transition sm:h-[40px] sm:px-[25px] sm:text-[14px]",
               active
                 ? "border-[#174A9B] bg-[#BFD8FF] text-[#174A9B]"
                 : "border-[#CFD8E8] bg-white text-[#111111]",
@@ -56,17 +57,17 @@ function Tabs({ activeTab, setActiveTab }) {
 
 function TransmissionToggle({ transmission, setTransmission }) {
   return (
-    <div className="flex h-[39px] w-full max-w-[384px] overflow-hidden rounded-full bg-white">
+    <div className="grid h-10 w-full max-w-[384px] grid-cols-2 overflow-hidden rounded-full bg-white">
       <button
         onClick={() => setTransmission("manual")}
-        className={`h-full w-[181px] rounded-full text-[14px] font-[500] ${transmission === "manual" ? "bg-[#174A9B] text-white" : "bg-white text-[#111111]"}`}
+        className={`h-full min-w-0 rounded-full px-1 text-[10px] font-[600] sm:text-[14px] sm:font-[500] ${transmission === "manual" ? "bg-[#174A9B] text-white" : "bg-white text-[#111111]"}`}
       >
         Manual transmission
       </button>
 
       <button
         onClick={() => setTransmission("automatic")}
-        className={`h-full flex-1 rounded-full text-[14px] font-[500] ${transmission === "automatic" ? "bg-[#174A9B] text-white" : "bg-white text-[#111111]"}`}
+        className={`h-full min-w-0 rounded-full px-1 text-[10px] font-[600] sm:text-[14px] sm:font-[500] ${transmission === "automatic" ? "bg-[#174A9B] text-white" : "bg-white text-[#111111]"}`}
       >
         Automatic transmission
       </button>
@@ -102,17 +103,17 @@ function PriceBox({ sale, retail, className = "" }) {
 
 function PackageList({ features = [] }) {
   return (
-    <div className="mt-[28px] min-h-0 ">
-      <h3 className="text-[17px] font-[700] leading-none text-[#222222]">
+    <div className="mt-5 min-h-0 sm:mt-[28px]">
+      <h3 className="text-sm font-[700] leading-none text-[#222222] sm:text-[17px]">
         Package Contents
       </h3>
 
-      <ul className="mt-[20px] max-h-[210px] space-y-[17px] overflow-y-auto pr-[8px] pb-10">
+      <ul className="mt-4 max-h-[180px] space-y-3 overflow-y-auto pb-8 pr-1.5 sm:mt-[20px] sm:max-h-[210px] sm:space-y-[17px] sm:pb-10 sm:pr-[8px]">
         {features.map((content, index) => (
           <li key={index} className="flex items-start gap-[10px]">
             <FaCheckCircle className="mt-[2px] h-[13px] w-[13px] shrink-0 text-[#174A9B]" />
 
-            <span className="text-[15.5px] font-[500] leading-[18px] text-[#101010]">
+            <span className="text-xs font-[500] leading-[18px] text-[#101010] sm:text-[15.5px]">
               {content}
             </span>
           </li>
@@ -141,14 +142,14 @@ function CodeCard({ item }) {
   return (
     <article
       className={[
-        "relative flex min-h-[566px] flex-col rounded-[11px] bg-white px-[20px] pb-[20px] pt-[20px]",
+        "relative flex min-h-[500px] flex-col rounded-[11px] bg-white p-3 pb-5 sm:min-h-[566px] sm:px-[20px] sm:pb-[20px] sm:pt-[20px]",
         item.active
           ? "shadow-[0_24px_42px_rgba(23,74,155,0.20)] after:absolute after:bottom-0 after:left-0 after:h-[6px] after:w-full after:rounded-b-[11px] after:bg-[#174A9B]"
           : "",
       ].join(" ")}
     >
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[11px] bg-[#E8EEF8] px-[16px] pb-[18px] pt-[28px]">
-        <h2 className="mx-auto max-w-[250px] text-center text-[21px] font-[700] leading-[29px] text-[#E5273D]">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[11px] bg-[#E8EEF8] px-3 pb-[18px] pt-5 sm:px-[16px] sm:pt-[28px]">
+        <h2 className="mx-auto max-w-[250px] text-center text-lg font-[700] leading-6 text-[#E5273D] sm:text-[21px] sm:leading-[29px]">
           {item.title}
         </h2>
 
@@ -187,13 +188,13 @@ function DriveCard({ item }) {
   return (
     <article
       className={[
-        "relative flex min-h-[568px] flex-col rounded-[11px] bg-white px-[20px] pb-[20px] pt-[20px]",
+        "relative flex min-h-[510px] flex-col rounded-[11px] bg-white p-3 pb-5 sm:min-h-[568px] sm:px-[20px] sm:pb-[20px] sm:pt-[20px]",
         item.active
           ? "shadow-[0_28px_46px_rgba(23,74,155,0.25)] after:absolute after:bottom-0 after:left-0 after:h-[6px] after:w-full after:rounded-b-[11px] after:bg-[#174A9B]"
           : "",
       ].join(" ")}
     >
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[11px] bg-[#E8EEF8] px-[16px] pb-[14px] pt-[17px]">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[11px] bg-[#E8EEF8] px-3 pb-[14px] pt-[17px] sm:px-[16px]">
         <h2 className="text-center text-[21px] font-[700] leading-[25px] text-[#E5273D]">
           {item.title}
         </h2>
@@ -224,7 +225,7 @@ function DriveCard({ item }) {
 
 function CodeTab({ offers, transmission }) {
   return (
-    <section className="mt-[28px] rounded-[10px] bg-[#E8EEF8] px-[24px] pb-[24px] pt-[25px]">
+    <section className="mt-4 rounded-[10px] bg-[#E8EEF8] p-2.5 sm:mt-[28px] sm:px-[24px] sm:pb-[24px] sm:pt-[25px]">
       <div className="flex items-center justify-between gap-[20px] max-md:flex-col max-md:items-start">
         <h2 className="text-[21px] font-[700] leading-none text-[#174A9B]">
           Permisgo&apos;s Highway Code Packs
@@ -236,7 +237,7 @@ function CodeTab({ offers, transmission }) {
         />
       </div>
 
-      <div className="mt-[32px] grid grid-cols-1 gap-[23px] md:grid-cols-2 xl:grid-cols-3">
+      <div className="mt-4 grid grid-cols-1 gap-3 sm:mt-[32px] sm:gap-[23px] md:grid-cols-2 xl:grid-cols-3">
         {offers.map((item) => (
           <CodeCard key={item._id} item={item} />
         ))}
@@ -247,7 +248,7 @@ function CodeTab({ offers, transmission }) {
 
 function ToDriveTab({ offers, transmission }) {
   return (
-    <section className="mt-[28px] rounded-[10px] bg-[#E8EEF8] px-[24px] pb-[24px] pt-[24px]">
+    <section className="mt-4 rounded-[10px] bg-[#E8EEF8] p-2.5 sm:mt-[28px] sm:px-[24px] sm:pb-[24px] sm:pt-[24px]">
       <div className="flex items-center justify-between gap-[20px] max-md:flex-col max-md:items-start">
         <h2 className="text-[22px] font-[700] leading-none text-[#174A9B]">
           Our driving license offers
@@ -259,7 +260,7 @@ function ToDriveTab({ offers, transmission }) {
         />
       </div>
 
-      <div className="mt-[32px] grid grid-cols-1 gap-[24px] md:grid-cols-2 xl:grid-cols-3">
+      <div className="mt-4 grid grid-cols-1 gap-3 sm:mt-[32px] sm:gap-[24px] md:grid-cols-2 xl:grid-cols-3">
         {offers.map((item) => (
           <DriveCard key={item._id} item={item} />
         ))}
@@ -270,7 +271,7 @@ function ToDriveTab({ offers, transmission }) {
 
 function CpfTab({ offers, transmission }) {
   return (
-    <section className="mt-[28px] rounded-[10px] bg-[#E8EEF8] px-[24px] pb-[24px] pt-[24px]">
+    <section className="mt-4 rounded-[10px] bg-[#E8EEF8] p-2.5 sm:mt-[28px] sm:px-[24px] sm:pb-[24px] sm:pt-[24px]">
       <div className="flex items-center justify-between gap-[20px] max-md:flex-col max-md:items-start">
         <h2 className="text-[22px] font-[700] leading-none text-[#174A9B]">
           CPF rates
@@ -282,7 +283,7 @@ function CpfTab({ offers, transmission }) {
         />
       </div>
 
-      <div className="mt-[32px] grid grid-cols-1 gap-[24px] md:grid-cols-2 xl:grid-cols-3">
+      <div className="mt-4 grid grid-cols-1 gap-3 sm:mt-[32px] sm:gap-[24px] md:grid-cols-2 xl:grid-cols-3">
         {offers.map((item) => (
           <DriveCard key={item._id} item={item} />
         ))}
@@ -293,7 +294,7 @@ function CpfTab({ offers, transmission }) {
 
 function AccompanieTab({ offers, transmission }) {
   return (
-    <section className="mt-[28px] rounded-[10px] bg-[#E8EEF8] px-[24px] pb-[24px] pt-[25px]">
+    <section className="mt-4 rounded-[10px] bg-[#E8EEF8] p-2.5 sm:mt-[28px] sm:px-[24px] sm:pb-[24px] sm:pt-[25px]">
       <div className="flex items-center justify-between gap-[20px] max-md:flex-col max-md:items-start">
         <h2 className="text-[21px] font-[700] leading-none text-[#174A9B]">
           Permisgo&apos;s Highway Code Packs
@@ -305,7 +306,7 @@ function AccompanieTab({ offers, transmission }) {
         />
       </div>
 
-      <div className="mt-[32px] grid grid-cols-1 gap-[23px] md:grid-cols-2 xl:grid-cols-3">
+      <div className="mt-4 grid grid-cols-1 gap-3 sm:mt-[32px] sm:gap-[23px] md:grid-cols-2 xl:grid-cols-3">
         {offers.map((item) => (
           <CodeCard key={item._id} item={item} />
         ))}
@@ -444,7 +445,7 @@ function MapTab() {
 
 function MapPromoTab({ transmission, onViewMap }) {
   return (
-    <section className="mt-[28px] min-h-[558px] rounded-[10px] bg-[#E8EEF8] px-[24px] pb-[24px] pt-[22px] sm:px-[28px]">
+    <section className="mt-4 rounded-[10px] bg-[#E8EEF8] p-2.5 sm:mt-[28px] sm:min-h-[558px] sm:px-[28px] sm:pb-[24px] sm:pt-[22px]">
       <div className="flex items-center justify-between gap-5 max-sm:flex-col max-sm:items-start">
         <h2 className="text-[21px] font-[700] leading-none text-[#174A9B]">
           Permisgo&apos;s Highway Code Packs
@@ -455,9 +456,9 @@ function MapPromoTab({ transmission, onViewMap }) {
         />
       </div>
 
-      <div className="mt-[28px] flex min-h-[376px] items-center justify-center rounded-[11px] bg-white px-5 py-12">
+      <div className="mt-4 flex min-h-[280px] items-center justify-center rounded-[11px] bg-white px-4 py-8 sm:mt-[28px] sm:min-h-[376px] sm:px-5 sm:py-12">
         <div className="flex flex-col items-center text-center">
-          <FaMapMarkedAlt className="text-[70px] text-[#174A9B]" />
+          <FaMapMarkedAlt className="text-5xl text-[#174A9B] sm:text-[70px]" />
           <h3 className="mt-[20px] text-[20px] font-[700] leading-none text-[#174A9B]">
             Find Us in Your Area
           </h3>
@@ -503,7 +504,7 @@ export default function Page() {
   return (
     <>
       <main className="dashboard-poppins min-h-screen bg-white">
-        <div className="mx-auto w-full  px-[24px] pb-[28px] pt-[24px]">
+        <div className="mx-auto w-full min-w-0 px-2.5 pb-24 pt-4 sm:px-[24px] sm:pb-[28px] sm:pt-[24px]">
           <Header />
 
           <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />

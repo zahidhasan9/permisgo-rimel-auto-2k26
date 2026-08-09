@@ -232,23 +232,22 @@ function RequiredDocumentCard({
   const canSelect = !currentDocument || currentDocument.status === "rejected";
 
   return (
-    <article className="group min-w-0 rounded-2xl border border-slate-200 bg-white p-3.5 transition duration-200 hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md sm:p-5">
-      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+    <article className="group min-w-0 rounded-xl border border-slate-200 bg-white p-3 transition duration-200 hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md sm:rounded-2xl sm:p-5">
+      <div className="mb-3 flex flex-col gap-2.5 sm:mb-4 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
         <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <h3 className="min-w-0 text-sm font-extrabold uppercase leading-5 tracking-wide text-[#16458f]">
+          <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-start gap-2 sm:flex sm:flex-wrap sm:items-center">
+            <h3 className="min-w-0 break-words text-[12px] font-extrabold uppercase leading-[18px] tracking-wide text-[#16458f] sm:text-sm sm:leading-5">
               {requirement.title}
             </h3>
 
-            {requirement.required ? (
-              <span className="text-xs font-extrabold text-[#e2233d]">*</span>
-            ) : (
-              <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-slate-500">
-                Optional
-              </span>
-            )}
-
             <StatusBadge status={status} />
+            <div className="col-span-2">
+              {requirement.required ? (
+                <span className="text-[10px] font-bold uppercase text-[#e2233d]">Required</span>
+              ) : (
+                <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-slate-500">Optional</span>
+              )}
+            </div>
           </div>
         </div>
 
@@ -285,11 +284,11 @@ function RequiredDocumentCard({
         </label>
       </div>
 
-      <ul className="mb-5 ml-2 space-y-1">
+      <ul className="mb-3 ml-0.5 space-y-1 sm:mb-5 sm:ml-2">
         {requirement.items.map((item) => (
           <li
             key={item}
-            className="flex items-start gap-2 text-[13px] font-medium leading-5 text-slate-600"
+            className="flex items-start gap-2 text-[11px] font-medium leading-[17px] text-slate-600 sm:text-[13px] sm:leading-5"
           >
             <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#16458f]" />
             <span>{item}</span>
@@ -363,11 +362,11 @@ function RequiredDocumentCard({
               </div>
             </div>
 
-            <div className="flex min-w-0 flex-wrap items-center gap-2">
+            <div className="grid w-full min-w-0 grid-cols-[minmax(0,1fr)_36px_36px] items-center gap-2 sm:flex sm:w-auto sm:flex-wrap">
               <button
                 type="button"
                 onClick={() => onPreview(currentDocument)}
-                className="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-[11px] font-bold text-[#16458f] transition hover:border-blue-200 hover:bg-blue-50"
+                className="inline-flex h-9 min-w-0 items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-[11px] font-bold text-[#16458f] transition hover:border-blue-200 hover:bg-blue-50"
               >
                 <FaEye size={11} />
                 Preview
@@ -656,7 +655,6 @@ export default function StudentDocumentsPage() {
       await uploadDocument(formData);
     }
 
-    return documentApi.uploadDocument(formData);
   }
 
   async function handleUploadSelectedDocuments() {
@@ -801,23 +799,23 @@ export default function StudentDocumentsPage() {
       ) : null}
 
       <section className="mx-auto w-full">
-        <header className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-start gap-3 sm:items-center">
+        <header className="mb-4 flex min-w-0 items-start justify-between gap-2.5 sm:mb-6 sm:items-center">
+          <div className="flex min-w-0 items-start gap-2.5 sm:items-center sm:gap-3">
             <button
               type="button"
               onClick={() => router.back()}
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-[#16458f] shadow-sm transition hover:border-blue-200 hover:bg-blue-50"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] border border-slate-200 bg-white text-[#16458f] shadow-sm transition hover:border-blue-200 hover:bg-blue-50 sm:h-11 sm:w-11 sm:rounded-xl"
               aria-label="Go back"
             >
               <FaChevronLeft size={14} />
             </button>
 
             <div className="min-w-0">
-              <h1 className="text-2xl font-extrabold leading-tight text-[#16458f] sm:text-[28px]">
+              <h1 className="text-lg font-extrabold leading-tight text-[#16458f] sm:text-[28px]">
                 My Documents
               </h1>
 
-              <p className="mt-1 text-sm leading-5 text-slate-500">
+              <p className="mt-1 text-[10px] leading-4 text-slate-500 sm:text-sm sm:leading-5">
                 Upload and manage the documents required for verification.
               </p>
             </div>
@@ -827,10 +825,10 @@ export default function StudentDocumentsPage() {
             type="button"
             onClick={loadDocuments}
             disabled={loading || uploading}
-            className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-xs font-bold text-[#16458f] shadow-sm transition hover:border-blue-200 hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+            className="inline-flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-[10px] border border-slate-200 bg-white text-xs font-bold text-[#16458f] shadow-sm transition hover:border-blue-200 hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50 sm:h-11 sm:w-auto sm:rounded-xl sm:px-4"
           >
             <FaSyncAlt className={loading ? "animate-spin" : ""} size={12} />
-            Refresh
+            <span className="hidden sm:inline">Refresh</span>
           </button>
         </header>
 
@@ -884,20 +882,20 @@ export default function StudentDocumentsPage() {
           </div>
         </section> */}
 
-        <section className="min-w-0 rounded-2xl border border-slate-200 bg-slate-50/80 p-2.5 shadow-sm sm:rounded-3xl sm:p-5 lg:p-6">
-          <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <section className="min-w-0 rounded-xl border border-slate-200 bg-slate-50/80 p-2 shadow-sm sm:rounded-3xl sm:p-5 lg:p-6">
+          <div className="mb-3 flex items-start justify-between gap-2.5 px-1 sm:mb-5 sm:flex-row sm:items-center sm:px-0">
             <div>
-              <h2 className="text-lg font-extrabold text-slate-900">
+              <h2 className="text-base font-extrabold text-slate-900 sm:text-lg">
                 Required Documents
               </h2>
 
-              <p className="mt-1 text-xs leading-5 text-slate-500">
+              <p className="mt-1 text-[10px] leading-4 text-slate-500 sm:text-xs sm:leading-5">
                 Accepted formats are PDF, JPG, JPEG, PNG and WEBP. Maximum file
                 size is 5 MB.
               </p>
             </div>
 
-            <span className="inline-flex w-fit items-center rounded-full bg-blue-100 px-3 py-1.5 text-xs font-extrabold text-[#16458f]">
+            <span className="inline-flex w-fit shrink-0 items-center rounded-full bg-blue-100 px-2 py-1 text-[9px] font-extrabold text-[#16458f] sm:px-3 sm:py-1.5 sm:text-xs">
               {STUDENT_DOCUMENT_REQUIREMENTS.length} requirements
             </span>
           </div>
@@ -911,7 +909,7 @@ export default function StudentDocumentsPage() {
               </p>
             </div>
           ) : (
-            <div className="grid gap-4 md:grid-cols-1">
+            <div className="grid gap-2.5 sm:gap-4 lg:grid-cols-2">
               {STUDENT_DOCUMENT_REQUIREMENTS.map((requirement) => {
                 const currentDocument = latestDocumentByRequirement.get(
                   requirement.key,
@@ -966,8 +964,8 @@ export default function StudentDocumentsPage() {
           </section>
         ) : null}
 
-        <div className="mt-5 flex flex-col items-stretch justify-between gap-3 sm:flex-row sm:items-center">
-          <p className="text-xs font-semibold text-slate-500">
+        <div className="mt-4 flex flex-col items-stretch justify-between gap-2 rounded-xl border border-slate-200 bg-white p-2.5 shadow-sm sm:mt-5 sm:flex-row sm:items-center sm:gap-3 sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none">
+          <p className="px-1 text-[10px] font-semibold leading-4 text-slate-500 sm:px-0 sm:text-xs">
             {selectedCount > 0
               ? `${selectedCount} document${
                   selectedCount === 1 ? "" : "s"

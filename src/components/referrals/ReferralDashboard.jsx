@@ -134,9 +134,9 @@ export default function ReferralDashboard({ accountType = "student" }) {
 
           <section
             id="how-it-works"
-            className="grid gap-3 sm:gap-5 md:grid-cols-3 lg:gap-7"
+            className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 lg:gap-7"
           >
-            <article className="flex min-h-[190px] flex-col items-center justify-center rounded-[16px] bg-[#e8edf5] p-4 text-center sm:min-h-[240px] sm:p-6 md:min-h-[292px]">
+            <article className="col-span-2 flex min-h-[190px] flex-col items-center justify-center rounded-[16px] bg-[#e8edf5] p-4 text-center sm:min-h-[240px] sm:p-6 md:col-span-1 md:min-h-[292px]">
               <h2 className="text-[17px] font-extrabold">
                 Your Referral Code
               </h2>
@@ -222,12 +222,12 @@ export default function ReferralDashboard({ accountType = "student" }) {
 
 function StatCard({ title, value, Icon }) {
   return (
-    <article className="flex min-h-[170px] flex-col items-center justify-center rounded-[16px] bg-[#e8edf5] p-4 text-center sm:min-h-[240px] sm:p-6 md:min-h-[292px]">
+    <article className="flex min-h-[145px] min-w-0 flex-col items-center justify-center rounded-[16px] bg-[#e8edf5] p-3 text-center sm:min-h-[240px] sm:p-6 md:min-h-[292px]">
       <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-white text-lg text-[#16458f] sm:h-[52px] sm:w-[52px] sm:rounded-[13px] sm:text-xl">
         <Icon />
       </span>
-      <h2 className="mt-4 text-sm font-extrabold sm:mt-7 sm:text-[17px]">{title}</h2>
-      <p className="mt-2 text-3xl font-black leading-none text-[#16458f] sm:mt-3 sm:text-[35px]">
+      <h2 className="mt-3 break-words text-xs font-extrabold leading-4 sm:mt-7 sm:text-[17px] sm:leading-normal">{title}</h2>
+      <p className="mt-2 max-w-full break-words text-2xl font-black leading-none text-[#16458f] sm:mt-3 sm:text-[35px]">
         {value}
       </p>
     </article>

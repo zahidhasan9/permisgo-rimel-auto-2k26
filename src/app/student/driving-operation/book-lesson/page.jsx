@@ -586,7 +586,7 @@ function ConfirmationStep({ booking, teacher, router }) {
         <div className="mt-4 rounded-xl border border-green-400 bg-green-50 p-4 text-sm leading-6 text-slate-600">
           Your {booking?.duration ? `${booking.duration / 60}-hour` : "driving"} lesson with Mr. {teacherName(teacher)} has been successfully booked for {booking?.bookingDate ? formatBookingDate(booking.bookingDate) : "the selected date"} at {booking?.startTime}. Your lesson is confirmed.
         </div>
-        <button type="button" onClick={() => router.push("/student/driving-operation/my-lessons")} className="mt-4 w-full rounded-lg border border-[#174a9b] bg-white py-3 text-sm font-bold text-[#df2339]">Go to My Lessons</button>
+        <button type="button" onClick={() => router.push("/student/lessons")} className="mt-4 w-full rounded-lg border border-[#174a9b] bg-white py-3 text-sm font-bold text-[#df2339]">Go to My Lessons</button>
         <p className="mt-3 text-center text-xs text-slate-500"><FaClock className="mr-1 inline" />Students cannot cancel a confirmed booking.</p>
       </div>
     </section>

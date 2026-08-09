@@ -97,60 +97,60 @@ export default function LearningBookletPage() {
   const categoryPercentages = useMemo(() => groupedSkills.map((skills) => skills.length ? Math.round(skills.reduce((total, skill) => total + (STATUS_SCORE[skillStatus[skill]] || 0), 0) / skills.length) : 0), [groupedSkills, skillStatus]);
 
   return (
-    <main className="min-h-screen bg-white px-3 py-6 sm:px-6">
-      <header className="flex items-start gap-4">
-        <button type="button" onClick={() => router.back()} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#eef2f8]"><IoChevronBack size={25} /></button>
-        <div><h1 className="text-[25px] font-bold text-[#174a9b]">Learning booklet</h1><p className="mt-2 text-sm text-slate-500">Track your real driving lessons, reports and acquired skills.</p></div>
+    <main className="min-h-screen overflow-x-hidden bg-white px-2.5 pb-24 pt-3 sm:px-6 sm:pb-8 sm:pt-6">
+      <header className="flex min-w-0 items-start gap-2.5 sm:gap-4">
+        <button type="button" onClick={() => router.back()} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-[#eef2f8] sm:h-11 sm:w-11 sm:rounded-xl"><IoChevronBack size={22} /></button>
+        <div className="min-w-0"><h1 className="truncate text-lg font-bold text-[#174a9b] sm:text-[25px]">Learning booklet</h1><p className="mt-1 text-[10px] leading-4 text-slate-500 sm:mt-2 sm:text-sm">Track your real driving lessons, reports and acquired skills.</p></div>
       </header>
 
       {error && <div className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700">{error}</div>}
 
-      <section className="mt-8 rounded-xl bg-[#e8eef7] p-5">
-        <h2 className="text-xl font-bold text-[#174a9b]">Your learning booklet</h2>
-        <div className="mt-4 flex flex-wrap gap-4 text-sm"><p className="rounded-lg bg-white px-4 py-3">NEPH: <b>{profile?.nephNumber || "Not provided"}</b></p><p className="rounded-lg bg-white px-4 py-3">Completed lessons: <b>{completed.length}</b></p><p className="rounded-lg bg-white px-4 py-3">Completed hours: <b>{completedHours.toFixed(completedHours % 1 ? 1 : 0)}</b></p></div>
+      <section className="mt-4 min-w-0 rounded-xl bg-[#e8eef7] p-3 sm:mt-8 sm:p-5">
+        <h2 className="text-base font-bold text-[#174a9b] sm:text-xl">Your learning booklet</h2>
+        <div className="mt-3 grid grid-cols-2 gap-2 text-[10px] sm:mt-4 sm:flex sm:flex-wrap sm:gap-4 sm:text-sm"><p className="col-span-2 min-w-0 break-words rounded-lg bg-white px-3 py-2.5 sm:col-auto sm:px-4 sm:py-3">NEPH: <b>{profile?.nephNumber || "Not provided"}</b></p><p className="rounded-lg bg-white px-3 py-2.5 sm:px-4 sm:py-3">Completed lessons: <b className="block text-sm sm:inline">{completed.length}</b></p><p className="rounded-lg bg-white px-3 py-2.5 sm:px-4 sm:py-3">Completed hours: <b className="block text-sm sm:inline">{completedHours.toFixed(completedHours % 1 ? 1 : 0)}</b></p></div>
       </section>
 
-      <section className="mt-5 rounded-xl bg-[#e8eef7] p-5">
-        <h2 className="text-xl font-bold text-[#174a9b]">Tracking Sheet</h2>
+      <section className="mt-3 min-w-0 rounded-xl bg-[#e8eef7] p-3 sm:mt-5 sm:p-5">
+        <h2 className="text-base font-bold text-[#174a9b] sm:text-xl">Tracking Sheet</h2>
         {loading ? <div className="mt-5 h-44 animate-pulse rounded-xl bg-white" /> : latest ? (
-          <div className="mt-5 rounded-xl bg-white p-5">
+          <div className="mt-3 rounded-xl bg-white p-3 sm:mt-5 sm:p-5">
             <div className="grid gap-3 text-sm text-slate-600"><Row label="Date" value={`${formatDate(latest.lessonDate)} · ${formatDuration(latest.duration)}`} /><Row label="Location" value={getLessonLocation(latest)} /><Row label="Teacher" value={latest.teacher?.name || "Instructor"} /><Row label="Lesson summary" value={latest.lessonProgress?.teacherNotes || "No teacher report submitted yet."} /></div>
           </div>
         ) : <div className="mt-5 rounded-xl bg-white p-8 text-center text-sm text-slate-500">No lesson has been booked yet.</div>}
       </section>
 
-      <section className="mt-5 rounded-[12px] bg-[#E5ECF7] px-[20px] pb-[20px] pt-[18px]">
+      <section className="mt-3 rounded-[12px] bg-[#E5ECF7] p-3 sm:mt-5 sm:px-5 sm:pb-5 sm:pt-[18px]">
         <button type="button" onClick={() => setShowReports((current) => !current)} className="flex w-full items-center justify-between text-left text-[17px] font-[500] leading-[22px] text-[#174A9B]">
           Previous reports
           <FaCaretDown className={`text-[17px] text-[#222] transition-transform ${showReports ? "rotate-180" : ""}`} />
         </button>
 
         {showReports && (
-          <div className="mt-[10px] space-y-[15px]">
+          <div className="mt-2.5 max-h-[520px] space-y-2.5 overflow-y-auto pr-0.5 sm:space-y-[15px]">
             {completed.map((lesson) => <ReportCard key={lesson._id} lesson={lesson} />)}
             {completed.length === 0 && <div className="rounded-[12px] bg-white px-5 py-8 text-center text-sm text-slate-500">No completed report.</div>}
           </div>
         )}
       </section>
 
-      <section className="mt-5 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-        {categories.map((item, index) => <button type="button" key={item.code} onClick={() => { setOpenSkillGroup(index); window.setTimeout(() => document.getElementById(`student-skill-group-${index}`)?.scrollIntoView({ behavior: "smooth", block: "start" }), 0); }} className="rounded-xl border p-5 text-left transition hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#174a9b]" style={{ backgroundColor: item.bg, borderColor: item.border }}><div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-white font-bold text-[#174a9b]">{item.code}</div><h3 className="mt-3 text-center text-sm font-bold text-[#174a9b]">{item.title}</h3><p className="mt-1 text-center text-[10px] text-slate-600">{skillGroups[index].text}</p><div className="mt-4 overflow-hidden rounded-full bg-white"><div className="h-3 rounded-full" style={{ width: `${categoryPercentages[index]}%`, backgroundColor: item.bar }} /></div><p className="mt-2 text-center text-xs font-bold">{categoryPercentages[index]}% Completed · View skills</p></button>)}
+      <section className="mt-3 flex snap-x snap-mandatory gap-2.5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mt-5 sm:grid sm:grid-cols-2 sm:gap-5 sm:overflow-visible xl:grid-cols-4">
+        {categories.map((item, index) => <button type="button" key={item.code} onClick={() => { setOpenSkillGroup(index); window.setTimeout(() => document.getElementById(`student-skill-group-${index}`)?.scrollIntoView({ behavior: "smooth", block: "start" }), 0); }} className="w-[78%] shrink-0 snap-start rounded-xl border p-3.5 text-left transition hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#174a9b] sm:w-auto sm:p-5" style={{ backgroundColor: item.bg, borderColor: item.border }}><div className="mx-auto flex h-9 w-9 items-center justify-center rounded-full bg-white text-sm font-bold text-[#174a9b] sm:h-10 sm:w-10">{item.code}</div><h3 className="mt-2 text-center text-xs font-bold text-[#174a9b] sm:mt-3 sm:text-sm">{item.title}</h3><p className="mt-1 line-clamp-2 text-center text-[9px] text-slate-600 sm:text-[10px]">{skillGroups[index].text}</p><div className="mt-3 overflow-hidden rounded-full bg-white sm:mt-4"><div className="h-2.5 rounded-full sm:h-3" style={{ width: `${categoryPercentages[index]}%`, backgroundColor: item.bar }} /></div><p className="mt-2 text-center text-[10px] font-bold sm:text-xs">{categoryPercentages[index]}% Completed · View skills</p></button>)}
       </section>
 
-      <section id="booklet-skills" className="mt-5 scroll-mt-4 rounded-xl bg-[#e8eef7] p-5">
-        <div className="flex items-center justify-between gap-4"><h2 className="text-xl font-bold text-[#174a9b]">Skills</h2><p className="text-sm font-bold text-green-600">{completedHours.toFixed(completedHours % 1 ? 1 : 0)} hours Completed</p></div>
-        <div className="mt-5 rounded-xl bg-white p-4 sm:p-5">
+      <section id="booklet-skills" className="mt-3 scroll-mt-4 rounded-xl bg-[#e8eef7] p-3 sm:mt-5 sm:p-5">
+        <div className="flex items-center justify-between gap-3"><h2 className="text-base font-bold text-[#174a9b] sm:text-xl">Skills</h2><p className="text-right text-[10px] font-bold text-green-600 sm:text-sm">{completedHours.toFixed(completedHours % 1 ? 1 : 0)} hours Completed</p></div>
+        <div className="mt-3 rounded-xl bg-white p-2.5 sm:mt-5 sm:p-5">
           <div className="space-y-3">{skillGroups.map((group, index) => {
             const open = openSkillGroup === index;
             const skills = groupedSkills[index];
             return <section id={`student-skill-group-${index}`} key={group.title} className="scroll-mt-4 overflow-hidden rounded-xl bg-[#e8eef7]">
-              <button type="button" onClick={() => setOpenSkillGroup(open ? -1 : index)} aria-expanded={open} className="flex w-full items-center justify-between gap-4 px-5 py-5 text-left text-sm"><span><b>{group.title}</b> {group.text}</span><FaCaretDown className={`shrink-0 transition-transform ${open ? "rotate-180" : ""}`} /></button>
-              {open && <div className="mx-4 mb-4 space-y-3 rounded-xl bg-white p-3 sm:mx-5 sm:p-4">
-                {skills.length ? skills.map((skill) => <div key={skill} className="grid items-center gap-3 rounded-lg bg-[#f8fafc] p-3 sm:grid-cols-[1fr_150px_150px_165px]">
-                  <p className="text-xs text-slate-600">{skill}</p>
-                  <span className={`rounded-lg px-4 py-2 text-center text-xs ${skillStatus[skill] === "not_acquired" || !skillStatus[skill] ? "bg-slate-600 font-semibold text-white" : "bg-[#e8eef7] text-slate-500"}`}>Not acquired</span>
-                  <span className={`rounded-lg px-4 py-2 text-center text-xs ${skillStatus[skill] === "to_work" ? "bg-amber-500 font-semibold text-white" : "bg-[#e8eef7] text-slate-500"}`}>To work</span>
-                  <span className={`rounded-lg px-4 py-2 text-center text-xs font-semibold ${skillStatus[skill] === "acquired" ? "bg-[#174a9b] text-white" : "bg-[#e8eef7] text-slate-500"}`}>Acquired</span>
+              <button type="button" onClick={() => setOpenSkillGroup(open ? -1 : index)} aria-expanded={open} className="flex w-full items-center justify-between gap-3 px-3 py-3.5 text-left text-[11px] leading-4 sm:gap-4 sm:px-5 sm:py-5 sm:text-sm"><span><b>{group.title}</b> {group.text}</span><FaCaretDown className={`shrink-0 transition-transform ${open ? "rotate-180" : ""}`} /></button>
+              {open && <div className="mx-2 mb-2 space-y-2 rounded-xl bg-white p-2 sm:mx-5 sm:mb-4 sm:space-y-3 sm:p-4">
+                {skills.length ? skills.map((skill) => <div key={skill} className="grid grid-cols-3 items-center gap-1.5 rounded-lg bg-[#f8fafc] p-2.5 sm:grid-cols-[1fr_150px_150px_165px] sm:gap-3 sm:p-3">
+                  <p className="col-span-3 mb-1 text-[11px] leading-4 text-slate-600 sm:col-span-1 sm:mb-0 sm:text-xs">{skill}</p>
+                  <span className={`rounded-lg px-1 py-2 text-center text-[9px] leading-3 sm:px-4 sm:text-xs ${skillStatus[skill] === "not_acquired" || !skillStatus[skill] ? "bg-slate-600 font-semibold text-white" : "bg-[#e8eef7] text-slate-500"}`}>Not acquired</span>
+                  <span className={`rounded-lg px-1 py-2 text-center text-[9px] leading-3 sm:px-4 sm:text-xs ${skillStatus[skill] === "to_work" ? "bg-amber-500 font-semibold text-white" : "bg-[#e8eef7] text-slate-500"}`}>To work</span>
+                  <span className={`rounded-lg px-1 py-2 text-center text-[9px] font-semibold leading-3 sm:px-4 sm:text-xs ${skillStatus[skill] === "acquired" ? "bg-[#174a9b] text-white" : "bg-[#e8eef7] text-slate-500"}`}>Acquired</span>
                 </div>) : <p className="p-4 text-center text-sm text-slate-500">No skill recorded in this category yet.</p>}
               </div>}
             </section>;
@@ -162,22 +162,22 @@ export default function LearningBookletPage() {
 }
 
 function Row({ label, value }) {
-  return <div className="flex flex-wrap gap-2"><b className="min-w-[120px] text-slate-900">{label}:</b><span>{value}</span></div>;
+  return <div className="grid min-w-0 gap-1 sm:grid-cols-[120px_minmax(0,1fr)] sm:gap-2"><b className="text-slate-900">{label}:</b><span className="min-w-0 break-words">{value}</span></div>;
 }
 
 function ReportCard({ lesson }) {
   const durationLabel = formatDuration(lesson.duration);
 
   return (
-    <article className="min-h-[164px] rounded-[12px] bg-white px-[20px] py-[19px] text-[14px] leading-[20px] text-[#66666D]">
+    <article className="rounded-[12px] bg-white p-3.5 text-[11px] leading-[17px] text-[#66666D] sm:min-h-[164px] sm:px-5 sm:py-[19px] sm:text-[14px] sm:leading-5">
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
         <strong className="text-[#171717]">Date:</strong>
         <span>{formatDate(lesson.lessonDate)}</span>
         <span className="rounded-[4px] bg-[#EEF2F8] px-[6px] py-[2px] text-[#174A9B]">{durationLabel}</span>
       </div>
-      <p className="mt-[14px]"><strong className="text-[#171717]">Location:</strong> {getLessonLocation(lesson)}</p>
-      <p className="mt-[14px]"><strong className="text-[#171717]">Teacher:</strong> {lesson.teacher?.name || "Instructor"}</p>
-      <p className="mt-[14px]"><strong className="text-[#171717]">Lesson summary:</strong> {lesson.lessonProgress?.teacherNotes || "No teacher report submitted yet."}</p>
+      <p className="mt-2.5 break-words sm:mt-[14px]"><strong className="text-[#171717]">Location:</strong> {getLessonLocation(lesson)}</p>
+      <p className="mt-2.5 break-words sm:mt-[14px]"><strong className="text-[#171717]">Teacher:</strong> {lesson.teacher?.name || "Instructor"}</p>
+      <p className="mt-2.5 break-words sm:mt-[14px]"><strong className="text-[#171717]">Lesson summary:</strong> {lesson.lessonProgress?.teacherNotes || "No teacher report submitted yet."}</p>
     </article>
   );
 }

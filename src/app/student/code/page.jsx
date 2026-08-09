@@ -77,13 +77,13 @@ function MenuCard({ item }) {
   const external = /^https?:\/\//i.test(link);
   return <Link href={link} target={external ? "_blank" : undefined}
     rel={external ? "noopener noreferrer" : undefined}
-    className="flex h-[94px] w-full items-center justify-between rounded-[10px] border-[1.5px] border-[#0D55A7] bg-[#E8EEF7] px-[28px] transition hover:bg-[#dfe8f5]">
-    <span className="flex min-w-0 items-center gap-[18px]"><img src={icon} alt="" className="h-[45px] w-[45px] shrink-0 object-contain" /><span className="text-[16px] font-semibold text-[#272A31]">{title}{count && <b className="ml-1 text-[#E71936]">({count})</b>}</span></span><Chevron />
+    className="flex min-h-[112px] w-full min-w-0 flex-col items-center justify-center gap-2 rounded-[10px] border-[1.5px] border-[#0D55A7] bg-[#E8EEF7] px-2 py-3 text-center transition hover:bg-[#dfe8f5] sm:h-[94px] sm:min-h-0 sm:flex-row sm:justify-between sm:px-5 sm:py-0 sm:text-left lg:px-[28px]">
+    <span className="flex min-w-0 flex-col items-center gap-2 sm:flex-row sm:gap-[18px]"><img src={icon} alt="" className="h-9 w-9 shrink-0 object-contain sm:h-[45px] sm:w-[45px]" /><span className="break-words text-[13px] font-semibold leading-4 text-[#272A31] sm:text-[16px] sm:leading-5">{title}{count && <b className="ml-1 text-[#E71936]">({count})</b>}</span></span><span className="hidden sm:block"><Chevron /></span>
   </Link>;
 }
 
 function MenuGrid({ items }) {
-  return <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">{items.map((item) => <MenuCard key={item[0]} item={item} />)}</div>;
+  return <div className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-2 xl:grid-cols-3">{items.map((item) => <MenuCard key={item[0]} item={item} />)}</div>;
 }
 
 function TopicBar({ item }) {
@@ -98,7 +98,7 @@ function TopicBar({ item }) {
 }
 
 function TopicText({ item }) {
-  return <p className="flex items-start gap-2 text-[13px] font-medium leading-6 text-[#4b5563]"><b className="min-w-[38px] shrink-0 text-[17px]" style={{ color: item[1] }}>{item[0]} :</b><span>{item[2]}</span></p>;
+  return <p className="flex items-start gap-2 text-[12px] font-medium leading-5 text-[#4b5563] sm:text-[13px] sm:leading-6"><b className="min-w-[34px] shrink-0 text-[15px] sm:min-w-[38px] sm:text-[17px]" style={{ color: item[1] }}>{item[0]} :</b><span>{item[2]}</span></p>;
 }
 
 export default function CodePracticePage() {
@@ -157,37 +157,37 @@ export default function CodePracticePage() {
     return [item[0], `${percentage}%`, `${percentage}%`, item[3]];
   };
 
-  return <main className="min-h-screen bg-white px-3 py-[31px] sm:px-6">
-    <div className="mx-auto w-full ">
-      <header className="mb-[34px] flex items-center gap-[18px]"><button type="button" onClick={() => router.back()} className="flex h-[48px] w-[48px] items-center justify-center rounded-[12px] bg-[#EEF2F8]"><Chevron back /></button><h1 className="text-[25px] font-bold text-[#0D4598]">Code Practice</h1></header>
+  return <main className="min-h-screen overflow-x-hidden bg-white px-3 py-4 sm:px-6 sm:py-[31px]">
+    <div className="mx-auto w-full max-w-[1440px]">
+      <header className="mb-5 flex items-center gap-3 sm:mb-[34px] sm:gap-[18px]"><button type="button" onClick={() => router.back()} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-[#EEF2F8] sm:h-[48px] sm:w-[48px] sm:rounded-[12px]"><Chevron back /></button><h1 className="text-[21px] font-bold text-[#0D4598] sm:text-[25px]">Code Practice</h1></header>
 
       <MenuGrid items={practiceCards.map((item) => item[0] === "My mistakes" ? [...item, String(mistakeCount)] : item)} />
-      <h2 className="mb-[22px] mt-[34px] text-[22px] font-bold text-[#0D4598]">Code Revisions</h2>
+      <h2 className="mb-4 mt-7 text-[19px] font-bold text-[#0D4598] sm:mb-[22px] sm:mt-[34px] sm:text-[22px]">Code Revisions</h2>
       <MenuGrid items={revisionCards} />
-      <h2 className="mb-[22px] mt-[34px] text-[22px] font-bold text-[#0D4598]">Exam</h2>
+      <h2 className="mb-4 mt-7 text-[19px] font-bold text-[#0D4598] sm:mb-[22px] sm:mt-[34px] sm:text-[22px]">Exam</h2>
       <MenuGrid items={examCards} />
 
-      <section className="mt-[32px] rounded-[10px] bg-[#E8EEF7] px-[22px] pb-[24px] pt-[22px]">
-        <h2 className="text-[22px] font-bold text-[#0D4598]">My Latest Series</h2>
-        <div className="mt-5 overflow-hidden rounded-[8px] bg-white px-6">
+      <section className="mt-7 rounded-[10px] bg-[#E8EEF7] px-3 pb-4 pt-4 sm:mt-[32px] sm:px-[22px] sm:pb-[24px] sm:pt-[22px]">
+        <h2 className="text-[19px] font-bold text-[#0D4598] sm:text-[22px]">My Latest Series</h2>
+        <div className="mt-4 overflow-hidden rounded-[8px] bg-white px-3 sm:mt-5 sm:px-6">
           {latestLoading ? Array.from({ length: 5 }).map((_, index) => <div key={index} className="h-[62px] animate-pulse border-b border-[#E3E7EE] bg-slate-50 last:border-0" />) : latestSeries.length ? latestSeries.map((attempt) => {
             const quiz = attempt.quiz || {};
             const completed = attempt.status === "completed";
             const href = completed ? `/student/code/results?attemptId=${attempt._id}` : `/student/code/code-challenge?quizId=${quiz._id || quiz}`;
-            return <div key={attempt._id} className="grid min-h-[62px] grid-cols-1 items-center gap-3 border-b border-[#E3E7EE] py-3 last:border-0 md:grid-cols-[190px_1fr_170px_140px]">
-              <span className="inline-flex h-[31px] w-[120px] items-center justify-center rounded-[4px] bg-[#BFCBE2] text-[12px] font-bold text-[#0D4598]">{formatAttemptDate(attempt.createdAt)}</span>
-              <p className="text-[12px] font-semibold text-[#24262B]">{quizTypeLabel[quiz.type] || quiz.title || "Quiz Series"}</p>
-              <p className="text-[12px] font-medium text-[#878B94]">Last Score: {completed ? `${attempt.score || 0}/${attempt.totalQuestions || 0}` : `-/${attempt.totalQuestions || 0}`}</p>
-              <Link href={href} className={`flex h-9 w-[120px] items-center justify-center justify-self-start rounded-[8px] text-[12px] font-bold text-white md:justify-self-end ${completed ? "bg-[#0C3B78]" : "bg-[#E9223D]"}`}>{completed ? "Goodbye" : "Take The Exam"}</Link>
+            return <div key={attempt._id} className="grid min-h-[62px] grid-cols-[1fr_auto] items-center gap-x-2 gap-y-2 border-b border-[#E3E7EE] py-3 last:border-0 md:grid-cols-[190px_1fr_170px_140px] md:gap-3">
+              <span className="inline-flex h-[28px] w-fit items-center justify-center rounded-[4px] bg-[#BFCBE2] px-2 text-[10px] font-bold text-[#0D4598] sm:text-[12px] md:h-[31px] md:w-[120px] md:px-0">{formatAttemptDate(attempt.createdAt)}</span>
+              <p className="text-right text-[11px] font-semibold text-[#24262B] md:text-left md:text-[12px]">{quizTypeLabel[quiz.type] || quiz.title || "Quiz Series"}</p>
+              <p className="text-[11px] font-medium text-[#878B94] md:text-[12px]">Last Score: {completed ? `${attempt.score || 0}/${attempt.totalQuestions || 0}` : `-/${attempt.totalQuestions || 0}`}</p>
+              <Link href={href} className={`flex h-8 w-[104px] items-center justify-center justify-self-end rounded-[7px] text-[10px] font-bold text-white md:h-9 md:w-[120px] md:rounded-[8px] md:text-[12px] ${completed ? "bg-[#0C3B78]" : "bg-[#E9223D]"}`}>{completed ? "Goodbye" : "Take The Exam"}</Link>
             </div>;
           }) : <div className="flex min-h-[90px] items-center justify-center text-[13px] font-medium text-[#878B94]">No quiz attempt yet.</div>}
         </div>
       </section>
 
-      <section className="mt-[30px] rounded-[7px] bg-[#E8EEF7] px-[22px] pb-[22px] pt-[22px]">
-        <h2 className="text-[22px] font-bold text-[#0D4598]">My result by topic</h2>
-        <div className="mt-5 grid grid-cols-1 gap-x-5 gap-y-5 lg:grid-cols-2"><div className="space-y-5">{leftTopics.map((item) => <TopicBar key={item[0]} item={liveTopic(item)} />)}</div><div className="space-y-5">{rightTopics.map((item) => <TopicBar key={item[0]} item={liveTopic(item)} />)}</div></div>
-        <div className="mt-5 rounded-[6px] bg-white px-[18px] py-[20px]"><h3 className="mb-[18px] text-[15px] font-bold text-[#0D4598]">List of topics:</h3><div className="grid grid-cols-1 gap-x-[35px] gap-y-[15px] lg:grid-cols-2"><div className="space-y-[15px]">{leftTopicList.map((item) => <TopicText key={item[0]} item={item} />)}</div><div className="space-y-[15px]">{rightTopicList.map((item) => <TopicText key={item[0]} item={item} />)}</div></div></div>
+      <section className="mt-5 rounded-[7px] bg-[#E8EEF7] px-3 pb-4 pt-4 sm:mt-[30px] sm:px-[22px] sm:pb-[22px] sm:pt-[22px]">
+        <h2 className="text-[19px] font-bold text-[#0D4598] sm:text-[22px]">My result by topic</h2>
+        <div className="mt-4 grid grid-cols-1 gap-x-5 gap-y-3 sm:mt-5 sm:gap-y-5 lg:grid-cols-2"><div className="space-y-3 sm:space-y-5">{leftTopics.map((item) => <TopicBar key={item[0]} item={liveTopic(item)} />)}</div><div className="space-y-3 sm:space-y-5">{rightTopics.map((item) => <TopicBar key={item[0]} item={liveTopic(item)} />)}</div></div>
+        <div className="mt-4 rounded-[6px] bg-white px-3 py-4 sm:mt-5 sm:px-[18px] sm:py-[20px]"><h3 className="mb-4 text-[15px] font-bold text-[#0D4598] sm:mb-[18px]">List of topics:</h3><div className="grid grid-cols-1 gap-x-[35px] gap-y-3 sm:gap-y-[15px] lg:grid-cols-2"><div className="space-y-3 sm:space-y-[15px]">{leftTopicList.map((item) => <TopicText key={item[0]} item={item} />)}</div><div className="space-y-3 sm:space-y-[15px]">{rightTopicList.map((item) => <TopicText key={item[0]} item={item} />)}</div></div></div>
       </section>
     </div>
   </main>;

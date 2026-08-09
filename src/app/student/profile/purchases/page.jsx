@@ -207,7 +207,6 @@
 
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { IoChevronBack } from "react-icons/io5";
@@ -220,16 +219,16 @@ function Header() {
   }
 
   return (
-    <header className="flex items-center gap-[16px]">
+    <header className="flex min-w-0 items-center gap-2.5 sm:gap-4">
       <button
         type="button"
-        className="flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-[12px] bg-[#EEF4FB] text-[27px] text-black"
+        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-[#EEF4FB] text-[22px] text-black sm:h-[44px] sm:w-[44px] sm:rounded-[12px] sm:text-[27px]"
         onClick={handleBack}
       >
         <IoChevronBack />
       </button>
 
-      <h1 className="text-[26px] font-[700] leading-none text-[#174A9B]">
+      <h1 className="truncate text-xl font-[700] leading-none text-[#174A9B] sm:text-[26px]">
         My Purchase
       </h1>
     </header>
@@ -240,31 +239,25 @@ function Header() {
 
 
 function CreditCard() {
-  const router = useRouter();
-
-  function handleBack() {
-    router.back();
-  }
-
   return (
-    <section className="h-[333px] rounded-[10px] bg-[#E8EEF8] px-[24px] pt-[28px]">
-      <h2 className="text-[21px] font-[700] leading-none text-[#174A9B]">
+    <section className="flex min-h-[245px] min-w-0 flex-col rounded-[10px] bg-[#E8EEF8] p-4 sm:min-h-[333px] sm:px-6 sm:pt-7">
+      <h2 className="text-lg font-[700] leading-none text-[#174A9B] sm:text-[21px]">
         My Credit
       </h2>
 
-      <h3 className="mt-[29px] text-[21px] font-[700] leading-none text-[#252525]">
+      <h3 className="mt-6 text-lg font-[700] leading-none text-[#252525] sm:mt-[29px] sm:text-[21px]">
         Driving lessons
       </h3>
 
-      <p className="mt-[16px] text-[14px] font-[500] leading-none text-[#666666]">
+      <p className="mt-3 text-[13px] font-[500] leading-none text-[#666666] sm:mt-4 sm:text-[14px]">
         0 Credit available
       </p>
 
-      <button className="mt-[32px] h-[32px] w-[182px] rounded-[3px] bg-[#B6C8E5] text-[12px] font-[700] text-[#174A9B]">
+      <div className="mt-5 w-fit max-w-full rounded-md bg-[#B6C8E5] px-3 py-2 text-center text-[11px] font-[700] text-[#174A9B] sm:mt-8 sm:px-4 sm:text-[12px]">
         Automatic Transmission
-      </button>
+      </div>
 
-      <button className="mt-[75px] h-[40px] w-[71px] rounded-[8px] bg-[#E5273D] text-[12px] font-[700] text-white">
+      <button className="mt-auto h-11 w-full rounded-[8px] bg-[#E5273D] text-[12px] font-[700] text-white sm:h-10 sm:w-[90px]">
         Buy now
       </button>
     </section>
@@ -273,30 +266,30 @@ function CreditCard() {
 
 function PurchaseHistory() {
   return (
-    <section className="h-[333px] rounded-[10px] bg-[#E8EEF8] px-[24px] pt-[28px]">
-      <h2 className="text-[21px] font-[700] leading-none text-[#174A9B]">
+    <section className="min-w-0 rounded-[10px] bg-[#E8EEF8] p-4 sm:min-h-[333px] sm:px-6 sm:pt-7">
+      <h2 className="text-lg font-[700] leading-none text-[#174A9B] sm:text-[21px]">
         Purchase history
       </h2>
 
-      <div className="mt-[28px] min-h-[198px] rounded-[10px] bg-white px-[20px] py-[20px]">
-        <div className="flex items-start justify-between gap-[20px]">
+      <div className="mt-4 min-h-[198px] rounded-[10px] bg-white p-3.5 sm:mt-7 sm:p-5">
+        <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-5">
           <div className="min-w-0">
-            <p className="max-w-[520px] text-[14px] font-[500] leading-[22px] text-[#666666]">
+            <p className="max-w-[520px] break-words text-[12px] font-[500] leading-[19px] text-[#666666] sm:text-[14px] sm:leading-[22px]">
               Driving license | Zen Permit | Theory test + 20 driving lessons
-              <br />| 20 hours
+              <span className="block">| 20 hours</span>
             </p>
 
-            <p className="mt-[17px] text-[16px] font-[500] leading-none text-[#111111]">
+            <p className="mt-3 text-[13px] font-[500] leading-none text-[#111111] sm:mt-[17px] sm:text-[16px]">
               23 March, 2026
             </p>
           </div>
 
-          <span className="flex h-[32px] w-[86px] shrink-0 items-center justify-center rounded-[3px] bg-[#B6C8E5] text-[12px] font-[700] text-[#174A9B]">
+          <span className="flex h-8 w-fit shrink-0 items-center justify-center rounded-md bg-[#B6C8E5] px-3 text-[11px] font-[700] text-[#174A9B] sm:w-[86px] sm:text-[12px]">
             Credited
           </span>
         </div>
 
-        <button className="mt-[40px] h-[40px] w-[122px] rounded-[8px] bg-[#E5273D] text-[12px] font-[700] text-white">
+        <button className="mt-5 h-11 w-full rounded-[8px] bg-[#E5273D] px-4 text-[12px] font-[700] text-white sm:mt-10 sm:h-10 sm:w-auto">
           View my invoices
         </button>
       </div>
@@ -307,11 +300,11 @@ function PurchaseHistory() {
 export default function Page() {
   return (
     <>
-      <main className="dashboard-poppins min-h-screen bg-white">
-        <div className="mx-auto w-full  px-[24px] pb-[24px] pt-[26px]">
+      <main className="dashboard-poppins min-h-screen overflow-x-hidden bg-white">
+        <div className="mx-auto w-full px-2.5 pb-24 pt-3 sm:px-6 sm:pb-8 sm:pt-[26px]">
           <Header />
 
-          <div className="mt-[34px] grid grid-cols-1 gap-[20px] lg:grid-cols-[340px_1fr]">
+          <div className="mt-4 grid min-w-0 grid-cols-1 gap-3 sm:mt-[34px] sm:gap-5 lg:grid-cols-[340px_minmax(0,1fr)]">
             <CreditCard />
             <PurchaseHistory />
           </div>

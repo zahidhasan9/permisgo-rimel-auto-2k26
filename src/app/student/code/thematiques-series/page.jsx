@@ -63,17 +63,17 @@ export default function ThematiquesSeriesPage() {
   const series = useMemo(() => [...quizzes].sort((a, b) => Number(a.order || 0) - Number(b.order || 0) || new Date(a.createdAt) - new Date(b.createdAt)), [quizzes]);
 
   return (
-    <main className="min-h-screen bg-white px-3 py-[26px] sm:px-6">
-      <div className="mx-auto w-full ">
-        <header className="flex h-11 items-center gap-[18px]">
-          <button type="button" onClick={() => router.back()} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#e8eef7] text-black"><IoChevronBack size={26} /></button>
-          <h1 className="text-[24px] font-bold leading-none text-[#173f8f]">Thematic Series List</h1>
+    <main className="min-h-screen overflow-x-hidden bg-white px-3 py-4 sm:px-6 sm:py-[26px]">
+      <div className="mx-auto w-full max-w-[1440px]">
+        <header className="flex min-h-10 items-center gap-3 sm:h-11 sm:gap-[18px]">
+          <button type="button" onClick={() => router.back()} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-[#e8eef7] text-black sm:h-11 sm:w-11 sm:rounded-xl"><IoChevronBack size={22} /></button>
+          <h1 className="min-w-0 text-[20px] font-bold leading-6 text-[#173f8f] sm:text-[24px] sm:leading-none">Thematic Series List</h1>
         </header>
 
         {error && <div className="mt-[34px] rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700">{error}</div>}
 
-        <section className="mt-[34px] grid grid-cols-1 gap-5 lg:grid-cols-2">
-          {loading ? Array.from({ length: 10 }).map((_, index) => <div key={index} className="h-[108px] animate-pulse rounded-[10px] bg-[#e8eef7]" />) : series.map((quiz, index) => {
+        <section className="mt-6 grid grid-cols-1 gap-3 sm:mt-[34px] sm:gap-5 lg:grid-cols-2">
+          {loading ? Array.from({ length: 10 }).map((_, index) => <div key={index} className="h-[96px] animate-pulse rounded-[10px] bg-[#e8eef7] sm:h-[108px]" />) : series.map((quiz, index) => {
             const theme = THEMES[index] || { letter: String(index + 1), title: quiz.title || `Thematic Series ${index + 1}`, color: "#69A9DF" };
             const attempt = latestAttempts.get(quiz._id);
             const total = Number(attempt?.totalQuestions || quiz.totalQuestions || 0);
@@ -83,25 +83,25 @@ export default function ThematiquesSeriesPage() {
             const href = `/student/code/code-challenge?quizId=${quiz._id}`;
 
             return (
-              <article key={quiz._id} className="relative h-[108px] rounded-[10px]" style={{ backgroundColor: theme.color }}>
-                <div className="absolute left-7 top-[28px] flex h-[53px] w-[53px] items-center justify-center rounded-full bg-[#f7fbff] ring-4 ring-[#d9e5f0]">
-                  <span className="text-[20px] font-bold leading-none text-[#174596]">{theme.letter}</span>
+              <article key={quiz._id} className="flex min-h-[96px] items-center gap-3 overflow-hidden rounded-[10px] px-3 py-3 sm:h-[108px] sm:min-h-0 sm:gap-5 sm:px-7 sm:py-0" style={{ backgroundColor: theme.color }}>
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#f7fbff] ring-[3px] ring-[#d9e5f0] sm:h-[53px] sm:w-[53px] sm:ring-4">
+                  <span className="text-[17px] font-bold leading-none text-[#174596] sm:text-[20px]">{theme.letter}</span>
                 </div>
-                <div className="absolute left-[100px] top-[33px] w-[252px] max-w-[calc(100%_-_180px)]">
-                  <h2 className="truncate text-[16px] font-bold leading-5 text-white">{quiz.questionText || theme.title}</h2>
-                  <div className="mt-[11px] h-[15px] w-full overflow-hidden rounded-full bg-[#dde9f6]">
+                <div className="min-w-0 flex-1">
+                  <h2 className="line-clamp-2 text-[13px] font-bold leading-[17px] text-white sm:truncate sm:text-[16px] sm:leading-5">{quiz.questionText || theme.title}</h2>
+                  <div className="mt-2 h-2.5 w-full overflow-hidden rounded-full bg-[#dde9f6] sm:mt-[11px] sm:h-[15px]">
                     <div className="h-full rounded-full bg-[#174596] transition-[width] duration-300" style={{ width: `${progress}%` }} />
                   </div>
                 </div>
-                <Link href={href} aria-label={`Open ${quiz.questionText || theme.title}`} className="absolute right-[32px] top-[32px] flex h-[34px] w-[34px] items-center justify-center rounded-full bg-white transition hover:scale-105">
-                  <IoArrowForward size={28} style={{ color: theme.color }} />
+                <Link href={href} aria-label={`Open ${quiz.questionText || theme.title}`} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white transition hover:scale-105 sm:h-[34px] sm:w-[34px]">
+                  <IoArrowForward size={22} style={{ color: theme.color }} />
                 </Link>
               </article>
             );
           })}
         </section>
 
-        {!loading && !error && series.length === 0 && <div className="mt-[34px] rounded-xl bg-[#e8eef7] p-10 text-center text-sm font-semibold text-slate-600">No thematic series is available.</div>}
+        {!loading && !error && series.length === 0 && <div className="mt-6 rounded-xl bg-[#e8eef7] p-6 text-center text-sm font-semibold text-slate-600 sm:mt-[34px] sm:p-10">No thematic series is available.</div>}
       </div>
     </main>
   );

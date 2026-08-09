@@ -17,6 +17,7 @@ import {
 } from "recharts";
 import {
   getLoggedInUser,
+  getStudentDashboard,
   getLearningContents,
   getLearningSummary,
   getLessons,
@@ -55,12 +56,12 @@ const fallbackLearningRows = [
   ["Entrance to the driveway", "24/03/2026", "Theoretical exam"],
 ];
 
-const profileSteps = [
-  ["Account Setup", true],
-  ["Profile Photo", true],
-  ["Personal Info", true],
+const fallbackProfileSteps = [
+  ["Account Setup", false],
+  ["Profile Photo", false],
+  ["Personal Info", false],
   ["Driving Info (+20%)", false],
-  ["Contact", true],
+  ["Contact", false],
   ["Documents (+20%)", false],
 ];
 
@@ -301,6 +302,12 @@ export default function Page() {
   ]);
   const [summaryYear, setSummaryYear] = useState(2026);
   const [learningRows, setLearningRows] = useState(fallbackLearningRows);
+  const [profilePageLoading, setProfilePageLoading] = useState(true);
+  const [profileCompletion, setProfileCompletion] = useState({
+    percentage: 0,
+    steps: fallbackProfileSteps,
+  });
+  const [instructorNote, setInstructorNote] = useState(null);
   const [saving, setSaving] = useState(false);
 
   const [modal, setModal] = useState({
@@ -369,6 +376,21 @@ export default function Page() {
     ]);
   };
 
+  const applyProfileCompletion = (completion) => {
+    if (!Array.isArray(completion?.items)) return;
+
+    setProfileCompletion({
+      percentage: Math.min(
+        100,
+        Math.max(0, Number(completion?.percentage) || 0),
+      ),
+      steps: completion.items.map((item) => [
+        item?.label || "Profile item",
+        Boolean(item?.completed),
+      ]),
+    });
+  };
+
   useEffect(() => {
     let isMounted = true;
 
@@ -392,6 +414,7 @@ export default function Page() {
         getLessons({ limit: 100, sortOrder: "asc" }),
         getLearningContents(),
         getLearningSummary(),
+        getStudentDashboard(),
       ]);
 
       if (!isMounted) return;
@@ -409,6 +432,46 @@ export default function Page() {
         const lessons = getResponseData(results[2].value);
 
         if (Array.isArray(lessons)) {
+          const latestLessonWithNote = lessons
+            .filter(
+              (lesson) =>
+                lesson?.status === "completed" &&
+                String(lesson?.lessonProgress?.teacherNotes || "").trim(),
+            )
+            .sort((first, second) => {
+              const firstDate = new Date(
+                first?.lessonProgress?.teacherSubmittedAt ||
+                  first?.lessonDate ||
+                  0,
+              ).getTime();
+              const secondDate = new Date(
+                second?.lessonProgress?.teacherSubmittedAt ||
+                  second?.lessonDate ||
+                  0,
+              ).getTime();
+
+              return secondDate - firstDate;
+            })[0];
+
+          setInstructorNote(
+            latestLessonWithNote
+              ? {
+                  note: latestLessonWithNote.lessonProgress.teacherNotes,
+                  teacher:
+                    latestLessonWithNote?.teacher?.name ||
+                    latestLessonWithNote?.teacher?.fullName ||
+                    "Instructor",
+                  date:
+                    latestLessonWithNote?.lessonProgress?.teacherSubmittedAt ||
+                    latestLessonWithNote?.lessonDate,
+                  title:
+                    latestLessonWithNote?.title ||
+                    latestLessonWithNote?.booking?.title ||
+                    "Driving lesson",
+                }
+              : null,
+          );
+
           const completedMinutes = lessons
             .filter((lesson) => lesson?.status === "completed")
             .reduce(
@@ -478,6 +541,15 @@ export default function Page() {
       ) {
         setLearningRows(createLearningRows(contents, learningSummary));
       }
+
+      if (results[5].status === "fulfilled") {
+        const dashboard = getResponseData(results[5].value);
+        const completion = dashboard?.profileCompletion;
+
+        applyProfileCompletion(completion);
+      }
+
+      setProfilePageLoading(false);
     };
 
     loadProfilePage();
@@ -529,8 +601,14 @@ export default function Page() {
         });
       }
 
-      const refreshedProfile = await getStudentProfile();
+      const [refreshedProfile, refreshedDashboard] = await Promise.all([
+        getStudentProfile(),
+        getStudentDashboard(),
+      ]);
       applyProfile(getResponseData(refreshedProfile));
+      applyProfileCompletion(
+        getResponseData(refreshedDashboard)?.profileCompletion,
+      );
 
       setModal({ open: false, type: "", title: "", data: [] });
     } catch (error) {
@@ -552,26 +630,26 @@ export default function Page() {
   };
 
   return (
-    <main className="min-h-screen bg-[#F6F8FC] px-3 py-3 font-sans sm:px-5 sm:py-5 lg:px-6">
-      <div className="mx-auto grid w-full  grid-cols-1 gap-4 xl:grid-cols-[1fr_280px]">
+    <main className="min-h-screen overflow-x-hidden bg-[#F6F8FC] px-2.5 pb-24 pt-3 font-sans sm:px-5 sm:py-5 lg:px-6">
+      <div className="mx-auto grid w-full min-w-0 grid-cols-1 gap-3 sm:gap-4 xl:grid-cols-[minmax(0,1fr)_280px]">
         {/* LEFT SIDE */}
-        <div className="space-y-4">
+        <div className="min-w-0 space-y-3 sm:space-y-4">
           {/* HEADER */}
-          <header className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
-            <div className="flex gap-3">
+          <header className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm sm:rounded-2xl sm:p-5">
+            <div className="flex min-w-0 gap-2.5 sm:gap-3">
               <button
                 type="button"
                 onClick={handleBack}
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#EEF4FB] text-[24px] text-[#111827]"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-[#EEF4FB] text-[21px] text-[#111827] sm:h-10 sm:w-10 sm:rounded-xl sm:text-[24px]"
               >
                 <IoChevronBack />
               </button>
 
-              <div>
-                <h1 className="text-xl font-bold text-[#174A9B] sm:text-2xl">
+              <div className="min-w-0">
+                <h1 className="text-lg font-bold text-[#174A9B] sm:text-2xl">
                   Profile
                 </h1>
-                <p className="mt-1 text-xs font-medium leading-5 text-[#767B84] sm:text-[13px]">
+                <p className="mt-1 text-[11px] font-medium leading-[17px] text-[#767B84] sm:text-[13px] sm:leading-5">
                   Update your information to ensure accurate lesson scheduling
                   and communication.
                 </p>
@@ -580,10 +658,10 @@ export default function Page() {
           </header>
 
           {/* PROFILE INFO */}
-          <section className="rounded-2xl border border-[#DCE7F5] bg-[#E8EEF8] p-4 shadow-sm sm:p-5">
-            <div className="flex items-center gap-4">
+          <section className="min-w-0 rounded-xl border border-[#DCE7F5] bg-[#E8EEF8] p-3 shadow-sm sm:rounded-2xl sm:p-5">
+            <div className="flex min-w-0 items-center gap-3 sm:gap-4">
               {/* AVATAR */}
-              <div className="relative h-[66px] w-[66px] shrink-0 rounded-full border border-[#174A9B] bg-white p-[3px]">
+              <div className="relative h-14 w-14 shrink-0 rounded-full border border-[#174A9B] bg-white p-[3px] sm:h-[66px] sm:w-[66px]">
                 <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-full bg-[#DDE9F7] text-[28px] font-bold text-[#174A9B]">
                   {profileHeader.avatar ? (
                     <img
@@ -607,8 +685,8 @@ export default function Page() {
                 </div>
               </div>
 
-              <div>
-                <h2 className="text-lg font-bold text-[#174A9B] sm:text-[21px]">
+              <div className="min-w-0">
+                <h2 className="truncate text-base font-bold text-[#174A9B] sm:text-[21px]">
                   {profileHeader.name}
                 </h2>
                 <p className="mt-1 text-xs font-medium text-[#7C818A]">
@@ -618,7 +696,7 @@ export default function Page() {
             </div>
 
             {/* PERSONAL INFO */}
-            <div className="mt-5 rounded-2xl bg-white p-4 shadow-sm">
+            <div className="mt-4 min-w-0 rounded-xl bg-white p-3 shadow-sm sm:mt-5 sm:rounded-2xl sm:p-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-bold text-[#174A9B]">
                   Personal information
@@ -640,13 +718,13 @@ export default function Page() {
                 </button>
               </div>
 
-              <div className="mt-4 grid gap-3 sm:grid-cols-3">
+              <div className="mt-3 grid gap-2 sm:mt-4 sm:grid-cols-3 sm:gap-3">
                 {personalInfo.map((item) => (
-                  <div key={item.label} className="rounded-xl bg-slate-50 p-3">
+                  <div key={item.label} className="min-w-0 rounded-xl bg-slate-50 p-3">
                     <p className="text-[12px] font-bold text-[#292D33]">
                       {item.label}
                     </p>
-                    <p className="mt-1 text-[12px] font-medium text-[#777B84]">
+                    <p className="mt-1 break-words text-[12px] font-medium text-[#777B84]">
                       {item.value}
                     </p>
                   </div>
@@ -655,7 +733,7 @@ export default function Page() {
             </div>
 
             {/* DRIVING INFO */}
-            <div className="mt-4 rounded-2xl bg-white p-4 shadow-sm">
+            <div className="mt-3 min-w-0 rounded-xl bg-white p-3 shadow-sm sm:mt-4 sm:rounded-2xl sm:p-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-bold text-[#174A9B]">
                   Driving Information
@@ -677,13 +755,13 @@ export default function Page() {
                 </button>
               </div>
 
-              <div className="mt-4 grid gap-3 sm:grid-cols-3">
+              <div className="mt-3 grid gap-2 sm:mt-4 sm:grid-cols-3 sm:gap-3">
                 {drivingInfo.map((item) => (
-                  <div key={item.label} className="rounded-xl bg-slate-50 p-3">
+                  <div key={item.label} className="min-w-0 rounded-xl bg-slate-50 p-3">
                     <p className="text-[12px] font-bold text-[#292D33]">
                       {item.label}
                     </p>
-                    <p className="mt-1 text-[12px] font-medium text-[#777B84]">
+                    <p className="mt-1 break-words text-[12px] font-medium text-[#777B84]">
                       {item.value}
                     </p>
                   </div>
@@ -693,7 +771,7 @@ export default function Page() {
           </section>
 
           {/* LESSON SUMMARY */}
-          <section className="rounded-2xl border border-[#DCE7F5] bg-[#E8EEF8] p-4 shadow-sm sm:p-5">
+          <section className="min-w-0 rounded-xl border border-[#DCE7F5] bg-[#E8EEF8] p-3 shadow-sm sm:rounded-2xl sm:p-5">
             <div className="flex items-center justify-between">
               <h2 className="text-sm font-bold text-[#174A9B]">
                 Lesson Summary
@@ -703,13 +781,13 @@ export default function Page() {
               </span>
             </div>
 
-            <div className="mt-4 grid grid-cols-3 gap-3">
+            <div className="mt-3 grid grid-cols-3 gap-2 sm:mt-4 sm:gap-3">
               {lessonSummary.map((item) => (
                 <div
                   key={item[1]}
-                  className="rounded-2xl bg-white px-2 py-3 text-center shadow-sm"
+                  className="min-w-0 rounded-xl bg-white px-1.5 py-2.5 text-center shadow-sm sm:rounded-2xl sm:px-2 sm:py-3"
                 >
-                  <p className="text-[13px] font-bold text-[#30323A]">
+                  <p className="break-words text-[11px] font-bold leading-4 text-[#30323A] sm:text-[13px]">
                     {item[0]}
                   </p>
                   <p className="mt-1 text-[11px] font-medium text-[#64748B]">
@@ -719,7 +797,7 @@ export default function Page() {
               ))}
             </div>
 
-            <div className="mt-4 h-[230px] rounded-2xl border border-[#B7CBE8] bg-white p-3 sm:h-[310px]">
+            <div className="mt-3 h-[200px] min-w-0 rounded-xl border border-[#B7CBE8] bg-white p-1.5 sm:mt-4 sm:h-[310px] sm:rounded-2xl sm:p-3">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart
                   data={chartData}
@@ -790,20 +868,20 @@ export default function Page() {
           </section>
 
           {/* LEARNING PROGRESS */}
-          <section className="rounded-2xl border border-[#DCE7F5] bg-[#E8EEF8] p-4 shadow-sm sm:p-5">
-            <div className="rounded-2xl bg-white p-4 shadow-sm">
+          <section className="min-w-0 rounded-xl border border-[#DCE7F5] bg-[#E8EEF8] p-3 shadow-sm sm:rounded-2xl sm:p-5">
+            <div className="min-w-0 rounded-xl bg-white p-3 shadow-sm sm:rounded-2xl sm:p-4">
               <h2 className="text-sm font-bold text-[#174A9B]">
                 Learning Progress
               </h2>
 
-              <div className="mt-4 space-y-3 md:hidden">
+              <div className="mt-3 space-y-2 md:hidden">
                 {learningRows.map((row, index) => (
                   <div
                     key={`${row[0]}-${index}`}
-                    className="rounded-xl bg-slate-50 p-3"
+                    className="min-w-0 rounded-xl bg-slate-50 p-3"
                   >
                     <p className="text-xs font-bold text-[#2D3036]">{row[0]}</p>
-                    <p className="mt-1 text-[11px] text-[#7D828B]">
+                    <p className="mt-1 break-words text-[11px] leading-4 text-[#7D828B]">
                       {row[1]} · {row[2]}
                     </p>
 
@@ -846,8 +924,8 @@ export default function Page() {
           </section>
 
           {/* APPOINTMENTS + PERFORMANCE */}
-          <section className="grid grid-cols-1 gap-4 rounded-2xl border border-[#DCE7F5] bg-[#E8EEF8] p-4 shadow-sm md:grid-cols-2">
-            <div className="rounded-2xl bg-white p-4 shadow-sm">
+          <section className="grid min-w-0 grid-cols-1 gap-3 rounded-xl border border-[#DCE7F5] bg-[#E8EEF8] p-3 shadow-sm sm:rounded-2xl sm:p-4 md:grid-cols-2 md:gap-4">
+            <div className="min-w-0 rounded-xl bg-white p-3 shadow-sm sm:rounded-2xl sm:p-4">
               <h2 className="text-sm font-bold text-[#174A9B]">Appointments</h2>
 
               <div className="mt-4 space-y-3 text-[13px] text-[#747981]">
@@ -870,7 +948,7 @@ export default function Page() {
               </p>
             </div>
 
-            <div className="rounded-2xl bg-white p-4 shadow-sm">
+            <div className="min-w-0 rounded-xl bg-white p-3 shadow-sm sm:rounded-2xl sm:p-4">
               <h2 className="text-sm font-bold text-[#174A9B]">
                 Performance Overview
               </h2>
@@ -893,7 +971,7 @@ export default function Page() {
           </section>
 
           {/* ANTS */}
-          <section className="rounded-2xl border border-[#DCE7F5] bg-[#DEE7F2] p-4 shadow-sm md:flex md:items-center md:justify-between">
+          <section className="min-w-0 rounded-xl border border-[#DCE7F5] bg-[#DEE7F2] p-3 shadow-sm sm:rounded-2xl sm:p-4 md:flex md:items-center md:justify-between">
             <div>
               <h2 className="text-base font-bold text-[#174A9B]">
                 ANTS Registration
@@ -905,21 +983,21 @@ export default function Page() {
 
             <button
               type="button"
-              className="mt-4 h-10 rounded-xl border border-[#174A9B] bg-white px-4 text-xs font-bold text-[#F12B45] md:mt-0"
+              className="mt-4 min-h-10 w-full rounded-xl border border-[#174A9B] bg-white px-3 py-2 text-xs font-bold text-[#F12B45] md:mt-0 md:w-auto md:px-4"
             >
               Continue on ANTS website
             </button>
           </section>
 
           {/* BOOKLET */}
-          <section className="rounded-2xl border border-[#DCE7F5] bg-[#E8EEF8] p-4 shadow-sm">
-            <h2 className="text-base font-bold text-[#174A9B]">
+          <section className="min-w-0 rounded-xl border border-[#DCE7F5] bg-[#E8EEF8] p-3 shadow-sm sm:rounded-2xl sm:p-4">
+            <h2 className="text-sm font-bold leading-5 text-[#174A9B] sm:text-base">
               Check your learning booklet and track your progress
             </h2>
-            <Link href="/student/profile/booklet" className="mt-2 block">
+            <Link href="/student/profile/booklet" className="mt-3 block">
               <button
                 type="button"
-                className="mt-4 h-10 rounded-xl bg-[#F12B45] px-4 text-xs font-bold text-white"
+                className="h-10 w-full rounded-xl bg-[#F12B45] px-4 text-xs font-bold text-white sm:w-auto"
               >
                 Check Learning Booklet
               </button>
@@ -928,66 +1006,122 @@ export default function Page() {
         </div>
 
         {/* RIGHT SIDE */}
-        <aside className="space-y-4">
+        <aside className="min-w-0 space-y-3 sm:space-y-4">
           {/* COMPLETE PROFILE */}
-          <section className="rounded-2xl border border-[#DCE7F5] bg-[#DEE7F2] p-4 shadow-sm">
+          <section className="rounded-xl border border-[#DCE7F5] bg-[#DEE7F2] p-3 shadow-sm sm:rounded-2xl sm:p-4">
             <h2 className="text-center text-sm font-bold text-[#174A9B]">
               Complete your profile
             </h2>
 
-            <div className="relative mx-auto mt-5 h-28 w-28 rounded-full">
-              <div
-                className="absolute inset-0 rounded-full"
-                style={{
-                  background:
-                    "conic-gradient(#174A9B 0deg, #174A9B 216deg, #ffffff 216deg, #ffffff 360deg)",
-                }}
-              />
-              <div className="absolute inset-[12px] rounded-full bg-[#DEE7F2]" />
-              <div className="absolute inset-0 flex items-center justify-center text-lg font-bold text-[#174A9B]">
-                60%
-              </div>
-            </div>
-
-            <div className="mt-5 space-y-2">
-              {profileSteps.map(([label, done]) => (
-                <div key={label} className="flex items-center gap-2.5">
-                  {done ? (
-                    <BsCheckSquareFill className="text-[#2DBE52]" />
-                  ) : (
-                    <span className="h-4 w-4 rounded border border-[#4F7EC5] bg-white" />
-                  )}
-
-                  <span
-                    className={`text-sm font-medium ${
-                      done ? "text-[#30323A]" : "text-[#868A92]"
-                    }`}
-                  >
-                    {label}
-                  </span>
+            {profilePageLoading ? (
+              <div aria-label="Loading profile completion" className="animate-pulse">
+                <div className="mx-auto mt-4 h-24 w-24 rounded-full border-[12px] border-white/80 sm:mt-5 sm:h-28 sm:w-28" />
+                <div className="mt-4 grid grid-cols-2 gap-3 sm:mt-5 sm:grid-cols-1">
+                  {fallbackProfileSteps.map(([label]) => (
+                    <div key={label} className="flex items-center gap-2.5">
+                      <span className="h-4 w-4 shrink-0 rounded bg-white" />
+                      <span className="h-3 flex-1 rounded bg-white" />
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </div>
+            ) : (
+              <>
+                <div className="relative mx-auto mt-4 h-24 w-24 rounded-full sm:mt-5 sm:h-28 sm:w-28">
+                  <div
+                    className="absolute inset-0 rounded-full"
+                    style={{
+                      background: `conic-gradient(#174A9B 0deg, #174A9B ${
+                        profileCompletion.percentage * 3.6
+                      }deg, #ffffff ${
+                        profileCompletion.percentage * 3.6
+                      }deg, #ffffff 360deg)`,
+                    }}
+                  />
+                  <div className="absolute inset-[12px] rounded-full bg-[#DEE7F2]" />
+                  <div className="absolute inset-0 flex items-center justify-center text-lg font-bold text-[#174A9B]">
+                    {profileCompletion.percentage}%
+                  </div>
+                </div>
+
+                <div className="mt-4 grid grid-cols-2 gap-x-3 gap-y-2 sm:mt-5 sm:block sm:space-y-2 xl:grid-cols-1">
+                  {profileCompletion.steps.map(([label, done]) => (
+                    <div key={label} className="flex items-center gap-2.5">
+                      {done ? (
+                        <BsCheckSquareFill className="shrink-0 text-[#2DBE52]" />
+                      ) : (
+                        <span className="h-4 w-4 shrink-0 rounded border border-[#4F7EC5] bg-white" />
+                      )}
+
+                      <span
+                        className={`min-w-0 text-[11px] font-medium sm:text-sm ${
+                          done ? "text-[#30323A]" : "text-[#868A92]"
+                        }`}
+                      >
+                        {label}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
           </section>
 
           {/* NOTES */}
-          <section className="rounded-2xl border border-[#DCE7F5] bg-[#DEE7F2] p-4 shadow-sm">
-            <h2 className="text-sm font-bold text-[#174A9B]">
-              Instructor Notes
-            </h2>
+          <section className="rounded-xl border border-[#DCE7F5] bg-[#DEE7F2] p-3 shadow-sm sm:rounded-2xl sm:p-4">
+            <div className="flex items-start justify-between gap-3">
+              <h2 className="text-sm font-bold text-[#174A9B]">
+                Instructor Notes
+              </h2>
+              <Link
+                href="/student/profile/booklet"
+                className="shrink-0 text-[10px] font-bold text-[#174A9B] underline underline-offset-2"
+              >
+                View all
+              </Link>
+            </div>
 
-            <textarea
-              placeholder="Write here"
-              className="mt-3 h-24 w-full resize-none rounded-xl border border-[#A6B9D8] bg-white px-3 py-2 text-xs outline-none focus:border-[#174A9B]"
-            />
+            {profilePageLoading ? (
+              <div aria-label="Loading instructor note" className="mt-3 animate-pulse rounded-xl border border-[#B7CBE8] bg-white p-3">
+                <div className="h-3 w-full rounded bg-slate-100" />
+                <div className="mt-2 h-3 w-4/5 rounded bg-slate-100" />
+                <div className="mt-4 h-px bg-slate-100" />
+                <div className="mt-3 h-3 w-1/2 rounded bg-slate-100" />
+                <div className="mt-2 h-2.5 w-2/3 rounded bg-slate-100" />
+              </div>
+            ) : instructorNote ? (
+              <div className="mt-3 rounded-xl border border-[#B7CBE8] bg-white p-3">
+                <p className="break-words text-xs font-medium leading-5 text-[#30323A]">
+                  {instructorNote.note}
+                </p>
+                <div className="mt-3 border-t border-slate-100 pt-2.5">
+                  <p className="truncate text-[11px] font-bold text-[#174A9B]">
+                    {instructorNote.teacher}
+                  </p>
+                  <p className="mt-1 truncate text-[10px] text-[#767B84]">
+                    {instructorNote.title} · {formatLongDate(instructorNote.date)}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="mt-3 rounded-xl border border-dashed border-[#A6B9D8] bg-white px-3 py-5 text-center">
+                <p className="text-xs font-semibold text-[#767B84]">
+                  No instructor notes yet.
+                </p>
+                <p className="mt-1 text-[10px] leading-4 text-[#9297A0]">
+                  Your teacher&apos;s feedback will appear here after a lesson is
+                  completed and submitted.
+                </p>
+              </div>
+            )}
           </section>
         </aside>
       </div>
 
       {/* EDIT MODAL */}
       {modal.open && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 px-3 pb-3 sm:items-center sm:p-4">
-          <div className="w-full max-w-[430px] rounded-2xl bg-white p-4 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-2.5 sm:items-center sm:p-4">
+          <div className="max-h-[calc(100dvh-20px)] w-full max-w-[430px] overflow-y-auto rounded-2xl bg-white p-3.5 shadow-2xl sm:p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-[11px] font-semibold uppercase text-slate-400">
@@ -1026,7 +1160,7 @@ export default function Page() {
 
                       setModal({ ...modal, data: updatedData });
                     }}
-                    className="h-10 w-full rounded-xl border border-[#B7CBE8] px-3 text-xs outline-none focus:border-[#174A9B]"
+                    className="h-11 w-full rounded-xl border border-[#B7CBE8] px-3 text-base outline-none focus:border-[#174A9B] sm:h-10 sm:text-xs"
                   />
                 </div>
               ))}
