@@ -13,7 +13,7 @@ export default function FloatingWhatsApp() {
       target="_blank"
       rel="noreferrer"
       aria-label="Chat with PermisGo on WhatsApp"
-      className="fixed bottom-6 right-5 z-[998] flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-[29px] text-white shadow-[0_10px_30px_rgba(0,0,0,0.24)] transition hover:-translate-y-1 hover:scale-105 hover:bg-[#1fbd5a] max-[500px]:bottom-[82px]"
+      className="fixed bottom-6 right-5 z-[998] flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-[29px] text-white shadow-[0_10px_30px_rgba(0,0,0,0.24)] transition hover:-translate-y-1 hover:scale-105 hover:bg-[#1fbd5a] max-[500px]:bottom-[118px]"
     >
       <FaWhatsapp aria-hidden="true" />
     </a>

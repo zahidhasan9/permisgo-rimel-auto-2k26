@@ -330,7 +330,7 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   FaCheckCircle,
   FaClock,
@@ -398,28 +398,43 @@ function Badge({ children, tone = "slate" }) {
 function ImagePreview({ src, alt = "Preview" }) {
   if (!src) {
     return (
-      <div className="flex h-16 w-20 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-300">
+      <div className="flex h-14 w-14 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-300 sm:h-16 sm:w-16">
         <FaImage />
       </div>
     );
   }
 
   return (
-    <img
-      src={src}
-      alt={alt}
-      className="h-16 w-20 rounded-xl border border-slate-200 object-cover"
-    />
+    <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50 sm:h-16 sm:w-16">
+      <img
+        src={src}
+        alt={alt}
+        className="h-full w-full object-contain p-1"
+      />
+    </div>
   );
 }
 
 function FileUploadBox({ label, currentImage, selectedFile, onChange, removed = false, onRemove }) {
+  const previewSrc = useMemo(() => {
+    if (removed) return "";
+    if (selectedFile) return URL.createObjectURL(selectedFile);
+    if (currentImage) return mediaUrl(currentImage);
+    return "";
+  }, [currentImage, removed, selectedFile]);
+
+  useEffect(() => {
+    return () => {
+      if (previewSrc?.startsWith("blob:")) URL.revokeObjectURL(previewSrc);
+    };
+  }, [previewSrc]);
+
   return (
     <div>
       <FieldLabel icon={FaImage}>{label}</FieldLabel>
 
-      <div className="grid gap-2 sm:grid-cols-[1fr_86px]">
-        <label className="flex h-16 cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-[#f8f8fb] px-3 text-center transition hover:border-violet-300 hover:bg-violet-50/40">
+      <div className="grid gap-2 sm:grid-cols-[1fr_72px]">
+        <label className="flex h-14 cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-[#f8f8fb] px-3 text-center transition hover:border-violet-300 hover:bg-violet-50/40 sm:h-16">
           <FaCloudUploadAlt className="mb-1 text-base text-violet-500" />
 
           <p className="text-[11px] font-bold text-slate-700">
@@ -434,10 +449,7 @@ function FileUploadBox({ label, currentImage, selectedFile, onChange, removed = 
           />
         </label>
 
-        <ImagePreview
-          src={!removed && currentImage ? mediaUrl(currentImage) : ""}
-          alt={label}
-        />
+        <ImagePreview src={previewSrc} alt={label} />
       </div>
       {currentImage && !selectedFile && <button type="button" onClick={onRemove} className={`mt-1.5 text-[11px] font-bold ${removed ? "text-blue-700" : "text-red-600"}`}>{removed ? "Undo image removal" : "Remove current image"}</button>}
     </div>
