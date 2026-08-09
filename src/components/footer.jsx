@@ -18,7 +18,7 @@ import { IoChevronDown } from "react-icons/io5";
 import { MdOutlineEmail } from "react-icons/md";
 
 // Images
-import downCar from "../../public/image/down-car.png";
+import downCar from "../../public/image/down-car.gif";
 import Logo from "../../public/image/logo.png";
 import useSiteSettings from "@/hooks/useSiteSettings";
 
@@ -96,14 +96,9 @@ const Footer = () => {
   return (
     <>
       {/* Car Image */}
-      <section className="bg-[#eef3fb]">
-        <div className="mx-auto flex  max-w-[1320px] justify-end px-4 pt-8 sm:px-6 lg:px-8 lg:pt-[72px]">
-          <Image
-            src={downCar}
-            alt="Car"
-            priority
-            className="h-auto w-[190px] sm:w-[230px] md:w-[270px] lg:w-[300px]"
-          />
+      <section className="w-full bg-[#eef3fb]">
+        <div className="w-full">
+          <Image src={downCar} alt="Car" className="h-auto w-full" priority />
         </div>
       </section>
 
@@ -141,14 +136,22 @@ const Footer = () => {
                     <span className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-white">
                       <FaPhoneSquareAlt />
                     </span>
-                    <a href={`tel:${site.phone.replace(/\s/g, "")}`} className="leading-7">{site.phone}</a>
+                    <a
+                      href={`tel:${site.phone.replace(/\s/g, "")}`}
+                      className="leading-7"
+                    >
+                      {site.phone}
+                    </a>
                   </li>
 
                   <li className="flex items-start gap-3">
                     <span className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-white">
                       <MdOutlineEmail />
                     </span>
-                    <a href={`mailto:${site.supportEmail}`} className="break-all leading-7">
+                    <a
+                      href={`mailto:${site.supportEmail}`}
+                      className="break-all leading-7"
+                    >
                       {site.supportEmail}
                     </a>
                   </li>
@@ -158,12 +161,21 @@ const Footer = () => {
                       <GrLocation />
                     </span>
                     <span className="leading-7">
-                      {site.address}<br />{site.address2}
+                      {site.address}
+                      <br />
+                      {site.address2}
                     </span>
                   </li>
                 </ul>
 
-                <a href={site.websiteUrl} target="_blank" rel="noreferrer" className="mt-3 inline-block text-[14px] font-semibold text-white/80 hover:text-white">{site.domainName}</a>
+                <a
+                  href={site.websiteUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-3 inline-block text-[14px] font-semibold text-white/80 hover:text-white"
+                >
+                  {site.domainName}
+                </a>
 
                 {/* Social */}
                 <div className="mt-5">

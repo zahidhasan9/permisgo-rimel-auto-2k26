@@ -285,24 +285,24 @@ export default function InstructorsPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#EDF1F8] px-[10px] py-[10px] sm:px-[18px] sm:py-[18px]">
-      <div className="mx-auto w-full rounded-[14px] bg-white p-[16px] sm:p-[22px]">
+    <main className="min-h-screen overflow-x-hidden bg-[#EDF1F8] px-2 py-2 sm:px-[18px] sm:py-[18px]">
+      <div className="mx-auto w-full max-w-[1440px] rounded-[14px] bg-white p-3 sm:p-[22px]">
         <header className="flex items-center gap-[14px]">
           <button
             type="button"
             onClick={() => router.back()}
             aria-label="Go back"
-            className="flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-[12px] bg-[#E8EDF5] text-[#111111] transition hover:bg-[#DDE5F0]"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-[#E8EDF5] text-[#111111] transition hover:bg-[#DDE5F0] sm:h-[44px] sm:w-[44px] sm:rounded-[12px]"
           >
             <IoChevronBack size={24} />
           </button>
 
-          <h1 className="text-[24px] font-[700] leading-none text-[#123F88] sm:text-[26px]">
+          <h1 className="text-[20px] font-[700] leading-none text-[#123F88] sm:text-[26px]">
             Instructors
           </h1>
         </header>
 
-        <section className="mt-[24px] rounded-[12px] bg-[#E8EEF7] p-[16px] sm:p-[20px]">
+        <section className="mt-4 rounded-[12px] bg-[#E8EEF7] p-3 sm:mt-[24px] sm:p-[20px]">
           <h2 className="text-[16px] font-[700] text-[#222222]">
             Find an Instructor
           </h2>
@@ -364,8 +364,38 @@ export default function InstructorsPage() {
           </div>
         )}
 
-        <section className="mt-[20px] rounded-[12px] bg-[#E8EEF7] p-[12px] sm:p-[16px]">
-          <div className="overflow-x-auto rounded-[12px]">
+        <section className="mt-4 rounded-[12px] bg-[#E8EEF7] p-2.5 sm:mt-[20px] sm:p-[16px]">
+          <div className="space-y-3 md:hidden">
+            {loading ? (
+              Array.from({ length: 4 }).map((_, index) => <div key={index} className="h-[180px] animate-pulse rounded-xl bg-white" />)
+            ) : visible.length ? (
+              visible.map((booking) => {
+                const teacher = booking.teacher || {};
+                const teacherName = teacher.name || teacher.fullName || "Instructor";
+                return (
+                  <article key={teacherId(booking)} className="rounded-xl bg-white p-3.5 shadow-sm">
+                    <div className="flex min-w-0 items-center gap-3 border-b border-slate-100 pb-3">
+                      {teacher.avatar ? <img src={mediaUrl(teacher.avatar)} alt={teacherName} className="h-11 w-11 shrink-0 rounded-full object-cover" /> : <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#E8EEF7] text-base font-bold text-[#174A9B]">{teacherName.charAt(0)}</span>}
+                      <div className="min-w-0 flex-1">
+                        <h3 className="truncate text-sm font-bold text-slate-800">{teacherName}</h3>
+                        <p className="mt-1 truncate text-[11px] text-slate-500">{locationText(booking)}</p>
+                      </div>
+                      <Link href={`/student/driving-operation/instructors/${teacherId(booking)}`} className="inline-flex h-8 shrink-0 items-center justify-center rounded-lg bg-[#DF2339] px-3 text-[11px] font-bold text-white">View</Link>
+                    </div>
+                    <dl className="mt-3 grid grid-cols-2 gap-x-3 gap-y-3 text-xs">
+                      <div><dt className="text-[10px] font-semibold uppercase text-slate-400">Date</dt><dd className="mt-1 font-semibold text-slate-700">{formatDate(booking.bookingDate)}</dd></div>
+                      <div><dt className="text-[10px] font-semibold uppercase text-slate-400">Duration</dt><dd className="mt-1 font-semibold text-slate-700">{booking.startTime || "—"} – {booking.endTime || "—"}</dd></div>
+                      <div className="col-span-2"><dt className="text-[10px] font-semibold uppercase text-slate-400">Vehicle type</dt><dd className="mt-1 font-semibold text-slate-700">{vehicleText(booking)}</dd></div>
+                    </dl>
+                  </article>
+                );
+              })
+            ) : (
+              <div className="rounded-xl bg-white p-7 text-center"><p className="text-sm font-bold text-[#123F88]">No booked instructor found</p><p className="mt-2 text-xs text-slate-500">Only instructors you have booked will appear here.</p></div>
+            )}
+          </div>
+
+          <div className="hidden overflow-x-auto rounded-[12px] md:block">
             <div className="min-w-[900px] overflow-hidden rounded-[12px] bg-white">
               <div className="grid grid-cols-[1.2fr_1fr_1.15fr_1fr_.9fr_86px] items-center bg-[#174A9B] px-[18px] py-[14px] text-[13px] font-[700] text-white">
                 <div>Instructor Name</div>

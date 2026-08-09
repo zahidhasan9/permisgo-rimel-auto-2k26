@@ -358,23 +358,23 @@ export default function TeacherProfilePage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f7f9fc] px-4 py-6 sm:px-6 lg:px-8">
+    <main className="min-h-screen overflow-x-hidden bg-[#f7f9fc] px-2 py-3 sm:px-6 sm:py-6 lg:px-8">
       <section className="mx-auto max-w-7xl">
         {/* Page header */}
-        <div className="mb-6 flex items-start gap-4">
+        <div className="mb-4 flex min-w-0 items-start gap-3 px-1 sm:mb-6 sm:gap-4 sm:px-0">
           <button
             type="button"
             onClick={() => router.back()}
             aria-label="Go back"
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-[#103f8f] shadow-sm transition hover:bg-blue-50"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-white text-[#103f8f] shadow-sm transition hover:bg-blue-50 sm:h-11 sm:w-11 sm:rounded-xl"
           >
             <FaChevronLeft size={16} />
           </button>
 
-          <div>
-            <h1 className="text-2xl font-bold text-[#103f8f]">Profile</h1>
+          <div className="min-w-0">
+            <h1 className="text-xl font-bold text-[#103f8f] sm:text-2xl">Profile</h1>
 
-            <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-500">
+            <p className="mt-1 max-w-2xl text-xs leading-5 text-slate-500 sm:text-sm sm:leading-6">
               Update your information to ensure accurate lesson scheduling and
               communication.
             </p>
@@ -382,11 +382,11 @@ export default function TeacherProfilePage() {
         </div>
 
         {/* Profile card */}
-        <div className="rounded-3xl bg-white p-4 shadow-sm ring-1 ring-slate-100 sm:p-6">
+        <div className="rounded-2xl bg-white p-3 shadow-sm ring-1 ring-slate-100 sm:rounded-3xl sm:p-6">
           {/* Teacher summary */}
-          <div className="mb-6 flex flex-col gap-4 rounded-2xl bg-[#eef4fb] p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
-            <div className="flex items-center gap-4">
-              <div className="relative h-[78px] w-[78px] shrink-0">
+          <div className="mb-5 flex flex-col gap-4 rounded-xl bg-[#eef4fb] p-3 sm:mb-6 sm:flex-row sm:items-center sm:justify-between sm:rounded-2xl sm:p-5">
+            <div className="flex min-w-0 flex-col items-center gap-3 text-center min-[430px]:flex-row min-[430px]:items-center min-[430px]:gap-4 min-[430px]:text-left">
+              <div className="relative h-[72px] w-[72px] shrink-0 sm:h-[78px] sm:w-[78px]">
                 {avatarSource ? (
                   <img
                     src={avatarSource}
@@ -418,15 +418,15 @@ export default function TeacherProfilePage() {
                 </button>
               </div>
 
-              <div>
-                <h2 className="text-xl font-bold text-slate-900">
+              <div className="min-w-0 max-w-full">
+                <h2 className="break-words text-lg font-bold text-slate-900 sm:text-xl">
                   {fullName || "Teacher User"}
                 </h2>
 
-                <p className="mt-1 flex items-center gap-2 text-sm text-slate-500">
-                  <SiGmail className="text-[#e63946]" />
+                <p className="mt-1 flex min-w-0 items-start justify-center gap-2 text-xs text-slate-500 min-[430px]:justify-start sm:text-sm">
+                  <SiGmail className="mt-0.5 shrink-0 text-[#e63946]" />
 
-                  {form.email || "No email found"}
+                  <span className="min-w-0 break-all">{form.email || "No email found"}</span>
                 </p>
 
                 <p className="mt-1 text-xs font-semibold capitalize text-[#103f8f]">
@@ -439,11 +439,11 @@ export default function TeacherProfilePage() {
           {/* Form section */}
           <div>
             <div className="mb-5">
-              <h3 className="text-xl font-bold text-slate-900">
+              <h3 className="text-lg font-bold text-slate-900 sm:text-xl">
                 Personal Details
               </h3>
 
-              <p className="mt-1 text-sm text-slate-500">
+              <p className="mt-1 text-xs leading-5 text-slate-500 sm:text-sm">
                 Manage your personal and driving instructor information.
               </p>
             </div>
@@ -466,7 +466,7 @@ export default function TeacherProfilePage() {
 
             <form
               onSubmit={handleSubmit}
-              className="grid grid-cols-1 gap-5 lg:grid-cols-2"
+              className="grid grid-cols-1 gap-4 sm:gap-5 lg:grid-cols-2"
             >
               <Field
                 label="First Name"
@@ -549,11 +549,11 @@ export default function TeacherProfilePage() {
                 </span>
               </div>
 
-              <div className="flex justify-end pt-2 lg:col-span-2">
+              <div className="flex justify-end pt-1 sm:pt-2 lg:col-span-2">
                 <button
                   type="submit"
                   disabled={saving}
-                  className="flex h-12 min-w-40 items-center justify-center gap-2 rounded-xl bg-[#103f8f] px-8 text-sm font-bold text-white shadow-sm transition hover:bg-[#0b3272] disabled:cursor-not-allowed disabled:opacity-60"
+                  className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#103f8f] px-6 text-sm font-bold text-white shadow-sm transition hover:bg-[#0b3272] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:min-w-40 sm:px-8"
                 >
                   {saving ? (
                     <>

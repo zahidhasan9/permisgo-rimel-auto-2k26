@@ -169,22 +169,28 @@ function CodeCard({ item }) {
   );
 }
 
-function HourBadge({ value, active = false }) {
+function HourBadge({ value, active = false, onSelect }) {
   return (
-    <div
+    <button
+      type="button"
+      onClick={onSelect}
+      aria-pressed={active}
       className={[
-        "flex items-center justify-center rounded-full font-[700]",
+        "flex shrink-0 items-center justify-center rounded-full font-[700] transition duration-200 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#174A9B] focus-visible:ring-offset-2",
         active
-          ? "h-[60px] w-[60px] bg-[#174A9B] text-[16px] text-white"
-          : "h-[41px] w-[41px] bg-[#B9CAE8] text-[12px] text-[#174A9B]",
+          ? "h-[60px] w-[60px] bg-[#174A9B] text-[16px] text-white shadow-[0_8px_18px_rgba(23,74,155,0.25)]"
+          : "h-[44px] w-[44px] bg-[#B9CAE8] text-[12px] text-[#174A9B] hover:bg-[#a9bee1]",
       ].join(" ")}
     >
       {value}
-    </div>
+    </button>
   );
 }
 
-function DriveCard({ item }) {
+function DriveCard({ item, hourOptions }) {
+  const availableHours = hourOptions || (item.hours?.length ? item.hours : ["01 hr", "05 hr", "10 hr"]);
+  const [selectedHour, setSelectedHour] = useState(availableHours[Math.min(1, availableHours.length - 1)]);
+
   return (
     <article
       className={[
@@ -204,9 +210,9 @@ function DriveCard({ item }) {
         </p>
 
         <div className="mt-[24px] flex items-center justify-center gap-[8px]">
-          {(item.hours?.length ? item.hours : ["01 hr", "05 hr", "10 hr"]).map(
-            (hour, index) => (
-              <HourBadge key={hour} value={hour} active={index === 1} />
+          {availableHours.map(
+            (hour) => (
+              <HourBadge key={hour} value={hour} active={selectedHour === hour} onSelect={() => setSelectedHour(hour)} />
             ),
           )}
         </div>
@@ -285,7 +291,7 @@ function CpfTab({ offers, transmission }) {
 
       <div className="mt-4 grid grid-cols-1 gap-3 sm:mt-[32px] sm:gap-[24px] md:grid-cols-2 xl:grid-cols-3">
         {offers.map((item) => (
-          <DriveCard key={item._id} item={item} />
+          <DriveCard key={item._id} item={item} hourOptions={["10 hr", "20 hr", "30 hr"]} />
         ))}
       </div>
     </section>
@@ -297,7 +303,7 @@ function AccompanieTab({ offers, transmission }) {
     <section className="mt-4 rounded-[10px] bg-[#E8EEF8] p-2.5 sm:mt-[28px] sm:px-[24px] sm:pb-[24px] sm:pt-[25px]">
       <div className="flex items-center justify-between gap-[20px] max-md:flex-col max-md:items-start">
         <h2 className="text-[21px] font-[700] leading-none text-[#174A9B]">
-          Permisgo&apos;s Highway Code Packs
+          Accompanied driving offers
         </h2>
 
         <TransmissionToggle
@@ -308,7 +314,7 @@ function AccompanieTab({ offers, transmission }) {
 
       <div className="mt-4 grid grid-cols-1 gap-3 sm:mt-[32px] sm:gap-[23px] md:grid-cols-2 xl:grid-cols-3">
         {offers.map((item) => (
-          <CodeCard key={item._id} item={item} />
+          <DriveCard key={item._id} item={item} hourOptions={["10 hr", "20 hr", "30 hr"]} />
         ))}
       </div>
     </section>

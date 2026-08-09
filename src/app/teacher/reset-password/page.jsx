@@ -2,15 +2,17 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { FaChevronLeft, FaEye, FaEyeSlash, FaSpinner } from "react-icons/fa";
-import { toast, Toaster } from "sonner";
+import { FaSpinner } from "react-icons/fa";
+import { FiEye, FiEyeOff } from "react-icons/fi";
+import { IoChevronBack } from "react-icons/io5";
+import { toast } from "sonner";
 
 import { changePassword } from "@/features/API";
 
 const inputClass =
-  "h-11 w-full rounded-xl border border-slate-200 bg-white px-4 pr-11 text-sm font-medium text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-[#16458f] focus:ring-4 focus:ring-blue-50 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500";
+  "h-12 w-full rounded-xl border border-[#D4DDEA] bg-[#F6F8FB] px-3 pr-11 text-base text-[#333333] outline-none transition placeholder:text-[#969696] focus:border-[#174A9B] focus:bg-white disabled:cursor-not-allowed disabled:opacity-70 sm:h-11 sm:px-4 sm:pr-12 sm:text-[14px]";
 
-const labelClass = "mb-2 block text-sm font-bold text-slate-600";
+const labelClass = "mb-2 block text-xs font-semibold text-[#5F5F5F] sm:mb-3 sm:text-[14px]";
 
 const initialFormData = {
   currentPassword: "",
@@ -134,39 +136,32 @@ export default function ResetPassword() {
   }
 
   return (
-    <>
-      {/* <Toaster position="top-right" richColors closeButton duration={3500} /> */}
-
-      <main className="min-h-screen bg-[#f8fafc] px-4 py-5 sm:px-6 lg:px-8">
-        <section className="mx-auto">
+    <main className="min-h-screen overflow-x-hidden bg-white px-2.5 py-4 pb-24 sm:px-6 sm:py-6 sm:pb-8">
+        <section className="mx-auto w-full max-w-4xl min-w-0">
           {/* Header */}
 
-          <header className="mb-5 flex items-start gap-3">
+          <header>
+            <div className="flex min-w-0 items-center gap-3 sm:gap-4">
             <button
               type="button"
               onClick={() => router.back()}
               disabled={loading}
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-[#16458f] shadow-sm transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#E7ECF4] text-xl text-[#111827] transition hover:bg-[#DCE4F0] disabled:cursor-not-allowed disabled:opacity-60 sm:h-11 sm:w-11 sm:text-[25px]"
               aria-label="Go back"
             >
-              <FaChevronLeft size={14} />
+              <IoChevronBack />
             </button>
 
-            <div>
-              <h1 className="text-[24px] font-bold leading-tight text-[#16458f]">
+              <h1 className="min-w-0 truncate text-xl font-bold text-[#174A9B] sm:text-[26px]">
                 Reset Password
               </h1>
-
-              <p className="mt-1 max-w-xl text-sm leading-5 text-slate-500">
-                Update your password to keep your account secure.
-              </p>
             </div>
+            <p className="mt-2 text-xs font-normal leading-5 text-[#666666] sm:text-[15px]">Update your information to ensure accurate lesson scheduling and communication.</p>
           </header>
 
           {/* Card */}
 
-          <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-100 sm:p-5">
-            <form className="space-y-5" onSubmit={handleSubmit} noValidate>
+          <form className="mt-5 min-w-0 rounded-[14px] bg-[#E7ECF4] p-3.5 sm:mt-8 sm:p-6" onSubmit={handleSubmit} noValidate>
               {/* Current Password */}
 
               <div>
@@ -186,14 +181,14 @@ export default function ResetPassword() {
                   disabled={loading}
                 />
 
-                <p className="mt-2 text-xs font-medium text-slate-500">
-                  Enter your existing password to verify your identity.
+                <p className="mt-2 text-[11px] leading-4 text-[#686868] sm:mt-3 sm:text-[14px] sm:leading-5">
+                  If you don&apos;t have a password, skip the old password field
                 </p>
               </div>
 
               {/* New Password Fields */}
 
-              <div className="grid gap-4 md:grid-cols-2">
+              <div className="mt-5 grid grid-cols-1 gap-4 sm:mt-7 sm:grid-cols-2 sm:gap-6">
                 <div>
                   <label htmlFor="newPassword" className={labelClass}>
                     New Password
@@ -211,9 +206,6 @@ export default function ResetPassword() {
                     disabled={loading}
                   />
 
-                  <p className="mt-2 text-xs font-medium text-slate-500">
-                    Password must contain at least 6 characters.
-                  </p>
                 </div>
 
                 <div>
@@ -237,11 +229,11 @@ export default function ResetPassword() {
 
               {/* Button */}
 
-              <div className="flex justify-end pt-2">
+              <div>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#e2233d] px-6 text-sm font-bold text-white transition hover:bg-[#c91f35] disabled:cursor-not-allowed disabled:bg-slate-300 sm:w-auto"
+                  className="mt-6 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#D72638] px-5 text-base font-bold text-white transition hover:bg-[#C41F31] disabled:cursor-not-allowed disabled:opacity-60 sm:mt-12 sm:w-auto sm:min-w-[182px]"
                 >
                   {loading ? (
                     <>
@@ -253,11 +245,9 @@ export default function ResetPassword() {
                   )}
                 </button>
               </div>
-            </form>
-          </div>
+          </form>
         </section>
       </main>
-    </>
   );
 }
 
@@ -290,11 +280,11 @@ function PasswordInput({
         type="button"
         onClick={onToggle}
         disabled={disabled}
-        className="absolute right-4 top-1/2 flex -translate-y-1/2 items-center text-slate-500 transition hover:text-[#16458f] disabled:cursor-not-allowed disabled:opacity-50"
+        className="absolute right-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center text-lg text-[#222222] transition hover:text-[#174A9B] disabled:cursor-not-allowed disabled:opacity-60 sm:right-4 sm:text-[20px]"
         aria-label={show ? "Hide password" : "Show password"}
         aria-pressed={show}
       >
-        {show ? <FaEyeSlash size={17} /> : <FaEye size={17} />}
+        {show ? <FiEye /> : <FiEyeOff />}
       </button>
     </div>
   );

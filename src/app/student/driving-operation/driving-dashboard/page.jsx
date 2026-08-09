@@ -117,8 +117,8 @@ export default function Page() {
   }
 
   return (
-    <main className="min-h-screen bg-white px-4 py-5 font-sans text-[#171717] sm:px-6 lg:px-8">
-      <div className="mx-auto w-full ">
+    <main className="min-h-screen overflow-x-hidden bg-white px-3 py-4 font-sans text-[#171717] sm:px-6 sm:py-5 lg:px-8">
+      <div className="mx-auto w-full max-w-[1440px]">
         {/* Header */}
         <header className="flex items-center gap-3 sm:gap-4">
           <button
@@ -130,16 +130,16 @@ export default function Page() {
             <IoChevronBack />
           </button>
 
-          <h1 className="text-[22px] font-bold leading-none text-[#173F8F] sm:text-[24px]">
+          <h1 className="text-[20px] font-bold leading-none text-[#173F8F] sm:text-[24px]">
             Driving
           </h1>
         </header>
 
         {/* License Progress */}
-        <section className="mt-7 rounded-[13px] bg-[#E8EEF7] p-4 sm:p-5">
+        <section className="mt-5 rounded-[13px] bg-[#E8EEF7] p-3 sm:mt-7 sm:p-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <h2 className="text-[16px] font-bold text-[#171717]">
+              <h2 className="text-[15px] font-bold leading-5 text-[#171717] sm:text-[16px]">
                 My road to getting my driver&apos;s license
               </h2>
 
@@ -148,7 +148,7 @@ export default function Page() {
               </p>
             </div>
 
-            <div className="flex flex-col items-start gap-3 sm:items-end">
+            <div className="flex flex-row items-center justify-between gap-3 sm:flex-col sm:items-end">
               <Link
                 href="/student/driving-operation/step-details"
                 className="text-[14px] font-bold text-[#174596] underline"
@@ -156,19 +156,19 @@ export default function Page() {
                 Details
               </Link>
 
-              <p className="text-[15px] font-bold text-[#20BF3A]">
+              <p className="text-right text-[12px] font-bold leading-4 text-[#20BF3A] sm:text-[15px]">
                 {journey?.completedHours || 0} / {journey?.targetHours || 20} hours completed
               </p>
             </div>
           </div>
 
-          <div className="mt-6 overflow-x-auto pb-2">
-            <div className="flex min-w-[760px] items-center">
+          <div className="mt-5 w-full pb-1 sm:mt-6 sm:overflow-x-auto sm:pb-2">
+            <div className="flex w-full items-start sm:min-w-[760px] sm:items-center">
               {journeySteps.map((step, index) => (
                 <Fragment key={step.id}>
-                  <div className="flex shrink-0 flex-col items-center">
+                  <div className="flex min-w-0 flex-[0_0_38px] flex-col items-center sm:shrink-0 sm:flex-none">
                     <div
-                      className={`flex h-11 w-11 items-center justify-center rounded-full text-[18px] ${
+                      className={`flex h-8 w-8 items-center justify-center rounded-full text-[14px] sm:h-11 sm:w-11 sm:text-[18px] ${
                         step.type === "empty"
                           ? "bg-white text-[#174596]"
                           : step.type === "car"
@@ -178,18 +178,18 @@ export default function Page() {
                     >
                       {step.type === "done" && <IoCheckmark />}
                       {step.type === "car" && (
-                        <FaCarSide className="text-[20px]" />
+                        <FaCarSide className="text-[15px] sm:text-[20px]" />
                       )}
                     </div>
 
-                    <span className="mt-3 whitespace-nowrap text-[11px] font-bold text-[#667085]">
+                    <span className="mt-2 max-w-[54px] text-center text-[8px] font-bold leading-[10px] text-[#667085] sm:mt-3 sm:max-w-none sm:whitespace-nowrap sm:text-[11px] sm:leading-normal">
                       {step.label}
                     </span>
-                    <span className="mt-1 text-[10px] font-semibold text-[#174596]">{step.progress ?? 0}%</span>
+                    <span className="mt-1 text-[8px] font-semibold text-[#174596] sm:text-[10px]">{step.progress ?? 0}%</span>
                   </div>
 
                   {index !== journeySteps.length - 1 && (
-                    <div className={`mb-7 h-[2px] flex-1 ${journeySteps[index + 1]?.type === "done" || journeySteps[index + 1]?.type === "car" ? "bg-[#174596]" : "bg-slate-300"}`} />
+                    <div className={`mt-[15px] h-[2px] min-w-0 flex-1 sm:mb-7 sm:mt-0 ${journeySteps[index + 1]?.type === "done" || journeySteps[index + 1]?.type === "car" ? "bg-[#174596]" : "bg-slate-300"}`} />
                   )}
                 </Fragment>
               ))}
@@ -198,12 +198,12 @@ export default function Page() {
         </section>
 
         {/* Teachers */}
-        <section className="mt-7">
-          <h2 className="text-[21px] font-bold text-[#174596]">
+        <section className="mt-6 sm:mt-7">
+          <h2 className="text-[19px] font-bold text-[#174596] sm:text-[21px]">
             My Favorite Teachers
           </h2>
 
-          <div className="mt-5 rounded-[13px] bg-[#E8EEF7] p-4 sm:p-5">
+          <div className="mt-4 rounded-[13px] bg-[#E8EEF7] p-3 sm:mt-5 sm:p-5">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {teachers.map((teacher) => {
                 const user = teacher.user || {};
@@ -211,17 +211,17 @@ export default function Page() {
                 return (
                 <article
                   key={teacher._id}
-                  className="rounded-[12px] bg-white p-4 text-center transition hover:-translate-y-1 hover:shadow-[0_12px_28px_rgba(23,69,150,0.13)]"
+                  className="rounded-[12px] bg-white p-3 text-center transition hover:-translate-y-1 hover:shadow-[0_12px_28px_rgba(23,69,150,0.13)] sm:p-4"
                 >
                   {user.avatar ? <img src={user.avatar} alt={user.name || "Teacher"} className="mx-auto h-[66px] w-[66px] rounded-full object-cover" /> : <div className="mx-auto flex h-[66px] w-[66px] items-center justify-center rounded-full bg-[#174596] text-2xl font-bold text-white">{(user.name || "T").charAt(0).toUpperCase()}</div>}
 
-                  <h3 className="mt-4 text-[20px] font-bold leading-tight text-[#174596]">
+                  <h3 className="mt-3 break-words text-[18px] font-bold leading-tight text-[#174596] sm:mt-4 sm:text-[20px]">
                     {user.name || user.fullName || "Teacher"}
                   </h3>
 
-                  <div className="mt-2 flex items-center justify-center gap-1.5 text-[13px] text-[#667085]">
+                  <div className="mt-2 flex min-w-0 items-center justify-center gap-1.5 text-[12px] text-[#667085] sm:text-[13px]">
                     <FaWhatsapp className="text-[15px] text-[#19C463]" />
-                    <span>{user.phone || "Phone not provided"}</span>
+                    <span className="min-w-0 break-all">{user.phone || "Phone not provided"}</span>
                   </div>
 
                   <div className="mt-4 rounded-[10px] bg-[#E8EEF7] px-3 py-3">
@@ -255,15 +255,15 @@ export default function Page() {
         </section>
 
         {/* Lessons */}
-        <section className="mt-7">
+        <section className="mt-6 sm:mt-7">
           <h2 className="text-[20px] font-bold text-[#174596]">Lessons</h2>
 
-          <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-4 grid grid-cols-1 gap-3 sm:mt-5 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
             {lessonItems.map((item) => (
               <Link
                 key={item.id}
                 href={item.link}
-                className="group flex min-h-[88px] items-center justify-between gap-4 rounded-[10px] border border-[#174596] bg-[#E8EEF7] px-5 py-4 transition hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_10px_25px_rgba(23,69,150,0.12)]"
+                className="group flex min-h-[76px] items-center justify-between gap-3 rounded-[10px] border border-[#174596] bg-[#E8EEF7] px-3 py-3 transition hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_10px_25px_rgba(23,69,150,0.12)] sm:min-h-[88px] sm:gap-4 sm:px-5 sm:py-4"
               >
                 <div className="flex min-w-0 items-center gap-4">
                   <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[10px] bg-white">
@@ -286,15 +286,15 @@ export default function Page() {
         </section>
 
         {/* Learning */}
-        <section className="mt-7">
+        <section className="mt-6 sm:mt-7">
           <h2 className="text-[20px] font-bold text-[#174596]">Learning</h2>
 
-          <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-4 grid grid-cols-1 gap-3 sm:mt-5 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
             {learningItems.map((item) => (
               <Link
                 key={item.id}
                 href={item.link}
-                className="group flex min-h-[88px] items-center justify-between gap-4 rounded-[10px] border border-[#174596] bg-[#E8EEF7] px-5 py-4 transition hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_10px_25px_rgba(23,69,150,0.12)]"
+                className="group flex min-h-[76px] items-center justify-between gap-3 rounded-[10px] border border-[#174596] bg-[#E8EEF7] px-3 py-3 transition hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_10px_25px_rgba(23,69,150,0.12)] sm:min-h-[88px] sm:gap-4 sm:px-5 sm:py-4"
               >
                 <div className="flex min-w-0 items-center gap-4">
                   <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[10px] bg-white">
@@ -317,13 +317,13 @@ export default function Page() {
         </section>
 
         {/* Driving Test */}
-        <section className="mt-7">
+        <section className="mt-6 sm:mt-7">
           <h2 className="text-[20px] font-bold text-[#174596]">Driving test</h2>
 
-          <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-4 grid grid-cols-1 gap-3 sm:mt-5 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
             <Link
               href="/student/driving-operation/demand-driving-exam"
-              className="group flex min-h-[88px] items-center justify-between gap-4 rounded-[10px] border border-[#174596] bg-[#E8EEF7] px-5 py-4 transition hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_10px_25px_rgba(23,69,150,0.12)]"
+              className="group flex min-h-[76px] items-center justify-between gap-3 rounded-[10px] border border-[#174596] bg-[#E8EEF7] px-3 py-3 transition hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_10px_25px_rgba(23,69,150,0.12)] sm:min-h-[88px] sm:gap-4 sm:px-5 sm:py-4"
             >
               <div className="flex min-w-0 items-center gap-4">
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[10px] bg-white text-[29px] text-[#174596] transition group-hover:bg-[#174596] group-hover:text-white">
