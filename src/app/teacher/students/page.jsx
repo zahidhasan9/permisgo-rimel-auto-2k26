@@ -85,7 +85,7 @@ export default function Students() {
   const resetFilters = () => setFilters({ name: "", email: "", phone: "" });
 
   return (
-    <main className="min-h-screen bg-[#f8fafc] px-4 py-5 sm:px-6 lg:px-8">
+    <main className="min-h-screen overflow-x-hidden bg-[#f8fafc] px-2.5 py-4 pb-24 sm:px-6 sm:py-5 sm:pb-8 lg:px-8">
       <section className="mx-auto">
         <header className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
@@ -111,7 +111,7 @@ export default function Students() {
           </div>
         )}
 
-        <div className="mb-4 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-100">
+        <div className="mb-4 rounded-2xl bg-white p-3.5 shadow-sm ring-1 ring-slate-100 sm:p-4">
           <div className="grid gap-3 md:grid-cols-3">
             {filterFields.map((field) => {
               const Icon = field.icon;
@@ -140,11 +140,11 @@ export default function Students() {
               );
             })}
           </div>
-          <div className="mt-3 flex justify-end">
+          <div className="mt-3 flex justify-stretch sm:justify-end">
             <button
               type="button"
               onClick={resetFilters}
-              className="inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-[#e2233d] px-4 text-xs font-bold text-white transition hover:bg-[#c91f35]"
+              className="inline-flex h-9 w-full items-center justify-center gap-2 rounded-lg bg-[#e2233d] px-4 text-xs font-bold text-white transition hover:bg-[#c91f35] sm:w-auto"
             >
               <FaTimes size={11} /> Reset Filter
             </button>
@@ -152,7 +152,7 @@ export default function Students() {
         </div>
 
         <div className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-100">
-          <div className="overflow-x-auto">
+          <div className="hidden overflow-x-auto sm:block">
             <table className="w-full min-w-[720px] text-left">
               <thead>
                 <tr className="bg-[#16458f] text-white">
@@ -211,6 +211,28 @@ export default function Students() {
                 )}
               </tbody>
             </table>
+          </div>
+          <div className="space-y-3 bg-[#f8fafc] p-2.5 sm:hidden">
+            {loading ? (
+              <div className="rounded-xl bg-white px-4 py-10 text-center text-sm text-slate-500">Loading students...</div>
+            ) : students.length ? (
+              students.map((student) => (
+                <article key={student._id} onClick={() => router.push(`/teacher/students/${student._id}`)} className="cursor-pointer rounded-2xl border border-slate-100 bg-white p-3.5 shadow-sm active:bg-blue-50">
+                  <div className="flex min-w-0 items-center gap-3 border-b border-slate-100 pb-3">
+                    {student.avatar ? <img src={mediaUrl(student.avatar)} alt={student.name || "Student"} className="h-11 w-11 shrink-0 rounded-full object-cover" /> : <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#16458f] text-sm font-black text-white">{(student.name || "S").charAt(0).toUpperCase()}</div>}
+                    <div className="min-w-0 flex-1"><h3 className="truncate text-sm font-extrabold text-slate-900">{student.name || "Student"}</h3><p className="mt-0.5 truncate text-[11px] text-slate-500">{student.email || student.phone || "Booked student"}</p></div>
+                  </div>
+                  <dl className="mt-3 grid grid-cols-2 gap-x-3 gap-y-2 text-[11px]">
+                    <div className="min-w-0"><dt className="font-bold text-slate-400">Date</dt><dd className="mt-0.5 break-words font-semibold text-slate-700">{formatDate(student.bookingDate)}</dd></div>
+                    <div className="min-w-0"><dt className="font-bold text-slate-400">Duration</dt><dd className="mt-0.5 break-words font-semibold text-slate-700">{formatDuration(student.startTime, student.endTime)}</dd></div>
+                    <div className="col-span-2 min-w-0"><dt className="font-bold text-slate-400">Vehicle type</dt><dd className="mt-0.5 capitalize font-semibold text-slate-700">{student.vehicleType ? `${student.vehicleType} transmission` : "—"}</dd></div>
+                  </dl>
+                  <button type="button" onClick={(event) => { event.stopPropagation(); router.push(`/teacher/students/${student._id}/booklet`); }} className="mt-3 w-full rounded-xl bg-[#e2233d] px-3 py-2.5 text-xs font-bold text-white">Set Booklet</button>
+                </article>
+              ))
+            ) : (
+              <div className="rounded-xl bg-white px-4 py-10 text-center"><h3 className="text-base font-bold text-slate-800">No students found</h3><p className="mt-1 text-sm text-slate-500">Try changing your search filters.</p></div>
+            )}
           </div>
           <Pagination
             page={meta.page}

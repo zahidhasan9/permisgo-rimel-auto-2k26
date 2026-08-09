@@ -3,8 +3,9 @@
 import GooglePlaceAutocomplete from "@/components/maps/GooglePlaceAutocomplete";
 import {
   GoogleMap,
-  InfoWindowF,
   MarkerF,
+  OverlayView,
+  OverlayViewF,
   useJsApiLoader,
 } from "@react-google-maps/api";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -93,9 +94,9 @@ const vehicleFor = (teacher, type) => {
 
 function BackHeader({ onBack }) {
   return (
-    <header className="mb-7 flex items-center gap-4">
-      <button type="button" onClick={onBack} className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#eef2f8]"><IoChevronBack size={24} /></button>
-      <h1 className="text-[24px] font-bold text-[#123f88]">Book Lesson</h1>
+    <header className="mb-4 flex items-center gap-3 sm:mb-7 sm:gap-4">
+      <button type="button" onClick={onBack} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#eef2f8] sm:h-11 sm:w-11"><IoChevronBack size={22} /></button>
+      <h1 className="text-xl font-bold text-[#123f88] sm:text-[24px]">Book Lesson</h1>
     </header>
   );
 }
@@ -353,7 +354,7 @@ function BookingFlow() {
   };
 
   return (
-    <main className="min-h-screen bg-white px-3 py-6 sm:px-6">
+    <main className="min-h-screen overflow-x-hidden bg-white px-2 py-4 pb-24 sm:px-6 sm:py-6 sm:pb-8">
       <BackHeader onBack={back} />
       <Notice error={error} />
       {step === "map" && (
@@ -418,20 +419,22 @@ function MapStep({
   mapRef,
 }) {
   return (
-    <section className="rounded-xl bg-[#e8eef7] p-4 sm:p-5">
-      <div className="mb-4 grid gap-4 lg:grid-cols-[310px_1fr]">
-        <GooglePlaceAutocomplete value={search.address} placeholder="Search a location" onPlaceSelect={selectPlace} />
-        <div className="flex justify-end">
-          <div className="inline-flex rounded-full bg-white p-1">
+    <section className="rounded-xl bg-[#e8eef7] p-2.5 sm:p-5">
+      <div className="mb-3 grid gap-3 sm:mb-4 lg:grid-cols-[310px_1fr] lg:gap-4">
+        <div className="min-w-0 max-w-full overflow-hidden">
+          <GooglePlaceAutocomplete value={search.address} placeholder="Search a location" onPlaceSelect={selectPlace} />
+        </div>
+        <div className="flex min-w-0 justify-stretch sm:justify-end">
+          <div className="grid w-full grid-cols-2 rounded-full bg-white p-1 sm:inline-flex sm:w-auto">
             {["manual", "automatic"].map((type) => (
-              <button key={type} type="button" onClick={() => setVehicleType(type)} className={`rounded-full px-5 py-2 text-xs font-bold capitalize ${vehicleType === type ? "bg-[#16499a] text-white" : "text-slate-700"}`}>{type} transmission</button>
+              <button key={type} type="button" onClick={() => setVehicleType(type)} className={`min-w-0 rounded-full px-2 py-2 text-[11px] font-bold capitalize sm:px-5 sm:text-xs ${vehicleType === type ? "bg-[#16499a] text-white" : "text-slate-700"}`}>{type} transmission</button>
             ))}
           </div>
         </div>
       </div>
 
-      <div className="grid min-h-[620px] overflow-hidden rounded-xl lg:grid-cols-[310px_1fr]">
-        <aside className="max-h-[620px] space-y-3 overflow-y-auto bg-[#eef2f8] p-3">
+      <div className="grid overflow-hidden rounded-xl lg:min-h-[620px] lg:grid-cols-[310px_1fr]">
+        <aside className="order-2 max-h-[340px] space-y-2 overflow-y-auto bg-[#eef2f8] p-2.5 sm:max-h-[420px] sm:space-y-3 sm:p-3 lg:order-1 lg:max-h-[620px]">
           <p className="px-1 text-xs text-slate-500">The {teachers.length} closest meeting points to this address</p>
           {loading ? Array.from({ length: 5 }).map((_, index) => <div key={index} className="h-24 animate-pulse rounded-xl bg-white" />) : teachers.length ? teachers.map((teacher) => {
             const location = teacher.nearestLocation;
@@ -443,8 +446,9 @@ function MapStep({
                 if (point) {
                   mapRef.current?.panTo(point);
                   mapRef.current?.setZoom(14);
+                  window.setTimeout(() => mapRef.current?.panBy(0, -45), 0);
                 }
-              }} className="w-full rounded-xl bg-white p-4 text-left shadow-sm transition hover:ring-2 hover:ring-[#174a9b]">
+              }} className="w-full rounded-xl bg-white p-3 text-left shadow-sm transition hover:ring-2 hover:ring-[#174a9b] sm:p-4">
                 <p className="flex items-center gap-2 text-sm font-bold"><FaMapMarkerAlt className="text-[#174a9b]" />{location?.title || location?.address || "Meeting point"}</p>
                 <p className="ml-5 mt-1 text-xs text-slate-500">{teacher.distanceKm || 0} km</p>
                 <div className="mt-3 flex items-center gap-2 border-t border-slate-100 pt-3"><Avatar teacher={teacher} className="h-8 w-8" /><div className="min-w-0 flex-1"><p className="truncate text-xs font-bold text-[#123f88]">{teacherName(teacher)}</p><p className="truncate text-[10px] text-slate-500">{[vehicle?.brand, vehicle?.model].filter(Boolean).join(" ") || `${vehicleType} vehicle`}</p></div><span className="rounded bg-[#e7edf6] px-2 py-1 text-[10px] font-bold text-[#174a9b]">Details</span></div>
@@ -453,21 +457,38 @@ function MapStep({
           }) : <div className="rounded-xl bg-white p-6 text-center text-sm text-slate-500">No available instructor found near this location.</div>}
         </aside>
 
-        <div className="relative min-h-[500px]">
+        <div className="relative order-1 h-[330px] min-w-0 sm:h-[420px] lg:order-2 lg:h-auto lg:min-h-[500px]">
           <GoogleMap mapContainerStyle={{ width: "100%", height: "100%" }} center={center} zoom={12} options={MAP_OPTIONS} onLoad={(map) => { mapRef.current = map; }}>
             {teachers.map((teacher) => {
               const position = teacherPoint(teacher);
-              return position ? <MarkerF key={teacher.user._id} position={position} onClick={() => setSelectedTeacher(teacher)} /> : null;
+              return position ? <MarkerF key={teacher.user._id} position={position} onClick={() => {
+                setSelectedTeacher(teacher);
+                mapRef.current?.panTo(position);
+                window.setTimeout(() => mapRef.current?.panBy(0, -45), 0);
+              }} /> : null;
             })}
             {selectedTeacher && teacherPoint(selectedTeacher) && (
-              <InfoWindowF position={teacherPoint(selectedTeacher)} onCloseClick={() => setSelectedTeacher(null)}>
-                <div className="w-[250px] p-2 text-slate-900">
-                  <div className="flex items-center gap-3"><Avatar teacher={selectedTeacher} /><div className="min-w-0"><h3 className="truncate font-bold text-[#123f88]">{teacherName(selectedTeacher)}</h3><p className="text-xs">Experience {selectedTeacher.experienceYears || 0} Years</p></div></div>
-                  <div className="mt-3 flex items-center justify-between"><RatingStars value={selectedTeacher.rating?.average} /><span className="text-[10px] text-slate-500">{selectedTeacher.rating?.totalReviews || 0} reviews</span></div>
-                  <div className="mt-3 space-y-1.5 rounded-md bg-[#eef2f8] p-2 text-[10px] text-slate-600"><p className="truncate"><b>Meeting point:</b> {selectedTeacher.nearestLocation?.title || selectedTeacher.nearestLocation?.address || "Not provided"}</p><p><b>Vehicle:</b> {[vehicleFor(selectedTeacher, vehicleType)?.brand, vehicleFor(selectedTeacher, vehicleType)?.model].filter(Boolean).join(" ") || "Not provided"}</p><p className="capitalize"><b>Transmission:</b> {vehicleType}</p></div>
-                  <button type="button" onClick={() => openTeacher(selectedTeacher)} className="mt-4 w-full rounded-md bg-[#df2339] py-2 text-xs font-bold text-white">View Details</button>
+              <OverlayViewF
+                position={teacherPoint(selectedTeacher)}
+                mapPaneName={OverlayView.FLOAT_PANE}
+                getPixelPositionOffset={(width, height) => ({
+                  x: -(width / 2),
+                  y: -(height + 42),
+                })}
+              >
+                <div className="relative w-[180px] overflow-hidden rounded-lg border border-[#174a9b] bg-white p-2 text-slate-900 shadow-xl sm:w-[270px] sm:rounded-xl sm:border-2 sm:p-4 sm:shadow-2xl">
+                  <button type="button" onClick={() => setSelectedTeacher(null)} aria-label="Close teacher details" className="absolute right-1.5 top-1.5 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-slate-100 text-sm leading-none text-slate-600 hover:bg-slate-200 sm:right-2 sm:top-2 sm:h-7 sm:w-7 sm:text-lg">×</button>
+                  <div className="flex min-w-0 items-center gap-1.5 pr-5 sm:gap-3 sm:pr-7"><Avatar teacher={selectedTeacher} className="h-7 w-7 sm:h-12 sm:w-12" /><div className="min-w-0 flex-1"><h3 className="truncate text-[10px] font-bold leading-3 text-[#123f88] sm:text-base sm:leading-normal">{teacherName(selectedTeacher)}</h3><p className="truncate text-[7px] leading-3 text-slate-500 sm:text-xs sm:leading-normal">Experience {selectedTeacher.experienceYears || 0} Years</p></div></div>
+                  <div className="mt-1 flex items-center justify-between gap-1 sm:mt-2 sm:gap-2"><RatingStars value={selectedTeacher.rating?.average} className="gap-px text-[8px] sm:gap-1 sm:text-sm" /><span className="shrink-0 text-[7px] text-slate-500 sm:text-[10px]">{selectedTeacher.rating?.totalReviews || 0} reviews</span></div>
+                  <dl className="mt-1 space-y-1 rounded bg-[#eef2f8] p-1.5 text-[8px] leading-3 text-slate-600 sm:mt-2 sm:space-y-1.5 sm:rounded-md sm:p-2 sm:text-[10px] sm:leading-4">
+                    <div className="grid grid-cols-[58px_minmax(0,1fr)] items-start gap-1 sm:grid-cols-[76px_minmax(0,1fr)]"><dt className="font-bold">Meeting point:</dt><dd className="min-w-0 break-words">{selectedTeacher.nearestLocation?.title || selectedTeacher.nearestLocation?.address || "Not provided"}</dd></div>
+                    <div className="grid grid-cols-[58px_minmax(0,1fr)] items-start gap-1 sm:grid-cols-[76px_minmax(0,1fr)]"><dt className="font-bold">Vehicle:</dt><dd className="min-w-0 break-words">{[vehicleFor(selectedTeacher, vehicleType)?.brand, vehicleFor(selectedTeacher, vehicleType)?.model].filter(Boolean).join(" ") || "Not provided"}</dd></div>
+                    <div className="grid grid-cols-[58px_minmax(0,1fr)] items-start gap-1 sm:grid-cols-[76px_minmax(0,1fr)]"><dt className="font-bold">Transmission:</dt><dd className="min-w-0 break-words capitalize">{vehicleType}</dd></div>
+                  </dl>
+                  <button type="button" onClick={() => openTeacher(selectedTeacher)} className="mt-1.5 w-full rounded bg-[#df2339] py-1.5 text-[8px] font-bold text-white sm:mt-2.5 sm:rounded-md sm:py-2 sm:text-xs">View Details</button>
+                  <span className="absolute -bottom-2 left-1/2 h-4 w-4 -translate-x-1/2 rotate-45 border-b-2 border-r-2 border-[#174a9b] bg-white" />
                 </div>
-              </InfoWindowF>
+              </OverlayViewF>
             )}
           </GoogleMap>
         </div>
@@ -483,7 +504,7 @@ function TeacherStep({ teacher, reviews, favorite, toggleFavorite, savingFavorit
   const [showAllReviews, setShowAllReviews] = useState(false);
   const visibleReviews = showAllReviews ? reviews : reviews.slice(0, 4);
   return (
-    <section className="rounded-xl bg-[#e8eef7] p-3 sm:p-4">
+    <section className="rounded-xl bg-[#e8eef7] p-2.5 sm:p-4">
       <div className="grid gap-3 lg:grid-cols-[290px_minmax(0,1fr)]">
         <div>
           <div className="rounded-xl bg-[#174a9b] p-3 text-white">
@@ -499,7 +520,7 @@ function TeacherStep({ teacher, reviews, favorite, toggleFavorite, savingFavorit
             <div className="mt-2 rounded-lg bg-white p-3 text-xs text-slate-800"><FaMapMarkerAlt className="mr-2 inline text-slate-500" /><b>Meeting point</b><p className="mt-1 text-[10px] text-slate-500">{location?.address || location?.title || "Address unavailable"}</p></div>
             <div className="mt-2 rounded-lg bg-white p-3 text-xs text-slate-800"><FaCarSide className="mr-2 inline text-slate-500" /><b>Vehicle</b><p className="mt-1 text-[10px] capitalize text-slate-500">{vehicleType} transmission ({[vehicle?.brand, vehicle?.model].filter(Boolean).join(" ") || vehicle?.vehicleName || "vehicle unavailable"})</p></div>
           </div>
-          <button type="button" onClick={onSlots} className="mt-3 rounded-lg bg-[#df2339] px-4 py-2.5 text-xs font-bold text-white">View Available Slot</button>
+          <button type="button" onClick={onSlots} className="mt-3 w-full rounded-lg bg-[#df2339] px-4 py-3 text-xs font-bold text-white sm:w-auto sm:py-2.5">View Available Slot</button>
         </div>
 
         <div className="rounded-xl bg-[#e3e9f3] p-3 sm:p-4">
@@ -531,10 +552,10 @@ function ScheduleStep({
   book,
 }) {
   return (
-    <section className="flex min-h-[620px] items-center justify-center rounded-xl bg-[#e8eef7] p-4 sm:p-8">
+    <section className="flex min-h-[520px] items-start justify-center rounded-xl bg-[#e8eef7] p-2.5 sm:min-h-[620px] sm:items-center sm:p-8">
       <div className="w-full max-w-[430px]">
-        <div className="rounded-xl bg-white p-5">
-          <div className="rounded-xl bg-[#174a9b] p-5 text-center text-white"><Avatar teacher={teacher} className="mx-auto h-14 w-14" /><h2 className="mt-2 font-bold">{teacherName(teacher)}</h2><p className="mt-1 text-xs">Book a lesson</p></div>
+        <div className="rounded-xl bg-white p-3.5 sm:p-5">
+          <div className="rounded-xl bg-[#174a9b] p-4 text-center text-white sm:p-5"><Avatar teacher={teacher} className="mx-auto h-12 w-12 sm:h-14 sm:w-14" /><h2 className="mt-2 font-bold">{teacherName(teacher)}</h2><p className="mt-1 text-xs">Book a lesson</p></div>
           <h3 className="mt-5 text-sm font-bold text-[#123f88]">Choose the duration</h3>
           <p className="mt-3 rounded-xl border border-[#174a9b] bg-[#eef2f8] p-4 text-xs leading-6 text-slate-600">For your first lesson with this instructor, we recommend a one-hour session. This allows us to properly assess your level and personalize your future lessons.</p>
           <div className="mt-3 flex gap-2">{[60, 120].map((value) => <button key={value} type="button" onClick={() => setDuration(value)} className={`rounded-full px-4 py-2 text-xs font-bold ${duration === value ? "bg-[#174a9b] text-white" : "bg-[#eef2f8]"}`}>{value / 60} hour{value > 60 ? "s" : ""}</button>)}</div>
@@ -559,8 +580,8 @@ function ScheduleStep({
 
 function ConfirmationStep({ booking, teacher, router }) {
   return (
-    <section className="flex min-h-[500px] items-start justify-center rounded-xl bg-[#e8eef7] p-6 pt-16">
-      <div className="w-full max-w-[390px] rounded-xl bg-white p-5">
+    <section className="flex min-h-[440px] items-start justify-center rounded-xl bg-[#e8eef7] p-3 pt-8 sm:min-h-[500px] sm:p-6 sm:pt-16">
+      <div className="w-full max-w-[390px] rounded-xl bg-white p-4 sm:p-5">
         <h2 className="font-bold text-[#123f88]">Confirmation Message</h2>
         <div className="mt-4 rounded-xl border border-green-400 bg-green-50 p-4 text-sm leading-6 text-slate-600">
           Your {booking?.duration ? `${booking.duration / 60}-hour` : "driving"} lesson with Mr. {teacherName(teacher)} has been successfully booked for {booking?.bookingDate ? formatBookingDate(booking.bookingDate) : "the selected date"} at {booking?.startTime}. Your lesson is confirmed.

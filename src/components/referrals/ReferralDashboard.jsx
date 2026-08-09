@@ -83,18 +83,17 @@ export default function ReferralDashboard({ accountType = "student" }) {
   };
 
   return (
-    <main className=" pb-8 text-[#161616] 
-    min-h-screen bg-[#f8fafc] px-4 py-5 sm:px-6 lg:px-8">
-      <header className="mb-8 flex items-center gap-4">
+    <main className="min-h-screen overflow-x-hidden bg-[#f8fafc] px-2.5 py-4 pb-24 text-[#161616] sm:px-6 sm:py-5 sm:pb-8 lg:px-8">
+      <header className="mb-4 flex min-w-0 items-center gap-3 sm:mb-8 sm:gap-4">
         <button
           type="button"
           onClick={() => router.back()}
-          className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-[14px] bg-[#e8edf5] text-xl text-slate-950 transition hover:bg-[#dce4f0]"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#e8edf5] text-base text-slate-950 transition hover:bg-[#dce4f0] sm:h-[52px] sm:w-[52px] sm:rounded-[14px] sm:text-xl"
           aria-label="Go back"
         >
           <FaChevronLeft />
         </button>
-        <h1 className="text-[27px] font-extrabold text-[#16458f]">
+        <h1 className="min-w-0 truncate text-xl font-extrabold text-[#16458f] sm:text-[27px]">
           My Sponsorships
         </h1>
         <span className="sr-only">{accountType} referral account</span>
@@ -110,20 +109,20 @@ export default function ReferralDashboard({ accountType = "student" }) {
         </div>
       ) : (
         <>
-          <section className="relative mb-7 min-h-[226px] overflow-hidden rounded-[16px] bg-[#e8edf5] px-6 py-7 sm:px-7">
+          <section className="relative mb-4 overflow-hidden rounded-[16px] bg-[#e8edf5] px-4 py-5 sm:mb-7 sm:min-h-[226px] sm:px-7 sm:py-7">
             <div className="relative z-10 max-w-[760px]">
-              <h2 className="flex items-center gap-3 text-[21px] font-extrabold leading-tight sm:text-[23px]">
+              <h2 className="flex items-start gap-2 text-base font-extrabold leading-6 sm:items-center sm:gap-3 sm:text-[23px] sm:leading-tight">
                 <FaGift className="shrink-0 text-[#e2233d]" />
                 Referral Program - Earn money by recommending the driving
                 School
               </h2>
-              <p className="mt-3 text-[14px] text-[#6d6d6d]">
+              <p className="mt-2 text-xs leading-5 text-[#6d6d6d] sm:mt-3 sm:text-[14px]">
                 Share your experience and help your friend sign up
               </p>
 
               <a
                 href="#how-it-works"
-                className="mt-10 flex min-h-[68px] items-center gap-4 rounded-[15px] bg-white px-6 text-[16px] font-extrabold text-[#16458f] underline underline-offset-2 transition hover:shadow-sm"
+                className="mt-4 flex min-h-12 items-center gap-3 rounded-xl bg-white px-4 text-sm font-extrabold text-[#16458f] underline underline-offset-2 transition hover:shadow-sm sm:mt-10 sm:min-h-[68px] sm:rounded-[15px] sm:px-6 sm:text-[16px]"
               >
                 <span className="text-xl">💎</span>
                 How does it work?
@@ -135,13 +134,13 @@ export default function ReferralDashboard({ accountType = "student" }) {
 
           <section
             id="how-it-works"
-            className="grid gap-7 md:grid-cols-3"
+            className="grid gap-3 sm:gap-5 md:grid-cols-3 lg:gap-7"
           >
-            <article className="flex min-h-[292px] flex-col items-center justify-center rounded-[16px] bg-[#e8edf5] p-6 text-center">
+            <article className="flex min-h-[190px] flex-col items-center justify-center rounded-[16px] bg-[#e8edf5] p-4 text-center sm:min-h-[240px] sm:p-6 md:min-h-[292px]">
               <h2 className="text-[17px] font-extrabold">
                 Your Referral Code
               </h2>
-              <div className="mt-6 flex h-[54px] w-full max-w-[245px] items-center justify-between rounded-[12px] bg-white px-4">
+              <div className="mt-4 flex h-[50px] w-full max-w-[245px] min-w-0 items-center justify-between rounded-[12px] bg-white px-3 sm:mt-6 sm:h-[54px] sm:px-4">
                 <span className="truncate text-[15px] font-bold tracking-wide text-[#6c6c6c]">
                   {code}
                 </span>
@@ -158,7 +157,7 @@ export default function ReferralDashboard({ accountType = "student" }) {
               <button
                 type="button"
                 onClick={shareCode}
-                className="mt-5 inline-flex min-h-[40px] items-center justify-center gap-2 rounded-[10px] bg-[#e2233d] px-6 text-[13px] font-extrabold text-white transition hover:bg-[#c91f35]"
+                className="mt-4 inline-flex min-h-[40px] w-full max-w-[245px] items-center justify-center gap-2 rounded-[10px] bg-[#e2233d] px-6 text-[13px] font-extrabold text-white transition hover:bg-[#c91f35] sm:mt-5 sm:w-auto"
               >
                 <FaShareAlt className="text-xs" /> Share
               </button>
@@ -177,25 +176,25 @@ export default function ReferralDashboard({ accountType = "student" }) {
           </section>
 
           {referredUsers.length ? (
-            <section className="mt-7 overflow-hidden rounded-[16px] bg-[#e8edf5]">
-              <h2 className="border-b border-white/70 px-7 py-5 text-lg font-extrabold text-[#16458f]">
+            <section className="mt-4 overflow-hidden rounded-[16px] bg-[#e8edf5] sm:mt-7">
+              <h2 className="border-b border-white/70 px-4 py-4 text-base font-extrabold text-[#16458f] sm:px-7 sm:py-5 sm:text-lg">
                 Your Sponsorships
               </h2>
               <div className="divide-y divide-white/70">
                 {referredUsers.map((entry) => (
                   <div
                     key={entry._id}
-                    className="flex flex-wrap items-center justify-between gap-3 px-7 py-5"
+                    className="flex min-w-0 items-center justify-between gap-3 px-4 py-4 sm:px-7 sm:py-5"
                   >
-                    <div>
-                      <p className="font-extrabold">
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-extrabold sm:text-base">
                         {entry.user?.name || "PermisGo member"}
                       </p>
-                      <p className="mt-1 text-xs text-slate-500">
+                      <p className="mt-1 truncate text-[11px] text-slate-500 sm:text-xs">
                         {entry.user?.email || "Referral joined"}
                       </p>
                     </div>
-                    <span className="rounded-full bg-white px-4 py-1.5 text-xs font-bold capitalize text-[#16458f]">
+                    <span className="shrink-0 rounded-full bg-white px-3 py-1.5 text-[10px] font-bold capitalize text-[#16458f] sm:px-4 sm:text-xs">
                       {entry.status || "pending"}
                     </span>
                   </div>
@@ -203,11 +202,11 @@ export default function ReferralDashboard({ accountType = "student" }) {
               </div>
             </section>
           ) : (
-            <section className="mt-7 flex min-h-[340px] flex-col items-center justify-center rounded-[16px] bg-[#e8edf5] p-8 text-center">
-              <span className="flex h-20 w-20 items-center justify-center text-[62px] text-[#16458f]">
+            <section className="mt-4 flex min-h-[230px] flex-col items-center justify-center rounded-[16px] bg-[#e8edf5] p-5 text-center sm:mt-7 sm:min-h-[340px] sm:p-8">
+              <span className="flex h-16 w-16 items-center justify-center text-5xl text-[#16458f] sm:h-20 sm:w-20 sm:text-[62px]">
                 <FaSearchDollar />
               </span>
-              <h2 className="mt-5 text-[22px] font-extrabold">
+              <h2 className="mt-4 text-lg font-extrabold sm:mt-5 sm:text-[22px]">
                 No Sponsorships Found
               </h2>
               <p className="mt-2 text-[14px] text-[#777]">
@@ -223,12 +222,12 @@ export default function ReferralDashboard({ accountType = "student" }) {
 
 function StatCard({ title, value, Icon }) {
   return (
-    <article className="flex min-h-[292px] flex-col items-center justify-center rounded-[16px] bg-[#e8edf5] p-6 text-center">
-      <span className="flex h-[52px] w-[52px] items-center justify-center rounded-[13px] bg-white text-xl text-[#16458f]">
+    <article className="flex min-h-[170px] flex-col items-center justify-center rounded-[16px] bg-[#e8edf5] p-4 text-center sm:min-h-[240px] sm:p-6 md:min-h-[292px]">
+      <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-white text-lg text-[#16458f] sm:h-[52px] sm:w-[52px] sm:rounded-[13px] sm:text-xl">
         <Icon />
       </span>
-      <h2 className="mt-7 text-[17px] font-extrabold">{title}</h2>
-      <p className="mt-3 text-[35px] font-black leading-none text-[#16458f]">
+      <h2 className="mt-4 text-sm font-extrabold sm:mt-7 sm:text-[17px]">{title}</h2>
+      <p className="mt-2 text-3xl font-black leading-none text-[#16458f] sm:mt-3 sm:text-[35px]">
         {value}
       </p>
     </article>

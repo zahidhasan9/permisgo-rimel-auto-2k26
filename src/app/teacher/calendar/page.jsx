@@ -20,6 +20,7 @@ import {
   statusLabel,
   unwrap,
 } from "@/features/lessonHelpers";
+import { mediaUrl } from "@/utils/mediaUrl";
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const pad = (value) => String(value).padStart(2, "0");
@@ -462,7 +463,7 @@ export default function AvailabilityCalendar() {
   };
 
   return (
-    <section className="min-h-screen w-full max-w-full overflow-hidden bg-white px-3 py-4 sm:px-5 lg:px-6">
+    <section className="min-h-screen w-full max-w-full overflow-hidden bg-white px-2.5 py-3 pb-24 sm:px-5 sm:py-4 sm:pb-10 lg:px-6">
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 items-center gap-3">
           <button
@@ -477,12 +478,12 @@ export default function AvailabilityCalendar() {
           </h1>
         </div>
 
-        <div className="flex flex-col gap-2 sm:flex-row">
+        <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-row">
           <button
             type="button"
             onClick={copyForNextWeek}
             disabled={loading || saving}
-            className="rounded-xl border-2 border-blue-900 bg-white px-5 py-2.5 text-sm font-bold text-blue-900 transition hover:bg-blue-50 disabled:opacity-50"
+            className="min-w-0 rounded-xl border-2 border-blue-900 bg-white px-2 py-2.5 text-[11px] font-bold text-blue-900 transition hover:bg-blue-50 disabled:opacity-50 sm:px-5 sm:text-sm"
           >
             {saving ? "Copying..." : "Copy for next week"}
           </button>
@@ -490,7 +491,7 @@ export default function AvailabilityCalendar() {
             type="button"
             onClick={openAvailabilityEditor}
             disabled={loading || !availability}
-            className="rounded-xl bg-rose-600 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-rose-700"
+            className="min-w-0 rounded-xl bg-rose-600 px-2 py-2.5 text-[11px] font-bold text-white transition hover:bg-rose-700 sm:px-5 sm:text-sm"
           >
             Set availability
           </button>
@@ -504,7 +505,7 @@ export default function AvailabilityCalendar() {
       )}
 
       <div className="grid w-full max-w-full grid-cols-1 gap-5 xl:grid-cols-[280px_minmax(0,1fr)]">
-        <aside className="rounded-2xl bg-slate-100 p-4">
+        <aside className="order-2 rounded-2xl bg-slate-100 p-3 sm:p-4 xl:order-1">
           <div className="rounded-xl bg-white p-4">
             <div className="mb-4 flex items-center justify-between">
               <h3 className="text-base font-bold text-slate-900">
@@ -577,8 +578,8 @@ export default function AvailabilityCalendar() {
           </div>
         </aside>
 
-        <main className="min-w-0 rounded-2xl bg-slate-100 p-4">
-          <div className="mb-4 flex items-center justify-between rounded-xl bg-white px-4 py-3">
+        <main className="order-1 min-w-0 rounded-2xl bg-slate-100 p-2.5 sm:p-4 xl:order-2">
+          <div className="mb-3 flex items-center justify-between rounded-xl bg-white px-3 py-3 sm:mb-4 sm:px-4">
             <h3 className="text-sm font-bold text-slate-900 sm:text-base">
               {formatRange(weekStart)}
             </h3>
@@ -600,21 +601,22 @@ export default function AvailabilityCalendar() {
             </div>
           </div>
 
-          <div className="w-full max-w-full overflow-x-auto rounded-xl bg-white">
-            <div className="min-w-[760px]">
-              <div className="grid grid-cols-[110px_repeat(7,minmax(85px,1fr))] border-b border-slate-200">
-                <div className="flex h-20 items-center justify-center border-r border-slate-200 text-sm font-extrabold text-blue-900">
+          <p className="mb-2 text-[10px] font-semibold text-slate-500 sm:hidden">Swipe sideways to see the full week. Tap an empty or busy slot to change it.</p>
+          <div className="w-full max-w-full overflow-x-auto overscroll-x-contain rounded-xl bg-white">
+            <div className="min-w-[612px] sm:min-w-[760px]">
+              <div className="grid [grid-template-columns:80px_repeat(7,76px)] border-b border-slate-200 sm:grid-cols-[110px_repeat(7,minmax(85px,1fr))]">
+                <div className="sticky left-0 z-40 flex h-14 items-center justify-center border-r border-slate-200 bg-white text-xs font-extrabold text-blue-900 sm:h-20 sm:text-sm">
                   Time
                 </div>
                 {weekDays.map((day) => (
                   <div
                     key={dateKey(day)}
-                    className="flex h-20 flex-col items-center justify-center border-r border-slate-200 text-center last:border-r-0"
+                    className="flex h-14 flex-col items-center justify-center border-r border-slate-200 text-center last:border-r-0 sm:h-20"
                   >
-                    <span className="text-base font-extrabold text-slate-900">
+                    <span className="text-xs font-extrabold text-slate-900 sm:text-base">
                       {pad(day.getDate())}
                     </span>
-                    <span className="mt-1 text-sm font-bold text-slate-900">
+                    <span className="mt-0.5 text-[10px] font-bold text-slate-900 sm:mt-1 sm:text-sm">
                       {DAYS[day.getDay()]}
                     </span>
                   </div>
@@ -624,9 +626,9 @@ export default function AvailabilityCalendar() {
               {timeValues.map((time) => (
                 <div
                   key={time}
-                  className="grid grid-cols-[110px_repeat(7,minmax(85px,1fr))] border-b border-slate-200 last:border-b-0"
+                  className="grid [grid-template-columns:80px_repeat(7,76px)] border-b border-slate-200 last:border-b-0 sm:grid-cols-[110px_repeat(7,minmax(85px,1fr))]"
                 >
-                  <div className="flex h-[84px] items-center justify-center border-r border-slate-200 bg-slate-50 text-base font-extrabold text-green-500">
+                  <div className="sticky left-0 z-30 flex h-[68px] items-center justify-center border-r border-slate-200 bg-slate-50 text-[11px] font-extrabold text-green-500 sm:h-[84px] sm:text-base">
                     {displayTime(time)}
                   </div>
                   {weekDays.map((day) => {
@@ -637,7 +639,10 @@ export default function AvailabilityCalendar() {
                     return (
                       <div
                         key={dateKey(day)}
-                        className={`group relative flex h-[84px] items-center justify-center border-r border-slate-200 last:border-r-0 ${
+                        onClick={() => !occupied && setCellAvailability(day, time, available ? false : true)}
+                        role={!occupied ? "button" : undefined}
+                        tabIndex={!occupied ? 0 : undefined}
+                        className={`group relative flex h-[68px] [--calendar-cell-height:68px] items-center justify-center border-r border-slate-200 last:border-r-0 sm:h-[84px] sm:[--calendar-cell-height:84px] ${!occupied ? "cursor-pointer" : ""} ${
                           available ? "bg-emerald-50/50" : "bg-slate-50/60"
                         }`}
                       >
@@ -659,10 +664,7 @@ export default function AvailabilityCalendar() {
                                     : "bg-blue-900"
                             }`}
                             style={{
-                              height: `${Math.max(
-                                34,
-                                (Number(lesson.duration || 30) / 30) * 84 - 8,
-                              )}px`,
+                              height: `max(34px, calc(var(--calendar-cell-height) * ${Number(lesson.duration || 30) / 30} - 8px))`,
                             }}
                           >
                             <span className="block truncate">Booked</span>
@@ -690,7 +692,7 @@ export default function AvailabilityCalendar() {
                                 Busy
                               </span>
                             )}
-                            <div className="absolute inset-0 z-30 hidden items-center justify-center bg-white/90 px-1 group-hover:flex">
+                            <div className="absolute inset-0 z-30 hidden items-center justify-center bg-white/90 px-1 sm:group-hover:flex">
                               {available ? (
                                 <button
                                   type="button"
@@ -801,10 +803,21 @@ function AvailabilityEditor({ schedule, saving, onChange, onClose, onSave }) {
 }
 
 function StudentItem({ student }) {
+  const avatar = student.avatar || student.profileImage || student.image;
   return (
     <div className="flex items-center gap-3">
-      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-blue-900 bg-blue-100 text-sm font-extrabold text-blue-900">
+      <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-blue-900 bg-blue-100 text-sm font-extrabold text-blue-900">
         {getInitial(student.name)}
+        {avatar ? (
+          <img
+            src={mediaUrl(avatar)}
+            alt={student.name || "Student"}
+            className="absolute inset-0 h-full w-full object-cover"
+            onError={(event) => {
+              event.currentTarget.style.display = "none";
+            }}
+          />
+        ) : null}
       </div>
       <div className="min-w-0">
         <h5 className="truncate text-sm font-extrabold text-slate-900">

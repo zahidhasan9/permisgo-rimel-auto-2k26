@@ -61,6 +61,9 @@ export default function GooglePlaceAutocomplete({
         autocompleteElement = new PlaceAutocompleteElement();
         autocompleteElement.placeholder = placeholder;
         autocompleteElement.style.width = "100%";
+        autocompleteElement.style.maxWidth = "100%";
+        autocompleteElement.style.minWidth = "0";
+        autocompleteElement.style.boxSizing = "border-box";
         autocompleteElement.style.display = "block";
         autocompleteElement.style.colorScheme = "light";
 
@@ -165,7 +168,7 @@ export default function GooglePlaceAutocomplete({
   return (
     <div
       ref={containerRef}
-      className="min-h-[50px] w-full overflow-visible rounded-2xl border border-slate-200 bg-white px-1 py-1 shadow-sm focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-100"
+      className="min-h-[50px] min-w-0 max-w-full overflow-hidden rounded-2xl border border-slate-200 bg-white px-1 py-1 shadow-sm focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-100"
     />
   );
 }

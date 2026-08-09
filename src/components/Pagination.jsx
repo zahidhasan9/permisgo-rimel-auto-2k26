@@ -27,20 +27,20 @@ export default function Pagination({
   const pageNumbers = buildPageNumbers(safePage, safeTotalPages);
 
   return (
-    <div className="flex flex-col gap-4 border-t border-slate-200 bg-white px-4 py-4 lg:flex-row lg:items-center lg:justify-between">
-      <p className="text-sm text-slate-600">
+    <div className="flex min-w-0 flex-col gap-3 border-t border-slate-200 bg-white px-3 py-3 sm:px-4 sm:py-4 lg:flex-row lg:items-center lg:justify-between">
+      <p className="text-center text-xs text-slate-600 sm:text-left sm:text-sm">
         Showing <strong>{firstItem}</strong>–<strong>{lastItem}</strong> of{" "}
         <strong>{safeTotal}</strong>
       </p>
 
-      <div className="flex flex-wrap items-center gap-2">
-        <label className="mr-2 flex items-center gap-2 text-sm text-slate-600">
+      <div className="flex max-w-full items-center gap-1.5 overflow-x-auto pb-1 sm:flex-wrap sm:gap-2 sm:overflow-visible sm:pb-0">
+        <label className="mr-1 flex shrink-0 items-center gap-1 text-xs text-slate-600 sm:mr-2 sm:gap-2 sm:text-sm">
           Rows
           <select
             value={safeLimit}
             disabled={loading}
             onChange={(event) => onLimitChange(Number(event.target.value))}
-            className="rounded-lg border border-slate-300 bg-white px-2 py-2"
+            className="rounded-lg border border-slate-300 bg-white px-1.5 py-2"
           >
             {[10, 20, 50, 100].map((value) => (
               <option key={value} value={value}>
@@ -54,9 +54,9 @@ export default function Pagination({
           type="button"
           disabled={loading || safePage <= 1}
           onClick={() => onPageChange(safePage - 1)}
-          className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 disabled:cursor-not-allowed disabled:opacity-40"
+          className="shrink-0 rounded-lg border border-slate-300 px-2.5 py-2 text-xs font-semibold text-slate-700 disabled:cursor-not-allowed disabled:opacity-40 sm:px-3 sm:text-sm"
         >
-          Previous
+          <span className="sm:hidden">Prev</span><span className="hidden sm:inline">Previous</span>
         </button>
 
         {pageNumbers.map((pageNumber, index) => {
@@ -70,7 +70,7 @@ export default function Pagination({
                 type="button"
                 disabled={loading}
                 onClick={() => onPageChange(pageNumber)}
-                className={`min-w-10 rounded-lg px-3 py-2 text-sm font-semibold ${
+                className={`min-w-9 rounded-lg px-2.5 py-2 text-xs font-semibold sm:min-w-10 sm:px-3 sm:text-sm ${
                   pageNumber === safePage
                     ? "bg-blue-600 text-white"
                     : "border border-slate-300 bg-white text-slate-700"
@@ -86,7 +86,7 @@ export default function Pagination({
           type="button"
           disabled={loading || safePage >= safeTotalPages}
           onClick={() => onPageChange(safePage + 1)}
-          className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 disabled:cursor-not-allowed disabled:opacity-40"
+          className="shrink-0 rounded-lg border border-slate-300 px-2.5 py-2 text-xs font-semibold text-slate-700 disabled:cursor-not-allowed disabled:opacity-40 sm:px-3 sm:text-sm"
         >
           Next
         </button>

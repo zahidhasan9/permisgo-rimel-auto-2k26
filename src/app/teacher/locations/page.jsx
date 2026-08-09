@@ -19,7 +19,6 @@ import {
 } from "@/features/API";
 
 const GOOGLE_MAP_LIBRARIES = ["places"];
-const MAP_STYLE = { width: "100%", height: "430px" };
 const DEFAULT_CENTER = { lat: 48.8566, lng: 2.3522 };
 
 const emptyLocation = () => ({
@@ -345,11 +344,11 @@ function LocationsContent() {
   };
 
   return (
-    <main className="space-y-6 pb-10">
-      <section className="rounded-3xl bg-gradient-to-r from-[#123D7A] to-[#1E63B7] p-6 text-white shadow-lg">
-        <p className="text-sm font-bold text-blue-100">Teacher settings</p>
-        <h1 className="mt-1 text-3xl font-black">Lesson locations</h1>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-blue-100">
+    <main className="min-w-0 space-y-4 overflow-x-hidden pb-24 sm:space-y-6 sm:pb-10">
+      <section className="rounded-2xl bg-gradient-to-r from-[#123D7A] to-[#1E63B7] p-4 text-white shadow-lg sm:rounded-3xl sm:p-6">
+        <p className="text-xs font-bold text-blue-100 sm:text-sm">Teacher settings</p>
+        <h1 className="mt-1 text-2xl font-black sm:text-3xl">Lesson locations</h1>
+        <p className="mt-2 max-w-2xl text-xs leading-5 text-blue-100 sm:text-sm sm:leading-6">
           Add and manage accurate lesson meeting points for your students.
         </p>
       </section>
@@ -366,17 +365,17 @@ function LocationsContent() {
         </div>
       )}
 
-      <section className="grid gap-6 xl:grid-cols-[420px_minmax(0,1fr)]">
+      <section className="grid min-w-0 gap-4 sm:gap-6 xl:grid-cols-[420px_minmax(0,1fr)]">
         <form
           onSubmit={saveLocation}
-          className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm"
+          className="min-w-0 rounded-2xl border border-slate-200 bg-white p-3.5 shadow-sm sm:rounded-3xl sm:p-5"
         >
-          <div className="flex items-center justify-between gap-3">
-            <div>
+          <div className="flex flex-col items-start gap-3 min-[390px]:flex-row min-[390px]:justify-between">
+            <div className="min-w-0">
               <p className="text-xs font-black uppercase tracking-wider text-blue-600">
                 {form.id ? "Edit location" : "New location"}
               </p>
-              <h2 className="mt-1 text-xl font-black text-slate-900">
+              <h2 className="mt-1 text-lg font-black text-slate-900 sm:text-xl">
                 Lesson meeting point
               </h2>
             </div>
@@ -384,7 +383,7 @@ function LocationsContent() {
               <button
                 type="button"
                 onClick={resetForm}
-                className="rounded-xl bg-slate-100 px-3 py-2 text-xs font-black text-slate-700 hover:bg-slate-200"
+                className="w-full rounded-xl bg-slate-100 px-3 py-2 text-xs font-black text-slate-700 hover:bg-slate-200 min-[390px]:w-auto"
               >
                 <FaPlus className="mr-1 inline" /> New
               </button>
@@ -412,7 +411,7 @@ function LocationsContent() {
                 onError={setError}
               />
               {form.address && (
-                <p className="mt-2 rounded-xl bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-800">
+                <p className="mt-2 break-words rounded-xl bg-blue-50 px-3 py-2 text-[11px] font-semibold leading-5 text-blue-800 sm:text-xs">
                   <FaMapMarkerAlt className="mr-1 inline" /> {form.address}
                 </p>
               )}
@@ -421,12 +420,12 @@ function LocationsContent() {
             <button
               type="button"
               onClick={useCurrentLocation}
-              className="flex w-full items-center justify-center gap-2 rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm font-black text-blue-700 hover:bg-blue-100"
+              className="flex w-full items-center justify-center gap-2 rounded-2xl border border-blue-200 bg-blue-50 px-3 py-3 text-xs font-black text-blue-700 hover:bg-blue-100 sm:px-4 sm:text-sm"
             >
               <FaLocationArrow /> Use my current location
             </button>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid gap-3 min-[420px]:grid-cols-2">
               <TextField
                 label="City"
                 value={form.city}
@@ -498,9 +497,9 @@ function LocationsContent() {
           </div>
         </form>
 
-        <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white p-3 shadow-sm">
+        <div className="min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-white p-2 shadow-sm sm:rounded-3xl sm:p-3">
           <GoogleMap
-            mapContainerStyle={MAP_STYLE}
+            mapContainerClassName="h-[270px] w-full sm:h-[430px]"
             center={selectedPoint}
             zoom={hasCoordinate(form.lat) ? 15 : 11}
             onLoad={(map) => {
@@ -541,14 +540,14 @@ function LocationsContent() {
               );
             })}
           </GoogleMap>
-          <p className="px-2 pb-1 pt-3 text-xs font-semibold text-slate-500">
+          <p className="px-1 pb-1 pt-2 text-[10px] font-semibold leading-4 text-slate-500 sm:px-2 sm:pt-3 sm:text-xs sm:leading-normal">
             Search an address, click the map, or drag the marker to correct the
             exact point.
           </p>
         </div>
       </section>
 
-      <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+      <section className="min-w-0 rounded-2xl border border-slate-200 bg-white p-3.5 shadow-sm sm:rounded-3xl sm:p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="text-xs font-black uppercase tracking-wider text-blue-600">
@@ -572,19 +571,19 @@ function LocationsContent() {
             {locations.map((location) => (
               <article
                 key={location._id}
-                className="rounded-2xl border border-slate-200 p-4"
+                className="min-w-0 rounded-2xl border border-slate-200 p-3.5 sm:p-4"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <h3 className="truncate font-black text-slate-900">
                       {location.title || "Lesson meeting point"}
                     </h3>
-                    <p className="mt-2 text-sm leading-5 text-slate-600">
+                    <p className="mt-2 break-words text-xs leading-5 text-slate-600 sm:text-sm">
                       {location.address}
                     </p>
                   </div>
                   <span
-                    className={`rounded-full px-2.5 py-1 text-[11px] font-black ${
+                    className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-black sm:text-[11px] ${
                       location.status === "active"
                         ? "bg-emerald-100 text-emerald-700"
                         : "bg-slate-100 text-slate-600"
@@ -594,9 +593,9 @@ function LocationsContent() {
                   </span>
                 </div>
 
-                <div className="mt-4 flex items-center justify-between text-xs font-bold text-slate-500">
-                  <span>{location.city || "City not set"}</span>
-                  <span>{location.serviceRadiusKm || 10} km radius</span>
+                <div className="mt-4 flex flex-wrap items-center justify-between gap-2 text-[11px] font-bold text-slate-500 sm:text-xs">
+                  <span className="min-w-0 break-words">{location.city || "City not set"}</span>
+                  <span className="shrink-0">{location.serviceRadiusKm || 10} km radius</span>
                 </div>
 
                 <div className="mt-4 grid grid-cols-2 gap-2">
@@ -642,7 +641,7 @@ function TextField({ label, value, onChange, placeholder = "" }) {
         value={value}
         placeholder={placeholder}
         onChange={(event) => onChange(event.target.value)}
-        className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+        className="w-full rounded-2xl border border-slate-200 px-3 py-3 text-base outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 sm:px-4 sm:text-sm"
       />
     </label>
   );
@@ -657,7 +656,7 @@ function SelectField({ label, value, onChange, options }) {
       <select
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+        className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-3 text-base outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 sm:px-4 sm:text-sm"
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>

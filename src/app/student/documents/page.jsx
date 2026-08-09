@@ -232,7 +232,7 @@ function RequiredDocumentCard({
   const canSelect = !currentDocument || currentDocument.status === "rejected";
 
   return (
-    <article className="group rounded-2xl border border-slate-200 bg-white p-4 transition duration-200 hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md sm:p-5">
+    <article className="group min-w-0 rounded-2xl border border-slate-200 bg-white p-3.5 transition duration-200 hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md sm:p-5">
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
@@ -253,7 +253,7 @@ function RequiredDocumentCard({
         </div>
 
         <label
-          className={`flex h-11 shrink-0 items-center justify-center gap-2 rounded-xl px-4 text-xs font-bold text-white shadow-sm transition active:scale-[0.99] ${
+          className={`flex h-11 w-full shrink-0 items-center justify-center gap-2 rounded-xl px-3 text-xs font-bold text-white shadow-sm transition active:scale-[0.99] sm:w-auto sm:px-4 ${
             canSelect && !uploading
               ? "cursor-pointer bg-[#e2233d] hover:bg-[#c91f35]"
               : "cursor-not-allowed bg-slate-300"
@@ -363,7 +363,7 @@ function RequiredDocumentCard({
               </div>
             </div>
 
-            <div className="flex shrink-0 items-center gap-2">
+            <div className="flex min-w-0 flex-wrap items-center gap-2">
               <button
                 type="button"
                 onClick={() => onPreview(currentDocument)}
@@ -425,13 +425,13 @@ function RequiredDocumentCard({
 
 function DownloadDocumentCard({ document, onPreview, onDownload }) {
   return (
-    <article className="flex flex-row gap-4 rounded-2xl border border-slate-200 bg-white p-4 transition duration-200 hover:border-blue-200 hover:shadow-md sm:flex-row sm:items-center sm:justify-between sm:p-5">
-      <div className="flex min-w-0 items-center gap-3">
+    <article className="flex min-w-0 flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-3.5 transition duration-200 hover:border-blue-200 hover:shadow-md sm:flex-row sm:items-center sm:justify-between sm:p-5">
+      <div className="flex min-w-0 w-full items-center gap-3 sm:w-auto">
         <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-[#16458f]">
           <FaFileAlt size={17} />
         </div>
 
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <h3 className="truncate text-sm font-extrabold uppercase tracking-wide text-[#16458f]">
               {document.title || "Submitted Document"}
@@ -457,11 +457,11 @@ function DownloadDocumentCard({ document, onPreview, onDownload }) {
         </div>
       </div>
 
-      <div className="flex shrink-0 gap-2">
+      <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:shrink-0">
         <button
           type="button"
           onClick={() => onPreview(document)}
-          className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-[#16458f] bg-white px-4 text-xs font-bold text-[#16458f] transition hover:bg-[#16458f] hover:text-white"
+          className="inline-flex h-10 min-w-0 items-center justify-center gap-2 rounded-xl border border-[#16458f] bg-white px-3 text-xs font-bold text-[#16458f] transition hover:bg-[#16458f] hover:text-white sm:px-4"
         >
           <FaEye size={12} />
           Preview
@@ -470,7 +470,7 @@ function DownloadDocumentCard({ document, onPreview, onDownload }) {
         <button
           type="button"
           onClick={() => onDownload(document)}
-          className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-[#e2233d] bg-white px-4 text-xs font-bold text-[#e2233d] transition hover:bg-[#e2233d] hover:text-white"
+          className="inline-flex h-10 min-w-0 items-center justify-center gap-2 rounded-xl border border-[#e2233d] bg-white px-3 text-xs font-bold text-[#e2233d] transition hover:bg-[#e2233d] hover:text-white sm:px-4"
         >
           <FaDownload size={12} />
           Download
@@ -791,9 +791,9 @@ export default function StudentDocumentsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f8fafc] px-4 py-6 sm:px-6 lg:px-8">
+    <main className="min-h-screen overflow-x-hidden bg-[#f8fafc] px-2.5 py-4 pb-24 sm:px-6 sm:py-6 sm:pb-8 lg:px-8">
       {successMessage ? (
-        <div className="fixed right-5 top-5 z-[200] flex max-w-md items-center gap-2 rounded-xl bg-slate-900 px-5 py-3 text-sm font-bold text-white shadow-2xl">
+        <div className="fixed left-3 right-3 top-3 z-[200] flex max-w-md items-center gap-2 rounded-xl bg-slate-900 px-4 py-3 text-xs font-bold text-white shadow-2xl sm:left-auto sm:right-5 sm:top-5 sm:px-5 sm:text-sm">
           <FaCheckCircle className="shrink-0 text-emerald-400" />
 
           <span>{successMessage}</span>
@@ -827,7 +827,7 @@ export default function StudentDocumentsPage() {
             type="button"
             onClick={loadDocuments}
             disabled={loading || uploading}
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-xs font-bold text-[#16458f] shadow-sm transition hover:border-blue-200 hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-xs font-bold text-[#16458f] shadow-sm transition hover:border-blue-200 hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
           >
             <FaSyncAlt className={loading ? "animate-spin" : ""} size={12} />
             Refresh
@@ -884,7 +884,7 @@ export default function StudentDocumentsPage() {
           </div>
         </section> */}
 
-        <section className="rounded-3xl border border-slate-200 bg-slate-50/80 p-4 shadow-sm sm:p-5 lg:p-6">
+        <section className="min-w-0 rounded-2xl border border-slate-200 bg-slate-50/80 p-2.5 shadow-sm sm:rounded-3xl sm:p-5 lg:p-6">
           <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h2 className="text-lg font-extrabold text-slate-900">
@@ -941,7 +941,7 @@ export default function StudentDocumentsPage() {
         </section>
 
         {documents.length > 0 ? (
-          <section className="mt-5 rounded-3xl border border-slate-200 bg-slate-50/80 p-4 shadow-sm sm:p-5 lg:p-6">
+          <section className="mt-5 min-w-0 rounded-2xl border border-slate-200 bg-slate-50/80 p-2.5 shadow-sm sm:rounded-3xl sm:p-5 lg:p-6">
             <div className="mb-5">
               <h2 className="text-lg font-extrabold text-slate-900">
                 Downloadable Documents
@@ -1010,8 +1010,8 @@ export default function StudentDocumentsPage() {
 
       {previewDocument ? (
         <div className="fixed inset-0 z-[160] flex items-center justify-center bg-slate-950/75 p-3 backdrop-blur-sm sm:p-5">
-          <div className="flex h-[92vh] w-full max-w-5xl flex-col overflow-hidden rounded-3xl bg-white shadow-2xl">
-            <div className="flex items-center justify-between gap-4 border-b border-slate-200 px-5 py-4">
+          <div className="flex h-[92dvh] min-w-0 w-full max-w-5xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl sm:rounded-3xl">
+            <div className="flex min-w-0 items-center justify-between gap-2 border-b border-slate-200 px-3 py-3 sm:gap-4 sm:px-5 sm:py-4">
               <div className="min-w-0">
                 <h2 className="truncate font-extrabold text-[#16458f]">
                   {previewDocument.title || "Document preview"}
@@ -1026,10 +1026,10 @@ export default function StudentDocumentsPage() {
                 <button
                   type="button"
                   onClick={() => handleDownload(previewDocument)}
-                  className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-[#e2233d] bg-white px-4 text-xs font-bold text-[#e2233d] transition hover:bg-[#e2233d] hover:text-white"
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#e2233d] bg-white text-xs font-bold text-[#e2233d] transition hover:bg-[#e2233d] hover:text-white sm:w-auto sm:gap-2 sm:px-4"
                 >
                   <FaDownload size={12} />
-                  Download
+                  <span className="hidden sm:inline">Download</span>
                 </button>
 
                 <button
