@@ -12,7 +12,7 @@ import {
   FaPinterestSquare,
   FaYoutube,
 } from "react-icons/fa";
-import { FaFacebook } from "react-icons/fa6";
+import { FaFacebook, FaTiktok } from "react-icons/fa6";
 import { GrLocation } from "react-icons/gr";
 import { IoChevronDown } from "react-icons/io5";
 import { MdOutlineEmail } from "react-icons/md";
@@ -20,17 +20,18 @@ import { MdOutlineEmail } from "react-icons/md";
 // Images
 import downCar from "../../public/image/down-car.png";
 import Logo from "../../public/image/logo.png";
+import useSiteSettings from "@/hooks/useSiteSettings";
 
 const Footer = () => {
   const date = new Date().getFullYear();
   const [openTime, setOpenTime] = useState(false);
+  const site = useSiteSettings();
 
   const socialLinks = [
-    { icon: <FaFacebook />, href: "" },
-    { icon: <FaPinterestSquare />, href: "" },
-    { icon: <FaInstagram />, href: "" },
-    { icon: <FaYoutube />, href: "" },
-    { icon: <FaLinkedin />, href: "" },
+    { icon: <FaFacebook />, href: site.facebookUrl, label: "Facebook" },
+    { icon: <FaInstagram />, href: site.instagramUrl, label: "Instagram" },
+    { icon: <FaTiktok />, href: site.tiktokUrl, label: "TikTok" },
+    { icon: <FaYoutube />, href: site.youtubeUrl, label: "YouTube" },
   ];
 
   const openingTimes = [
@@ -140,15 +141,15 @@ const Footer = () => {
                     <span className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-white">
                       <FaPhoneSquareAlt />
                     </span>
-                    <a href="tel:0956736333" className="leading-7">09 56 73 63 33</a>
+                    <a href={`tel:${site.phone.replace(/\s/g, "")}`} className="leading-7">{site.phone}</a>
                   </li>
 
                   <li className="flex items-start gap-3">
                     <span className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-white">
                       <MdOutlineEmail />
                     </span>
-                    <a href="mailto:support@permisgo.fr" className="break-all leading-7">
-                      support@permisgo.fr
+                    <a href={`mailto:${site.supportEmail}`} className="break-all leading-7">
+                      {site.supportEmail}
                     </a>
                   </li>
 
@@ -157,10 +158,12 @@ const Footer = () => {
                       <GrLocation />
                     </span>
                     <span className="leading-7">
-                      100 rue Danielle Casanova 93300 Aubervilliers
+                      {site.address}<br />{site.address2}
                     </span>
                   </li>
                 </ul>
+
+                <a href={site.websiteUrl} target="_blank" rel="noreferrer" className="mt-3 inline-block text-[14px] font-semibold text-white/80 hover:text-white">{site.domainName}</a>
 
                 {/* Social */}
                 <div className="mt-5">
@@ -169,6 +172,9 @@ const Footer = () => {
                       <li key={index}>
                         <Link
                           href={item.href}
+                          target="_blank"
+                          rel="noreferrer"
+                          aria-label={item.label}
                           className="flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/10 text-[18px] text-white transition-all duration-300 hover:-translate-y-1 hover:bg-[var(--second-color)] hover:text-white"
                         >
                           {item.icon}
@@ -281,7 +287,7 @@ const Footer = () => {
               </ul>
 
               <p className="text-center text-[14px] leading-6 text-white/70 lg:text-right">
-                &copy; {date} Permisgo Auto Ecole | All Right Reserved. Design &
+                &copy; {date} {site.companyName} | All Right Reserved. Design &
                 Development By{" "}
                 <Link
                   href="https://www.digitalmarketingbd.com/"

@@ -6,6 +6,9 @@ import { usePathname, useRouter } from "next/navigation";
 import { fetchLoggedInUser } from "@/features/userSlice";
 import { getDashboardRouteByRole } from "@/utils/roleRoutes";
 
+const loginRouteForPath = (pathname) =>
+  pathname?.startsWith("/admin") ? "/login" : "/user-login";
+
 export default function ProtectedRoute({ allowedRoles = [], children }) {
   const dispatch = useDispatch();
   const router = useRouter();
@@ -18,7 +21,7 @@ export default function ProtectedRoute({ allowedRoles = [], children }) {
 
   useEffect(() => {
     if (!token) {
-      router.replace(`/login?redirect=${encodeURIComponent(pathname)}`);
+      router.replace(loginRouteForPath(pathname));
       return;
     }
 
@@ -31,7 +34,7 @@ export default function ProtectedRoute({ allowedRoles = [], children }) {
     if (!authChecked) return;
 
     if (!isAuthenticated || !currentRole) {
-      router.replace(`/login?redirect=${encodeURIComponent(pathname)}`);
+      router.replace(loginRouteForPath(pathname));
       return;
     }
 

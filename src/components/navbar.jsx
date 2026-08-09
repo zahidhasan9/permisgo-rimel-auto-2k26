@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Select from "react-select";
 
 // Icons
@@ -14,31 +14,44 @@ import {
   FaPinterestSquare,
   FaYoutube,
 } from "react-icons/fa";
-import { FaFacebook } from "react-icons/fa6";
+import { FaFacebook, FaTiktok } from "react-icons/fa6";
 import { IoClose, IoMenu } from "react-icons/io5";
 import { MdOutlineEmail } from "react-icons/md";
 
 // Image
 import Logo from "../../public/image/logo.png";
+import useSiteSettings from "@/hooks/useSiteSettings";
 
 const Navbar = () => {
   const [openMenu, setOpenMenu] = useState(false);
+  const [language, setLanguage] = useState("");
   const pathname = usePathname();
+  const site = useSiteSettings();
+
+  useEffect(() => setLanguage((localStorage.getItem("permisgo-language") || "en").toUpperCase()), []);
+  const changeLanguage = (option) => {
+    const next = option?.value || "EN";
+    setLanguage(next);
+    localStorage.setItem("permisgo-language", next.toLowerCase());
+    document.cookie = `permisgo-language=${next.toLowerCase()}; path=/; max-age=31536000; samesite=lax`;
+    document.documentElement.lang = next.toLowerCase();
+    window.dispatchEvent(new CustomEvent("permisgo-language-change", { detail: next.toLowerCase() }));
+  };
 
   const options = [
     {
       value: "EN",
-      label: "English",
+      label: "EN",
       img: "/image/eng-flag.png",
     },
     {
       value: "BN",
-      label: "Bangla",
+      label: "BN",
       img: "/image/ban-flag.png",
     },
     {
       value: "FR",
-      label: "Français",
+      label: "FR",
       img: "/image/fra-flag.png",
     },
   ];
@@ -53,11 +66,10 @@ const Navbar = () => {
   ];
 
   const socialLinks = [
-    { icon: <FaFacebook />, href: "" },
-    { icon: <FaInstagram />, href: "" },
-    { icon: <FaLinkedin />, href: "" },
-    { icon: <FaPinterestSquare />, href: "" },
-    { icon: <FaYoutube />, href: "" },
+    { icon: <FaFacebook />, href: site.facebookUrl, label: "Facebook" },
+    { icon: <FaInstagram />, href: site.instagramUrl, label: "Instagram" },
+    { icon: <FaTiktok />, href: site.tiktokUrl, label: "TikTok" },
+    { icon: <FaYoutube />, href: site.youtubeUrl, label: "YouTube" },
   ];
 
   const selectStyles = {
@@ -152,38 +164,40 @@ const Navbar = () => {
             <ul className="flex min-w-0 items-center gap-4">
               <li>
                 <a
-                  href="tel:1774649438"
+                  href={`tel:${site.phone.replace(/\s/g, "")}`}
                   className="flex items-center gap-1.5 whitespace-nowrap text-[13px] font-medium text-[#103677] transition hover:text-[#2563eb] sm:text-[14px]"
                 >
                   <FaPhoneSquareAlt className="text-[15px]" />
 
-                  <span>1774649438</span>
+                  <span>{site.phone}</span>
                 </a>
               </li>
 
               <li className="hidden md:block">
                 <a
-                  href="mailto:yourmail@mail.com"
+                  href={`mailto:${site.supportEmail}`}
                   className="flex items-center gap-1.5 text-[14px] font-medium text-[#103677] transition hover:text-[#2563eb]"
                 >
                   <MdOutlineEmail className="text-[17px]" />
 
-                  <span>yourmail@mail.com</span>
+                  <span>{site.supportEmail}</span>
                 </a>
               </li>
             </ul>
 
             <div className="flex items-center gap-2 sm:gap-3">
-              <div className="w-[82px] sm:w-[88px]">
-                <Select
+              <div data-no-translate className="w-[82px] sm:w-[88px]">
+                {language ? <Select
                   options={options}
-                  defaultValue={options[0]}
+                  value={options.find((option) => option.value === language) || options[0]}
+                  onChange={changeLanguage}
                   placeholder={null}
                   isSearchable={false}
                   styles={selectStyles}
                   formatOptionLabel={(opt) => (
                     <div className="flex items-center">
                       <Image
+                        key={`${opt.value}-${opt.img}`}
                         src={opt.img}
                         alt={opt.label}
                         width={18}
@@ -194,7 +208,7 @@ const Navbar = () => {
                       <span>{opt.value}</span>
                     </div>
                   )}
-                />
+                /> : <div className="h-8 w-full animate-pulse rounded-full bg-slate-200" aria-label="Loading saved language" />}
               </div>
 
               <ul className="hidden items-center gap-1 sm:flex lg:gap-2">
@@ -202,6 +216,9 @@ const Navbar = () => {
                   <li key={index}>
                     <Link
                       href={item.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label={item.label}
                       className="flex h-8 w-8 items-center justify-center rounded-full text-[16px] text-[#103677] transition-all duration-300 hover:bg-[#103677] hover:text-white"
                     >
                       {item.icon}
@@ -360,6 +377,9 @@ const Navbar = () => {
                 <li key={index}>
                   <Link
                     href={item.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={item.label}
                     className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-[18px] text-[#103677] transition hover:bg-[#103677] hover:text-white"
                   >
                     {item.icon}
@@ -370,21 +390,21 @@ const Navbar = () => {
 
             <div className="mt-5 space-y-2 text-[14px] text-slate-600">
               <a
-                href="tel:1774649438"
+                href={`tel:${site.phone.replace(/\s/g, "")}`}
                 className="flex items-center gap-2 transition hover:text-[#103677]"
               >
                 <FaPhoneSquareAlt />
 
-                <span>1774649438</span>
+                <span>{site.phone}</span>
               </a>
 
               <a
-                href="mailto:yourmail@mail.com"
+                href={`mailto:${site.supportEmail}`}
                 className="flex items-center gap-2 break-all transition hover:text-[#103677]"
               >
                 <MdOutlineEmail />
 
-                <span>yourmail@mail.com</span>
+                <span>{site.supportEmail}</span>
               </a>
             </div>
           </div>

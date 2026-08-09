@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { createContactSubmission } from "@/features/API";
@@ -17,7 +16,9 @@ import {
   FaCheck,
   FaXmark,
   FaYoutube,
+  FaTiktok,
 } from "react-icons/fa6";
+import useSiteSettings from "@/hooks/useSiteSettings";
 
 const fields = [
   {
@@ -46,14 +47,6 @@ const fields = [
   },
 ];
 
-const socialLinks = [
-  { label: "Facebook", icon: FaFacebookF },
-  { label: "Pinterest", icon: FaPinterestP },
-  { label: "Instagram", icon: FaInstagram },
-  { label: "YouTube", icon: FaYoutube },
-  { label: "LinkedIn", icon: FaLinkedinIn },
-];
-
 const inputClass =
   "h-[46px] w-full rounded-[11px] border border-[#b9c9e4] bg-[#f6f8fc] px-4 !text-[14px] font-medium text-[#222] outline-none transition-all duration-300 placeholder:text-[#969696] focus:border-[#174a9b] focus:bg-white focus:ring-4 focus:ring-[#174a9b]/10";
 
@@ -66,6 +59,14 @@ function InfoIcon({ children }) {
 }
 
 export default function ContactUsPage() {
+  const site = useSiteSettings();
+  const mapEmbedUrl = `https://www.google.com/maps?q=${encodeURIComponent(site.address)}&output=embed`;
+  const socialLinks = [
+    { label: "Facebook", icon: FaFacebookF, href: site.facebookUrl },
+    { label: "Instagram", icon: FaInstagram, href: site.instagramUrl },
+    { label: "TikTok", icon: FaTiktok, href: site.tiktokUrl },
+    { label: "YouTube", icon: FaYoutube, href: site.youtubeUrl },
+  ];
   const initialForm = { firstName: "", lastName: "", email: "", phone: "", subject: "", location: "", description: "" };
   const [form, setForm] = useState(initialForm);
   const [submitting, setSubmitting] = useState(false);
@@ -195,32 +196,43 @@ export default function ContactUsPage() {
 
               <div className="mt-4 space-y-3">
                 <Link
-                  href="tel:+94814585584"
+                  href={`tel:${site.phone.replace(/\s/g, "")}`}
                   className="group flex items-center gap-3 !text-[14px] font-medium text-[#252525] transition-colors hover:text-[#e2233d]"
                 >
                   <InfoIcon>
                     <FaPhone />
                   </InfoIcon>
-                  <span>| +948 1458 5584</span>
+                  <span>| {site.phone}</span>
                 </Link>
                 <Link
-                  href="https://wa.me/94814585584"
+                  href={`tel:${site.mobile.replace(/\s/g, "")}`}
+                  className="group flex items-center gap-3 !text-[14px] font-medium text-[#252525] transition-colors hover:text-[#e2233d]"
+                >
+                  <InfoIcon>
+                    <FaPhone />
+                  </InfoIcon>
+                  <span>| Mobile: {site.mobile}</span>
+                </Link>
+                <Link
+                  href={site.whatsappUrl}
+                  target="_blank"
+                  rel="noreferrer"
                   className="group flex items-center gap-3 !text-[14px] font-medium text-[#252525] transition-colors hover:text-[#e2233d]"
                 >
                   <InfoIcon>
                     <FaWhatsapp />
                   </InfoIcon>
-                  <span>| +948 1458 5584</span>
+                  <span>| {site.whatsappNumber}</span>
                 </Link>
                 <Link
-                  href="mailto:info@permisgoautoecole.com"
+                  href={`mailto:${site.admissionEmail}`}
                   className="group flex items-center gap-3 !text-[14px] font-medium text-[#252525] transition-colors hover:text-[#e2233d]"
                 >
                   <InfoIcon>
                     <FaEnvelope />
                   </InfoIcon>
                   <span className="break-all">
-                    | info@permisgoautoecole.com
+                    | {site.admissionEmail}
                   </span>
                 </Link>
               </div>
@@ -237,7 +249,7 @@ export default function ContactUsPage() {
                 <InfoIcon>
                   <FaLocationDot />
                 </InfoIcon>
-                <span>| 100 Smith Street, Collingwood VIC 3066</span>
+                <span>| {site.address}<br />| {site.address2}</span>
               </div>
             </section>
 
@@ -249,10 +261,12 @@ export default function ContactUsPage() {
                 Speak to our friendly team via live chat.
               </p>
               <div className="mt-4 flex flex-wrap gap-3">
-                {socialLinks.map(({ label, icon: Icon }) => (
+                {socialLinks.map(({ label, icon: Icon, href }) => (
                   <Link
                     key={label}
-                    href="#"
+                    href={href}
+                    target="_blank"
+                    rel="noreferrer"
                     aria-label={label}
                     className="flex h-9 w-9 items-center justify-center rounded-[3px] bg-[#174a9b] text-[17px] text-white transition-all duration-300 hover:-translate-y-1 hover:bg-[#e2233d] hover:shadow-lg"
                   >
@@ -270,14 +284,18 @@ export default function ContactUsPage() {
       <section
         id="location"
         className="relative h-[360px] w-full overflow-hidden bg-[#d7dfeb] sm:h-[420px] lg:h-[465px]"
+        aria-label="Open Permis Go Auto École in Google Maps"
       >
-        <Image
-          src="/image/contact-map.jpg"
-          alt="Road map showing the area around Forchheim and Pegnitz"
-          fill
-          sizes="100vw"
-          className="object-cover"
+        <iframe
+          key={mapEmbedUrl}
+          src={mapEmbedUrl}
+          title={`${site.companyName} location on Google Maps`}
+          className="h-full w-full border-0"
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+          allowFullScreen
         />
+        <a href={site.googleMapUrl} target="_blank" rel="noreferrer" className="absolute bottom-5 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-xl bg-[#174a9b] px-6 py-3 text-sm font-bold text-white shadow-xl transition hover:bg-[#e2233d]">Open in Google Maps</a>
       </section>
     </div>
   );

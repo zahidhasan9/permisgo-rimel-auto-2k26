@@ -1,29 +1,64 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { FiEdit2, FiPlus, FiTrash2, FiX } from "react-icons/fi";
-import { FaStar } from "react-icons/fa";
+import { useCallback, useEffect, useState } from "react";
 import { createTestimonial, deleteTestimonial, getAdminTestimonials, updateTestimonial } from "@/features/API";
 import { showToast } from "@/utils/showToast";
 
-const emptyForm = { name: "", role: "PermisGo learner", message: "", rating: 5, status: "active", image: null, removeImage: false };
-const errorMessage = (error) => error?.response?.data?.message || error?.message || "Something went wrong.";
+const empty = { name: "", role: "PermisGo learner", message: "", role_bn: "", message_bn: "", role_fr: "", message_fr: "", rating: 5, status: "active", image: null };
+const languages = [["English", "role", "message", true], ["বাংলা", "role_bn", "message_bn", false], ["Français", "role_fr", "message_fr", false]];
 
 export default function AdminTestimonialsPage() {
-  const [items, setItems] = useState([]); const [filter, setFilter] = useState("all"); const [form, setForm] = useState(emptyForm);
-  const [editing, setEditing] = useState(null); const [open, setOpen] = useState(false); const [loading, setLoading] = useState(true); const [saving, setSaving] = useState(false);
-  const load = useCallback(async () => { try { setLoading(true); const { data } = await getAdminTestimonials(filter === "all" ? {} : { status: filter }); setItems(data?.data || []); } catch (error) { showToast.error(errorMessage(error)); } finally { setLoading(false); } }, [filter]);
-  useEffect(() => { load(); }, [load]);
-  const preview = useMemo(() => form.image ? URL.createObjectURL(form.image) : form.removeImage ? "" : editing?.image, [form.image, form.removeImage, editing]);
-  const close = () => { setOpen(false); setEditing(null); setForm(emptyForm); };
-  const edit = (item) => { setEditing(item); setForm({ name: item.name, role: item.role || "PermisGo learner", message: item.message, rating: item.rating, status: item.status, image: null, removeImage: false }); setOpen(true); };
-  const submit = async (event) => { event.preventDefault(); if (!form.name.trim() || !form.message.trim()) return showToast.warning("Name and testimonial message are required."); if (!editing && !form.image) return showToast.warning("A profile image is required."); const data = new FormData(); ["name", "role", "message", "rating", "status"].forEach((key) => data.append(key, form[key])); if (form.image) data.append("image", form.image); if (form.removeImage) data.append("removeImage", "true"); try { setSaving(true); if (editing) { await updateTestimonial(editing._id, data); showToast.success("Testimonial updated."); } else { await createTestimonial(data); showToast.success("Testimonial created."); } close(); await load(); } catch (error) { showToast.error(errorMessage(error)); } finally { setSaving(false); } };
-  const remove = async (item) => { if (!window.confirm(`Delete ${item.name}'s testimonial?`)) return; try { await deleteTestimonial(item._id); showToast.success("Testimonial deleted."); await load(); } catch (error) { showToast.error(errorMessage(error)); } };
+  const [items, setItems] = useState([]);
+  const [form, setForm] = useState(empty);
+  const [editing, setEditing] = useState(null);
+  const [open, setOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
 
-  return <div className="mx-auto max-w-7xl space-y-6"><div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"><div><h1 className="text-2xl font-extrabold text-[#172033]">Testimonial Management</h1><p className="mt-1 text-sm text-slate-500">Manage learner stories shown across the website.</p></div><button onClick={() => { setForm(emptyForm); setEditing(null); setOpen(true); }} className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#174a9b] px-5 py-3 text-sm font-bold text-white"><FiPlus /> Add Testimonial</button></div>
-    <div className="rounded-xl bg-white p-4 shadow-sm"><select value={filter} onChange={(e) => setFilter(e.target.value)} className="rounded-lg border border-slate-200 px-3 py-2 text-sm"><option value="all">All testimonials</option><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
-    <div className="overflow-hidden rounded-xl bg-white shadow-sm">{loading ? <p className="p-10 text-center text-slate-500">Loading testimonials...</p> : items.length === 0 ? <p className="p-10 text-center text-slate-500">No testimonials found.</p> : <div className="overflow-x-auto"><table className="w-full min-w-[800px] text-left text-sm"><thead className="bg-[#174a9b] text-white"><tr><th className="px-5 py-4">Learner</th><th className="px-5 py-4">Message</th><th className="px-5 py-4">Rating</th><th className="px-5 py-4">Status</th><th className="px-5 py-4 text-right">Actions</th></tr></thead><tbody className="divide-y divide-slate-100">{items.map((item) => <tr key={item._id} className="hover:bg-slate-50"><td className="px-5 py-4"><div className="flex items-center gap-3"><div className="relative h-12 w-12 overflow-hidden rounded-full bg-slate-100"><Image src={item.image} alt={item.name} fill sizes="48px" className="object-cover" /></div><div><p className="font-bold text-slate-800">{item.name}</p><p className="text-xs text-slate-500">{item.role}</p></div></div></td><td className="px-5 py-4"><p className="max-w-lg line-clamp-2 leading-6 text-slate-600">{item.message}</p></td><td className="px-5 py-4"><div className="flex gap-1">{[1,2,3,4,5].map((star) => <FaStar key={star} className={star <= item.rating ? "text-amber-400" : "text-slate-200"} />)}</div></td><td className="px-5 py-4"><span className={`rounded-full px-3 py-1 text-xs font-bold ${item.status === "active" ? "bg-green-100 text-green-700" : "bg-slate-100 text-slate-600"}`}>{item.status}</span></td><td className="px-5 py-4"><div className="flex justify-end gap-2"><button onClick={() => edit(item)} className="rounded-lg bg-blue-50 p-2.5 text-[#174a9b]"><FiEdit2 /></button><button onClick={() => remove(item)} className="rounded-lg bg-red-50 p-2.5 text-red-600"><FiTrash2 /></button></div></td></tr>)}</tbody></table></div>}</div>
-    {open && <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/50 p-4 backdrop-blur-sm"><div className="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl"><div className="flex items-center justify-between border-b px-6 py-4"><h2 className="text-xl font-extrabold">{editing ? "Update Testimonial" : "Add Testimonial"}</h2><button onClick={close} className="rounded-full p-2 hover:bg-slate-100"><FiX /></button></div><form onSubmit={submit} className="space-y-5 p-6"><div className="grid gap-4 sm:grid-cols-2"><label><span className="mb-2 block text-sm font-bold">Learner name *</span><input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="w-full rounded-lg border border-slate-200 px-4 py-3" /></label><label><span className="mb-2 block text-sm font-bold">Role / label</span><input value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} className="w-full rounded-lg border border-slate-200 px-4 py-3" /></label></div><label className="block"><span className="mb-2 block text-sm font-bold">Testimonial message *</span><textarea rows={6} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} className="w-full rounded-lg border border-slate-200 px-4 py-3" /></label><div className="grid gap-4 sm:grid-cols-3"><label><span className="mb-2 block text-sm font-bold">Rating</span><select value={form.rating} onChange={(e) => setForm({ ...form, rating: Number(e.target.value) })} className="w-full rounded-lg border border-slate-200 px-3 py-3">{[5,4,3,2,1].map((n) => <option key={n} value={n}>{n} star{n > 1 ? "s" : ""}</option>)}</select></label><label><span className="mb-2 block text-sm font-bold">Status</span><select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })} className="w-full rounded-lg border border-slate-200 px-3 py-3"><option value="active">Active</option><option value="inactive">Inactive</option></select></label><label><span className="mb-2 block text-sm font-bold">Profile image {editing ? "" : "*"}</span><input type="file" accept="image/jpeg,image/png,image/webp" onChange={(e) => setForm({ ...form, image: e.target.files?.[0] || null })} className="w-full text-xs" /></label></div>{preview && <div className="relative h-24 w-24 overflow-hidden rounded-full ring-4 ring-blue-50"><Image src={preview} alt="Preview" fill sizes="96px" className="object-cover" unoptimized /></div>}<div className="flex justify-end gap-3 border-t pt-5"><button type="button" onClick={close} className="rounded-lg border px-5 py-3 font-bold">Cancel</button><button disabled={saving} className="rounded-lg bg-[#e2233d] px-6 py-3 font-bold text-white disabled:opacity-60">{saving ? "Saving..." : editing ? "Update" : "Create"}</button></div></form></div></div>}
+  const load = useCallback(async () => {
+    try {
+      const response = await getAdminTestimonials();
+      setItems(response.data?.data || []);
+    } catch (error) {
+      showToast.error(error.response?.data?.message || "Testimonials could not be loaded.");
+    }
+  }, []);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  const close = () => { setOpen(false); setEditing(null); setForm(empty); };
+  const edit = (item) => {
+    setEditing(item);
+    setForm({ ...empty, ...item, role_bn: item.translations?.bn?.role || "", message_bn: item.translations?.bn?.message || "", role_fr: item.translations?.fr?.role || "", message_fr: item.translations?.fr?.message || "", image: null });
+    setOpen(true);
+  };
+
+  const submit = async (event) => {
+    event.preventDefault();
+    if (!form.name.trim() || !form.message.trim()) return showToast.warning("Name and English message are required.");
+    if (!editing && !form.image) return showToast.warning("Profile image is required.");
+    const data = new FormData();
+    ["name", "role", "message", "role_bn", "message_bn", "role_fr", "message_fr", "rating", "status"].forEach((key) => data.append(key, form[key]));
+    if (form.image) data.append("image", form.image);
+    setSaving(true);
+    try {
+      if (editing) await updateTestimonial(editing._id, data); else await createTestimonial(data);
+      showToast.success("Testimonial saved.");
+      close();
+      await load();
+    } catch (error) {
+      showToast.error(error.response?.data?.message || "Could not save testimonial.");
+    } finally { setSaving(false); }
+  };
+
+  return <div className="mx-auto max-w-7xl space-y-6">
+    <header className="flex items-center justify-between"><div><h1 className="text-2xl font-extrabold">Testimonial Management</h1><p className="text-sm text-slate-500">Manage English, Bangla and French learner stories.</p></div><button onClick={() => setOpen(true)} className="rounded-lg bg-[#174a9b] px-5 py-3 font-bold text-white">Add Testimonial</button></header>
+    <div className="grid gap-4 md:grid-cols-2">{items.map((item) => <article key={item._id} className="flex gap-4 rounded-xl bg-white p-4 shadow"><div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full bg-slate-100">{item.image && <Image src={item.image} alt={item.name} fill sizes="64px" className="object-cover" />}</div><div className="min-w-0"><b>{item.name}</b><p className="text-xs text-slate-500">{item.role}</p><p className="mt-2 line-clamp-2 text-sm">{item.message}</p><button onClick={() => edit(item)} className="mt-3 mr-4 font-bold text-blue-700">Edit</button><button onClick={async () => { if (confirm("Delete testimonial?")) { await deleteTestimonial(item._id); await load(); } }} className="font-bold text-red-600">Delete</button></div></article>)}</div>
+    {open && <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4"><form onSubmit={submit} className="max-h-[92vh] w-full max-w-2xl space-y-5 overflow-y-auto rounded-2xl bg-white p-6"><h2 className="text-xl font-extrabold">{editing ? "Update" : "Add"} Testimonial</h2><input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Learner name *" className="w-full rounded-lg border p-3" />
+      {languages.map(([label, roleKey, messageKey, required]) => <section key={roleKey} className="space-y-3 rounded-xl border p-4"><h3 className="font-bold text-[#174a9b]">{label}</h3><input required={required} value={form[roleKey]} onChange={(e) => setForm({ ...form, [roleKey]: e.target.value })} placeholder={`Role / label${required ? " *" : ""}`} className="w-full rounded-lg border p-3" /><textarea required={required} rows={4} value={form[messageKey]} onChange={(e) => setForm({ ...form, [messageKey]: e.target.value })} placeholder={`Testimonial message${required ? " *" : ""}`} className="w-full rounded-lg border p-3" /></section>)}
+      <div className="grid gap-3 sm:grid-cols-3"><select value={form.rating} onChange={(e) => setForm({ ...form, rating: e.target.value })} className="rounded-lg border p-3">{[5, 4, 3, 2, 1].map((number) => <option key={number} value={number}>{number} stars</option>)}</select><select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })} className="rounded-lg border p-3"><option value="active">active</option><option value="inactive">inactive</option></select><input type="file" accept="image/*" onChange={(e) => setForm({ ...form, image: e.target.files?.[0] || null })} /></div>
+      <div className="flex justify-end gap-3"><button type="button" onClick={close} className="rounded-lg border px-5 py-3">Cancel</button><button disabled={saving} className="rounded-lg bg-[#e2233d] px-6 py-3 font-bold text-white">{saving ? "Saving..." : "Save"}</button></div></form></div>}
   </div>;
 }

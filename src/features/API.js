@@ -94,13 +94,16 @@ export const updateUserRole = (id, role) => {
 export const getAdminDrivingSettings = () =>
   axios.get("/admin/settings/driving");
 
-export const updateAdminDrivingSettings = (requiredHours, requiredSkillsPercentage, contactRecipientEmail = "", whatsappNumber = "") =>
-  axios.patch("/admin/settings/driving", { requiredHours, requiredSkillsPercentage, contactRecipientEmail, whatsappNumber });
+export const updateAdminDrivingSettings = (requiredHours, requiredSkillsPercentage, contactRecipientEmail = "", siteSettings = {}) =>
+  axios.patch("/admin/settings/driving", { requiredHours, requiredSkillsPercentage, contactRecipientEmail, ...siteSettings });
 
 export const createContactSubmission = (data) => axios.post("/contact", data);
 export const getPublicContactConfig = () => axios.get("/contact/config");
 export const getContactSubmissions = (params = {}) => axios.get("/contact", { params });
 export const updateContactSubmissionStatus = (id, status) => axios.patch(`/contact/${id}/status`, { status });
+export const createAppointmentRequest = (data) => axios.post("/appointments", data);
+export const getAdminAppointments = (params = {}) => axios.get("/appointments", { params });
+export const updateAppointmentStatus = (id, status) => axios.patch(`/appointments/${id}/status`, { status });
 
 export const deleteAdminUser = (id) => {
   return axios.delete(`/admin/users/${id}`);
@@ -290,7 +293,7 @@ export const deleteDocument = (documentId) => {
 export const getBlogs = (params = {}) => axios.get("/blogs", { params });
 export const getAdminBlogs = (params = {}) =>
   axios.get("/blogs/admin/all", { params });
-export const getBlog = (slug) => axios.get(`/blogs/${slug}`);
+export const getBlog = (slug, params = {}) => axios.get(`/blogs/${slug}`, { params });
 export const createBlog = (data) =>
   axios.post("/blogs", data, {
     headers: { "Content-Type": "multipart/form-data" },

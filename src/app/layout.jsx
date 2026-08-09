@@ -91,6 +91,7 @@ import "../globals.css";
 import ReduxProvider from "@/provider/provider";
 import AppToast from "@/components/common/AppToast";
 import AppShell from "@/components/layout/AppShell";
+import TawkChat from "@/components/TawkChat";
 import { headers } from "next/headers";
 
 import { createMetadata, createRouteMetadata, siteConfig } from "@/lib/seo";
@@ -174,6 +175,7 @@ export default function RootLayout({ children }) {
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning>
         <ReduxProvider><AppShell>{children}</AppShell></ReduxProvider>
+        <TawkChat />
 
         <AppToast />
       </body>

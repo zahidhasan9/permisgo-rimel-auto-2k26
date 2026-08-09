@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getFaqs } from "@/features/API";
+import useCurrentLanguage from "@/hooks/useCurrentLanguage";
 import { FaChevronDown, FaWhatsappSquare } from "react-icons/fa";
 
 const fallbackFaqs = [
@@ -33,15 +34,20 @@ const fallbackFaqs = [
 ];
 
 const Faq = () => {
+  const language = useCurrentLanguage();
   const [faqs, setFaqs] = useState(fallbackFaqs);
   const [activeFaq, setActiveFaq] = useState(1);
 
   useEffect(() => {
-    getFaqs({ section: "general" }).then(({ data }) => {
+    if (!language) return;
+    let active = true;
+    getFaqs({ section: "general", lang: language }).then(({ data }) => {
+      if (!active) return;
       const items = data?.data || [];
       if (items.length) { setFaqs(items); setActiveFaq(items[0]._id); }
     });
-  }, []);
+    return () => { active = false; };
+  }, [language]);
 
   const toggleFaq = (id) => {
     setActiveFaq(activeFaq === id ? null : id);
@@ -69,7 +75,7 @@ const Faq = () => {
         <div className="mx-auto w-full max-w-[1140px] px-4">
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
             <div className="lg:col-span-8">
-              <div className="overflow-hidden space-y-2   rounded-md border border-gray-200">
+              <div data-no-translate className="overflow-hidden space-y-2 rounded-md border border-gray-200">
                 {faqs.map((item, index) => (
                   <div
                     key={item._id || item.id}

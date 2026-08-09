@@ -10,6 +10,7 @@ import Link from "next/link";
 import Testimonials from "@/components/testimonials";
 import { useEffect, useState } from "react";
 import { getFaqs } from "@/features/API";
+import useCurrentLanguage from "@/hooks/useCurrentLanguage";
 
 // Icons
 import { FaChevronDown, FaStar, FaStarHalfAlt } from "react-icons/fa";
@@ -138,16 +139,21 @@ const RatingStars = ({ small = false }) => {
 };
 
 const Locations = () => {
+  const language = useCurrentLanguage();
   const [activeMarker, setActiveMarker] = useState(null);
   const [faqs, setFaqs] = useState(fallbackFaqs);
   const [activeFaq, setActiveFaq] = useState(1);
 
   useEffect(() => {
-    getFaqs({ section: "locations" }).then(({ data }) => {
+    if (!language) return;
+    let active = true;
+    getFaqs({ section: "locations", lang: language }).then(({ data }) => {
+      if (!active) return;
       const items = data?.data || [];
       if (items.length) { setFaqs(items); setActiveFaq(items[0]._id); }
     });
-  }, []);
+    return () => { active = false; };
+  }, [language]);
 
   const toggleFaq = (id) => {
     setActiveFaq(activeFaq === id ? null : id);

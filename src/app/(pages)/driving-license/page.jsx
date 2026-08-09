@@ -218,7 +218,7 @@ export default function DrivingLicensePage() {
           </div>
           <div className="mt-16 rounded-[10px] bg-[#eaf0f9] px-6 py-9 text-center">
             <h3 className="text-[20px] font-bold">Manage your entire online training at the best price</h3>
-            <Link href="/offers" className="mt-6 inline-flex rounded-[8px] bg-[#e4213c] px-8 py-3 !text-[13px] font-semibold text-white transition hover:bg-[#174a9b]">Discover Our Offers</Link>
+            <Link href="/pricing" className="mt-6 inline-flex rounded-[8px] bg-[#e4213c] px-8 py-3 !text-[13px] font-semibold text-white transition hover:bg-[#174a9b]">Discover Our Offers</Link>
           </div>
         </div>
       </section>
@@ -258,7 +258,7 @@ export default function DrivingLicensePage() {
           </div>
           <div className="mt-8 rounded-[10px] bg-[#eaf0f9] px-6 py-8 text-center">
             <h3 className="text-[20px] font-bold">Manage your entire online training at the best price</h3>
-            <Link href="/offers" className="mt-6 inline-flex rounded-[8px] bg-[#e4213c] px-8 py-3 !text-[13px] font-semibold text-white transition hover:bg-[#174a9b]">Discover Our Method for the Permit</Link>
+            <Link href="/pricing" className="mt-6 inline-flex rounded-[8px] bg-[#e4213c] px-8 py-3 !text-[13px] font-semibold text-white transition hover:bg-[#174a9b]">Discover Our Method for the Permit</Link>
           </div>
         </div>
       </section>
@@ -302,11 +302,11 @@ export default function DrivingLicensePage() {
               <article key={service.title} className="rounded-[10px] bg-[#eaf0f9] px-6 py-8 transition hover:-translate-y-1 hover:shadow-xl">
                 <Image src={service.image} alt="" sizes="70px" className="mx-auto h-[70px] w-[70px] object-contain" />
                 <h3 className="mt-5 text-[17px] font-bold">{service.title}</h3><p className="mt-3 !text-[13px] text-[#3f9d5a]">{service.price}</p>
-                <Link href="/offers" className="mt-5 inline-flex rounded-full border border-[#174a9b] px-5 py-2 !text-[12px] font-semibold text-[#e4213c] transition hover:bg-[#174a9b] hover:text-white">Learn more</Link>
+                <Link href="/pricing" className="mt-5 inline-flex rounded-full border border-[#174a9b] px-5 py-2 !text-[12px] font-semibold text-[#e4213c] transition hover:bg-[#174a9b] hover:text-white">Learn more</Link>
               </article>
             ))}
           </div>
-          <Link href="/offers" className="mt-8 inline-flex rounded-[8px] bg-[#e4213c] px-7 py-3 !text-[13px] font-semibold text-white transition hover:bg-[#174a9b]">View All</Link>
+          <Link href="/pricing" className="mt-8 inline-flex rounded-[8px] bg-[#e4213c] px-7 py-3 !text-[13px] font-semibold text-white transition hover:bg-[#174a9b]">View All</Link>
         </div>
       </section>
 

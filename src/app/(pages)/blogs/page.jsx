@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { FaCalendarAlt, FaCommentAlt, FaFolderOpen, FaUser } from "react-icons/fa";
 
 import { getBlogs } from "@/features/API";
+import useCurrentLanguage from "@/hooks/useCurrentLanguage";
 
 const formatDate = (value) => new Date(value).toLocaleDateString("en-GB", { year: "numeric", month: "short", day: "2-digit" });
 
@@ -19,12 +20,17 @@ function PostMeta({ post }) {
 }
 
 export default function BlogsPage() {
+  const language = useCurrentLanguage();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getBlogs({ limit: 50 }).then(({ data }) => setPosts(data?.data || [])).finally(() => setLoading(false));
-  }, []);
+    if (!language) return;
+    let active = true;
+    setLoading(true);
+    getBlogs({ limit: 50, lang: language }).then(({ data }) => { if (active) setPosts(data?.data || []); }).finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, [language]);
 
   const recentPosts = posts.slice(0, 5);
   return <section className="bg-white px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-[72px]">
@@ -33,10 +39,10 @@ export default function BlogsPage() {
         {loading && <p className="rounded-[12px] bg-[#dfe7f3] p-10 text-center text-slate-600">Loading blogs...</p>}
         {!loading && posts.length === 0 && <p className="rounded-[12px] bg-[#dfe7f3] p-10 text-center text-slate-600">No published blogs yet.</p>}
         {posts.map((post, index) => <article key={post._id} className="rounded-[12px] bg-[#dfe7f3] p-4 shadow-[0_2px_4px_rgba(15,54,119,0.06)] sm:p-[18px]">
-          <h2 className="text-[17px] font-extrabold leading-snug text-[#161d2a] sm:text-[19px]"><Link href={`/blogs/${post.slug}`} className="transition hover:text-[#174a9b]">{post.title}</Link></h2>
+          <h2 data-no-translate className="text-[17px] font-extrabold leading-snug text-[#161d2a] sm:text-[19px]"><Link href={`/blogs/${post.slug}`} className="transition hover:text-[#174a9b]">{post.title}</Link></h2>
           <PostMeta post={post} />
           <Link href={`/blogs/${post.slug}`} className="relative mt-4 block aspect-[2.55/1] overflow-hidden rounded-[9px] bg-slate-200"><Image src={post.coverImage} alt={post.title} fill priority={index === 0} sizes="(max-width: 1024px) 100vw, 850px" className="object-cover transition duration-500 hover:scale-[1.02]" /></Link>
-          <p className="mt-4 line-clamp-2 text-[13px] leading-[1.65] text-slate-700 sm:text-[14px]">{post.excerpt || post.content}</p>
+          <p data-no-translate className="mt-4 line-clamp-2 text-[13px] leading-[1.65] text-slate-700 sm:text-[14px]">{post.excerpt || post.content}</p>
           <Link href={`/blogs/${post.slug}`} className="mt-3 inline-flex rounded-[7px] bg-[#e2233d] px-5 py-2.5 text-[12px] font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[#174a9b]">Read More</Link>
         </article>)}
       </div>

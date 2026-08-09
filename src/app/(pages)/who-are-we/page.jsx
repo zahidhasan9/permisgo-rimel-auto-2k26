@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 
@@ -16,7 +18,9 @@ import {
   FaPhone,
   FaPinterestP,
   FaYoutube,
+  FaTiktok,
 } from "react-icons/fa6";
+import useSiteSettings from "@/hooks/useSiteSettings";
 import { FaBookOpen, FaEnvelope, FaFileLines, FaUser } from "react-icons/fa6";
 import { IoMdCheckbox } from "react-icons/io";
 
@@ -56,6 +60,13 @@ function HeadingIcon({ children }) {
 }
 
 export default function WhoAreWePage() {
+  const site = useSiteSettings();
+  const companySocialLinks = [
+    { icon: FaFacebookF, label: "Facebook", href: site.facebookUrl },
+    { icon: FaInstagram, label: "Instagram", href: site.instagramUrl },
+    { icon: FaTiktok, label: "TikTok", href: site.tiktokUrl },
+    { icon: FaYoutube, label: "YouTube", href: site.youtubeUrl },
+  ];
   return (
     <div className="bg-[#eef3fb] text-[#1d1d1f]">
       {/* Introduction */}
@@ -208,18 +219,16 @@ export default function WhoAreWePage() {
                 <li className="group flex items-start gap-3 rounded-[8px] border border-white/30 bg-white/20 px-4 py-3 !text-[14px] font-semibold leading-5 text-white transition-all duration-300 hover:translate-x-1.5 hover:bg-white/30">
                   <FaLocationDot className="mt-1 shrink-0" />
                   <span>
-                    | 100 Rue Danielle Casanova 93300
-                    <br />
-                    Aubervilliers, France
+                    | {site.address}
                   </span>
                 </li>
                 <li className="group flex items-center gap-3 rounded-[8px] border border-white/30 bg-white/20 px-4 py-3 !text-[14px] font-semibold text-white transition-all duration-300 hover:translate-x-1.5 hover:bg-white/30">
                   <FaPhone className="shrink-0" />
-                  <span>| +948 1458 5584</span>
+                  <span>| {site.phone}</span>
                 </li>
                 <li className="group flex items-center gap-3 rounded-[8px] border border-white/30 bg-white/20 px-4 py-3 !text-[14px] font-semibold text-white transition-all duration-300 hover:translate-x-1.5 hover:bg-white/30">
                   <FaEnvelope className="shrink-0" />
-                  <span>| permisgo.fr@gmail.com</span>
+                  <span>| {site.supportEmail}</span>
                 </li>
               </ul>
 
@@ -231,10 +240,12 @@ export default function WhoAreWePage() {
                   Book Your First Lesson
                 </Link>
                 <div className="mt-4 flex items-center justify-center gap-4">
-                  {socialLinks.map(({ icon: Icon, label }) => (
+                  {companySocialLinks.map(({ icon: Icon, label, href }) => (
                     <Link
                       key={label}
-                      href="#"
+                      href={href}
+                      target="_blank"
+                      rel="noreferrer"
                       aria-label={label}
                       className="text-[16px] text-white transition-all duration-300 hover:-translate-y-1 hover:text-[#d6e5ff]"
                     >

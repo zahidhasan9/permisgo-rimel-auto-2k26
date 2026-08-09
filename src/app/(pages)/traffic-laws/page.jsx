@@ -117,7 +117,7 @@ export default function TrafficLawsPage() {
                 Register for FREE
               </Link>
               <Link
-                href="/offers"
+                href="/pricing"
                 className="inline-flex min-h-[48px] items-center justify-center rounded-[9px] border-2 border-[#174a9b] px-6 !text-[15px] font-semibold text-[#e4213c] transition duration-300 hover:-translate-y-0.5 hover:bg-[#174a9b] hover:text-white hover:shadow-lg"
               >
                 Discover all our offers
@@ -269,7 +269,7 @@ export default function TrafficLawsPage() {
           <h2 className="text-[32px] font-bold text-white lg:text-[37px]">And After your code?</h2>
           <p className="mt-4 !text-[14px] text-white/85">Discover Our License Offers Starting at $500</p>
           <Link
-            href="/offers"
+            href="/pricing"
             className="mt-7 inline-flex min-h-[46px] min-w-[360px] max-w-full items-center justify-center rounded-[9px] bg-[#e4213c] px-7 !text-[14px] font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-white hover:text-[#174a9b] hover:shadow-lg"
           >
             Discover All Our Offers

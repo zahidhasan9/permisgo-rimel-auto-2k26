@@ -4,10 +4,17 @@ import { useEffect, useMemo, useState } from "react";
 import { FaChevronDown, FaQuestionCircle } from "react-icons/fa";
 import GuidePage, { SectionTitle } from "@/components/public/GuidePage";
 import { getFaqs } from "@/features/API";
+import useCurrentLanguage from "@/hooks/useCurrentLanguage";
 
 export default function MonitorFaqsPage() {
+  const language = useCurrentLanguage();
   const [faqs, setFaqs] = useState([]);
-  useEffect(() => { getFaqs({ section: "instructors" }).then(({ data }) => setFaqs(data?.data || [])); }, []);
+  useEffect(() => {
+    if (!language) return;
+    let active = true;
+    getFaqs({ section: "instructors", lang: language }).then(({ data }) => { if (active) setFaqs(data?.data || []); });
+    return () => { active = false; };
+  }, [language]);
   const groups = useMemo(() => Object.entries(faqs.reduce((result, faq) => { const key = faq.category || "Instructor guidance"; (result[key] ||= []).push(faq); return result; }, {})), [faqs]);
 
   return <GuidePage eyebrow="Instructor help centre" title="Monitor FAQs" description="Clear answers to the questions our instructors and partners ask most often." icon={<FaQuestionCircle />} highlights={["Quick answers", "Instructor guidance", "Dedicated support"]} currentPath="/monitor-faqs">

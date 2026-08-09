@@ -1,12 +1,14 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   FaCalendarDays,
   FaChevronLeft,
   FaChevronRight,
   FaGlobe,
 } from "react-icons/fa6";
+import { createAppointmentRequest, getPublicTeachers } from "@/features/API";
+import { showToast } from "@/utils/showToast";
 
 const MONTHS = [
   "January",
@@ -24,8 +26,7 @@ const MONTHS = [
 ];
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-const TIME_SLOTS = ["11:00 AM", "02:00 PM", "04:00 PM", "05:00 PM"];
-const INITIAL_DATE = new Date(2021, 11, 23);
+const INITIAL_DATE = new Date();
 
 function buildCalendar(viewDate) {
   const year = viewDate.getFullYear();
@@ -83,8 +84,6 @@ function formatCalendarHeader(date) {
 }
 
 function formatSelectedDate(date) {
-  if (isSameDay(date, INITIAL_DATE)) return "Wed, December, 23";
-
   const weekday = date.toLocaleDateString("en-US", { weekday: "short" });
   return `${weekday}, ${MONTHS[date.getMonth()]}, ${date.getDate()}`;
 }
@@ -95,9 +94,12 @@ const inputClass =
   "h-11 w-full rounded-[8px] border border-[#c2cfe2] bg-white px-3 !text-[13px] font-medium text-[#222] outline-none transition-all duration-300 [&::placeholder]:!text-[13px] [&::placeholder]:text-[#a0a0a0] focus:border-[#174a9b] focus:ring-4 focus:ring-[#174a9b]/10";
 
 export default function AppointmentBooking() {
-  const [viewDate, setViewDate] = useState(new Date(2021, 11, 1));
+  const [viewDate, setViewDate] = useState(() => new Date(INITIAL_DATE.getFullYear(), INITIAL_DATE.getMonth(), 1));
   const [selectedDate, setSelectedDate] = useState(INITIAL_DATE);
   const [selectedTime, setSelectedTime] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [instructors, setInstructors] = useState([]);
+  const [instructorsLoading, setInstructorsLoading] = useState(true);
   const [form, setForm] = useState({
     courseTitle: "",
     instructor: "",
@@ -109,6 +111,19 @@ export default function AppointmentBooking() {
   });
 
   const calendarCells = useMemo(() => buildCalendar(viewDate), [viewDate]);
+
+  useEffect(() => {
+    let active = true;
+    getPublicTeachers()
+      .then((response) => {
+        if (active) setInstructors(Array.isArray(response.data?.data) ? response.data.data : []);
+      })
+      .catch(() => {
+        if (active) showToast.error("Instructors could not be loaded. Please refresh the page.");
+      })
+      .finally(() => { if (active) setInstructorsLoading(false); });
+    return () => { active = false; };
+  }, []);
 
   const updateForm = (event) => {
     const { name, value } = event.target;
@@ -134,6 +149,25 @@ export default function AppointmentBooking() {
     if (!value) return;
     const [year, month, day] = value.split("-").map(Number);
     selectCalendarDate(new Date(year, month - 1, day));
+  };
+
+  const submitAppointment = async (event) => {
+    event.preventDefault();
+    setSubmitting(true);
+    try {
+      await createAppointmentRequest({
+        ...form,
+        appointmentDate: formatInputDate(selectedDate),
+        appointmentTime: selectedTime,
+      });
+      setForm({ courseTitle: "", instructor: "", duration: "", name: "", email: "", phone: "", notes: "" });
+      setSelectedTime("");
+      showToast.success("Your appointment request has been submitted successfully.", { title: "Appointment submitted" });
+    } catch (error) {
+      showToast.error(error.response?.data?.message || "Appointment could not be submitted. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -162,7 +196,7 @@ export default function AppointmentBooking() {
 
             <form
               className="mt-7 space-y-6"
-              onSubmit={(event) => event.preventDefault()}
+              onSubmit={submitAppointment}
             >
               <div>
                 <label htmlFor="course-title" className={labelClass}>
@@ -175,6 +209,7 @@ export default function AppointmentBooking() {
                   value={form.courseTitle}
                   onChange={updateForm}
                   className={inputClass}
+                  required
                 />
               </div>
 
@@ -188,11 +223,14 @@ export default function AppointmentBooking() {
                   value={form.instructor}
                   onChange={updateForm}
                   className={inputClass}
+                  required
                 >
-                  <option value="" aria-label="Select instructor" />
-                  <option value="john-doe">John Doe</option>
-                  <option value="marie-curie">Marie Curie</option>
-                  <option value="alex-smith">Alex Smith</option>
+                  <option value="">{instructorsLoading ? "Loading instructors..." : "Select instructor"}</option>
+                  {instructors.map((teacher) => (
+                    <option key={teacher.user?._id || teacher._id} value={teacher.user?._id || ""}>
+                      {teacher.user?.name}{teacher.user?.city ? ` — ${teacher.user.city}` : ""}
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -209,6 +247,7 @@ export default function AppointmentBooking() {
                       value={formatInputDate(selectedDate)}
                       onChange={(event) => selectInputDate(event.target.value)}
                       className={`${inputClass} pr-10 [&::-webkit-calendar-picker-indicator]:opacity-0`}
+                      required
                     />
                     <FaCalendarDays
                       aria-hidden="true"
@@ -221,20 +260,15 @@ export default function AppointmentBooking() {
                   <label htmlFor="appointment-time" className={labelClass}>
                     Select Time
                   </label>
-                  <select
+                  <input
                     id="appointment-time"
                     name="time"
+                    type="time"
                     value={selectedTime}
                     onChange={(event) => setSelectedTime(event.target.value)}
                     className={inputClass}
-                  >
-                    <option value="" aria-label="Select time" />
-                    {TIME_SLOTS.map((time) => (
-                      <option key={time} value={time}>
-                        {time}
-                      </option>
-                    ))}
-                  </select>
+                    required
+                  />
                 </div>
               </div>
 
@@ -249,6 +283,7 @@ export default function AppointmentBooking() {
                     value={form.duration}
                     onChange={updateForm}
                     className={inputClass}
+                    required
                   >
                     <option value="" aria-label="Select duration" />
                     <option value="30">30 minutes</option>
@@ -268,7 +303,8 @@ export default function AppointmentBooking() {
                     autoComplete="name"
                     value={form.name}
                     onChange={updateForm}
-                    className={inputClass}
+                  className={inputClass}
+                  required
                   />
                 </div>
               </div>
@@ -286,6 +322,7 @@ export default function AppointmentBooking() {
                     value={form.email}
                     onChange={updateForm}
                     className={inputClass}
+                    required
                   />
                 </div>
 
@@ -301,6 +338,7 @@ export default function AppointmentBooking() {
                     value={form.phone}
                     onChange={updateForm}
                     className={inputClass}
+                    required
                   />
                 </div>
               </div>
@@ -322,9 +360,10 @@ export default function AppointmentBooking() {
 
               <button
                 type="submit"
+                disabled={submitting || instructorsLoading || !instructors.length}
                 className="flex h-12 w-full items-center justify-center rounded-[8px] bg-[#e2233d] px-5 !text-[13px] font-extrabold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#174a9b] hover:shadow-lg"
               >
-                Submit
+                {submitting ? "Submitting..." : "Submit"}
               </button>
             </form>
           </div>
@@ -403,25 +442,8 @@ export default function AppointmentBooking() {
               <h3 className="!font-sans !text-[14px] font-extrabold text-[#343434]">
                 {formatSelectedDate(selectedDate)}
               </h3>
-              <div className="mt-5 grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-2">
-                {TIME_SLOTS.map((time) => {
-                  const active = selectedTime === time;
-                  return (
-                    <button
-                      key={time}
-                      type="button"
-                      onClick={() => setSelectedTime(time)}
-                      aria-pressed={active}
-                      className={`h-11 rounded-[8px] border !text-[12px] font-semibold transition-all duration-300 ${
-                        active
-                          ? "border-[#174a9b] bg-[#174a9b] text-white"
-                          : "border-[#174a9b] bg-white text-[#555] hover:bg-[#edf3fb]"
-                      }`}
-                    >
-                      {time}
-                    </button>
-                  );
-                })}
+              <div className="mt-5 rounded-[8px] border border-[#174a9b] bg-[#edf3fb] px-4 py-3 text-center !text-[13px] font-semibold text-[#174a9b]">
+                {selectedTime ? `Selected time: ${selectedTime}` : "Choose your preferred time from the form"}
               </div>
             </div>
 

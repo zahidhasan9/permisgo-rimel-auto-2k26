@@ -17,6 +17,8 @@ const emptyForm = {
   title: "",
   excerpt: "",
   content: "",
+  title_bn: "", excerpt_bn: "", content_bn: "",
+  title_fr: "", excerpt_fr: "", content_fr: "",
   status: "published",
   coverImage: null,
   removeCoverImage: false,
@@ -33,6 +35,7 @@ export default function AdminBlogsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [filter, setFilter] = useState("all");
+  const [activeLanguage, setActiveLanguage] = useState("en");
 
   const loadBlogs = useCallback(async () => {
     try {
@@ -61,11 +64,13 @@ export default function AdminBlogsPage() {
     setOpen(false);
     setEditing(null);
     setForm(emptyForm);
+    setActiveLanguage("en");
   };
 
   const startCreate = () => {
     setEditing(null);
     setForm(emptyForm);
+    setActiveLanguage("en");
     setOpen(true);
   };
 
@@ -75,10 +80,17 @@ export default function AdminBlogsPage() {
       title: blog.title || "",
       excerpt: blog.excerpt || "",
       content: blog.content || "",
+      title_bn: blog.translations?.bn?.title || "",
+      excerpt_bn: blog.translations?.bn?.excerpt || "",
+      content_bn: blog.translations?.bn?.content || "",
+      title_fr: blog.translations?.fr?.title || "",
+      excerpt_fr: blog.translations?.fr?.excerpt || "",
+      content_fr: blog.translations?.fr?.content || "",
       status: blog.status || "draft",
       coverImage: null,
       removeCoverImage: false,
     });
+    setActiveLanguage("en");
     setOpen(true);
   };
 
@@ -95,6 +107,11 @@ export default function AdminBlogsPage() {
     payload.append("title", form.title.trim());
     payload.append("excerpt", form.excerpt.trim());
     payload.append("content", form.content.trim());
+    for (const language of ["bn", "fr"]) {
+      payload.append(`title_${language}`, form[`title_${language}`].trim());
+      payload.append(`excerpt_${language}`, form[`excerpt_${language}`].trim());
+      payload.append(`content_${language}`, form[`content_${language}`].trim());
+    }
     payload.append("status", form.status);
     if (form.coverImage) payload.append("coverImage", form.coverImage);
     if (form.removeCoverImage) payload.append("removeCoverImage", "true");
@@ -179,9 +196,8 @@ export default function AdminBlogsPage() {
           <div className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
             <div className="sticky top-0 z-10 flex items-center justify-between border-b bg-white px-6 py-4"><h2 className="text-xl font-extrabold text-slate-800">{editing ? "Update Blog" : "Create Blog"}</h2><button onClick={closeModal} className="rounded-full p-2 text-slate-500 hover:bg-slate-100"><FiX /></button></div>
             <form onSubmit={submit} className="space-y-5 p-6">
-              <label className="block"><span className="mb-2 block text-sm font-bold text-slate-700">Title *</span><input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} maxLength={180} className="w-full rounded-lg border border-slate-200 px-4 py-3 outline-none focus:border-[#174a9b]" /></label>
-              <label className="block"><span className="mb-2 block text-sm font-bold text-slate-700">Short excerpt</span><textarea value={form.excerpt} onChange={(e) => setForm({ ...form, excerpt: e.target.value })} rows={3} maxLength={320} className="w-full resize-none rounded-lg border border-slate-200 px-4 py-3 outline-none focus:border-[#174a9b]" /></label>
-              <div><span className="mb-2 block text-sm font-bold text-slate-700">Article content *</span><BlogEditor value={form.content} onChange={(content) => setForm((current) => ({ ...current, content }))} /></div>
+              <div className="grid grid-cols-3 gap-2 rounded-xl bg-slate-100 p-1.5">{[["en", "English"], ["bn", "বাংলা"], ["fr", "Français"]].map(([code, label]) => <button key={code} type="button" onClick={() => setActiveLanguage(code)} className={`rounded-lg px-3 py-2.5 text-sm font-bold ${activeLanguage === code ? "bg-[#174a9b] text-white shadow" : "text-slate-600"}`}>{label}</button>)}</div>
+              {(() => { const suffix = activeLanguage === "en" ? "" : `_${activeLanguage}`; const titleKey = `title${suffix}`; const excerptKey = `excerpt${suffix}`; const contentKey = `content${suffix}`; return <div className="space-y-5 rounded-xl border border-slate-200 p-4"><p className="text-xs font-semibold text-slate-500">{activeLanguage === "en" ? "English is required and controls the permanent blog URL." : `${activeLanguage === "bn" ? "Bangla" : "French"} translation is optional; English is used as fallback.`}</p><label className="block"><span className="mb-2 block text-sm font-bold text-slate-700">Title {activeLanguage === "en" ? "*" : ""}</span><input value={form[titleKey]} onChange={(e) => setForm({ ...form, [titleKey]: e.target.value })} maxLength={180} className="w-full rounded-lg border border-slate-200 px-4 py-3 outline-none focus:border-[#174a9b]" /></label><label className="block"><span className="mb-2 block text-sm font-bold text-slate-700">Short excerpt</span><textarea value={form[excerptKey]} onChange={(e) => setForm({ ...form, [excerptKey]: e.target.value })} rows={3} maxLength={320} className="w-full resize-none rounded-lg border border-slate-200 px-4 py-3 outline-none focus:border-[#174a9b]" /></label><div><span className="mb-2 block text-sm font-bold text-slate-700">Article content {activeLanguage === "en" ? "*" : ""}</span><BlogEditor value={form[contentKey]} onChange={(content) => setForm((current) => ({ ...current, [contentKey]: content }))} /></div></div>; })()}
               <div className="grid gap-5 sm:grid-cols-2">
                 <label className="block"><span className="mb-2 block text-sm font-bold text-slate-700">Status</span><select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })} className="w-full rounded-lg border border-slate-200 px-4 py-3 outline-none focus:border-[#174a9b]"><option value="published">Published</option><option value="draft">Draft</option></select></label>
                 <label className="block"><span className="mb-2 block text-sm font-bold text-slate-700">Cover image {editing ? "" : "*"}</span><input type="file" accept="image/jpeg,image/png,image/webp" onChange={(e) => setForm({ ...form, coverImage: e.target.files?.[0] || null, removeCoverImage: false })} className="block w-full rounded-lg border border-slate-200 text-sm file:mr-3 file:border-0 file:bg-blue-50 file:px-4 file:py-3 file:font-bold file:text-[#174a9b]" /><span className="mt-1 block text-xs text-slate-500">Uploaded to Cloudinary. Max 5 MB.</span>{editing?.coverImage && !form.coverImage && <button type="button" onClick={() => setForm({ ...form, removeCoverImage: !form.removeCoverImage })} className={`mt-2 text-xs font-bold ${form.removeCoverImage ? "text-blue-700" : "text-red-600"}`}>{form.removeCoverImage ? "Undo image removal" : "Remove current image"}</button>}</label>

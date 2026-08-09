@@ -1,171 +1,61 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FaCarSide, FaCheckCircle, FaEnvelope, FaExclamationTriangle, FaSave, FaSpinner } from "react-icons/fa";
+import { FaSave, FaSpinner } from "react-icons/fa";
 import { getAdminDrivingSettings, updateAdminDrivingSettings } from "@/features/API";
+import { defaultSiteSettings } from "@/hooks/useSiteSettings";
+import { showToast } from "@/utils/showToast";
 
-const errorMessage = (error) =>
-  error?.response?.data?.message || error?.message || "Something went wrong.";
+const fields = [
+  ["companyName", "Company name", "text"], ["domainName", "Domain name", "text"],
+  ["websiteUrl", "Website URL", "url"], ["supportEmail", "Support email", "email"],
+  ["admissionEmail", "Admission email", "email"], ["phone", "Telephone", "tel"],
+  ["mobile", "Mobile number", "tel"], ["whatsappNumber", "WhatsApp number", "tel"],
+  ["whatsappUrl", "WhatsApp link", "url"], ["address", "Primary address", "text"],
+  ["address2", "Second address", "text"], ["googleMapUrl", "Google Map link", "url"],
+  ["facebookUrl", "Facebook link", "url"], ["instagramUrl", "Instagram link", "url"],
+  ["tiktokUrl", "TikTok link", "url"], ["youtubeUrl", "YouTube link", "url"],
+];
+
+const inputClass = "mt-2 h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 disabled:opacity-60";
 
 export default function AdminSettingsPage() {
-  const [requiredHours, setRequiredHours] = useState("20");
-  const [savedHours, setSavedHours] = useState(20);
-  const [requiredSkillsPercentage, setRequiredSkillsPercentage] = useState("60");
-  const [savedSkillsPercentage, setSavedSkillsPercentage] = useState(60);
-  const [contactRecipientEmail, setContactRecipientEmail] = useState("");
-  const [savedContactRecipientEmail, setSavedContactRecipientEmail] = useState("");
-  const [whatsappNumber, setWhatsappNumber] = useState("");
-  const [savedWhatsappNumber, setSavedWhatsappNumber] = useState("");
+  const [form, setForm] = useState({ requiredHours: "20", requiredSkillsPercentage: "60", contactRecipientEmail: "", ...defaultSiteSettings });
+  const [saved, setSaved] = useState(form);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
 
   useEffect(() => {
-    getAdminDrivingSettings()
-      .then((response) => {
-        const value = Number(response?.data?.data?.requiredHours || 20);
-        setRequiredHours(String(value));
-        setSavedHours(value);
-        const skillsValue = Number(response?.data?.data?.requiredSkillsPercentage || 60);
-        setRequiredSkillsPercentage(String(skillsValue));
-        setSavedSkillsPercentage(skillsValue);
-        const recipientEmail = response?.data?.data?.contactRecipientEmail || "";
-        setContactRecipientEmail(recipientEmail);
-        setSavedContactRecipientEmail(recipientEmail);
-        const savedWhatsApp = response?.data?.data?.whatsappNumber || "";
-        setWhatsappNumber(savedWhatsApp);
-        setSavedWhatsappNumber(savedWhatsApp);
-      })
-      .catch((requestError) => setError(errorMessage(requestError)))
-      .finally(() => setLoading(false));
+    getAdminDrivingSettings().then((response) => {
+      const data = { ...defaultSiteSettings, ...(response.data?.data || {}) };
+      const next = { ...data, requiredHours: String(data.requiredHours || 20), requiredSkillsPercentage: String(data.requiredSkillsPercentage || 60), contactRecipientEmail: data.contactRecipientEmail || "" };
+      setForm(next); setSaved(next);
+    }).catch((error) => showToast.error(error.response?.data?.message || "Settings could not be loaded.")).finally(() => setLoading(false));
   }, []);
 
-  const handleSave = async () => {
-    const value = Number(requiredHours);
-    if (!Number.isFinite(value) || value < 1 || value > 200) {
-      setError("Required driving hours must be between 1 and 200.");
-      return;
-    }
-    const skillsValue = Number(requiredSkillsPercentage);
-    if (!Number.isFinite(skillsValue) || skillsValue < 1 || skillsValue > 100) {
-      setError("Required skills percentage must be between 1 and 100.");
-      return;
-    }
-    if (contactRecipientEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactRecipientEmail)) {
-      setError("Please enter a valid contact recipient email.");
-      return;
-    }
-    if (whatsappNumber && !/^\+?[0-9\s()-]{7,25}$/.test(whatsappNumber)) {
-      setError("Please enter a valid WhatsApp number with country code.");
-      return;
-    }
-
+  const update = (key, value) => setForm((current) => ({ ...current, [key]: value }));
+  const save = async () => {
+    const hours = Number(form.requiredHours); const skills = Number(form.requiredSkillsPercentage);
+    if (!Number.isFinite(hours) || hours < 1 || hours > 200) return showToast.error("Required hours must be between 1 and 200.");
+    if (!Number.isFinite(skills) || skills < 1 || skills > 100) return showToast.error("Required skills must be between 1 and 100 percent.");
+    setSaving(true);
     try {
-      setSaving(true);
-      setError("");
-      setSuccess("");
-      const response = await updateAdminDrivingSettings(value, skillsValue, contactRecipientEmail.trim(), whatsappNumber.trim());
-      const updated = Number(response?.data?.data?.requiredHours || value);
-      const updatedSkills = Number(response?.data?.data?.requiredSkillsPercentage || skillsValue);
-      setRequiredHours(String(updated));
-      setSavedHours(updated);
-      setRequiredSkillsPercentage(String(updatedSkills));
-      setSavedSkillsPercentage(updatedSkills);
-      const updatedRecipient = response?.data?.data?.contactRecipientEmail || "";
-      setContactRecipientEmail(updatedRecipient);
-      setSavedContactRecipientEmail(updatedRecipient);
-      const updatedWhatsApp = response?.data?.data?.whatsappNumber || "";
-      setWhatsappNumber(updatedWhatsApp);
-      setSavedWhatsappNumber(updatedWhatsApp);
-      setSuccess("Global driving requirements updated for all students.");
-    } catch (requestError) {
-      setError(errorMessage(requestError));
-    } finally {
-      setSaving(false);
-    }
+      const siteSettings = Object.fromEntries(Object.keys(defaultSiteSettings).map((key) => [key, form[key]?.trim() || ""]));
+      const response = await updateAdminDrivingSettings(hours, skills, form.contactRecipientEmail.trim(), siteSettings);
+      const next = { ...form, ...(response.data?.data || {}), requiredHours: String(response.data?.data?.requiredHours || hours), requiredSkillsPercentage: String(response.data?.data?.requiredSkillsPercentage || skills) };
+      setForm(next); setSaved(next); showToast.success("Company and platform settings updated.");
+    } catch (error) { showToast.error(error.response?.data?.message || "Settings could not be saved."); }
+    finally { setSaving(false); }
   };
 
-  return (
-    <main className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-4xl">
-        <header>
-          <h1 className="text-2xl font-bold text-slate-900">Settings</h1>
-          <p className="mt-2 text-sm text-slate-500">Manage platform-wide training requirements.</p>
-        </header>
+  const section = (title, description, content) => <section className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"><header className="border-b border-slate-100 px-5 py-5 sm:px-6"><h2 className="font-bold text-slate-900">{title}</h2><p className="mt-1 text-sm text-slate-500">{description}</p></header>{content}</section>;
 
-        {error && (
-          <div className="mt-5 flex items-center gap-3 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700">
-            <FaExclamationTriangle /> {error}
-          </div>
-        )}
-        {success && (
-          <div className="mt-5 flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700">
-            <FaCheckCircle /> {success}
-          </div>
-        )}
-
-        <section className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-          <div className="flex items-center gap-4 border-b border-slate-100 px-5 py-5 sm:px-6">
-            <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-xl text-[#174A9B]">
-              <FaCarSide />
-            </span>
-            <div>
-              <h2 className="font-bold text-slate-900">Driving lesson requirement</h2>
-              <p className="mt-1 text-sm text-slate-500">This single target applies to every student.</p>
-            </div>
-          </div>
-
-          <div className="p-5 sm:p-6">
-            <div className="rounded-xl border border-blue-100 bg-blue-50/60 p-4 text-sm leading-6 text-slate-600">
-              Current global targets: <strong className="text-[#174A9B]">{savedHours} hours</strong> and <strong className="text-[#174A9B]">{savedSkillsPercentage}% skills acquired</strong>. Student license journeys automatically use these values.
-            </div>
-
-            <div className="mt-6 grid max-w-3xl gap-5 sm:grid-cols-2">
-              <div>
-              <label htmlFor="required-hours" className="block text-sm font-bold text-slate-800">
-                Required driving hours for all students
-              </label>
-              <p className="mt-1 text-xs text-slate-500">Enter a value between 1 and 200 hours.</p>
-              <div className="mt-3">
-                <div className="relative min-w-0 flex-1">
-                  <input
-                    id="required-hours"
-                    type="number"
-                    min="1"
-                    max="200"
-                    step="0.5"
-                    value={requiredHours}
-                    disabled={loading || saving}
-                    onChange={(event) => setRequiredHours(event.target.value)}
-                    className="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 pr-16 text-base font-bold text-slate-800 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 disabled:opacity-60"
-                  />
-                  <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-slate-400">hours</span>
-                </div>
-              </div>
-              </div>
-
-              <div>
-                <label htmlFor="required-skills" className="block text-sm font-bold text-slate-800">Required skills percentage</label>
-                <p className="mt-1 text-xs text-slate-500">Enter a value between 1 and 100 percent.</p>
-                <div className="relative mt-3">
-                  <input id="required-skills" type="number" min="1" max="100" step="1" value={requiredSkillsPercentage} disabled={loading || saving} onChange={(event) => setRequiredSkillsPercentage(event.target.value)} className="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 pr-12 text-base font-bold text-slate-800 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 disabled:opacity-60" />
-                  <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-slate-400">%</span>
-                </div>
-              </div>
-            </div>
-
-            <button type="button" onClick={handleSave} disabled={loading || saving || (Number(requiredHours) === savedHours && Number(requiredSkillsPercentage) === savedSkillsPercentage && contactRecipientEmail.trim() === savedContactRecipientEmail && whatsappNumber.trim() === savedWhatsappNumber)} className="mt-5 inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-[#174A9B] px-5 text-sm font-bold text-white transition hover:bg-[#123d82] disabled:cursor-not-allowed disabled:opacity-50">
-              {loading || saving ? <FaSpinner className="animate-spin" /> : <FaSave />} Save settings
-            </button>
-          </div>
-        </section>
-
-        <section className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-          <div className="flex items-center gap-4 border-b border-slate-100 px-5 py-5 sm:px-6"><span className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-xl text-[#174A9B]"><FaEnvelope /></span><div><h2 className="font-bold text-slate-900">Contact form notification</h2><p className="mt-1 text-sm text-slate-500">New website contact requests will be emailed to this address.</p></div></div>
-          <div className="grid gap-5 p-5 sm:p-6 md:grid-cols-2"><div><label htmlFor="contact-recipient-email" className="block text-sm font-bold text-slate-800">Recipient email</label><input id="contact-recipient-email" type="email" value={contactRecipientEmail} disabled={loading || saving} onChange={(event) => setContactRecipientEmail(event.target.value)} placeholder="admin@permisgo.com" className="mt-3 h-12 w-full rounded-xl border border-slate-200 px-4 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" /><p className="mt-2 text-xs text-slate-500">Contact form notifications are delivered here.</p></div><div><label htmlFor="whatsapp-number" className="block text-sm font-bold text-slate-800">WhatsApp number</label><input id="whatsapp-number" type="tel" value={whatsappNumber} disabled={loading || saving} onChange={(event) => setWhatsappNumber(event.target.value)} placeholder="+33 6 12 34 56 78" className="mt-3 h-12 w-full rounded-xl border border-slate-200 px-4 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" /><p className="mt-2 text-xs text-slate-500">Include the country code. This controls the public floating button.</p></div><div className="md:col-span-2"><p className="text-xs text-slate-500">SMTP must be configured for email delivery. Contact submissions are always saved in Admin → Support.</p><button type="button" onClick={handleSave} disabled={loading || saving || (contactRecipientEmail.trim() === savedContactRecipientEmail && whatsappNumber.trim() === savedWhatsappNumber)} className="mt-4 inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-[#174A9B] px-5 text-sm font-bold text-white disabled:opacity-50">{saving ? <FaSpinner className="animate-spin" /> : <FaSave />} Save contact settings</button></div></div>
-        </section>
-      </div>
-    </main>
-  );
+  return <main className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-8"><div className="mx-auto max-w-5xl"><h1 className="text-2xl font-bold text-slate-900">Settings</h1><p className="mt-2 text-sm text-slate-500">Manage company details and platform-wide configuration.</p>
+    {section("Driving requirements", "These targets apply to every student.", <div className="grid gap-5 p-5 sm:p-6 md:grid-cols-2"><Field label="Required driving hours"><input type="number" min="1" max="200" value={form.requiredHours} onChange={(e) => update("requiredHours", e.target.value)} className={inputClass} /></Field><Field label="Required skills percentage"><input type="number" min="1" max="100" value={form.requiredSkillsPercentage} onChange={(e) => update("requiredSkillsPercentage", e.target.value)} className={inputClass} /></Field></div>)}
+    {section("Contact notification", "New contact submissions are emailed to this address when SMTP is configured.", <div className="p-5 sm:p-6"><Field label="Notification recipient email"><input type="email" value={form.contactRecipientEmail} onChange={(e) => update("contactRecipientEmail", e.target.value)} className={inputClass} /></Field></div>)}
+    {section("Company, contact and social details", "These details appear across the public website.", <div className="grid gap-5 p-5 sm:p-6 md:grid-cols-2">{fields.map(([key, label, type]) => <div key={key} className={key === "address" || key === "address2" ? "md:col-span-2" : ""}><Field label={label}><input type={type} value={form[key] || ""} onChange={(e) => update(key, e.target.value)} className={inputClass} /></Field></div>)}</div>)}
+    <button type="button" onClick={save} disabled={loading || saving || JSON.stringify(form) === JSON.stringify(saved)} className="mt-6 inline-flex h-12 items-center gap-2 rounded-xl bg-[#174A9B] px-6 text-sm font-bold text-white disabled:opacity-50">{loading || saving ? <FaSpinner className="animate-spin" /> : <FaSave />} Save all settings</button>
+  </div></main>;
 }
+
+function Field({ label, children }) { return <label className="block text-sm font-bold text-slate-800">{label}{children}</label>; }

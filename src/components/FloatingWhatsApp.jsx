@@ -1,23 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { FaWhatsapp } from "react-icons/fa";
-import { getPublicContactConfig } from "@/features/API";
+import useSiteSettings from "@/hooks/useSiteSettings";
 
 export default function FloatingWhatsApp() {
-  const [number, setNumber] = useState("");
-
-  useEffect(() => {
-    getPublicContactConfig()
-      .then((response) => setNumber(String(response.data?.data?.whatsappNumber || "").replace(/\D/g, "")))
-      .catch(() => setNumber(""));
-  }, []);
-
-  if (!number) return null;
+  const settings = useSiteSettings();
+  const whatsappUrl = settings.whatsappUrl || `https://wa.me/${String(settings.whatsappNumber).replace(/\D/g, "")}`;
 
   return (
     <a
-      href={`https://wa.me/${number}`}
+      href={whatsappUrl}
       target="_blank"
       rel="noreferrer"
       aria-label="Chat with PermisGo on WhatsApp"

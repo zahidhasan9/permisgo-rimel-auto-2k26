@@ -15,16 +15,28 @@ import { Autoplay, FreeMode, Navigation } from "swiper/modules";
 import { FaQuoteLeft, FaStar } from "react-icons/fa";
 import { FaArrowLeftLong, FaArrowRightLong } from "react-icons/fa6";
 import { getTestimonials } from "@/features/API";
+import useCurrentLanguage from "@/hooks/useCurrentLanguage";
 
 const Testimonials = () => {
+  const language = useCurrentLanguage();
+  const copy = {
+    en: { label: "Testimonials", title: "What Our Students Say", text: "Real feedback from learners who trusted our instructors and completed their driving journey with confidence.", view: "View All Reviews", previous: "Previous testimonial", next: "Next testimonial" },
+    bn: { label: "প্রশংসাপত্র", title: "আমাদের শিক্ষার্থীরা যা বলেন", text: "আমাদের প্রশিক্ষকদের বিশ্বাস করে আত্মবিশ্বাসের সঙ্গে ড্রাইভিং শেখা সম্পন্ন করা শিক্ষার্থীদের বাস্তব মতামত।", view: "সব রিভিউ দেখুন", previous: "আগের প্রশংসাপত্র", next: "পরের প্রশংসাপত্র" },
+    fr: { label: "Témoignages", title: "Ce que disent nos élèves", text: "Les avis authentiques des élèves qui ont fait confiance à nos moniteurs et terminé leur apprentissage avec assurance.", view: "Voir tous les avis", previous: "Témoignage précédent", next: "Témoignage suivant" },
+  }[language] || null;
   const swiperRefTwo = useRef(null);
   const [testimonials, setTestimonials] = useState([]);
-  useEffect(() => { getTestimonials().then(({ data }) => setTestimonials(data?.data || [])).catch(() => setTestimonials([])); }, []);
+  useEffect(() => {
+    if (!language) return;
+    let active = true;
+    getTestimonials({ lang: language }).then(({ data }) => { if (active) setTestimonials(data?.data || []); }).catch(() => { if (active) setTestimonials([]); });
+    return () => { active = false; };
+  }, [language]);
 
   if (!testimonials.length) return null;
 
   return (
-    <section className="relative overflow-hidden bg-slate-50 px-4 py-12 sm:px-6 lg:px-12">
+    <section data-no-translate className="relative overflow-hidden bg-slate-50 px-4 py-12 sm:px-6 lg:px-12">
       {/* Soft Background Shape */}
       <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-blue-100 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-24 -left-20 h-72 w-72 rounded-full bg-orange-100 blur-3xl" />
@@ -34,16 +46,15 @@ const Testimonials = () => {
         <div className="mb-8 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
           <div className="max-w-xl">
             <span className="inline-flex rounded-full bg-white px-4 py-1.5 text-sm font-semibold text-orange-500 shadow-sm ring-1 ring-slate-100">
-              Testimonials
+              {copy.label}
             </span>
 
             <h2 className="mt-4 text-2xl font-bold leading-tight text-slate-950 sm:text-3xl lg:text-4xl">
-              What Our Students Say
+              {copy.title}
             </h2>
 
             <p className="mt-3 text-sm leading-6 text-slate-600 sm:text-base">
-              Real feedback from learners who trusted our instructors and
-              completed their driving journey with confidence.
+              {copy.text}
             </p>
           </div>
 
@@ -52,7 +63,7 @@ const Testimonials = () => {
               type="button"
               onClick={() => swiperRefTwo.current?.slidePrev()}
               className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-900 shadow-sm transition hover:border-blue-600 hover:bg-blue-600 hover:text-white"
-              aria-label="Previous testimonial"
+              aria-label={copy.previous}
             >
               <FaArrowLeftLong className="text-sm" />
             </button>
@@ -61,7 +72,7 @@ const Testimonials = () => {
               type="button"
               onClick={() => swiperRefTwo.current?.slideNext()}
               className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-900 shadow-sm transition hover:border-blue-600 hover:bg-blue-600 hover:text-white"
-              aria-label="Next testimonial"
+              aria-label={copy.next}
             >
               <FaArrowRightLong className="text-sm" />
             </button>
@@ -153,7 +164,7 @@ const Testimonials = () => {
               href="/reviews"
               className="inline-flex min-h-[42px] items-center justify-center rounded-[8px] bg-[#E2233D] px-7 text-[13px] font-extrabold text-white shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-white hover:text-[#174A9B]"
             >
-              View All Reviews
+              {copy.view}
             </Link>
         </div>
       </div>

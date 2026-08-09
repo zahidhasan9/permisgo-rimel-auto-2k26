@@ -12,6 +12,7 @@ import {
 } from "react-icons/fa";
 
 import { getBlog, getBlogs } from "@/features/API";
+import useCurrentLanguage from "@/hooks/useCurrentLanguage";
 
 const formatDate = (value) =>
   new Date(value).toLocaleDateString("en-GB", {
@@ -22,13 +23,18 @@ const formatDate = (value) =>
 
 export default function BlogDetailsPage() {
   const { blog: slug } = useParams();
+  const language = useCurrentLanguage();
   const [post, setPost] = useState(null);
   const [recentPosts, setRecentPosts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([getBlog(slug), getBlogs({ limit: 6 })])
+    if (!language) return;
+    let active = true;
+    setLoading(true);
+    Promise.all([getBlog(slug, { lang: language }), getBlogs({ limit: 6, lang: language })])
       .then(([postResponse, listResponse]) => {
+        if (!active) return;
         const current = postResponse.data?.data;
         setPost(current);
         setRecentPosts(
@@ -37,8 +43,9 @@ export default function BlogDetailsPage() {
             .slice(0, 5),
         );
       })
-      .finally(() => setLoading(false));
-  }, [slug]);
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, [slug, language]);
 
   if (loading)
     return (
@@ -60,7 +67,7 @@ export default function BlogDetailsPage() {
     <section className="bg-white px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-[72px]">
       <div className="mx-auto grid max-w-[1180px] items-start gap-6 lg:grid-cols-[minmax(0,1fr)_270px]">
         <article className="rounded-[12px] bg-[#dfe7f3] p-4 shadow-[0_2px_4px_rgba(15,54,119,0.06)] sm:p-[18px]">
-          <h1 className="text-[19px] font-extrabold leading-snug text-[#161d2a] sm:text-[21px]">
+          <h1 data-no-translate className="text-[19px] font-extrabold leading-snug text-[#161d2a] sm:text-[21px]">
             {post.title}
           </h1>
           <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-[12px] font-medium text-slate-700 sm:text-[13px]">
@@ -89,7 +96,7 @@ export default function BlogDetailsPage() {
               className="object-cover"
             />
           </div>
-          <div
+          <div data-no-translate
             className="blog-article pb-1 pt-5 text-[14px] leading-[1.75] text-slate-700 sm:text-[15px]"
             dangerouslySetInnerHTML={{ __html: post.content }}
           />
@@ -114,7 +121,7 @@ export default function BlogDetailsPage() {
                     className="object-cover transition duration-500 group-hover:scale-105"
                   />
                 </div>
-                <h3 className="line-clamp-2 text-[12px] font-semibold leading-[1.45] text-slate-800 transition group-hover:text-[#174a9b]">
+                <h3 data-no-translate className="line-clamp-2 text-[12px] font-semibold leading-[1.45] text-slate-800 transition group-hover:text-[#174a9b]">
                   {item.title}
                 </h3>
               </Link>

@@ -1206,7 +1206,8 @@ import { Autoplay, FreeMode, Navigation } from "swiper/modules";
 import Footer from "@/components/footer";
 import Navbar from "@/components/navbar";
 import Testimonials from "@/components/testimonials";
-import { getBlogs, getFaqs, getPublicTeachers } from "@/features/API";
+import { createContactSubmission, getBlogs, getFaqs, getPublicTeachers } from "@/features/API";
+import useCurrentLanguage from "@/hooks/useCurrentLanguage";
 import { mediaUrl } from "@/utils/mediaUrl";
 
 import blogImg from "../../public/image/blog.jpg";
@@ -1293,6 +1294,43 @@ const services = [
   { img: hser8, title: "Permis Accelere", price: "20hr - 990£" },
   { img: hser9, title: "Code Accelere", price: "20hr - 990£" },
 ];
+
+const localizedHomeContent = {
+  en: {
+    heroTitle: "Drive toward freedom with PermisGo",
+    servicesLabel: "Services",
+    servicesTitle: "Your driving licence with PermisGo",
+    learnMore: "Learn more",
+    viewServices: "View Other Services",
+    blogLabel: "Blog", blogTitle: "News and Insights", readMore: "Read More", viewBlogs: "View All Blogs",
+    serviceTitles: ["Manual category B licence", "Automatic category B licence", "Accompanied driving", "Supervised driving (AAC)", "Classroom Highway Code", "Online Highway Code", "Supervised driving", "Accelerated licence", "Accelerated Highway Code"],
+  },
+  bn: {
+    heroTitle: "PermisGo-এর সঙ্গে স্বাধীনতার পথে গাড়ি চালান",
+    servicesLabel: "সেবাসমূহ",
+    servicesTitle: "PermisGo-এর সঙ্গে আপনার ড্রাইভিং লাইসেন্স",
+    learnMore: "আরও জানুন",
+    viewServices: "অন্যান্য সেবা দেখুন",
+    blogLabel: "ব্লগ", blogTitle: "সংবাদ ও গুরুত্বপূর্ণ তথ্য", readMore: "আরও পড়ুন", viewBlogs: "সব ব্লগ দেখুন",
+    serviceTitles: ["ম্যানুয়াল ক্যাটাগরি বি লাইসেন্স", "অটোমেটিক ক্যাটাগরি বি লাইসেন্স", "সহযোগী ড্রাইভিং", "তত্ত্বাবধানে ড্রাইভিং (AAC)", "ক্লাসরুম হাইওয়ে কোড", "অনলাইন হাইওয়ে কোড", "তত্ত্বাবধানে ড্রাইভিং", "দ্রুত লাইসেন্স কোর্স", "দ্রুত হাইওয়ে কোড"],
+  },
+  fr: {
+    heroTitle: "Conduisez vers la liberté avec PermisGo",
+    servicesLabel: "Services",
+    servicesTitle: "Votre permis de conduire avec PermisGo",
+    learnMore: "En savoir plus",
+    viewServices: "Voir les autres services",
+    blogLabel: "Blog", blogTitle: "Actualités et conseils", readMore: "Lire la suite", viewBlogs: "Voir tous les articles",
+    serviceTitles: ["Permis B conduite manuelle", "Permis B conduite automatique", "Conduite accompagnée", "Conduite supervisée (AAC)", "Code en salle", "Code en ligne", "Conduite supervisée", "Permis accéléré", "Code accéléré"],
+  },
+};
+
+const banglaDigits = (value) => String(value).replace(/\d/g, (digit) => "০১২৩৪৫৬৭৮৯"[Number(digit)]);
+const localizedHomePrice = (value, language) => {
+  if (language !== "bn") return value;
+  if (value === "20hr - 990£") return "২০ ঘণ্টা - ৯৯০£";
+  return banglaDigits(value);
+};
 
 const instructors = [
   instruc1,
@@ -1393,6 +1431,8 @@ function Stars({ center = true }) {
 }
 
 export default function Home() {
+  const language = useCurrentLanguage();
+  const homeContent = localizedHomeContent[language] || localizedHomeContent.en;
   const router = useRouter();
   const { token, user, role } = useSelector((state) => state.user);
   const swiperRefOne = useRef(null);
@@ -1431,7 +1471,9 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState("manual");
   const [openFaq, setOpenFaq] = useState(0);
   const [homeBlogs, setHomeBlogs] = useState([]);
-  const [homeFaqs, setHomeFaqs] = useState(fallbackFaqs);
+  const [homeFaqs, setHomeFaqs] = useState([]);
+  const [homeFaqLoading, setHomeFaqLoading] = useState(true);
+  const [homeFaqError, setHomeFaqError] = useState("");
   const [teacherSearch, setTeacherSearch] = useState("");
   const [nearbyTeachers, setNearbyTeachers] = useState([]);
   const [selectedNearbyTeacher, setSelectedNearbyTeacher] = useState(null);
@@ -1439,6 +1481,10 @@ export default function Home() {
   const [teacherSearchDone, setTeacherSearchDone] = useState(false);
   const [homeInstructors, setHomeInstructors] = useState([]);
   const [homeInstructorsLoading, setHomeInstructorsLoading] = useState(true);
+  const [contactForm, setContactForm] = useState({ firstName:"",lastName:"",email:"",phone:"",subject:"",location:"",description:"" });
+  const [contactSubmitting, setContactSubmitting] = useState(false);
+  const updateContact = (event) => setContactForm((current) => ({ ...current, [event.target.name]: event.target.value }));
+  const submitContact = async (event) => { event.preventDefault(); setContactSubmitting(true); try { await createContactSubmission(contactForm); setContactForm({ firstName:"",lastName:"",email:"",phone:"",subject:"",location:"",description:"" }); toast.success("Your message has been sent successfully."); } catch (error) { toast.error(error.response?.data?.message || "Your message could not be sent."); } finally { setContactSubmitting(false); } };
 
   const dynamicMapSrc = useMemo(() => {
     const location = selectedNearbyTeacher?.locations?.[0];
@@ -1522,10 +1568,13 @@ export default function Home() {
   };
 
   useEffect(() => {
-    getBlogs({ limit: 4 })
-      .then(({ data }) => setHomeBlogs(data?.data || []))
-      .catch(() => setHomeBlogs([]));
-  }, []);
+    if (!language) return;
+    let active = true;
+    getBlogs({ limit: 4, lang: language })
+      .then(({ data }) => { if (active) setHomeBlogs(data?.data || []); })
+      .catch(() => { if (active) setHomeBlogs([]); });
+    return () => { active = false; };
+  }, [language]);
 
   useEffect(() => {
     getPublicTeachers()
@@ -1539,11 +1588,25 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    getFaqs({ section: "home" }).then(({ data }) => {
-      const items = (data?.data || []).map((item) => ({ q: item.question, a: item.answer, id: item._id }));
-      if (items.length) setHomeFaqs(items);
-    });
-  }, []);
+    if (!language) return;
+    let active = true;
+    setHomeFaqLoading(true);
+    setHomeFaqError("");
+    getFaqs({ section: "home", lang: language })
+      .then(({ data }) => {
+        if (!active) return;
+        const items = (data?.data || []).map((item) => ({ q: item.question, a: item.answer, id: item._id }));
+        setHomeFaqs(items);
+        setOpenFaq(items.length ? 0 : null);
+      })
+      .catch(() => {
+        if (!active) return;
+        setHomeFaqs([]);
+        setHomeFaqError("FAQs could not be loaded. Please try again.");
+      })
+      .finally(() => { if (active) setHomeFaqLoading(false); });
+    return () => { active = false; };
+  }, [language]);
 
   return (
     <div className="permisgo-page">
@@ -1563,7 +1626,7 @@ export default function Home() {
         <div className="pointer-events-none absolute inset-0 bg-[#00132f]/10" />
 
         <div className="relative z-10 mx-auto w-full max-w-[1320px] px-5 sm:px-7 lg:px-8">
-          <div className="relative min-h-[520px] py-8 sm:py-10 lg:h-[520px] lg:py-[30px]">
+          <div className="relative min-h-[610px] py-8 sm:py-10 lg:h-[610px] lg:py-[30px]">
             {/* Left content */}
             <div className="relative z-20 w-full lg:w-[59%]">
               {/* Approval badge */}
@@ -1574,8 +1637,8 @@ export default function Home() {
               </div>
 
               {/* Heading */}
-              <h1 className="mt-3 max-w-[680px] text-[31px] font-black leading-[1.12] tracking-[-0.7px] text-white drop-shadow-sm sm:text-[36px] lg:text-[39px] xl:text-[42px]">
-                Conduisez vers la liberté, Per|
+              <h1 data-no-translate className="mt-3 max-w-[680px] text-[31px] font-black leading-[1.12] tracking-[-0.7px] text-white drop-shadow-sm sm:text-[36px] lg:text-[39px] xl:text-[42px]">
+                {homeContent.heroTitle}
               </h1>
 
               {/* Description */}
@@ -1619,8 +1682,8 @@ export default function Home() {
                           {offer.title}
                         </h4>
 
-                        <p className="mt-1 text-[11px] font-bold text-[#27d26b] line-through">
-                          {offer.oldPrice}
+                        <p data-no-translate className="mt-1 text-[11px] font-bold text-[#27d26b] line-through">
+                          {localizedHomePrice(offer.oldPrice, language)}
                         </p>
                       </div>
 
@@ -1639,8 +1702,8 @@ export default function Home() {
                           of the
                         </p>
 
-                        <h3 className="mt-1 text-[22px] font-black leading-none text-white">
-                          {offer.price}
+                        <h3 data-no-translate className="mt-1 text-[22px] font-black leading-none text-white">
+                          {localizedHomePrice(offer.price, language)}
                         </h3>
                       </div>
 
@@ -1713,16 +1776,16 @@ export default function Home() {
       </section>
 
       {/* Services */}
-      <section className="bg-white py-[60px] md:py-[78px]">
+      <section data-no-translate className="bg-white py-[60px] md:py-[78px]">
         <div className="mx-auto w-full max-w-[1320px] px-4 sm:px-6">
           {/* Section heading */}
           <div className="text-center">
             <span className="inline-flex min-h-[30px] items-center justify-center rounded-[7px] bg-[#E7ECF4] px-[14px] text-[15px] font-semibold text-[#20C943]">
-              Services
+              {homeContent.servicesLabel}
             </span>
 
             <h2 className="mt-5 text-[25px] font-extrabold leading-tight text-[#202020] md:text-[33px]">
-              Your driving licence with Permisgo
+              {homeContent.servicesTitle}
             </h2>
           </div>
 
@@ -1744,7 +1807,7 @@ export default function Home() {
                   <div className="flex h-[70px] w-[78px] items-center justify-center">
                     <Image
                       src={service.img}
-                      alt={service.title}
+                      alt=""
                       sizes="78px"
                       className="max-h-[70px] w-auto max-w-[78px] object-contain"
                     />
@@ -1752,12 +1815,12 @@ export default function Home() {
 
                   {/* Service title */}
                   <h4 className="mt-5 min-h-[42px] max-w-[240px] text-[17px] font-extrabold leading-[21px] text-[#101010]">
-                    {service.title}
+                    {homeContent.serviceTitles[index] || service.title}
                   </h4>
 
                   {/* Price */}
                   <p className="mt-1 text-[18px] font-bold leading-5 text-[#16C53A]">
-                    {service.price}
+                    {localizedHomePrice(service.price, language)}
                   </p>
 
                   {/* Button */}
@@ -1772,7 +1835,7 @@ export default function Home() {
                       "focus:outline-none focus:ring-2 focus:ring-[#ED1F3B]/30",
                     )}
                   >
-                    Learn more
+                    {homeContent.learnMore}
                   </Link>
                 </div>
               ))}
@@ -1784,7 +1847,7 @@ export default function Home() {
               href="/services"
               className="inline-flex min-h-[42px] items-center justify-center rounded-[8px] bg-[#E2233D] px-7 text-[13px] font-extrabold text-white shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#174A9B]"
             >
-              View Other Services
+              {homeContent.viewServices}
             </Link>
           </div>
         </div>
@@ -2241,7 +2304,7 @@ export default function Home() {
                   Fill out this form with necessary information
                 </p>
 
-                <form className="mt-[24px]">
+                <form className="mt-[24px]" onSubmit={submitContact}>
                   <div className="grid grid-cols-1 gap-x-[20px] gap-y-[18px] sm:grid-cols-2">
                     {/* First name */}
                     <div>
@@ -2255,6 +2318,10 @@ export default function Home() {
                       <input
                         type="text"
                         id="first-name"
+                        name="firstName"
+                        value={contactForm.firstName}
+                        onChange={updateContact}
+                        required
                         placeholder="Write name here"
                         className="h-[38px] w-full rounded-[8px] border border-[#C8D1DD] bg-white px-[13px] text-[10px] font-medium text-[#25282D] outline-none placeholder:text-[#A0A5AD] focus:border-[#174B9B] focus:ring-2 focus:ring-[#174B9B]/10"
                       />
@@ -2272,6 +2339,10 @@ export default function Home() {
                       <input
                         type="text"
                         id="last-name"
+                        name="lastName"
+                        value={contactForm.lastName}
+                        onChange={updateContact}
+                        required
                         placeholder="Write name here"
                         className="h-[38px] w-full rounded-[8px] border border-[#C8D1DD] bg-white px-[13px] text-[10px] font-medium text-[#25282D] outline-none placeholder:text-[#A0A5AD] focus:border-[#174B9B] focus:ring-2 focus:ring-[#174B9B]/10"
                       />
@@ -2289,6 +2360,10 @@ export default function Home() {
                       <input
                         type="email"
                         id="email"
+                        name="email"
+                        value={contactForm.email}
+                        onChange={updateContact}
+                        required
                         placeholder="Write Email address"
                         className="h-[38px] w-full rounded-[8px] border border-[#C8D1DD] bg-white px-[13px] text-[10px] font-medium text-[#25282D] outline-none placeholder:text-[#A0A5AD] focus:border-[#174B9B] focus:ring-2 focus:ring-[#174B9B]/10"
                       />
@@ -2306,10 +2381,17 @@ export default function Home() {
                       <input
                         type="tel"
                         id="phone-number"
+                        name="phone"
+                        value={contactForm.phone}
+                        onChange={updateContact}
+                        required
                         placeholder="Write phone number"
                         className="h-[38px] w-full rounded-[8px] border border-[#C8D1DD] bg-white px-[13px] text-[10px] font-medium text-[#25282D] outline-none placeholder:text-[#A0A5AD] focus:border-[#174B9B] focus:ring-2 focus:ring-[#174B9B]/10"
                       />
                     </div>
+
+                    <div><label htmlFor="contact-subject" className="mb-[8px] block text-[13px] font-semibold leading-none text-[#25282D]">Subject</label><input id="contact-subject" name="subject" value={contactForm.subject} onChange={updateContact} required placeholder="Write subject" className="h-[38px] w-full rounded-[8px] border border-[#C8D1DD] bg-white px-[13px] text-[10px] outline-none" /></div>
+                    <div><label htmlFor="contact-location" className="mb-[8px] block text-[13px] font-semibold leading-none text-[#25282D]">Location</label><input id="contact-location" name="location" value={contactForm.location} onChange={updateContact} required placeholder="Write location" className="h-[38px] w-full rounded-[8px] border border-[#C8D1DD] bg-white px-[13px] text-[10px] outline-none" /></div>
 
                     {/* Message */}
                     <div className="sm:col-span-2">
@@ -2322,6 +2404,10 @@ export default function Home() {
 
                       <textarea
                         id="question"
+                        name="description"
+                        value={contactForm.description}
+                        onChange={updateContact}
+                        required
                         placeholder="Write message"
                         className="h-[172px] w-full resize-none rounded-[8px] border border-[#C8D1DD] bg-white px-[13px] py-[12px] text-[10px] font-medium leading-[16px] text-[#25282D] outline-none placeholder:text-[#A0A5AD] focus:border-[#174B9B] focus:ring-2 focus:ring-[#174B9B]/10"
                       />
@@ -2331,9 +2417,10 @@ export default function Home() {
                     <div className="sm:col-span-2">
                       <button
                         type="submit"
+                        disabled={contactSubmitting}
                         className="inline-flex h-[40px] min-w-[82px] items-center justify-center rounded-[7px] bg-[#E4223C] px-[20px] text-[13px] font-bold text-white transition-colors duration-300 hover:bg-[#C91830]"
                       >
-                        Submit
+                        {contactSubmitting ? "Sending..." : "Submit"}
                       </button>
                     </div>
                   </div>
@@ -2342,13 +2429,16 @@ export default function Home() {
             </div>
 
             {/* Right accordion */}
-            <div className="space-y-[20px]">
+            <div data-no-translate className="space-y-[20px]">
+              {homeFaqLoading && <p className="rounded-[8px] bg-[#F4F6F9] p-6 text-center text-sm text-[#4F555E]">Loading FAQs...</p>}
+              {!homeFaqLoading && homeFaqError && <p className="rounded-[8px] bg-red-50 p-6 text-center text-sm text-red-600">{homeFaqError}</p>}
+              {!homeFaqLoading && !homeFaqError && homeFaqs.length === 0 && <p className="rounded-[8px] bg-[#F4F6F9] p-6 text-center text-sm text-[#4F555E]">No FAQs are available.</p>}
               {homeFaqs.map((faq, index) => {
                 const isOpen = openFaq === index;
 
                 return (
                   <div
-                    key={index}
+                    key={faq.id || index}
                     className="overflow-hidden rounded-[8px] bg-[#F4F6F9]"
                   >
                     <button
@@ -2468,9 +2558,9 @@ export default function Home() {
       </section>
 
       {/* Blog */}
-      <section className={cn(section, "bg-white")}>
+      <section data-no-translate className={cn(section, "bg-white")}>
         <div className={container}>
-          <SectionHeading small="Blog" title="News and Insights" />
+          <SectionHeading small={homeContent.blogLabel} title={homeContent.blogTitle} />
 
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
             {homeBlogs.map((item) => (
@@ -2483,7 +2573,7 @@ export default function Home() {
               >
                 <Image
                   src={item.coverImage || blogImg}
-                  alt={item.title}
+                  alt=""
                   width={500}
                   height={260}
                   sizes="(max-width: 768px) 100vw, 25vw"
@@ -2501,7 +2591,7 @@ export default function Home() {
 
                   <div className="mt-4">
                     <Link href={`/blogs/${item.slug}`} className={outlineBtn}>
-                      Read More
+                      {homeContent.readMore}
                     </Link>
                   </div>
                 </div>
@@ -2511,7 +2601,7 @@ export default function Home() {
 
           <div className="mt-8 text-center">
             <Link href="/blogs" className={primaryBtn}>
-              View All Blogs
+              {homeContent.viewBlogs}
             </Link>
           </div>
         </div>

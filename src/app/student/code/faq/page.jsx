@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getFaqs } from "@/features/API";
 import { IoChevronBack, IoChevronDown } from "react-icons/io5";
+import useCurrentLanguage from "@/hooks/useCurrentLanguage";
 
 const fallbackFaqs = [
   {
@@ -27,15 +28,20 @@ const fallbackFaqs = [
 ];
 
 export default function Page() {
+  const language = useCurrentLanguage();
   const [faqs, setFaqs] = useState(fallbackFaqs);
   const [openId, setOpenId] = useState(1);
 
   useEffect(() => {
-    getFaqs({ section: "driving-code" }).then(({ data }) => {
+    if (!language) return;
+    let active = true;
+    getFaqs({ section: "driving-code", lang: language }).then(({ data }) => {
+      if (!active) return;
       const items = data?.data || [];
       if (items.length) { setFaqs(items); setOpenId(items[0]._id); }
     });
-  }, []);
+    return () => { active = false; };
+  }, [language]);
 
   const toggleFaq = (id) => {
     setOpenId((prev) => (prev === id ? null : id));

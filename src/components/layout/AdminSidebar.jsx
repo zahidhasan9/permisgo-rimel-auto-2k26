@@ -202,6 +202,10 @@ const menu = [
     icon: MdOutlineSupportAgent,
     children: [
       {
+        name: "Appointments",
+        href: "/admin/appointments",
+      },
+      {
         name: "Support Tickets",
         href: "/admin/support",
       },

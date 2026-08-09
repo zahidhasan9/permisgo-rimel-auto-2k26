@@ -15,6 +15,7 @@ import TeacherSidebar from "@/components/layout/TeacherSidebar";
 import PresenceConnection from "@/components/chat/PresenceConnection";
 import BottomMenu from "@/components/bottom-menu";
 import FloatingWhatsApp from "@/components/FloatingWhatsApp";
+import HomeStaticTranslator from "@/components/HomeStaticTranslator";
 
 const authRoots = [
   "/login",
@@ -74,8 +75,8 @@ export default function AppShell({ children }) {
     return <><StudentAuthNavbar /><PublicOnlyRoute>{children}</PublicOnlyRoute></>;
   }
   if (pathname === "/") {
-    return <div className="max-[500px]:pb-[68px]">{children}<FloatingWhatsApp /><BottomMenu /></div>;
+    return <div data-public-site className="max-[500px]:pb-[68px]"><HomeStaticTranslator />{children}<FloatingWhatsApp /><BottomMenu /></div>;
   }
   if (isPathWithin(pathname, "/chat")) return children;
-  return <div className="max-[500px]:pb-[68px]"><Navbar /><main>{children}</main><Footer /><FloatingWhatsApp /><BottomMenu /></div>;
+  return <div data-public-site className="max-[500px]:pb-[68px]"><HomeStaticTranslator /><Navbar /><main>{children}</main><Footer /><FloatingWhatsApp /><BottomMenu /></div>;
 }
