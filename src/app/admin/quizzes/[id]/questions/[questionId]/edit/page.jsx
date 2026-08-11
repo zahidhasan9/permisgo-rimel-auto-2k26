@@ -76,7 +76,13 @@ export default function EditQuestionPage() {
       setError("");
 
       const res = await getQuestionById(questionId);
-      setQuestion(res.data?.data || null);
+      const payload = res.data?.data ?? res.data;
+      const loadedQuestion = payload?.question ?? payload?.data ?? payload;
+      setQuestion(
+        loadedQuestion && (loadedQuestion._id || loadedQuestion.questionText)
+          ? loadedQuestion
+          : null,
+      );
     } catch (err) {
       setError(
         err.response?.data?.message || err.message || "Failed to load question",

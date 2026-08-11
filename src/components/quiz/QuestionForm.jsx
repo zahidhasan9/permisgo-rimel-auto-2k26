@@ -472,6 +472,7 @@ export default function QuestionForm({
   const [correctOptionIndex, setCorrectOptionIndex] = useState(0);
   const [correctOptionIndexes, setCorrectOptionIndexes] = useState([0]);
   const [multipleAnswers, setMultipleAnswers] = useState(false);
+  const [optionError, setOptionError] = useState("");
   const [explanationText, setExplanationText] = useState("");
   const [topic, setTopic] = useState("");
   const [difficulty, setDifficulty] = useState("medium");
@@ -491,11 +492,17 @@ export default function QuestionForm({
       setSecondaryQuestionText(initialValues.secondaryQuestionText || "");
       setQuestionVideoUrl(initialValues.questionVideoUrl || "");
       setVoiceText(initialValues.voiceText || "");
-      setOptions(
-        initialValues.options?.length === 4
-          ? initialValues.options
-          : emptyOptions,
-      );
+      const savedOptions = Array.isArray(initialValues.options)
+        ? initialValues.options.slice(0, 4).map((option, index) => ({
+            text: option?.text || "",
+            image: option?.image || "",
+            order: option?.order ?? index,
+          }))
+        : [];
+      setOptions([
+        ...savedOptions,
+        ...emptyOptions.slice(savedOptions.length).map((option) => ({ ...option })),
+      ]);
       setCorrectOptionIndex(Number(initialValues.correctOptionIndex || 0));
       const savedCorrectIndexes = initialValues.correctOptionIndexes?.length ? initialValues.correctOptionIndexes.map(Number) : [Number(initialValues.correctOptionIndex || 0)];
       setCorrectOptionIndexes(savedCorrectIndexes);
@@ -509,6 +516,7 @@ export default function QuestionForm({
   }, [initialValues]);
 
   const updateOptionText = (index, value) => {
+    setOptionError("");
     setOptions((prev) =>
       prev.map((option, i) =>
         i === index ? { ...option, text: value } : option,
@@ -526,15 +534,38 @@ export default function QuestionForm({
   const handleSubmit = async (event) => {
     event.preventDefault();
 
+    const submittedOptionEntries = options
+      .map((option, originalIndex) => ({ option, originalIndex }))
+      .filter(({ option }) => promptCount === 2 || option.text.trim());
+    const submittedOptions = submittedOptionEntries.map(({ option }, index) => ({
+      ...option,
+      order: index,
+    }));
+    const submittedCorrectIndexes = correctOptionIndexes
+      .map((correctIndex) =>
+        submittedOptionEntries.findIndex(
+          ({ originalIndex }) => originalIndex === correctIndex,
+        ),
+      )
+      .filter((index) => index >= 0);
+    if (submittedOptions.length < 2) {
+      setOptionError("Please enter at least 2 answer options.");
+      return;
+    }
+    if (!submittedCorrectIndexes.length) {
+      setOptionError("Choose a correct answer from the options that contain text.");
+      return;
+    }
+    setOptionError("");
     const formData = new FormData();
     formData.append("questionText", questionText);
     formData.append("promptCount", String(promptCount));
     formData.append("secondaryQuestionText", promptCount === 2 ? secondaryQuestionText : "");
     formData.append("questionVideoUrl", questionVideoUrl);
     formData.append("voiceText", voiceText);
-    formData.append("options", JSON.stringify(options));
-    formData.append("correctOptionIndex", String(correctOptionIndex));
-    formData.append("correctOptionIndexes", JSON.stringify(correctOptionIndexes));
+    formData.append("options", JSON.stringify(submittedOptions));
+    formData.append("correctOptionIndex", String(submittedCorrectIndexes[0] ?? 0));
+    formData.append("correctOptionIndexes", JSON.stringify(submittedCorrectIndexes));
     formData.append("explanationText", explanationText);
     formData.append("topic", topic);
     formData.append("difficulty", difficulty);
@@ -548,10 +579,12 @@ export default function QuestionForm({
     if (removedImages.question) formData.append("removeQuestionImage", "true");
     if (removedImages.explanation) formData.append("removeExplanationImage", "true");
     if (removedImages.markedAnswer) formData.append("removeMarkedAnswerImage", "true");
-    removedImages.options.forEach((removed, index) => { if (removed) formData.append(`removeOptionImage${index}`, "true"); });
-
-    optionImages.forEach((file, index) => {
-      if (file) formData.append(`optionImage${index}`, file);
+    submittedOptionEntries.forEach(({ originalIndex }, submittedIndex) => {
+      if (removedImages.options[originalIndex]) {
+        formData.append(`removeOptionImage${submittedIndex}`, "true");
+      }
+      const file = optionImages[originalIndex];
+      if (file) formData.append(`optionImage${submittedIndex}`, file);
     });
 
     await onSubmit(formData);
@@ -643,8 +676,9 @@ export default function QuestionForm({
               <div>
                 <h3 className="text-sm font-bold text-slate-900">Answer Options</h3>
                 <p className="mt-0.5 text-[11px] font-medium text-slate-400">
-                  {promptCount === 2 ? "Choose one correct answer in A/B and one in C/D." : "Add four options and choose the correct answer."}
+                  {promptCount === 2 ? "Choose one correct answer in A/B and one in C/D." : "Add 2 to 4 options and choose the correct answer."}
                 </p>
+                {optionError && <p className="mt-1 text-[11px] font-bold text-red-600">{optionError}</p>}
               </div>
 
               <Badge tone="sky">
@@ -685,8 +719,8 @@ export default function QuestionForm({
                           updateOptionText(index, e.target.value)
                         }
                         className={inputClass}
-                        placeholder={`Option ${index + 1}`}
-                        required
+                        placeholder={`Option ${index + 1}${promptCount === 1 && index >= 2 ? " (optional)" : ""}`}
+                        required={promptCount === 2}
                       />
 
                       <label className="flex h-9 cursor-pointer items-center justify-center rounded-xl border border-dashed border-slate-300 bg-[#f8f8fb] px-2 text-center text-[11px] font-bold text-slate-600 transition hover:border-violet-300 hover:bg-violet-50/40">
