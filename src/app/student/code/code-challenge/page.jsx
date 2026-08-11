@@ -572,7 +572,13 @@ import {
 } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FaExpandArrowsAlt } from "react-icons/fa";
-import { IoChevronBack, IoVolumeHigh, IoVolumeMute } from "react-icons/io5";
+import {
+  IoChevronBack,
+  IoChevronForward,
+  IoHome,
+  IoVolumeHigh,
+  IoVolumeMute,
+} from "react-icons/io5";
 import { TbClockHour4 } from "react-icons/tb";
 
 import {
@@ -885,9 +891,34 @@ function QuizContent() {
   };
 
   return (
-    <main className="min-h-screen overflow-x-hidden bg-white px-3 py-4 text-[#171717] sm:px-6 sm:py-6">
-      <div ref={panelRef} className="mx-auto w-full max-w-[1084px] bg-white">
-        <header className="mb-4 flex min-h-10 items-center gap-3 sm:mb-8 sm:h-11 sm:gap-4">
+    <main className="min-h-screen overflow-x-hidden bg-[#111] text-[#171717] sm:bg-white sm:px-6 sm:py-6">
+      <div ref={panelRef} className="mx-auto min-h-screen w-full max-w-[1084px] bg-[#111] sm:min-h-0 sm:bg-white">
+        <header className="flex h-11 items-center justify-between bg-[#303435] px-4 text-white sm:hidden">
+          <p className="text-xs font-semibold">
+            Question <span className="text-[#27a9c7]">{currentIndex + 1}</span> / {questions.length}
+          </p>
+          <div className="flex items-center gap-5 text-[#c9cecf]">
+            <button type="button" onClick={speak} title="Read question">
+              {speaking ? <IoVolumeMute size={18} /> : <IoVolumeHigh size={18} />}
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                !document.fullscreenElement
+                  ? panelRef.current?.requestFullscreen?.()
+                  : document.exitFullscreen?.()
+              }
+              title="Fullscreen"
+            >
+              <FaExpandArrowsAlt size={14} />
+            </button>
+            <button type="button" onClick={() => router.push("/student/code")} title="Home">
+              <IoHome size={17} />
+            </button>
+          </div>
+        </header>
+
+        <header className="mb-4 hidden min-h-10 items-center gap-3 sm:mb-8 sm:flex sm:h-11 sm:gap-4">
           <button
             type="button"
             onClick={() => router.back()}
@@ -900,8 +931,8 @@ function QuizContent() {
           </h1>
         </header>
 
-        <section className="rounded-xl bg-[#e8eef7] p-3 sm:min-h-[760px] sm:p-6">
-          <div className="mb-3 flex min-h-7 items-center justify-between text-[#123f88] sm:mb-[30px] sm:h-[30px]">
+        <section className="bg-[#111] pb-[52px] sm:min-h-[760px] sm:rounded-xl sm:bg-[#e8eef7] sm:p-6">
+          <div className="mb-3 hidden min-h-7 items-center justify-between text-[#123f88] sm:mb-[30px] sm:flex sm:h-[30px]">
             <p className="text-[13px] font-bold leading-none sm:text-[16px]">
               Question {currentIndex + 1}/{questions.length}
             </p>
@@ -927,7 +958,7 @@ function QuizContent() {
             </div>
           </div>
 
-          <div className="overflow-hidden rounded-xl bg-white">
+          <div className="flex min-h-[238px] items-center overflow-hidden bg-[#111] py-6 sm:block sm:min-h-0 sm:rounded-xl sm:bg-white sm:py-0">
             {videoEmbedUrl ? (
               <iframe
                 src={videoEmbedUrl}
@@ -946,7 +977,7 @@ function QuizContent() {
               <img
                 src={mediaUrl(image)}
                 alt="Question"
-                className="h-[220px] w-full object-contain sm:h-[439px]"
+                className="max-h-[210px] w-full object-contain sm:h-[439px] sm:max-h-none"
               />
             ) : (
               <div className="flex h-[140px] items-center justify-center px-4 text-center text-sm text-slate-500 sm:h-[439px] sm:text-base">
@@ -955,8 +986,25 @@ function QuizContent() {
             )}
           </div>
 
-          <div className="mt-4 grid gap-5 sm:mt-[32px] sm:gap-7 lg:grid-cols-[559px_1fr]">
-            <div>
+          {feedback && (
+            <div className="mx-1 mb-2 flex h-7 text-[12px] sm:hidden">
+              <span className="flex flex-1 items-center justify-center bg-white text-black">
+                Score {correctPromptCount}/{hasTwoPrompts ? 2 : 1}
+              </span>
+              <span className={`flex flex-1 items-center justify-center text-white ${feedback.isCorrect ? "bg-[#20c23b]" : "bg-[#ef3038]"}`}>
+                {feedback.isCorrect ? "Correct answer" : "Wrong answer"}
+              </span>
+            </div>
+          )}
+
+          <div className="grid min-h-[330px] gap-5 bg-[#303435] px-4 pb-5 pt-4 text-white sm:mt-[32px] sm:min-h-0 sm:gap-7 sm:bg-transparent sm:px-0 sm:pb-0 sm:pt-0 sm:text-[#171717] lg:grid-cols-[559px_1fr]">
+            <div className="flex flex-col justify-center sm:block">
+              {!feedback && (
+                <div className="mb-6 flex flex-col items-center text-[#929899] sm:hidden">
+                  <TbClockHour4 className="h-16 w-16" />
+                  <span className="mt-1 text-xs font-bold">{formattedTime}</span>
+                </div>
+              )}
               {(Number(question.promptCount) === 2
                 ? [
                     { text: question.questionText, start: 0, end: 2 },
@@ -972,13 +1020,13 @@ function QuizContent() {
                       : ""
                   }
                 >
-                  <h2 className="mb-3 text-[14px] font-bold leading-5 sm:mb-[13px] sm:text-[16px]">
+                  <h2 className="mb-3 text-[13px] font-medium leading-5 sm:mb-[13px] sm:text-[16px] sm:font-bold">
                     {Number(question.promptCount) === 2
-                      ? `${promptIndex + 1}. `
+                      ? <span className="hidden sm:inline">{promptIndex + 1}. </span>
                       : ""}
                     {prompt.text}
                   </h2>
-                  <div className="space-y-2 text-[13px] leading-[18px] text-[#123f88] sm:space-y-[13px] sm:text-[16px] sm:leading-5">
+                  <div className="space-y-1 text-[12px] leading-[17px] text-white sm:space-y-[13px] sm:text-[16px] sm:leading-5 sm:text-[#123f88]">
                     {question.options
                       ?.slice(prompt.start, prompt.end)
                       .map((option, localIndex) => {
@@ -986,14 +1034,14 @@ function QuizContent() {
                         return (
                           <div
                             key={index}
-                            className="flex min-w-0 items-center gap-2 rounded-lg bg-white/70 px-3 py-2 sm:gap-3 sm:bg-transparent sm:px-0 sm:py-0 sm:pr-5"
+                            className="flex min-w-0 items-end gap-2 sm:items-center sm:gap-3 sm:pr-5"
                           >
                             <p className="min-w-0 flex-1">
                               <span className="hidden sm:inline">– </span>
                               {option.text}
                             </p>
-                            <span className="mb-[-4px] hidden min-w-8 flex-1 border-b-2 border-dashed border-[#252525] sm:block" />
-                            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#e8eef7] text-[11px] font-bold text-[#123f88] sm:block sm:h-auto sm:min-w-8 sm:bg-transparent sm:text-left sm:text-[16px] sm:font-medium sm:text-slate-900">
+                            <span className="mb-1 min-w-5 flex-1 border-b-2 border-dotted border-white sm:mb-[-4px] sm:border-dashed sm:border-[#252525]" />
+                            <span className={`shrink-0 text-[12px] sm:min-w-8 sm:text-left sm:text-[16px] sm:font-medium sm:text-slate-900 ${selectedIndexes.includes(index) ? "text-[#27b9c8]" : "text-white"}`}>
                               {letter(index)}
                             </span>
                           </div>
@@ -1009,7 +1057,7 @@ function QuizContent() {
               )}
             </div>
 
-            <div className="flex flex-col justify-end">
+            <div className="hidden flex-col justify-end sm:flex">
               {!feedback ? (
                 <div className="mb-3 flex items-center justify-between sm:mb-5 sm:block">
                   <p className="text-[13px] font-bold sm:mb-2 sm:text-base">
@@ -1106,6 +1154,46 @@ function QuizContent() {
                 )}
               </div>
             </div>
+          </div>
+
+          <div className="fixed inset-x-0 bottom-0 z-40 grid h-[52px] grid-cols-5 border-t border-[#bbb] bg-white sm:hidden">
+            {question.options.map((_, index) => {
+              const isCorrect = feedback && (feedback.correctOptionIndexes || [feedback.correctOptionIndex]).map(Number).includes(index);
+              const isWrong = feedback && selectedIndexes.includes(index) && !isCorrect;
+              const isSelected = selectedIndexes.includes(index);
+              return (
+                <button
+                  key={index}
+                  type="button"
+                  disabled={answered || submitting}
+                  onClick={() => selectOption(index)}
+                  className={`border-r border-[#d2d2d2] text-xs font-semibold ${
+                    isCorrect
+                      ? "bg-[#20c23b] text-white"
+                      : isWrong
+                        ? "bg-[#ef3038] text-white"
+                        : isSelected
+                          ? "bg-[#123f88] text-white"
+                          : "bg-white text-black"
+                  }`}
+                >
+                  {letter(index)}
+                </button>
+              );
+            })}
+            <button
+              type="button"
+              disabled={!feedback && (selectedIndexes.length !== requiredAnswerCount || submitting)}
+              onClick={feedback ? next : validate}
+              className={`flex items-center justify-center text-2xl ${
+                feedback || selectedIndexes.length === requiredAnswerCount
+                  ? "bg-[#208b60] text-white"
+                  : "bg-white text-[#777]"
+              } disabled:opacity-60`}
+              title={feedback ? "Next" : "Validate"}
+            >
+              <IoChevronForward />
+            </button>
           </div>
         </section>
       </div>
