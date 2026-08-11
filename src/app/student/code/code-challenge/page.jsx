@@ -751,7 +751,13 @@ function QuizContent() {
   };
 
   const validate = async () => {
-    if (!selectedIndexes.length || answered || submitting || !question?._id)
+    const requiredCount = Number(question?.requiredAnswerCount) || 1;
+    if (
+      selectedIndexes.length !== requiredCount ||
+      answered ||
+      submitting ||
+      !question?._id
+    )
       return;
     setSubmitting(true);
     try {
@@ -836,12 +842,13 @@ function QuizContent() {
     ? youtubeEmbed(question.questionVideoUrl)
     : "";
   const hasTwoPrompts = Number(question.promptCount) === 2;
+  const requiredAnswerCount = Number(question.requiredAnswerCount) || 1;
   const answerGroups = hasTwoPrompts
     ? [
         { label: "Question 1", indexes: [0, 1] },
         { label: "Question 2", indexes: [2, 3] },
       ]
-    : [{ label: "", indexes: [0, 1, 2, 3] }];
+    : [{ label: "", indexes: question.options.map((_, index) => index) }];
   const correctPromptCount = hasTwoPrompts
     ? (feedback?.groupResults || []).filter((result) => result.isCorrect).length
     : feedback?.isCorrect
@@ -865,7 +872,9 @@ function QuizContent() {
         else
           next = current.includes(index)
             ? current.filter((value) => value !== index)
-            : [...current, index].sort();
+            : current.length < requiredAnswerCount
+              ? [...current, index].sort()
+              : current;
         setSelectedIndex(next[0] ?? null);
         return next;
       });
@@ -1004,7 +1013,9 @@ function QuizContent() {
               {!feedback ? (
                 <div className="mb-3 flex items-center justify-between sm:mb-5 sm:block">
                   <p className="text-[13px] font-bold sm:mb-2 sm:text-base">
-                    {hasTwoPrompts ? "Select two answers" : "Select an answer"}
+                    {requiredAnswerCount > 1
+                      ? `Select ${requiredAnswerCount} answers`
+                      : "Select an answer"}
                   </p>
                   <div className="flex items-center gap-1 text-[#123f88] sm:gap-3">
                     <TbClockHour4 className="h-5 w-5 sm:h-[54px] sm:w-[54px]" />
@@ -1074,8 +1085,7 @@ function QuizContent() {
                   <button
                     type="button"
                     disabled={
-                      !selectedIndexes.length ||
-                      (hasTwoPrompts && selectedIndexes.length !== 2) ||
+                      selectedIndexes.length !== requiredAnswerCount ||
                       submitting
                     }
                     onClick={validate}
