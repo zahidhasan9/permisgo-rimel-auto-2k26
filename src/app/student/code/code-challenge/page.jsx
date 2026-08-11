@@ -931,7 +931,7 @@ function QuizContent() {
           </h1>
         </header>
 
-        <section className="bg-[#111] pb-[52px] sm:min-h-[760px] sm:rounded-xl sm:bg-[#e8eef7] sm:p-6">
+        <section className="min-h-[calc(100dvh-44px)] bg-[#303435] pb-[52px] sm:min-h-[760px] sm:rounded-xl sm:bg-[#e8eef7] sm:p-6">
           <div className="mb-3 hidden min-h-7 items-center justify-between text-[#123f88] sm:mb-[30px] sm:flex sm:h-[30px]">
             <p className="text-[13px] font-bold leading-none sm:text-[16px]">
               Question {currentIndex + 1}/{questions.length}
@@ -977,7 +977,7 @@ function QuizContent() {
               <img
                 src={mediaUrl(image)}
                 alt="Question"
-                className="max-h-[210px] w-full object-contain sm:h-[439px] sm:max-h-none"
+                className="h-[210px] w-full object-contain sm:h-[439px]"
               />
             ) : (
               <div className="flex h-[140px] items-center justify-center px-4 text-center text-sm text-slate-500 sm:h-[439px] sm:text-base">

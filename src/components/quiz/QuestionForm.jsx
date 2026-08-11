@@ -415,7 +415,7 @@ function ImagePreview({ src, alt = "Preview" }) {
   );
 }
 
-function FileUploadBox({ label, currentImage, selectedFile, onChange, removed = false, onRemove }) {
+function FileUploadBox({ label, hint = "", currentImage, selectedFile, onChange, removed = false, onRemove }) {
   const previewSrc = useMemo(() => {
     if (removed) return "";
     if (selectedFile) return URL.createObjectURL(selectedFile);
@@ -432,6 +432,7 @@ function FileUploadBox({ label, currentImage, selectedFile, onChange, removed = 
   return (
     <div>
       <FieldLabel icon={FaImage}>{label}</FieldLabel>
+      {hint && <p className="mb-2 text-[11px] font-medium text-slate-500">{hint}</p>}
 
       <div className="grid gap-2 sm:grid-cols-[1fr_72px]">
         <label className="flex h-14 cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-[#f8f8fb] px-3 text-center transition hover:border-violet-300 hover:bg-violet-50/40 sm:h-16">
@@ -614,6 +615,7 @@ export default function QuestionForm({
           <div className="xl:col-span-6">
             <FileUploadBox
               label="Question Image"
+              hint="Recommended ratio: 4:3 (for example 1200 × 900 px). Other image sizes are supported and will be shown fully without cropping."
               currentImage={initialValues?.questionImage}
               selectedFile={questionImage}
               removed={removedImages.question}
