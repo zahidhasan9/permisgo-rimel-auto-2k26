@@ -370,6 +370,7 @@ function BookingFlow() {
           loading={loadingTeachers}
           center={center}
           mapRef={mapRef}
+          onLocationError={setError}
         />
       )}
       {step === "teacher" && (
@@ -417,12 +418,13 @@ function MapStep({
   loading,
   center,
   mapRef,
+  onLocationError,
 }) {
   return (
     <section className="rounded-xl bg-[#e8eef7] p-2.5 sm:p-5">
-      <div className="mb-3 grid gap-3 sm:mb-4 lg:grid-cols-[310px_1fr] lg:gap-4">
-        <div className="min-w-0 max-w-full overflow-hidden">
-          <GooglePlaceAutocomplete value={search.address} placeholder="Search a location" onPlaceSelect={selectPlace} />
+      <div className="relative z-20 mb-3 grid gap-3 sm:mb-4 lg:grid-cols-[310px_1fr] lg:gap-4">
+        <div className="min-w-0 max-w-full overflow-visible">
+          <GooglePlaceAutocomplete value={search.address} placeholder="Search a location" onPlaceSelect={selectPlace} onError={onLocationError} />
         </div>
         <div className="flex min-w-0 justify-stretch sm:justify-end">
           <div className="grid w-full grid-cols-2 rounded-full bg-white p-1 sm:inline-flex sm:w-auto">

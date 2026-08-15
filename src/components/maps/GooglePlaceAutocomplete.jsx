@@ -168,7 +168,7 @@ export default function GooglePlaceAutocomplete({
   return (
     <div
       ref={containerRef}
-      className="min-h-[50px] min-w-0 max-w-full overflow-hidden rounded-2xl border border-slate-200 bg-white px-1 py-1 shadow-sm focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-100"
+      className="relative z-20 min-h-[50px] min-w-0 max-w-full overflow-visible rounded-2xl border border-slate-200 bg-white px-1 py-1 shadow-sm focus-within:z-50 focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-100"
     />
   );
 }

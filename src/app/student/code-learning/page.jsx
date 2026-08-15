@@ -119,9 +119,7 @@ export default function CodeLearningPage() {
               key={item}
               onClick={() =>
                 item === "Exams"
-                  ? window.location.assign(
-                      "https://app.klaxo.fr/mon-compte/connecter",
-                    )
+                  ? router.push("/student/code/mock-test")
                   : setTab(item)
               }
               className={`h-10 rounded-xl border border-[#174a9b] text-sm font-bold ${item === "Learn" ? "w-[88px]" : item === "Evaluations" ? "w-[132px]" : "w-[95px]"} ${tab === item ? "bg-[#bdd5fa] text-[#173f87]" : "bg-white text-black"}`}

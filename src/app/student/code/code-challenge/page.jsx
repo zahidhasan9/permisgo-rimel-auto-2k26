@@ -638,6 +638,7 @@ function QuizContent() {
 
   const question = questions[currentIndex];
   const feedback = question ? feedbackByQuestion[question._id] : null;
+  const isMockTest = quiz?.type === "mock_test";
   const answered =
     Boolean(feedback) ||
     Boolean(question && answeredIds.includes(question._id));
@@ -812,6 +813,13 @@ function QuizContent() {
 
   const optionClass = (index) => {
     if (feedback) {
+      if (isMockTest) {
+        if (!selectedIndexes.includes(index))
+          return "bg-white text-slate-800 border-white";
+        return feedback.isCorrect
+          ? "bg-[#21c33b] text-white border-[#21c33b]"
+          : "bg-[#e52a39] text-white border-[#e52a39]";
+      }
       if (
         (feedback.correctOptionIndexes || [feedback.correctOptionIndex])
           .map(Number)
@@ -841,6 +849,7 @@ function QuizContent() {
   if (!question) return <Message>No active question found.</Message>;
 
   const feedbackImage =
+    !isMockTest &&
     !feedback?.isCorrect &&
     (feedback?.markedAnswerImage || feedback?.explanationImage);
   const image = feedbackImage || question.questionImage;
@@ -1050,7 +1059,7 @@ function QuizContent() {
                   </div>
                 </div>
               ))}
-              {feedback?.explanationText && (
+              {!isMockTest && feedback?.explanationText && (
                 <p className="mt-4 rounded-lg bg-white/70 p-3 text-sm font-semibold text-[#123f88]">
                   {feedback.explanationText}
                 </p>
@@ -1156,7 +1165,7 @@ function QuizContent() {
             </div>
           </div>
 
-          <div className="fixed inset-x-0 bottom-0 z-40 grid h-[52px] grid-cols-5 border-t border-[#bbb] bg-white sm:hidden">
+          {/* <div className="fixed inset-x-0 bottom-0 z-40 grid h-[52px] grid-cols-5 border-t border-[#bbb] bg-white sm:hidden">
             {question.options.map((_, index) => {
               const isCorrect = feedback && (feedback.correctOptionIndexes || [feedback.correctOptionIndex]).map(Number).includes(index);
               const isWrong = feedback && selectedIndexes.includes(index) && !isCorrect;
@@ -1194,7 +1203,62 @@ function QuizContent() {
             >
               <IoChevronForward />
             </button>
-          </div>
+          </div> */}
+          <div className="fixed bottom-0 left-0 right-0 z-40 flex h-[52px] w-full bg-white border-t border-[#bbb] sm:hidden">
+  {question.options.map((_, index) => {
+    const isCorrect =
+      feedback &&
+      !isMockTest &&
+      (feedback.correctOptionIndexes || [feedback.correctOptionIndex])
+        .map(Number)
+        .includes(index);
+
+    const isWrong =
+      feedback && selectedIndexes.includes(index) && !feedback.isCorrect;
+
+    const isRight =
+      feedback && selectedIndexes.includes(index) && feedback.isCorrect;
+
+    const isSelected = selectedIndexes.includes(index);
+
+    return (
+      <button
+        key={index}
+        type="button"
+        disabled={answered || submitting}
+        onClick={() => selectOption(index)}
+        className={`flex-1 min-w-0 border-r border-[#d2d2d2] text-xs font-semibold ${
+          isRight || isCorrect
+            ? "bg-[#20c23b] text-white"
+            : isWrong
+              ? "bg-[#ef3038] text-white"
+              : isSelected
+                ? "bg-[#123f88] text-white"
+                : "bg-white text-black"
+        }`}
+      >
+        {letter(index)}
+      </button>
+    );
+  })}
+
+  <button
+    type="button"
+    disabled={
+      !feedback &&
+      (selectedIndexes.length !== requiredAnswerCount || submitting)
+    }
+    onClick={feedback ? next : validate}
+    className={`flex-1 min-w-0 flex items-center justify-center text-2xl ${
+      feedback || selectedIndexes.length === requiredAnswerCount
+        ? "bg-[#208b60] text-white"
+        : "bg-white text-[#777]"
+    } disabled:opacity-60`}
+    title={feedback ? "Next" : "Validate"}
+  >
+    <IoChevronForward />
+  </button>
+</div>
         </section>
       </div>
     </main>
