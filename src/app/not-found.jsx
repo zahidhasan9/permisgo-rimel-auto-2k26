@@ -17,8 +17,8 @@ export default function NotFound() {
 
         {/* Description */}
         <p className="mt-4 text-gray-300 text-lg leading-relaxed">
-          The page you're looking for doesn't exist or has been moved.
-          Don't worry, you can head back to the homepage and continue exploring.
+          The page you're looking for doesn't exist or has been moved. Don't
+          worry, you can head back to the homepage and continue exploring.
         </p>
 
         {/* Buttons */}
