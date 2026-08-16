@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Select from "react-select";
 
@@ -26,6 +26,7 @@ const Navbar = () => {
   const [openMenu, setOpenMenu] = useState(false);
   const [language, setLanguage] = useState("");
   const pathname = usePathname();
+  const router = useRouter();
   const site = useSiteSettings();
 
   useEffect(() => setLanguage((localStorage.getItem("permisgo-language") || "en").toUpperCase()), []);
@@ -36,6 +37,7 @@ const Navbar = () => {
     document.cookie = `permisgo-language=${next.toLowerCase()}; path=/; max-age=31536000; samesite=lax`;
     document.documentElement.lang = next.toLowerCase();
     window.dispatchEvent(new CustomEvent("permisgo-language-change", { detail: next.toLowerCase() }));
+    router.refresh();
   };
 
   const options = [

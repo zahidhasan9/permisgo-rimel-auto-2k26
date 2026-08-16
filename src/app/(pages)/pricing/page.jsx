@@ -9,6 +9,7 @@ import offerHero from "../../../../public/image/offer.png";
 import crownBadge from "../../../../public/image/traffic-two-price-batch.png";
 import { useState } from "react";
 import useOffers, { CATEGORY_BY_TAB, filterOffers } from "@/hooks/useOffers";
+import useCmsPageContent from "@/hooks/useCmsPageContent";
 
 const codePackages = [
   {
@@ -158,14 +159,17 @@ export default function PricingPage() {
   const cpfOffers = filterOffers(cards, "cpf", transmission);
   const drivingOffers = filterOffers(cards, "to drive", transmission);
   const otherOffers = filterOffers(cards, "other", transmission);
+  const { page, content } = useCmsPageContent("pricing");
+  const settings = content?.settings || {};
+  const copy = (key, fallback) => settings[key]?.trim?.() || fallback;
   return (
     <main className="overflow-hidden bg-white text-[#202124]">
       <section className="bg-[#eaf0f9]">
         <div className="mx-auto grid min-h-[560px] max-w-[1280px] grid-cols-[minmax(0,1fr)] items-center gap-10 px-5 py-14 sm:px-8 md:grid-cols-2 lg:px-10">
           <div>
-            <h1 className="text-[36px] font-bold tracking-[-0.025em] sm:text-[43px]">Best Driving Lesson Offers</h1>
-            <p className="mt-6 !text-[16px] text-[#71767d]">Choose the perfect package that fits your learning needs and budget.</p>
-            <Link href="#packages" className="mt-10 inline-flex min-h-[48px] min-w-[300px] items-center justify-center rounded-[9px] bg-[#e4213c] px-7 !text-[15px] font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#174a9b] hover:shadow-lg">View Packages</Link>
+            <h1 className="text-[36px] font-bold tracking-[-0.025em] sm:text-[43px]">{copy("heroTitle", "Best Driving Lesson Offers")}</h1>
+            <p className="mt-6 !text-[16px] text-[#71767d]">{copy("heroDescription", "Choose the perfect package that fits your learning needs and budget.")}</p>
+            <Link href="#packages" className="mt-10 inline-flex min-h-[48px] min-w-[300px] items-center justify-center rounded-[9px] bg-[#e4213c] px-7 !text-[15px] font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#174a9b] hover:shadow-lg">{copy("heroButton", "View Packages")}</Link>
           </div>
           <Image src={offerHero} alt="Driving lesson offer" priority sizes="(max-width: 768px) 92vw, 560px" className="h-auto w-full max-w-[540px] justify-self-end" />
         </div>
@@ -173,25 +177,25 @@ export default function PricingPage() {
 
       <section id="packages" className="scroll-mt-24 px-5 py-20 sm:px-8 lg:py-24">
         <div className="mx-auto max-w-[1280px]">
-          <SectionHeading transmission={transmission} onTransmissionChange={setTransmission}>Our Packages</SectionHeading>
+          <SectionHeading transmission={transmission} onTransmissionChange={setTransmission}>{copy("packagesTitle", "Our Packages")}</SectionHeading>
           <div className="mt-8 flex flex-wrap gap-3">{["Code", "Driving License", "CPF Offers", "Accompanied Driving", "À la carte"].map((tab) => <button type="button" onClick={() => setActiveTab(tab)} key={tab} className={`rounded-[7px] border px-5 py-2 !text-[12px] font-semibold ${activeTab === tab ? "border-[#174a9b] bg-[#dce8fb] text-[#174a9b]" : "border-[#d6deea]"}`}>{tab}</button>)}</div>
           <div className="mt-10 grid gap-9 lg:grid-cols-3">{selectedOffers.map((item) => activeTab === "Code" || activeTab === "Accompanied Driving" ? <CodeCard key={item._id} item={item} /> : <RateCard key={item._id} item={item} license={activeTab === "Driving License"} />)}</div>
           {loading && <p className="mt-8 text-center text-sm text-gray-500">Loading offers...</p>}{error && <p className="mt-8 text-center text-sm text-red-600">{error}</p>}
-          <div className="mt-16 rounded-[10px] bg-[#eaf0f9] px-6 py-10 text-center"><h3 className="text-[20px] font-bold">Manage your entire online training <span className="text-[#174a9b]">at the best price</span></h3><Link href="/appointment" className="mt-6 inline-flex min-w-[340px] max-w-full justify-center rounded-[8px] bg-[#e4213c] px-7 py-3 !text-[13px] font-semibold text-white transition hover:bg-[#174a9b]">Book Appointment</Link></div>
+          <div className="mt-16 rounded-[10px] bg-[#eaf0f9] px-6 py-10 text-center"><h3 className="text-[20px] font-bold">{copy("trainingTitle", "Manage your entire online training at the best price")}</h3><Link href="/appointment" className="mt-6 inline-flex min-w-[340px] max-w-full justify-center rounded-[8px] bg-[#e4213c] px-7 py-3 !text-[13px] font-semibold text-white transition hover:bg-[#174a9b]">{copy("trainingButton", "Book Appointment")}</Link></div>
         </div>
       </section>
 
       <section className="bg-[#eaf0f9] px-5 py-20 sm:px-8 lg:py-24">
-        <div className="mx-auto max-w-[1280px]"><SectionHeading transmission={transmission} onTransmissionChange={setTransmission}>Permisgo&apos;s CPF rates</SectionHeading><div className="mt-12 grid gap-8 lg:grid-cols-3">{cpfOffers.map((item) => <RateCard key={item._id} item={item} />)}</div></div>
+        <div className="mx-auto max-w-[1280px]"><SectionHeading transmission={transmission} onTransmissionChange={setTransmission}>{copy("cpfTitle", "Permisgo's CPF rates")}</SectionHeading><div className="mt-12 grid gap-8 lg:grid-cols-3">{cpfOffers.map((item) => <RateCard key={item._id} item={item} />)}</div></div>
       </section>
 
       <section className="px-5 py-20 sm:px-8 lg:py-24">
-        <div className="mx-auto max-w-[1280px]"><SectionHeading transmission={transmission} onTransmissionChange={setTransmission}>Our driving licence offers</SectionHeading><div className="mt-12 grid gap-8 lg:grid-cols-3">{drivingOffers.map((item) => <RateCard key={item._id} item={item} license />)}</div></div>
+        <div className="mx-auto max-w-[1280px]"><SectionHeading transmission={transmission} onTransmissionChange={setTransmission}>{copy("licenceOffersTitle", "Our driving licence offers")}</SectionHeading><div className="mt-12 grid gap-8 lg:grid-cols-3">{drivingOffers.map((item) => <RateCard key={item._id} item={item} license />)}</div></div>
       </section>
 
       <section className="px-5 pb-20 sm:px-8 lg:pb-24">
         <div className="mx-auto max-w-[1280px]">
-          <h2 className="text-center text-[34px] font-bold">Our supervised driving package</h2>
+          <h2 className="text-center text-[34px] font-bold">{copy("supervisedTitle", "Our supervised driving package")}</h2>
           <div className="mt-10 rounded-[10px] bg-[#f0f3f8] p-7 lg:p-12">
             <h3 className="text-center text-[25px] font-bold text-[#e4213c]">Accompanied Driving</h3><p className="mt-2 text-center !text-[12px] text-[#757a81]">Code + driving lessons</p>
             <div className="mx-auto mt-8 grid max-w-[900px] gap-10 md:grid-cols-2">
@@ -203,7 +207,7 @@ export default function PricingPage() {
       </section>
 
       <section className="px-5 pb-24 sm:px-8 lg:pb-28">
-        <div className="mx-auto max-w-[850px] text-center"><h2 className="text-[34px] font-bold">Discover our à la carte offers</h2><p className="mt-4 !text-[13px] text-[#777c82]">It is possible to choose your training program à la carte.</p>
+        <div className="mx-auto max-w-[850px] text-center"><h2 className="text-[34px] font-bold">{copy("carteTitle", "Discover our à la carte offers")}</h2><p className="mt-4 !text-[13px] text-[#777c82]">{copy("carteDescription", "It is possible to choose your training program à la carte.")}</p>
           <div className="mt-10 space-y-4 text-left">{otherOffers.map((item) => <div key={item._id} className="flex min-h-[62px] items-center rounded-[9px] bg-[#eaf0f9] px-5"><span className="flex-1 !text-[14px] font-semibold">{item.title}</span><span className="mr-7 !text-[13px] font-bold text-[#20ae55]">{item.price}</span><button type="button" className="rounded-full bg-[#e4213c] px-5 py-2 !text-[12px] font-semibold text-white transition hover:bg-[#174a9b]">Add</button></div>)}</div>
         </div>
       </section>

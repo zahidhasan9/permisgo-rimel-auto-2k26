@@ -170,9 +170,11 @@ export const viewport = {
   themeColor: "#0D4598",
 };
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+  const headerStore = await headers();
+  const language = headerStore.get("x-permisgo-locale") || "en";
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang={language} suppressHydrationWarning>
       <body suppressHydrationWarning>
         <ReduxProvider><AppShell>{children}</AppShell></ReduxProvider>
         <TawkChat />

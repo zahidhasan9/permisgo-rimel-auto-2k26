@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 // Icons
 import {
@@ -21,11 +21,31 @@ import { MdOutlineEmail } from "react-icons/md";
 import downCar from "../../public/image/down-car.gif";
 import Logo from "../../public/image/logo.png";
 import useSiteSettings from "@/hooks/useSiteSettings";
+import useCurrentLanguage from "@/hooks/useCurrentLanguage";
+import { getFooterCmsPages } from "@/features/API";
 
 const Footer = () => {
   const date = new Date().getFullYear();
   const [openTime, setOpenTime] = useState(false);
+  const [customLinks, setCustomLinks] = useState([]);
   const site = useSiteSettings();
+  const language = useCurrentLanguage() || "en";
+
+  useEffect(() => {
+    let active = true;
+    getFooterCmsPages(language)
+      .then(({ data }) => {
+        if (!active) return;
+        const pages = data?.data;
+        setCustomLinks(Array.isArray(pages) ? pages : pages ? [pages] : []);
+      })
+      .catch(() => { if (active) setCustomLinks([]); });
+    return () => { active = false; };
+  }, [language]);
+
+  const footerCustomLinks = (section) => customLinks
+    .filter((page) => page.footerSection === section)
+    .map((page) => ({ name: page.title, href: `/${page.slug}` }));
 
   const socialLinks = [
     { icon: <FaFacebook />, href: site.facebookUrl, label: "Facebook" },
@@ -234,7 +254,7 @@ const Footer = () => {
                 </h4>
 
                 <ul className="space-y-3">
-                  {aboutLinks.map((link, index) => (
+                  {[...aboutLinks, ...footerCustomLinks("about")].map((link, index) => (
                     <li key={index}>
                       <Link href={link.href} className={footerLinkClass}>
                         {link.name}
@@ -251,7 +271,7 @@ const Footer = () => {
                 </h4>
 
                 <ul className="space-y-3">
-                  {partnershipLinks.map((link, index) => (
+                  {[...partnershipLinks, ...footerCustomLinks("partnership")].map((link, index) => (
                     <li key={index}>
                       <Link href={link.href} className={footerLinkClass}>
                         {link.name}
@@ -268,7 +288,7 @@ const Footer = () => {
                 </h4>
 
                 <ul className="space-y-3">
-                  {serviceLinks.map((link, index) => (
+                  {[...serviceLinks, ...footerCustomLinks("services")].map((link, index) => (
                     <li key={index}>
                       <Link href={link.href} className={footerLinkClass}>
                         {link.name}
@@ -286,7 +306,7 @@ const Footer = () => {
           <div className="mx-auto max-w-7xl">
             <div className="flex flex-col items-center justify-between gap-4 ">
               <ul className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-                {supportLinks.map((link, index) => (
+                {[...supportLinks, ...footerCustomLinks("support")].map((link, index) => (
                   <li key={index}>
                     <Link
                       href={link.href}

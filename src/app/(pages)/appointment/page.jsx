@@ -5,6 +5,8 @@ import Link from "next/link";
 import Testimonials from "@/components/testimonials";
 import { useMemo, useState } from "react";
 import { FaArrowLeft, FaArrowRight, FaStar } from "react-icons/fa6";
+import useCurrentLanguage from "@/hooks/useCurrentLanguage";
+import useCmsPageContent from "@/hooks/useCmsPageContent";
 
 import AppointmentBooking from "@/components/appointment-booking-calander";
 
@@ -34,7 +36,18 @@ const testimonialItems = [
 const testimonialText =
   "Thanks to the instructors, I passed my driving test on the first try. The lessons were clear and very helpful!";
 
+const pageCopy = {
+  en: { title: "Book Your Driving Lesson", intro: "Schedule your driving lesson with our certified instructors. Choose your preferred date, time, and location to start your learning journey.", book: "Book Appointment", why: "Why choose PermisGo", benefits: ["Qualified instructor", "+500 successful students", "Qualiopi certified", "Accredited driving schools"], final: "Start Your Driving Journey Today", lesson: "Book Your Lesson" },
+  bn: { title: "আপনার ড্রাইভিং লেসন বুক করুন", intro: "আমাদের সনদপ্রাপ্ত প্রশিক্ষকদের সঙ্গে ড্রাইভিং লেসন নির্ধারণ করুন। শেখার যাত্রা শুরু করতে পছন্দের তারিখ, সময় ও স্থান নির্বাচন করুন।", book: "অ্যাপয়েন্টমেন্ট বুক করুন", why: "কেন PermisGo বেছে নেবেন", benefits: ["যোগ্য প্রশিক্ষক", "+৫০০ সফল শিক্ষার্থী", "Qualiopi সনদপ্রাপ্ত", "স্বীকৃত ড্রাইভিং স্কুল"], final: "আজই আপনার ড্রাইভিং যাত্রা শুরু করুন", lesson: "লেসন বুক করুন" },
+  fr: { title: "Réservez votre leçon de conduite", intro: "Planifiez votre leçon avec nos moniteurs certifiés. Choisissez la date, l’heure et le lieu qui vous conviennent pour commencer votre apprentissage.", book: "Prendre rendez-vous", why: "Pourquoi choisir PermisGo", benefits: ["Moniteur diplômé", "+500 élèves reçus", "Certifié Qualiopi", "Écoles de conduite labellisées"], final: "Commencez votre parcours de conduite aujourd’hui", lesson: "Réserver votre leçon" },
+};
+
 export default function AppointmentPage() {
+  const language = useCurrentLanguage() || "en";
+  const { page: cmsPage, content: cmsContent } = useCmsPageContent("appointment");
+  const baseCopy = pageCopy[language] || pageCopy.en;
+  const settings = cmsPage?.updatedBy ? cmsContent?.settings || {} : {};
+  const copy = { ...baseCopy, title: settings.heroTitle || baseCopy.title, intro: settings.heroDescription || baseCopy.intro, book: settings.heroButton || baseCopy.book, why: settings.whyTitle || baseCopy.why, benefits: [settings.benefit1, settings.benefit2, settings.benefit3, settings.benefit4].map((value, index) => value || baseCopy.benefits[index]), final: settings.finalTitle || baseCopy.final, lesson: settings.finalButton || baseCopy.lesson };
   const [testimonialStart, setTestimonialStart] = useState(0);
 
   const visibleTestimonials = useMemo(
@@ -60,18 +73,16 @@ export default function AppointmentPage() {
         <div className="mx-auto grid min-h-[600px] w-full max-w-[1360px] grid-cols-[minmax(0,1fr)] items-center gap-10 px-5 py-14 sm:px-8 md:grid-cols-2 lg:min-h-[628px] lg:px-10 lg:py-0">
           <div className="order-1 min-w-0 text-center md:text-left lg:translate-y-1">
             <h1 className="text-[28px] font-extrabold leading-[1.15] tracking-[-0.02em] sm:text-[36px] lg:text-[38px]">
-              Book Your Driving Lesson
+              {copy.title}
             </h1>
             <p className="mx-auto mt-6 max-w-[570px] !text-[15px] font-medium leading-[1.6] text-[#62656b] md:mx-0">
-              Schedule your driving lesson with our certified instructors.
-              Choose your preferred date, time, and location to start your
-              learning journey.
+              {copy.intro}
             </p>
             <Link
               href="#appointment-booking"
               className="mt-10 inline-flex h-12 w-full max-w-[300px] items-center justify-center rounded-[10px] bg-[#e2233d] px-8 !text-[14px] font-extrabold text-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:bg-[#174a9b] hover:shadow-lg"
             >
-              Book Appointment
+              {copy.book}
             </Link>
           </div>
 
@@ -89,15 +100,15 @@ export default function AppointmentPage() {
 
       {/* Booking and benefits */}
       <section className="bg-[#eef3fb] px-5 pb-20 pt-20 sm:px-8 lg:px-10 lg:pt-[74px]">
-        <AppointmentBooking />
+        <AppointmentBooking title={settings.bookingTitle} />
 
         <div className="mx-auto mt-28 w-full max-w-[1280px] lg:mt-[170px]">
           <h2 className="text-center text-[30px] font-extrabold tracking-[-0.02em] text-[#1d1d1f] sm:text-[36px]">
-            Why choose Permisgo
+            {copy.why}
           </h2>
 
           <div className="mt-12 grid grid-cols-[minmax(0,1fr)] gap-5 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
-            {benefits.map((benefit) => (
+            {benefits.map((benefit, index) => (
               <article
                 key={benefit.title}
                 className="group min-h-[110px] -skew-x-[5deg] rounded-[18px] bg-white px-7 py-5 shadow-[0_2px_12px_rgba(18,53,101,0.02)] transition-all duration-300 hover:-translate-y-1 hover:bg-[#174a9b] hover:shadow-xl"
@@ -110,7 +121,7 @@ export default function AppointmentPage() {
                     className="h-12 w-12 shrink-0 object-contain"
                   />
                   <h3 className="!font-sans !text-[14px] font-bold leading-5 text-[#242424] transition-colors duration-300 group-hover:text-white">
-                    {benefit.title}
+                    {copy.benefits[index] || benefit.title}
                   </h3>
                 </div>
               </article>
@@ -208,13 +219,13 @@ export default function AppointmentPage() {
       <section className="bg-[#eef3fb] px-5 sm:px-8 lg:px-10">
         <div className="mx-auto flex min-h-[205px] w-full max-w-[1280px] flex-col items-center justify-center rounded-[12px] bg-[#174a9b] px-6 py-10 text-center">
           <h2 className="text-[24px] font-bold text-white sm:text-[26px]">
-            Start Your Driving Journey Today
+            {copy.final}
           </h2>
           <Link
             href="#appointment-booking"
             className="mt-7 inline-flex h-12 items-center justify-center rounded-[10px] bg-[#e2233d] px-7 !text-[14px] font-extrabold text-white transition-all duration-300 hover:-translate-y-1 hover:bg-white hover:text-[#174a9b] hover:shadow-lg"
           >
-            Book Your Lesson
+            {copy.lesson}
           </Link>
         </div>
       </section>

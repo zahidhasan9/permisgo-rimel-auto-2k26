@@ -21,6 +21,7 @@ import badge from "../../../../public/image/traffic-two-price-batch.png";
 import trustLogo from "../../../../public/image/trustLogo.png";
 import { useState } from "react";
 import useOffers, { CATEGORY_BY_TAB, filterOffers } from "@/hooks/useOffers";
+import useCmsPageContent from "@/hooks/useCmsPageContent";
 
 const licensePackages = [
   {
@@ -185,17 +186,18 @@ export default function DrivingLicensePage() {
   const { cards, loading, error } = useOffers();
   const selectedOffers = filterOffers(cards, CATEGORY_BY_TAB[activeTab], transmission);
   const codeOffers = filterOffers(cards, "code", transmission);
+  const { page, content } = useCmsPageContent("driving-license");
+  const settings = content?.settings || {};
+  const copy = (key, fallback) => settings[key]?.trim?.() || fallback;
+  const accompaniedFeatures = copy("accompaniedFeatures", "20 driving lessons\nAge: From 15 years old\nInitial assessment\nCode Training\nTraining follow-up by a coach\nLearning booklet\nAppointment prior to accompanied driving").split(/\r?\n/).map((item) => item.trim()).filter(Boolean);
   return (
     <main className="overflow-hidden bg-white text-[#202124]">
       <section className="bg-[#eaf0f9]">
         <div className="mx-auto grid min-h-[500px] max-w-[1280px] grid-cols-[minmax(0,1fr)] items-center gap-10 px-5 py-14 sm:px-8 md:grid-cols-2 lg:px-10">
           <div>
-            <h1 className="text-[35px] font-bold leading-tight tracking-[-0.025em] sm:text-[42px]">
-              Our rates are up to <span className="text-[#e4213c]">30%</span>
-              <br /> cheaper <span className="text-[#e4213c]">*</span>
-            </h1>
+            <h1 className="text-[35px] font-bold leading-tight tracking-[-0.025em] sm:text-[42px]">{copy("heroTitle", "Our rates are up to 30% cheaper*")}</h1>
             <Link href="/contact-us" className="mt-10 inline-flex min-h-[46px] items-center justify-center rounded-[8px] bg-[#e4213c] px-7 !text-[14px] font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#174a9b] hover:shadow-lg">
-              To be accompanied by an advisor
+              {copy("heroButton", "To be accompanied by an advisor")}
             </Link>
           </div>
           <Image src={hero} alt="Driving lesson with an instructor" priority sizes="(max-width: 768px) 92vw, 560px" className="h-auto w-full max-w-[560px] justify-self-end" />
@@ -205,7 +207,7 @@ export default function DrivingLicensePage() {
       <section className="px-5 py-20 sm:px-8 lg:py-24">
         <div className="mx-auto max-w-[1280px]">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-            <h2 className="text-[32px] font-bold">Our Packages</h2>
+            <h2 className="text-[32px] font-bold">{copy("packagesTitle", "Our Packages")}</h2>
             <TransmissionSwitch value={transmission} onChange={setTransmission} />
           </div>
           <div className="mt-8 flex flex-wrap gap-3">
@@ -217,8 +219,8 @@ export default function DrivingLicensePage() {
             {selectedOffers.map((item) => activeTab === "Code" || activeTab === "Accompanied Driving" ? <CodePackCard key={item._id} item={item} /> : <PackageCard key={item._id} item={item} />)}
           </div>
           <div className="mt-16 rounded-[10px] bg-[#eaf0f9] px-6 py-9 text-center">
-            <h3 className="text-[20px] font-bold">Manage your entire online training at the best price</h3>
-            <Link href="/pricing" className="mt-6 inline-flex rounded-[8px] bg-[#e4213c] px-8 py-3 !text-[13px] font-semibold text-white transition hover:bg-[#174a9b]">Discover Our Offers</Link>
+            <h3 className="text-[20px] font-bold">{copy("trainingTitle", "Manage your entire online training at the best price")}</h3>
+            <Link href="/pricing" className="mt-6 inline-flex rounded-[8px] bg-[#e4213c] px-8 py-3 !text-[13px] font-semibold text-white transition hover:bg-[#174a9b]">{copy("trainingButton", "Discover Our Offers")}</Link>
           </div>
         </div>
       </section>
@@ -226,9 +228,9 @@ export default function DrivingLicensePage() {
       <section className="px-5 pb-20 sm:px-8 lg:pb-24">
         <div className="mx-auto grid max-w-[1280px] items-center gap-10 rounded-[100px] bg-[#174a9b] px-9 py-12 text-white md:grid-cols-[1fr_300px] lg:px-[110px]">
           <div>
-            <h2 className="text-[28px] font-bold">Get your driver&apos;s license using your CPF</h2>
-            <p className="mt-4 !text-[14px] leading-6 text-white/85">Permisgo is Qualiopi certified and eligible for CPF funding. Finance your driving license with your Personal Training Account.</p>
-            <Link href="/cpf-offer" className="mt-6 inline-flex rounded-[8px] bg-[#e4213c] px-8 py-3 !text-[13px] font-semibold text-white transition hover:bg-white hover:text-[#174a9b]">Discover Our CPF Offers</Link>
+            <h2 className="text-[28px] font-bold">{copy("cpfTitle", "Get your driver's license using your CPF")}</h2>
+            <p className="mt-4 !text-[14px] leading-6 text-white/85">{copy("cpfDescription", "Permisgo is Qualiopi certified and eligible for CPF funding. Finance your driving license with your Personal Training Account.")}</p>
+            <Link href="/cpf-offer" className="mt-6 inline-flex rounded-[8px] bg-[#e4213c] px-8 py-3 !text-[13px] font-semibold text-white transition hover:bg-white hover:text-[#174a9b]">{copy("cpfButton", "Discover Our CPF Offers")}</Link>
           </div>
           <Image src={cpfOffer} alt="Mon Compte Formation" sizes="260px" className="mx-auto h-auto w-[260px]" />
         </div>
@@ -237,36 +239,36 @@ export default function DrivingLicensePage() {
       <section className="px-5 pb-20 sm:px-8 lg:pb-24">
         <div className="mx-auto max-w-[1280px]">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-            <h2 className="text-[30px] font-bold">Our accompanied driving package</h2>
+            <h2 className="text-[30px] font-bold">{copy("accompaniedTitle", "Our accompanied driving package")}</h2>
             <TransmissionSwitch value={transmission} onChange={setTransmission} />
           </div>
           <div className="mt-8 grid gap-10 rounded-[10px] bg-[#eaf0f9] p-7 md:grid-cols-[45%_55%] lg:p-12">
             <div className="rounded-[10px] bg-white p-7 text-center">
-              <h3 className="text-[24px] font-bold text-[#e4213c]">Accompanied Driving</h3>
-              <p className="mt-2 !text-[13px] text-[#757a81]">Code + 20 driving lessons</p>
-              <div className="mt-8 flex items-end justify-between"><strong className="text-[25px] text-[#174a9b]">€599*</strong><span className="!text-[12px] text-[#717780] line-through">€699</span></div>
-              <Link href="/inscription" className="mt-7 inline-flex w-full justify-center rounded-[8px] bg-[#e4213c] px-6 py-3 !text-[13px] font-semibold text-white transition hover:bg-[#174a9b]">Sign up</Link>
+              <h3 className="text-[24px] font-bold text-[#e4213c]">{copy("accompaniedCardTitle", "Accompanied Driving")}</h3>
+              <p className="mt-2 !text-[13px] text-[#757a81]">{copy("accompaniedCardSubtitle", "Code + 20 driving lessons")}</p>
+              <div className="mt-8 flex items-end justify-between"><strong className="text-[25px] text-[#174a9b]">{copy("accompaniedPrice", "€599*")}</strong><span className="!text-[12px] text-[#717780] line-through">{copy("accompaniedOldPrice", "€699")}</span></div>
+              <Link href="/inscription" className="mt-7 inline-flex w-full justify-center rounded-[8px] bg-[#e4213c] px-6 py-3 !text-[13px] font-semibold text-white transition hover:bg-[#174a9b]">{copy("accompaniedButton", "Sign up")}</Link>
             </div>
             <div>
-              <h3 className="text-[18px] font-bold text-[#174a9b]">Package Contents</h3>
+              <h3 className="text-[18px] font-bold text-[#174a9b]">{copy("accompaniedContentsTitle", "Package Contents")}</h3>
               <ul className="mt-5 grid gap-3 sm:grid-cols-2">
-                {["20 driving lessons", "Age: From 15 years old", "Initial assessment", "Code Training", "Training follow-up by a coach", "Learning booklet", "Appointment prior to accompanied driving"].map((feature) => (
+                {accompaniedFeatures.map((feature) => (
                   <li key={feature} className="flex gap-3 !text-[13px] text-[#34383e]"><FaSquareCheck className="mt-1 shrink-0 text-[#174a9b]" />{feature}</li>
                 ))}
               </ul>
             </div>
           </div>
           <div className="mt-8 rounded-[10px] bg-[#eaf0f9] px-6 py-8 text-center">
-            <h3 className="text-[20px] font-bold">Manage your entire online training at the best price</h3>
-            <Link href="/pricing" className="mt-6 inline-flex rounded-[8px] bg-[#e4213c] px-8 py-3 !text-[13px] font-semibold text-white transition hover:bg-[#174a9b]">Discover Our Method for the Permit</Link>
+            <h3 className="text-[20px] font-bold">{copy("secondTrainingTitle", "Manage your entire online training at the best price")}</h3>
+            <Link href="/pricing" className="mt-6 inline-flex rounded-[8px] bg-[#e4213c] px-8 py-3 !text-[13px] font-semibold text-white transition hover:bg-[#174a9b]">{copy("secondTrainingButton", "Discover Our Method for the Permit")}</Link>
           </div>
         </div>
       </section>
 
       <section className="px-5 py-20 sm:px-8 lg:py-24">
         <div className="mx-auto max-w-[850px] text-center">
-          <h2 className="text-[32px] font-bold">Discover our à la carte offers</h2>
-          <p className="mt-4 !text-[13px] text-[#777c82]">It is possible to choose your training program à la carte.</p>
+          <h2 className="text-[32px] font-bold">{copy("carteTitle", "Discover our à la carte offers")}</h2>
+          <p className="mt-4 !text-[13px] text-[#777c82]">{copy("carteDescription", "It is possible to choose your training program à la carte.")}</p>
           <div className="mt-10 space-y-4 text-left">
             {singleOffers.map(([name, price]) => (
               <div key={name} className="flex min-h-[58px] items-center rounded-[9px] bg-[#eaf0f9] px-5">
@@ -281,41 +283,41 @@ export default function DrivingLicensePage() {
 
       <section className="bg-[#eaf0f9] px-5 py-20 sm:px-8 lg:py-24">
         <div className="mx-auto max-w-[1280px]">
-          <div className="text-center"><h2 className="text-[34px] font-bold">Permisgo&apos;s Highway Code Packs</h2><p className="mt-4 !text-[13px] text-[#73787e]">What is your need?</p></div>
+          <div className="text-center"><h2 className="text-[34px] font-bold">{copy("codePacksTitle", "Permisgo's Highway Code Packs")}</h2><p className="mt-4 !text-[13px] text-[#73787e]">{copy("codePacksDescription", "What is your need?")}</p></div>
           <div className="mt-12 grid grid-cols-[minmax(0,1fr)] gap-9 lg:grid-cols-3">{codeOffers.map((item) => <CodePackCard key={item._id} item={item} />)}</div>
         </div>
       </section>
 
       <section className="px-5 py-20 sm:px-8 lg:py-24">
         <div className="mx-auto grid max-w-[1280px] items-center gap-10 rounded-[100px] bg-[#174a9b] px-9 py-12 text-white md:grid-cols-[1fr_240px] lg:px-[120px]">
-          <div><h2 className="text-[28px] font-bold">écoles de conduite labellisées</h2><p className="mt-5 !text-[14px] text-white/85">Des centres de formation agréés, respectant des standards de qualité élevés.</p></div>
+          <div><h2 className="text-[28px] font-bold">{copy("certificationTitle", "écoles de conduite labellisées")}</h2><p className="mt-5 !text-[14px] text-white/85">{copy("certificationDescription", "Des centres de formation agréés, respectant des standards de qualité élevés.")}</p></div>
           <Image src={laws3} alt="Qualiopi certification" sizes="190px" className="mx-auto h-auto w-[190px] rounded-[6px]" />
         </div>
       </section>
 
       <section className="px-5 pb-20 sm:px-8 lg:pb-24">
         <div className="mx-auto max-w-[1280px] text-center">
-          <span className="rounded-[5px] bg-[#e7f7ec] px-4 py-2 !text-[12px] font-semibold text-[#20a657]">Services</span>
-          <h2 className="mt-5 text-[34px] font-bold">All our other services</h2>
+          <span className="rounded-[5px] bg-[#e7f7ec] px-4 py-2 !text-[12px] font-semibold text-[#20a657]">{copy("servicesLabel", "Services")}</span>
+          <h2 className="mt-5 text-[34px] font-bold">{copy("servicesTitle", "All our other services")}</h2>
           <div className="mt-12 grid gap-6 md:grid-cols-3">
-            {services.map((service) => (
+            {services.map((service, index) => (
               <article key={service.title} className="rounded-[10px] bg-[#eaf0f9] px-6 py-8 transition hover:-translate-y-1 hover:shadow-xl">
                 <Image src={service.image} alt="" sizes="70px" className="mx-auto h-[70px] w-[70px] object-contain" />
-                <h3 className="mt-5 text-[17px] font-bold">{service.title}</h3><p className="mt-3 !text-[13px] text-[#3f9d5a]">{service.price}</p>
-                <Link href="/pricing" className="mt-5 inline-flex rounded-full border border-[#174a9b] px-5 py-2 !text-[12px] font-semibold text-[#e4213c] transition hover:bg-[#174a9b] hover:text-white">Learn more</Link>
+                <h3 className="mt-5 text-[17px] font-bold">{copy(`service${index + 1}Title`, service.title)}</h3><p className="mt-3 !text-[13px] text-[#3f9d5a]">{copy(`service${index + 1}Price`, service.price)}</p>
+                <Link href="/pricing" className="mt-5 inline-flex rounded-full border border-[#174a9b] px-5 py-2 !text-[12px] font-semibold text-[#e4213c] transition hover:bg-[#174a9b] hover:text-white">{copy("serviceLearnMore", "Learn more")}</Link>
               </article>
             ))}
           </div>
-          <Link href="/pricing" className="mt-8 inline-flex rounded-[8px] bg-[#e4213c] px-7 py-3 !text-[13px] font-semibold text-white transition hover:bg-[#174a9b]">View All</Link>
+          <Link href="/pricing" className="mt-8 inline-flex rounded-[8px] bg-[#e4213c] px-7 py-3 !text-[13px] font-semibold text-white transition hover:bg-[#174a9b]">{copy("servicesButton", "View All")}</Link>
         </div>
       </section>
 
       <section className="bg-[#174a9b] px-5 py-16 sm:px-8 lg:py-20">
         <div className="mx-auto grid max-w-[1280px] gap-6 md:grid-cols-3">
-          {ratingCards.map((rating) => (
+          {ratingCards.map((rating, index) => (
             <article key={rating.title} className="flex min-h-[165px] flex-col items-center justify-center rounded-[20px] bg-[#f6f8fb] p-6 text-center transition hover:-translate-y-1 hover:bg-white hover:shadow-xl">
-              <Image src={rating.image} alt="" sizes="40px" className="h-10 w-10 object-contain" /><h3 className="mt-2 text-[18px] font-bold">{rating.title}</h3>
-              <div className="mt-2 flex gap-3 text-[#ffc52c]">{[0,1,2,3,4].map((star) => <FaStar key={star} />)}</div><p className="mt-2 !text-[13px]">04 out of 05</p>
+              <Image src={rating.image} alt="" sizes="40px" className="h-10 w-10 object-contain" /><h3 className="mt-2 text-[18px] font-bold">{copy(`rating${index + 1}Title`, rating.title)}</h3>
+              <div className="mt-2 flex gap-3 text-[#ffc52c]">{[0,1,2,3,4].map((star) => <FaStar key={star} />)}</div><p className="mt-2 !text-[13px]">{copy("ratingScore", "04 out of 05")}</p>
             </article>
           ))}
         </div>

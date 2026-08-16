@@ -317,6 +317,14 @@ export const deleteFaq = (id) => axios.delete(`/faqs/${id}`);
 // Testimonials
 // =======================
 export const getTestimonials = (params = {}) => axios.get("/testimonials", { params });
+
+// Multilingual public-pages CMS
+export const getAdminCmsPages = () => axios.get("/cms-pages/admin/all");
+export const getCmsPage = (slug, lang = "en") =>
+  axios.get(`/cms-pages/${encodeURIComponent(slug)}`, { params: { lang } });
+export const getFooterCmsPages = (lang = "en") => axios.get("/cms-pages/footer", { params: { lang, _: Date.now() } });
+export const saveCmsPage = (slug, data) =>
+  axios.put(`/cms-pages/admin/${encodeURIComponent(slug)}`, data);
 export const getAdminTestimonials = (params = {}) => axios.get("/testimonials/admin/all", { params });
 export const createTestimonial = (data) => axios.post("/testimonials", data, { headers: { "Content-Type": "multipart/form-data" } });
 export const updateTestimonial = (id, data) =>

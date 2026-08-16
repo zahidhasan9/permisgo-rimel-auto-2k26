@@ -184,6 +184,14 @@ const menu = [
         href: "/admin/blogs",
       },
       {
+        name: "Designed Pages",
+        href: "/admin/site-pages",
+      },
+      {
+        name: "Custom Pages CMS",
+        href: "/admin/custom-pages",
+      },
+      {
         name: "FAQ",
         href: "/admin/faqs",
       },

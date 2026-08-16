@@ -1,4 +1,18 @@
+"use client";
+
+import { usePathname } from "next/navigation";
+import useCmsPageContent from "@/hooks/useCmsPageContent";
+
 const Support = ({ title, headPara, mainContent }) => {
+  const pathname = usePathname();
+  const slug = pathname.split("/").filter(Boolean).filter((part) => !["en", "bn", "fr"].includes(part)).join("/");
+  const { page, content } = useCmsPageContent(slug);
+  // Seeded records intentionally do not replace the original page. Once an
+  // admin saves the record, updatedBy is set and CMS content becomes live.
+  const settings = content?.settings || {};
+  const displayTitle = settings.title || title;
+  const displayHeadPara = settings.intro || headPara;
+  const displayContent = settings.body || mainContent;
   return (
     <>
       {/* Header Section */}
@@ -6,11 +20,11 @@ const Support = ({ title, headPara, mainContent }) => {
         <div className="mx-auto max-w-5xl">
           <div className="text-center">
             <h1 className="text-3xl font-black leading-tight tracking-tight text-white sm:text-4xl lg:text-5xl">
-              {title}
+              {displayTitle}
             </h1>
 
             <p className="mx-auto mt-4 max-w-2xl text-sm font-medium leading-7 text-white/80 sm:text-base">
-              {headPara}
+              {displayHeadPara}
             </p>
           </div>
         </div>
@@ -20,7 +34,7 @@ const Support = ({ title, headPara, mainContent }) => {
       <section className="bg-white px-4 py-8 sm:py-10 lg:py-12">
         <div className="mx-auto max-w-6xl">
           <div className="rounded-2xl border border-slate-100 bg-white p-5 text-sm font-medium leading-7 text-slate-700 shadow-sm sm:p-6 sm:text-base">
-            <span>{mainContent}</span>
+            <span className="whitespace-pre-line">{displayContent}</span>
           </div>
         </div>
       </section>

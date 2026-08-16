@@ -9,6 +9,13 @@ import {
 } from "react-icons/fa6";
 import { createAppointmentRequest, getPublicTeachers } from "@/features/API";
 import { showToast } from "@/utils/showToast";
+import useCurrentLanguage from "@/hooks/useCurrentLanguage";
+
+const bookingCopy = {
+  en: { formTitle: "Appointment Booking Form", school: "PermisGo Driving School", heading: "Your Appointment with PermisGo", intro: "To schedule an appointment, please fill out the information below.", course: "Course Title", instructor: "Choose Instructor", loading: "Loading instructors...", selectInstructor: "Select instructor", date: "Select Date", time: "Select Time", duration: "Duration", name: "Your Name", email: "Email Address", phone: "Phone Number", notes: "Additional Notes", write: "Write here", submit: "Submit", submitting: "Submitting...", d30: "30 minutes", d60: "1 hour", d120: "2 hours", chosen: "Selected time", chooseTime: "Choose your preferred time from the form" },
+  bn: { formTitle: "অ্যাপয়েন্টমেন্ট বুকিং ফর্ম", school: "PermisGo ড্রাইভিং স্কুল", heading: "PermisGo-এর সঙ্গে আপনার অ্যাপয়েন্টমেন্ট", intro: "অ্যাপয়েন্টমেন্ট নির্ধারণ করতে নিচের তথ্যগুলো পূরণ করুন।", course: "কোর্সের নাম", instructor: "প্রশিক্ষক নির্বাচন করুন", loading: "প্রশিক্ষক লোড হচ্ছে...", selectInstructor: "প্রশিক্ষক বাছুন", date: "তারিখ নির্বাচন করুন", time: "সময় নির্বাচন করুন", duration: "সময়কাল", name: "আপনার নাম", email: "ইমেইল ঠিকানা", phone: "ফোন নম্বর", notes: "অতিরিক্ত তথ্য", write: "এখানে লিখুন", submit: "জমা দিন", submitting: "জমা হচ্ছে...", d30: "৩০ মিনিট", d60: "১ ঘণ্টা", d120: "২ ঘণ্টা", chosen: "নির্বাচিত সময়", chooseTime: "ফর্ম থেকে আপনার পছন্দের সময় নির্বাচন করুন" },
+  fr: { formTitle: "Formulaire de rendez-vous", school: "Auto-école PermisGo", heading: "Votre rendez-vous avec PermisGo", intro: "Pour prendre rendez-vous, veuillez remplir les informations ci-dessous.", course: "Intitulé de la formation", instructor: "Choisir un moniteur", loading: "Chargement des moniteurs...", selectInstructor: "Sélectionner un moniteur", date: "Choisir la date", time: "Choisir l’heure", duration: "Durée", name: "Votre nom", email: "Adresse e-mail", phone: "Numéro de téléphone", notes: "Informations complémentaires", write: "Écrivez ici", submit: "Envoyer", submitting: "Envoi...", d30: "30 minutes", d60: "1 heure", d120: "2 heures", chosen: "Heure sélectionnée", chooseTime: "Choisissez votre heure dans le formulaire" },
+};
 
 const MONTHS = [
   "January",
@@ -26,6 +33,8 @@ const MONTHS = [
 ];
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const localizedWeekdays = { en: WEEKDAYS, bn: ["রবি", "সোম", "মঙ্গল", "বুধ", "বৃহঃ", "শুক্র", "শনি"], fr: ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"] };
+const localeCodes = { en: "en-US", bn: "bn-BD", fr: "fr-FR" };
 const INITIAL_DATE = new Date();
 
 function buildCalendar(viewDate) {
@@ -79,13 +88,12 @@ function formatInputDate(date) {
   return `${year}-${month}-${day}`;
 }
 
-function formatCalendarHeader(date) {
-  return `${MONTHS[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+function formatCalendarHeader(date, language) {
+  return date.toLocaleDateString(localeCodes[language] || localeCodes.en, { month: "long", day: "numeric", year: "numeric" });
 }
 
-function formatSelectedDate(date) {
-  const weekday = date.toLocaleDateString("en-US", { weekday: "short" });
-  return `${weekday}, ${MONTHS[date.getMonth()]}, ${date.getDate()}`;
+function formatSelectedDate(date, language) {
+  return date.toLocaleDateString(localeCodes[language] || localeCodes.en, { weekday: "short", month: "long", day: "numeric" });
 }
 
 const labelClass =
@@ -93,7 +101,9 @@ const labelClass =
 const inputClass =
   "h-11 w-full rounded-[8px] border border-[#c2cfe2] bg-white px-3 !text-[13px] font-medium text-[#222] outline-none transition-all duration-300 [&::placeholder]:!text-[13px] [&::placeholder]:text-[#a0a0a0] focus:border-[#174a9b] focus:ring-4 focus:ring-[#174a9b]/10";
 
-export default function AppointmentBooking() {
+export default function AppointmentBooking({ title = "" }) {
+  const language = useCurrentLanguage() || "en";
+  const copy = bookingCopy[language] || bookingCopy.en;
   const [viewDate, setViewDate] = useState(() => new Date(INITIAL_DATE.getFullYear(), INITIAL_DATE.getMonth(), 1));
   const [selectedDate, setSelectedDate] = useState(INITIAL_DATE);
   const [selectedTime, setSelectedTime] = useState("");
@@ -176,7 +186,7 @@ export default function AppointmentBooking() {
       className="mx-auto min-w-0 w-full max-w-[1280px] overflow-hidden rounded-[12px] bg-white px-3 pb-6 pt-6 sm:px-6"
     >
       <h2 className="text-center text-[30px] font-extrabold tracking-[-0.02em] text-[#222] sm:text-[36px]">
-        Appointment Booking Form
+        {title || copy.formTitle}
       </h2>
 
       <div className="mt-10 min-w-0 rounded-[12px] bg-[#dce4f1] p-3 sm:p-6">
@@ -184,14 +194,13 @@ export default function AppointmentBooking() {
           {/* Appointment form */}
           <div className="min-w-0 rounded-[12px] bg-white px-5 py-8 sm:px-10 lg:min-h-[980px] lg:px-12 lg:py-12">
             <p className="!text-[12px] font-medium text-[#494949]">
-              PermisGo Driving School
+              {copy.school}
             </p>
             <h3 className="mt-3 text-[24px] font-extrabold leading-tight text-[#181818] sm:text-[28px]">
-              Your Appointment with PermisGo
+              {copy.heading}
             </h3>
             <p className="mt-3 !text-[12px] font-medium leading-5 text-[#7b7b7b]">
-              To schedule an appointment, please fill out the information
-              below.
+              {copy.intro}
             </p>
 
             <form
@@ -200,7 +209,7 @@ export default function AppointmentBooking() {
             >
               <div>
                 <label htmlFor="course-title" className={labelClass}>
-                  Course Title
+                  {copy.course}
                 </label>
                 <input
                   id="course-title"
@@ -215,7 +224,7 @@ export default function AppointmentBooking() {
 
               <div>
                 <label htmlFor="instructor" className={labelClass}>
-                  Choose Instructor
+                  {copy.instructor}
                 </label>
                 <select
                   id="instructor"
@@ -225,7 +234,7 @@ export default function AppointmentBooking() {
                   className={inputClass}
                   required
                 >
-                  <option value="">{instructorsLoading ? "Loading instructors..." : "Select instructor"}</option>
+                  <option value="">{instructorsLoading ? copy.loading : copy.selectInstructor}</option>
                   {instructors.map((teacher) => (
                     <option key={teacher.user?._id || teacher._id} value={teacher.user?._id || ""}>
                       {teacher.user?.name}{teacher.user?.city ? ` — ${teacher.user.city}` : ""}
@@ -237,7 +246,7 @@ export default function AppointmentBooking() {
               <div className="grid grid-cols-[minmax(0,1fr)] gap-5 sm:grid-cols-2">
                 <div>
                   <label htmlFor="appointment-date" className={labelClass}>
-                    Select Date
+                    {copy.date}
                   </label>
                   <div className="relative">
                     <input
@@ -258,7 +267,7 @@ export default function AppointmentBooking() {
 
                 <div>
                   <label htmlFor="appointment-time" className={labelClass}>
-                    Select Time
+                    {copy.time}
                   </label>
                   <input
                     id="appointment-time"
@@ -275,7 +284,7 @@ export default function AppointmentBooking() {
               <div className="grid grid-cols-[minmax(0,1fr)] gap-5 sm:grid-cols-2">
                 <div>
                   <label htmlFor="duration" className={labelClass}>
-                    Duration
+                    {copy.duration}
                   </label>
                   <select
                     id="duration"
@@ -286,15 +295,15 @@ export default function AppointmentBooking() {
                     required
                   >
                     <option value="" aria-label="Select duration" />
-                    <option value="30">30 minutes</option>
-                    <option value="60">1 hour</option>
-                    <option value="120">2 hours</option>
+                    <option value="30">{copy.d30}</option>
+                    <option value="60">{copy.d60}</option>
+                    <option value="120">{copy.d120}</option>
                   </select>
                 </div>
 
                 <div>
                   <label htmlFor="full-name" className={labelClass}>
-                    Your Name
+                    {copy.name}
                   </label>
                   <input
                     id="full-name"
@@ -312,7 +321,7 @@ export default function AppointmentBooking() {
               <div className="grid grid-cols-[minmax(0,1fr)] gap-5 sm:grid-cols-2">
                 <div>
                   <label htmlFor="email-address" className={labelClass}>
-                    Email Address
+                    {copy.email}
                   </label>
                   <input
                     id="email-address"
@@ -328,7 +337,7 @@ export default function AppointmentBooking() {
 
                 <div>
                   <label htmlFor="phone-number" className={labelClass}>
-                    Phone Number
+                    {copy.phone}
                   </label>
                   <input
                     id="phone-number"
@@ -345,7 +354,7 @@ export default function AppointmentBooking() {
 
               <div>
                 <label htmlFor="additional-notes" className={labelClass}>
-                  Additional Notes
+                  {copy.notes}
                 </label>
                 <textarea
                   id="additional-notes"
@@ -353,7 +362,7 @@ export default function AppointmentBooking() {
                   rows={4}
                   value={form.notes}
                   onChange={updateForm}
-                  placeholder="Write here"
+                  placeholder={copy.write}
                   className={`${inputClass} min-h-[118px] resize-none py-3`}
                 />
               </div>
@@ -363,7 +372,7 @@ export default function AppointmentBooking() {
                 disabled={submitting || instructorsLoading || !instructors.length}
                 className="flex h-12 w-full items-center justify-center rounded-[8px] bg-[#e2233d] px-5 !text-[13px] font-extrabold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#174a9b] hover:shadow-lg"
               >
-                {submitting ? "Submitting..." : "Submit"}
+                {submitting ? copy.submitting : copy.submit}
               </button>
             </form>
           </div>
@@ -373,7 +382,7 @@ export default function AppointmentBooking() {
             <div className="overflow-hidden rounded-[12px] bg-white">
               <div className="flex h-14 items-center justify-between border-b border-[#cbd5e3] px-5">
                 <h3 className="!font-sans !text-[14px] font-extrabold text-[#242424]">
-                  {formatCalendarHeader(selectedDate)}
+                  {formatCalendarHeader(selectedDate, language)}
                 </h3>
                 <div className="flex items-center gap-4 text-[#174a9b]">
                   <button
@@ -396,7 +405,7 @@ export default function AppointmentBooking() {
               </div>
 
               <div className="grid grid-cols-7 border-b border-[#d3dae5]">
-                {WEEKDAYS.map((weekday) => (
+                {(localizedWeekdays[language] || WEEKDAYS).map((weekday) => (
                   <div
                     key={weekday}
                     className="flex h-14 items-center justify-center !text-[12px] font-extrabold text-[#202020] lg:h-[100px]"
@@ -440,10 +449,10 @@ export default function AppointmentBooking() {
 
             <div className="mt-5 rounded-[12px] bg-white p-5">
               <h3 className="!font-sans !text-[14px] font-extrabold text-[#343434]">
-                {formatSelectedDate(selectedDate)}
+                {formatSelectedDate(selectedDate, language)}
               </h3>
               <div className="mt-5 rounded-[8px] border border-[#174a9b] bg-[#edf3fb] px-4 py-3 text-center !text-[13px] font-semibold text-[#174a9b]">
-                {selectedTime ? `Selected time: ${selectedTime}` : "Choose your preferred time from the form"}
+                {selectedTime ? `${copy.chosen}: ${selectedTime}` : copy.chooseTime}
               </div>
             </div>
 

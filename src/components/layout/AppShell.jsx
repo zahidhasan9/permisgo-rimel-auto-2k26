@@ -88,7 +88,7 @@ export default function AppShell({ children }) {
   if (authRoots.some((root) => isPathWithin(pathname, root))) {
     return <><StudentAuthNavbar /><PublicOnlyRoute>{children}</PublicOnlyRoute></>;
   }
-  if (pathname === "/") {
+  if (pathname === "/" || /^\/(en|bn|fr)$/.test(pathname)) {
     return <div data-public-site className="max-[500px]:pb-[68px]"><HomeStaticTranslator />{children}<FloatingWhatsApp /><BottomMenu /></div>;
   }
   if (isPathWithin(pathname, "/chat")) return children;

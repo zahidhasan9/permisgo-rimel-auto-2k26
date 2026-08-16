@@ -99,12 +99,17 @@ const translateRoot = (root, language) => {
   let node;
   while ((node = walker.nextNode())) {
     if (node.parentElement?.closest("script,style,[data-no-translate]")) continue;
-    if (node._permisgoOriginal === undefined) node._permisgoOriginal = node.nodeValue;
+    if (node._permisgoOriginal === undefined || (node._permisgoTranslatedValue !== undefined && node.nodeValue !== node._permisgoTranslatedValue)) {
+      // React/CMS replaced this text after the previous translation. Treat the
+      // new value as the source instead of restoring the old fallback copy.
+      node._permisgoOriginal = node.nodeValue;
+    }
     const original = node._permisgoOriginal;
     const trimmed = original.trim();
     const translated = dictionary[trimmed];
     const nextValue = translated ? original.replace(trimmed, translated) : original;
     if (node.nodeValue !== nextValue) node.nodeValue = nextValue;
+    node._permisgoTranslatedValue = nextValue;
   }
   root.querySelectorAll("[placeholder]:not([data-no-translate] [placeholder])").forEach((element) => {
     if (!element.dataset.originalPlaceholder) element.dataset.originalPlaceholder = element.placeholder;

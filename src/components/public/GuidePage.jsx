@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import {
   FaArrowRight,
@@ -5,6 +7,7 @@ import {
   FaHeadset,
   FaRegCompass,
 } from "react-icons/fa";
+import useCmsPageContent from "@/hooks/useCmsPageContent";
 
 const guideLinks = [
   { label: "Where are we?", href: "/where-are-we" },
@@ -23,6 +26,11 @@ export default function GuidePage({
   children,
   currentPath,
 }) {
+  const slug = String(currentPath || "").replace(/^\/+|\/+$/g, "");
+  const { page, content } = useCmsPageContent(slug);
+  const settings = content?.settings || {};
+  const displayTitle = settings.heroTitle || title;
+  const displayDescription = settings.heroDescription || description;
   return (
     <div className="bg-[#f5f8fd] text-slate-900">
       <section className="relative overflow-hidden bg-[#103677] px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
@@ -40,10 +48,10 @@ export default function GuidePage({
                 {eyebrow}
               </p>
               <h1 className="text-4xl font-extrabold leading-tight text-white sm:text-5xl lg:text-[58px]">
-                {title}
+                {displayTitle}
               </h1>
               <p className="mt-6 max-w-2xl text-base leading-8 text-blue-100 sm:text-lg">
-                {description}
+                {displayDescription}
               </p>
             </div>
             <div className="relative mx-auto flex h-52 w-52 items-center justify-center rounded-[38px] border border-white/15 bg-white/10 text-[88px] text-white shadow-2xl backdrop-blur sm:h-60 sm:w-60">
@@ -124,4 +132,3 @@ export function SectionTitle({ eyebrow, title, description }) {
     </div>
   );
 }
-
