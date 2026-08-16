@@ -69,7 +69,11 @@ export default function AppShell({ children }) {
   const pathname = usePathname() || "/";
 
   if (isPathWithin(pathname, "/admin")) {
-    return <DashboardShell role="admin" Sidebar={AdminSidebar}>{children}</DashboardShell>;
+    return (
+      <DashboardShell role="admin" Sidebar={AdminSidebar}>
+        {children}
+      </DashboardShell>
+    );
   }
   if (isPathWithin(pathname, "/student")) {
     return (
@@ -83,14 +87,39 @@ export default function AppShell({ children }) {
     );
   }
   if (isPathWithin(pathname, "/teacher")) {
-    return <DashboardShell role="teacher" Sidebar={TeacherSidebar}>{children}</DashboardShell>;
+    return (
+      <DashboardShell role="teacher" Sidebar={TeacherSidebar}>
+        {children}
+      </DashboardShell>
+    );
   }
   if (authRoots.some((root) => isPathWithin(pathname, root))) {
-    return <><StudentAuthNavbar /><PublicOnlyRoute>{children}</PublicOnlyRoute></>;
+    return (
+      <>
+        <StudentAuthNavbar />
+        <PublicOnlyRoute>{children}</PublicOnlyRoute>
+      </>
+    );
   }
   if (pathname === "/" || /^\/(en|bn|fr)$/.test(pathname)) {
-    return <div data-public-site className="max-[500px]:pb-[68px]"><HomeStaticTranslator />{children}<FloatingWhatsApp /><BottomMenu /></div>;
+    return (
+      <div data-public-site className="max-[500px]:pb-[68px]">
+        <HomeStaticTranslator />
+        {children}
+        <FloatingWhatsApp />
+        <BottomMenu />
+      </div>
+    );
   }
   if (isPathWithin(pathname, "/chat")) return children;
-  return <div data-public-site className="max-[500px]:pb-[68px]"><HomeStaticTranslator /><Navbar /><main>{children}</main><Footer /><FloatingWhatsApp /><BottomMenu /></div>;
+  return (
+    <div data-public-site className="max-[500px]:pb-[68px]">
+      <HomeStaticTranslator />
+      <Navbar />
+      <main>{children}</main>
+      <Footer />
+      <FloatingWhatsApp />
+      <BottomMenu />
+    </div>
+  );
 }

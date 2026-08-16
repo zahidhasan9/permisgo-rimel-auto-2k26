@@ -372,7 +372,9 @@ export default function TeacherProfilePage() {
           </button>
 
           <div className="min-w-0">
-            <h1 className="text-xl font-bold text-[#103f8f] sm:text-2xl">Profile</h1>
+            <h1 className="text-xl font-bold text-[#103f8f] sm:text-2xl">
+              Profile
+            </h1>
 
             <p className="mt-1 max-w-2xl text-xs leading-5 text-slate-500 sm:text-sm sm:leading-6">
               Update your information to ensure accurate lesson scheduling and
@@ -426,7 +428,9 @@ export default function TeacherProfilePage() {
                 <p className="mt-1 flex min-w-0 items-start justify-center gap-2 text-xs text-slate-500 min-[430px]:justify-start sm:text-sm">
                   <SiGmail className="mt-0.5 shrink-0 text-[#e63946]" />
 
-                  <span className="min-w-0 break-all">{form.email || "No email found"}</span>
+                  <span className="min-w-0 break-all">
+                    {form.email || "No email found"}
+                  </span>
                 </p>
 
                 <p className="mt-1 text-xs font-semibold capitalize text-[#103f8f]">

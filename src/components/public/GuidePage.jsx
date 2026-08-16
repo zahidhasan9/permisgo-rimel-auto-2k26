@@ -1,12 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import {
-  FaArrowRight,
-  FaCheck,
-  FaHeadset,
-  FaRegCompass,
-} from "react-icons/fa";
+import { FaArrowRight, FaCheck, FaHeadset, FaRegCompass } from "react-icons/fa";
 import useCmsPageContent from "@/hooks/useCmsPageContent";
 
 const guideLinks = [
@@ -38,7 +33,9 @@ export default function GuidePage({
         <div className="absolute -bottom-32 left-1/4 h-80 w-80 rounded-full bg-blue-400/20 blur-3xl" />
         <div className="relative mx-auto max-w-7xl">
           <div className="mb-7 flex items-center gap-2 text-sm font-medium text-blue-100">
-            <Link href="/" className="transition hover:text-white">Home</Link>
+            <Link href="/" className="transition hover:text-white">
+              Home
+            </Link>
             <span>/</span>
             <span className="text-white">{eyebrow}</span>
           </div>
@@ -66,7 +63,10 @@ export default function GuidePage({
         <section className="relative z-10 mx-auto -mt-7 max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-[0_18px_50px_rgba(15,50,110,0.12)] sm:grid-cols-3">
             {highlights.map((item) => (
-              <div key={item} className="flex items-center gap-3 border-b border-slate-100 px-6 py-5 last:border-0 sm:border-b-0 sm:border-r">
+              <div
+                key={item}
+                className="flex items-center gap-3 border-b border-slate-100 px-6 py-5 last:border-0 sm:border-b-0 sm:border-r"
+              >
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-red-50 text-sm text-[#e2233d]">
                   <FaCheck />
                 </span>
@@ -126,9 +126,17 @@ export default function GuidePage({
 export function SectionTitle({ eyebrow, title, description }) {
   return (
     <div className="mb-8">
-      {eyebrow && <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#e2233d]">{eyebrow}</p>}
-      <h2 className="mt-2 text-3xl font-extrabold leading-tight text-[#103677] sm:text-4xl">{title}</h2>
-      {description && <p className="mt-3 max-w-3xl leading-7 text-slate-600">{description}</p>}
+      {eyebrow && (
+        <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#e2233d]">
+          {eyebrow}
+        </p>
+      )}
+      <h2 className="mt-2 text-3xl font-extrabold leading-tight text-[#103677] sm:text-4xl">
+        {title}
+      </h2>
+      {description && (
+        <p className="mt-3 max-w-3xl leading-7 text-slate-600">{description}</p>
+      )}
     </div>
   );
 }

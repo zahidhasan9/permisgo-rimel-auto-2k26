@@ -25,7 +25,9 @@ import { mediaUrl } from "@/utils/mediaUrl";
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const pad = (value) => String(value).padStart(2, "0");
 const toMinutes = (value) => {
-  const [hours, minutes] = String(value || "00:00").split(":").map(Number);
+  const [hours, minutes] = String(value || "00:00")
+    .split(":")
+    .map(Number);
   return hours * 60 + minutes;
 };
 const minutesToTime = (value) =>
@@ -52,7 +54,9 @@ const removeRangeFromSlots = (slots, startTime, endTime) =>
     const removeEnd = toMinutes(endTime);
     if (removeEnd <= start || removeStart >= end) return [slot];
     return [
-      start < removeStart ? { startTime: slot.startTime, endTime: startTime } : null,
+      start < removeStart
+        ? { startTime: slot.startTime, endTime: startTime }
+        : null,
       removeEnd < end ? { startTime: endTime, endTime: slot.endTime } : null,
     ].filter(Boolean);
   });
@@ -93,7 +97,15 @@ const formatRange = (start) => {
   })}`;
 };
 const getInitial = (name = "Student") => name.trim().charAt(0).toUpperCase();
-const FULL_DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const FULL_DAYS = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
 const toEditorSchedule = (availability) =>
   FULL_DAYS.map((_, dayOfWeek) => {
     const day = availability?.weeklySchedule?.find(
@@ -152,21 +164,21 @@ export default function AvailabilityCalendar() {
     try {
       const [lessonResponse, bookingResponse, availabilityResponse] =
         await Promise.all([
-        getLessons({
-          dateFrom: dateKey(weekStart),
-          dateTo: dateKey(addDays(weekStart, 6)),
-          limit: 100,
-          sortOrder: "asc",
-        }),
-        getLocationBookings({
-          dateFrom: dateKey(weekStart),
-          dateTo: dateKey(addDays(weekStart, 6)),
-          status: "pending",
-          page: 1,
-          limit: 100,
-        }),
-        getTeacherAvailability(),
-      ]);
+          getLessons({
+            dateFrom: dateKey(weekStart),
+            dateTo: dateKey(addDays(weekStart, 6)),
+            limit: 100,
+            sortOrder: "asc",
+          }),
+          getLocationBookings({
+            dateFrom: dateKey(weekStart),
+            dateTo: dateKey(addDays(weekStart, 6)),
+            status: "pending",
+            page: 1,
+            limit: 100,
+          }),
+          getTeacherAvailability(),
+        ]);
       const lessonData = unwrap(lessonResponse, []);
       const bookingData = unwrap(bookingResponse, []);
       setLessons(Array.isArray(lessonData) ? lessonData : []);
@@ -187,7 +199,8 @@ export default function AvailabilityCalendar() {
     const unique = new Map();
     [...lessons, ...bookings].forEach((item) => {
       const student = item.student;
-      if (student?._id && !unique.has(student._id)) unique.set(student._id, student);
+      if (student?._id && !unique.has(student._id))
+        unique.set(student._id, student);
     });
     const query = search.trim().toLowerCase();
     return [...unique.values()].filter((student) =>
@@ -232,13 +245,22 @@ export default function AvailabilityCalendar() {
       ...eventStartMinutes.map(minutesToTime),
     ].filter(Boolean);
     const minimum = allStartTimes.length
-      ? Math.max(0, Math.floor(Math.min(...allStartTimes.map(toMinutes)) / 30) * 30)
+      ? Math.max(
+          0,
+          Math.floor(Math.min(...allStartTimes.map(toMinutes)) / 30) * 30,
+        )
       : 9 * 60;
     const availabilityLastStarts = availabilityTimes.length
-      ? effectiveSlots.map((slot) => Math.max(toMinutes(slot.startTime), toMinutes(slot.endTime) - 30))
+      ? effectiveSlots.map((slot) =>
+          Math.max(toMinutes(slot.startTime), toMinutes(slot.endTime) - 30),
+        )
       : [];
-    const maximumStart = [...availabilityLastStarts, ...eventStartMinutes].length
-      ? Math.min(23 * 60 + 30, Math.max(...availabilityLastStarts, ...eventStartMinutes))
+    const maximumStart = [...availabilityLastStarts, ...eventStartMinutes]
+      .length
+      ? Math.min(
+          23 * 60 + 30,
+          Math.max(...availabilityLastStarts, ...eventStartMinutes),
+        )
       : 17 * 60 + 30;
     for (let value = minimum; value <= maximumStart; value += 30) {
       values.push(minutesToTime(value));
@@ -256,13 +278,12 @@ export default function AvailabilityCalendar() {
         ? []
         : exception.slots || []
       : availability?.weeklySchedule?.find(
-            (item) => Number(item.dayOfWeek) === day.getDay(),
-          )?.slots || [];
+          (item) => Number(item.dayOfWeek) === day.getDay(),
+        )?.slots || [];
     const minute = toMinutes(time);
     return slots.some(
       (slot) =>
-        minute >= toMinutes(slot.startTime) &&
-        minute < toMinutes(slot.endTime),
+        minute >= toMinutes(slot.startTime) && minute < toMinutes(slot.endTime),
     );
   };
 
@@ -282,7 +303,9 @@ export default function AvailabilityCalendar() {
       setSelectedEvent(null);
       await loadCalendar();
     } catch (error) {
-      setNotice(getErrorMessage(error, "Booking action could not be completed."));
+      setNotice(
+        getErrorMessage(error, "Booking action could not be completed."),
+      );
     } finally {
       setSaving(false);
     }
@@ -301,9 +324,7 @@ export default function AvailabilityCalendar() {
     setSaving(true);
     setNotice("");
     try {
-      const nextKeys = new Set(
-        weekDays.map((day) => dateKey(addDays(day, 7))),
-      );
+      const nextKeys = new Set(weekDays.map((day) => dateKey(addDays(day, 7))));
       const retained = (availability.dateExceptions || []).filter(
         (item) => !nextKeys.has(lessonDateKey(item.date)),
       );
@@ -333,8 +354,9 @@ export default function AvailabilityCalendar() {
         timezone: availability.timezone || "Europe/Paris",
         bufferMinutes: availability.bufferMinutes ?? 15,
         slotIntervalMinutes: availability.slotIntervalMinutes ?? 30,
-        lessonDurationOptions:
-          availability.lessonDurationOptions || [30, 60, 90, 120],
+        lessonDurationOptions: availability.lessonDurationOptions || [
+          30, 60, 90, 120,
+        ],
         weeklySchedule: availability.weeklySchedule,
         dateExceptions: [...retained, ...copied],
       });
@@ -366,7 +388,9 @@ export default function AvailabilityCalendar() {
       (day) => day.enabled && day.endTime <= day.startTime,
     );
     if (invalidDay) {
-      setNotice(`${FULL_DAYS[invalidDay.dayOfWeek]} end time must be after start time.`);
+      setNotice(
+        `${FULL_DAYS[invalidDay.dayOfWeek]} end time must be after start time.`,
+      );
       return;
     }
 
@@ -377,7 +401,9 @@ export default function AvailabilityCalendar() {
         timezone: availability?.timezone || "Europe/Paris",
         bufferMinutes: availability?.bufferMinutes ?? 15,
         slotIntervalMinutes: availability?.slotIntervalMinutes ?? 30,
-        lessonDurationOptions: availability?.lessonDurationOptions || [30, 60, 90, 120],
+        lessonDurationOptions: availability?.lessonDurationOptions || [
+          30, 60, 90, 120,
+        ],
         // A newly saved weekly schedule becomes the single source of truth.
         // Remove older copied/custom overrides that could keep stale hours visible.
         dateExceptions: [],
@@ -439,12 +465,16 @@ export default function AvailabilityCalendar() {
         timezone: availability.timezone || "Europe/Paris",
         bufferMinutes: availability.bufferMinutes ?? 15,
         slotIntervalMinutes: availability.slotIntervalMinutes ?? 30,
-        lessonDurationOptions: availability.lessonDurationOptions || [30, 60, 90, 120],
+        lessonDurationOptions: availability.lessonDurationOptions || [
+          30, 60, 90, 120,
+        ],
         weeklySchedule: availability.weeklySchedule,
         dateExceptions: nextExceptions,
       });
       setAvailability(unwrap(response, availability));
-      setNotice(`${key} at ${displayTime(time)} marked ${makeFree ? "free" : "busy"}.`);
+      setNotice(
+        `${key} at ${displayTime(time)} marked ${makeFree ? "free" : "busy"}.`,
+      );
     } catch (error) {
       setNotice(getErrorMessage(error, "This time slot could not be updated."));
     } finally {
@@ -515,10 +545,18 @@ export default function AvailabilityCalendar() {
                 })}
               </h3>
               <div className="flex items-center gap-2 text-blue-900">
-                <button type="button" onClick={() => moveMonth(-1)} className="text-lg">
+                <button
+                  type="button"
+                  onClick={() => moveMonth(-1)}
+                  className="text-lg"
+                >
                   <IoChevronBack />
                 </button>
-                <button type="button" onClick={() => moveMonth(1)} className="text-lg">
+                <button
+                  type="button"
+                  onClick={() => moveMonth(1)}
+                  className="text-lg"
+                >
                   <IoChevronForward />
                 </button>
               </div>
@@ -526,7 +564,10 @@ export default function AvailabilityCalendar() {
 
             <div className="grid grid-cols-7 gap-1 text-center">
               {["S", "M", "T", "W", "T", "F", "S"].map((day, index) => (
-                <span key={index} className="text-xs font-semibold text-slate-900">
+                <span
+                  key={index}
+                  className="text-xs font-semibold text-slate-900"
+                >
                   {day}
                 </span>
               ))}
@@ -553,7 +594,9 @@ export default function AvailabilityCalendar() {
           </div>
 
           <div className="mt-7">
-            <h4 className="mb-3 text-sm font-extrabold text-slate-900">Student</h4>
+            <h4 className="mb-3 text-sm font-extrabold text-slate-900">
+              Student
+            </h4>
             <div className="mb-4 flex h-11 items-center gap-3 rounded-xl bg-white px-4">
               <IoSearch className="text-xl text-slate-500" />
               <input
@@ -601,7 +644,10 @@ export default function AvailabilityCalendar() {
             </div>
           </div>
 
-          <p className="mb-2 text-[10px] font-semibold text-slate-500 sm:hidden">Swipe sideways to see the full week. Tap an empty or busy slot to change it.</p>
+          <p className="mb-2 text-[10px] font-semibold text-slate-500 sm:hidden">
+            Swipe sideways to see the full week. Tap an empty or busy slot to
+            change it.
+          </p>
           <div className="w-full max-w-full overflow-x-auto overscroll-x-contain rounded-xl bg-white">
             <div className="min-w-[612px] sm:min-w-[760px]">
               <div className="grid [grid-template-columns:80px_repeat(7,76px)] border-b border-slate-200 sm:grid-cols-[110px_repeat(7,minmax(85px,1fr))]">
@@ -639,7 +685,14 @@ export default function AvailabilityCalendar() {
                     return (
                       <div
                         key={dateKey(day)}
-                        onClick={() => !occupied && setCellAvailability(day, time, available ? false : true)}
+                        onClick={() =>
+                          !occupied &&
+                          setCellAvailability(
+                            day,
+                            time,
+                            available ? false : true,
+                          )
+                        }
                         role={!occupied ? "button" : undefined}
                         tabIndex={!occupied ? 0 : undefined}
                         className={`group relative flex h-[68px] [--calendar-cell-height:68px] items-center justify-center border-r border-slate-200 last:border-r-0 sm:h-[84px] sm:[--calendar-cell-height:84px] ${!occupied ? "cursor-pointer" : ""} ${
@@ -678,7 +731,10 @@ export default function AvailabilityCalendar() {
                             type="button"
                             key={booking._id}
                             onClick={() =>
-                              setSelectedEvent({ type: "booking", data: booking })
+                              setSelectedEvent({
+                                type: "booking",
+                                data: booking,
+                              })
                             }
                             className="absolute bottom-1 left-1 right-1 z-20 rounded-lg bg-amber-500 px-2 py-1.5 text-xs font-extrabold text-white shadow-sm"
                           >
@@ -696,7 +752,9 @@ export default function AvailabilityCalendar() {
                               {available ? (
                                 <button
                                   type="button"
-                                  onClick={() => setCellAvailability(day, time, false)}
+                                  onClick={() =>
+                                    setCellAvailability(day, time, false)
+                                  }
                                   disabled={saving}
                                   className="rounded-md bg-slate-800 px-3 py-1.5 text-[10px] font-extrabold text-white disabled:opacity-40"
                                 >
@@ -705,7 +763,9 @@ export default function AvailabilityCalendar() {
                               ) : (
                                 <button
                                   type="button"
-                                  onClick={() => setCellAvailability(day, time, true)}
+                                  onClick={() =>
+                                    setCellAvailability(day, time, true)
+                                  }
                                   disabled={saving}
                                   className="rounded-md bg-emerald-600 px-3 py-1.5 text-[10px] font-extrabold text-white disabled:opacity-40"
                                 >
@@ -762,40 +822,108 @@ function AvailabilityEditor({ schedule, saving, onChange, onClose, onSave }) {
       <div className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white p-5 shadow-2xl sm:p-6">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h2 className="text-xl font-extrabold text-blue-900">Set weekly availability</h2>
-            <p className="mt-1 text-sm text-slate-500">Students can only book inside these saved hours.</p>
+            <h2 className="text-xl font-extrabold text-blue-900">
+              Set weekly availability
+            </h2>
+            <p className="mt-1 text-sm text-slate-500">
+              Students can only book inside these saved hours.
+            </p>
           </div>
-          <button type="button" onClick={onClose} className="rounded-xl bg-slate-100 p-3 text-slate-600"><FaTimes /></button>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-xl bg-slate-100 p-3 text-slate-600"
+          >
+            <FaTimes />
+          </button>
         </div>
         <div className="mt-5 rounded-xl border border-blue-200 bg-blue-50 p-4">
-          <p className="text-sm font-extrabold text-blue-900">Apply time to all available days</p>
+          <p className="text-sm font-extrabold text-blue-900">
+            Apply time to all available days
+          </p>
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
             <label className="text-xs font-bold text-slate-600">
               Start time
-              <input type="time" value={firstEnabled?.startTime || "09:00"} onChange={(event) => applyTimeToEnabledDays("startTime", event.target.value)} className="mt-1 block w-full rounded-xl border border-blue-200 bg-white px-3 py-2.5 text-sm" />
+              <input
+                type="time"
+                value={firstEnabled?.startTime || "09:00"}
+                onChange={(event) =>
+                  applyTimeToEnabledDays("startTime", event.target.value)
+                }
+                className="mt-1 block w-full rounded-xl border border-blue-200 bg-white px-3 py-2.5 text-sm"
+              />
             </label>
             <label className="text-xs font-bold text-slate-600">
               End time
-              <input type="time" value={firstEnabled?.endTime || "18:00"} onChange={(event) => applyTimeToEnabledDays("endTime", event.target.value)} className="mt-1 block w-full rounded-xl border border-blue-200 bg-white px-3 py-2.5 text-sm" />
+              <input
+                type="time"
+                value={firstEnabled?.endTime || "18:00"}
+                onChange={(event) =>
+                  applyTimeToEnabledDays("endTime", event.target.value)
+                }
+                className="mt-1 block w-full rounded-xl border border-blue-200 bg-white px-3 py-2.5 text-sm"
+              />
             </label>
           </div>
         </div>
         <div className="mt-5 space-y-3">
           {schedule.map((day) => (
-            <div key={day.dayOfWeek} className="grid items-center gap-3 rounded-xl border border-slate-200 p-3 sm:grid-cols-[130px_110px_1fr_1fr]">
-              <strong className="text-sm text-slate-800">{FULL_DAYS[day.dayOfWeek]}</strong>
+            <div
+              key={day.dayOfWeek}
+              className="grid items-center gap-3 rounded-xl border border-slate-200 p-3 sm:grid-cols-[130px_110px_1fr_1fr]"
+            >
+              <strong className="text-sm text-slate-800">
+                {FULL_DAYS[day.dayOfWeek]}
+              </strong>
               <label className="flex items-center gap-2 text-sm font-semibold text-slate-600">
-                <input type="checkbox" checked={day.enabled} onChange={(event) => onChange(day.dayOfWeek, "enabled", event.target.checked)} className="h-4 w-4 accent-blue-900" />
+                <input
+                  type="checkbox"
+                  checked={day.enabled}
+                  onChange={(event) =>
+                    onChange(day.dayOfWeek, "enabled", event.target.checked)
+                  }
+                  className="h-4 w-4 accent-blue-900"
+                />
                 Available
               </label>
-              <input type="time" value={day.startTime} disabled={!day.enabled} onChange={(event) => onChange(day.dayOfWeek, "startTime", event.target.value)} className="rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-semibold disabled:bg-slate-100" />
-              <input type="time" value={day.endTime} disabled={!day.enabled} onChange={(event) => onChange(day.dayOfWeek, "endTime", event.target.value)} className="rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-semibold disabled:bg-slate-100" />
+              <input
+                type="time"
+                value={day.startTime}
+                disabled={!day.enabled}
+                onChange={(event) =>
+                  onChange(day.dayOfWeek, "startTime", event.target.value)
+                }
+                className="rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-semibold disabled:bg-slate-100"
+              />
+              <input
+                type="time"
+                value={day.endTime}
+                disabled={!day.enabled}
+                onChange={(event) =>
+                  onChange(day.dayOfWeek, "endTime", event.target.value)
+                }
+                className="rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-semibold disabled:bg-slate-100"
+              />
             </div>
           ))}
         </div>
         <div className="mt-6 flex justify-end gap-3">
-          <button type="button" onClick={onClose} disabled={saving} className="rounded-xl border border-slate-300 px-5 py-2.5 text-sm font-bold text-slate-700">Cancel</button>
-          <button type="button" onClick={onSave} disabled={saving} className="rounded-xl bg-rose-600 px-5 py-2.5 text-sm font-bold text-white disabled:opacity-50">{saving ? "Saving..." : "Save availability"}</button>
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={saving}
+            className="rounded-xl border border-slate-300 px-5 py-2.5 text-sm font-bold text-slate-700"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={onSave}
+            disabled={saving}
+            className="rounded-xl bg-rose-600 px-5 py-2.5 text-sm font-bold text-white disabled:opacity-50"
+          >
+            {saving ? "Saving..." : "Save availability"}
+          </button>
         </div>
       </div>
     </div>
@@ -885,7 +1013,9 @@ function EventModal({
           </p>
           <p>
             <strong className="block text-slate-900">Vehicle</strong>
-            <span className="capitalize">{item.booking?.vehicleType || item.vehicleType || "Not set"}</span>
+            <span className="capitalize">
+              {item.booking?.vehicleType || item.vehicleType || "Not set"}
+            </span>
           </p>
           <p>
             <strong className="block text-slate-900">Status</strong>

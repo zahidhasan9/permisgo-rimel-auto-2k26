@@ -62,7 +62,9 @@ export const requestLabel = (status) => {
 
 export const getLessonLocation = (lesson) => {
   const location = lesson?.booking?.location || {};
-  return [location.address, location.city].filter(Boolean).join(", ") || "Not set";
+  return (
+    [location.address, location.city].filter(Boolean).join(", ") || "Not set"
+  );
 };
 
 export const getVehicleType = (lesson) =>

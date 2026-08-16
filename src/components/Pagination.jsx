@@ -56,7 +56,8 @@ export default function Pagination({
           onClick={() => onPageChange(safePage - 1)}
           className="shrink-0 rounded-lg border border-slate-300 px-2.5 py-2 text-xs font-semibold text-slate-700 disabled:cursor-not-allowed disabled:opacity-40 sm:px-3 sm:text-sm"
         >
-          <span className="sm:hidden">Prev</span><span className="hidden sm:inline">Previous</span>
+          <span className="sm:hidden">Prev</span>
+          <span className="hidden sm:inline">Previous</span>
         </button>
 
         {pageNumbers.map((pageNumber, index) => {

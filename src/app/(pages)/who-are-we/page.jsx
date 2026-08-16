@@ -84,8 +84,8 @@ export default function WhoAreWePage() {
 
             <p className="mt-7 max-w-[505px] !text-[15px] font-medium leading-[1.85] text-[#444] sm:!text-[16px]">
               Lorem ipsum dolor sit amet consectetur adipisicing elit. Ducimus
-              quisquam voluptas doloremque pariatur voluptatibus. Distinctio
-              sit blanditiis eius odit illo itaque, ratione, laudantium est sunt
+              quisquam voluptas doloremque pariatur voluptatibus. Distinctio sit
+              blanditiis eius odit illo itaque, ratione, laudantium est sunt
               perspiciatis ullam corrupti, in sint.
             </p>
 
@@ -218,9 +218,7 @@ export default function WhoAreWePage() {
               <ul className="space-y-2.5">
                 <li className="group flex items-start gap-3 rounded-[8px] border border-white/30 bg-white/20 px-4 py-3 !text-[14px] font-semibold leading-5 text-white transition-all duration-300 hover:translate-x-1.5 hover:bg-white/30">
                   <FaLocationDot className="mt-1 shrink-0" />
-                  <span>
-                    | {site.address}
-                  </span>
+                  <span>| {site.address}</span>
                 </li>
                 <li className="group flex items-center gap-3 rounded-[8px] border border-white/30 bg-white/20 px-4 py-3 !text-[14px] font-semibold text-white transition-all duration-300 hover:translate-x-1.5 hover:bg-white/30">
                   <FaPhone className="shrink-0" />

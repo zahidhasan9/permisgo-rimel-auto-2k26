@@ -25,23 +25,31 @@ const getErrorMessage = (error, fallback) => {
   );
 };
 
-export const fetchAdminDashboard = createAsyncThunk("admin/fetchDashboard", async (_, { rejectWithValue }) => {
-  try {
-    const { data } = await getAdminDashboard();
-    return data;
-  } catch (error) {
-    return rejectWithValue(getErrorMessage(error, "Failed to fetch admin dashboard"));
-  }
-});
+export const fetchAdminDashboard = createAsyncThunk(
+  "admin/fetchDashboard",
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await getAdminDashboard();
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        getErrorMessage(error, "Failed to fetch admin dashboard"),
+      );
+    }
+  },
+);
 
-export const fetchAdminUsers = createAsyncThunk("admin/fetchUsers", async (_, { rejectWithValue }) => {
-  try {
-    const { data } = await getAdminUsers();
-    return data;
-  } catch (error) {
-    return rejectWithValue(getErrorMessage(error, "Failed to fetch users"));
-  }
-});
+export const fetchAdminUsers = createAsyncThunk(
+  "admin/fetchUsers",
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await getAdminUsers();
+      return data;
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error, "Failed to fetch users"));
+    }
+  },
+);
 
 export const changeUserStatus = createAsyncThunk(
   "admin/changeUserStatus",
@@ -50,28 +58,40 @@ export const changeUserStatus = createAsyncThunk(
       const { data } = await updateUserStatus(id, status);
       return data;
     } catch (error) {
-      return rejectWithValue(getErrorMessage(error, "Failed to update user status"));
+      return rejectWithValue(
+        getErrorMessage(error, "Failed to update user status"),
+      );
     }
-  }
+  },
 );
 
-export const teacherVerify = createAsyncThunk("admin/teacherVerify", async (teacherId, { rejectWithValue }) => {
-  try {
-    const { data } = await verifyTeacher(teacherId);
-    return data;
-  } catch (error) {
-    return rejectWithValue(getErrorMessage(error, "Teacher verification failed"));
-  }
-});
+export const teacherVerify = createAsyncThunk(
+  "admin/teacherVerify",
+  async (teacherId, { rejectWithValue }) => {
+    try {
+      const { data } = await verifyTeacher(teacherId);
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        getErrorMessage(error, "Teacher verification failed"),
+      );
+    }
+  },
+);
 
-export const fetchDocuments = createAsyncThunk("admin/fetchDocuments", async (_, { rejectWithValue }) => {
-  try {
-    const { data } = await getDocuments();
-    return data;
-  } catch (error) {
-    return rejectWithValue(getErrorMessage(error, "Failed to fetch documents"));
-  }
-});
+export const fetchDocuments = createAsyncThunk(
+  "admin/fetchDocuments",
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await getDocuments();
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        getErrorMessage(error, "Failed to fetch documents"),
+      );
+    }
+  },
+);
 
 export const documentReview = createAsyncThunk(
   "admin/documentReview",
@@ -82,17 +102,20 @@ export const documentReview = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(getErrorMessage(error, "Document review failed"));
     }
-  }
+  },
 );
 
-export const fetchSupportTickets = createAsyncThunk("admin/fetchSupportTickets", async (_, { rejectWithValue }) => {
-  try {
-    const { data } = await getSupportTickets();
-    return data;
-  } catch (error) {
-    return rejectWithValue(getErrorMessage(error, "Failed to fetch tickets"));
-  }
-});
+export const fetchSupportTickets = createAsyncThunk(
+  "admin/fetchSupportTickets",
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await getSupportTickets();
+      return data;
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error, "Failed to fetch tickets"));
+    }
+  },
+);
 
 export const replyTicket = createAsyncThunk(
   "admin/replyTicket",
@@ -103,53 +126,74 @@ export const replyTicket = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(getErrorMessage(error, "Reply failed"));
     }
-  }
+  },
 );
 
-export const fetchNotifications = createAsyncThunk("admin/fetchNotifications", async (_, { rejectWithValue }) => {
-  try {
-    const { data } = await getNotifications();
-    return data;
-  } catch (error) {
-    return rejectWithValue(getErrorMessage(error, "Failed to fetch notifications"));
-  }
-});
+export const fetchNotifications = createAsyncThunk(
+  "admin/fetchNotifications",
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await getNotifications();
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        getErrorMessage(error, "Failed to fetch notifications"),
+      );
+    }
+  },
+);
 
-export const readNotification = createAsyncThunk("admin/readNotification", async (id, { rejectWithValue }) => {
-  try {
-    const { data } = await markNotificationAsRead(id);
-    return data;
-  } catch (error) {
-    return rejectWithValue(getErrorMessage(error, "Failed to mark notification"));
-  }
-});
+export const readNotification = createAsyncThunk(
+  "admin/readNotification",
+  async (id, { rejectWithValue }) => {
+    try {
+      const { data } = await markNotificationAsRead(id);
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        getErrorMessage(error, "Failed to mark notification"),
+      );
+    }
+  },
+);
 
-export const fetchMyReferral = createAsyncThunk("admin/fetchMyReferral", async (_, { rejectWithValue }) => {
-  try {
-    const { data } = await getMyReferral();
-    return data;
-  } catch (error) {
-    return rejectWithValue(getErrorMessage(error, "Failed to fetch referral"));
-  }
-});
+export const fetchMyReferral = createAsyncThunk(
+  "admin/fetchMyReferral",
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await getMyReferral();
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        getErrorMessage(error, "Failed to fetch referral"),
+      );
+    }
+  },
+);
 
-export const addExamRequest = createAsyncThunk("admin/addExamRequest", async (formData, { rejectWithValue }) => {
-  try {
-    const { data } = await createExamRequest(formData);
-    return data;
-  } catch (error) {
-    return rejectWithValue(getErrorMessage(error, "Exam request failed"));
-  }
-});
+export const addExamRequest = createAsyncThunk(
+  "admin/addExamRequest",
+  async (formData, { rejectWithValue }) => {
+    try {
+      const { data } = await createExamRequest(formData);
+      return data;
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error, "Exam request failed"));
+    }
+  },
+);
 
-export const fetchMyExams = createAsyncThunk("admin/fetchMyExams", async (_, { rejectWithValue }) => {
-  try {
-    const { data } = await getMyExams();
-    return data;
-  } catch (error) {
-    return rejectWithValue(getErrorMessage(error, "Failed to fetch exams"));
-  }
-});
+export const fetchMyExams = createAsyncThunk(
+  "admin/fetchMyExams",
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await getMyExams();
+      return data;
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error, "Failed to fetch exams"));
+    }
+  },
+);
 
 export const examUpdate = createAsyncThunk(
   "admin/examUpdate",
@@ -160,7 +204,7 @@ export const examUpdate = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(getErrorMessage(error, "Exam update failed"));
     }
-  }
+  },
 );
 
 const initialState = {
@@ -191,19 +235,21 @@ const adminSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addMatcher(
-        (action) => action.type.startsWith("admin/") && action.type.endsWith("/pending"),
+        (action) =>
+          action.type.startsWith("admin/") && action.type.endsWith("/pending"),
         (state) => {
           state.loading = true;
           state.error = null;
           state.success = false;
-        }
+        },
       )
       .addMatcher(
-        (action) => action.type.startsWith("admin/") && action.type.endsWith("/rejected"),
+        (action) =>
+          action.type.startsWith("admin/") && action.type.endsWith("/rejected"),
         (state, action) => {
           state.loading = false;
           state.error = action.payload;
-        }
+        },
       )
       .addCase(fetchAdminDashboard.fulfilled, (state, action) => {
         state.loading = false;
@@ -217,17 +263,23 @@ const adminSlice = createSlice({
       .addCase(fetchDocuments.fulfilled, (state, action) => {
         state.loading = false;
         const payload = action.payload?.data || action.payload;
-        state.documents = Array.isArray(payload) ? payload : payload?.documents || [];
+        state.documents = Array.isArray(payload)
+          ? payload
+          : payload?.documents || [];
       })
       .addCase(fetchSupportTickets.fulfilled, (state, action) => {
         state.loading = false;
         const payload = action.payload?.data || action.payload;
-        state.tickets = Array.isArray(payload) ? payload : payload?.tickets || [];
+        state.tickets = Array.isArray(payload)
+          ? payload
+          : payload?.tickets || [];
       })
       .addCase(fetchNotifications.fulfilled, (state, action) => {
         state.loading = false;
         const payload = action.payload?.data || action.payload;
-        state.notifications = Array.isArray(payload) ? payload : payload?.notifications || [];
+        state.notifications = Array.isArray(payload)
+          ? payload
+          : payload?.notifications || [];
       })
       .addCase(fetchMyReferral.fulfilled, (state, action) => {
         state.loading = false;

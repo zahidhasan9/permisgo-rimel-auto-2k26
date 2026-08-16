@@ -218,7 +218,11 @@ export default function Dashboard() {
           </h4>
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2 2xl:grid-cols-1">
             {lessonsInProgress.slice(0, 2).map((lesson, index) => (
-              <ProgressLessonCard key={lesson._id} lesson={lesson} number={index + 1} />
+              <ProgressLessonCard
+                key={lesson._id}
+                lesson={lesson}
+                number={index + 1}
+              />
             ))}
             {!lessonsInProgress.length && (
               <div className="rounded-xl bg-white p-5 text-center text-xs text-slate-500 shadow-sm">
@@ -301,9 +305,7 @@ function ProgressTracker({ steps }) {
 function RequestCard({ booking, busy, onAccept, onReject }) {
   return (
     <div className="rounded-xl bg-white p-3 shadow-sm">
-      <h6 className="text-sm font-extrabold text-slate-900">
-        Booking request
-      </h6>
+      <h6 className="text-sm font-extrabold text-slate-900">Booking request</h6>
       <p className="mt-1.5 text-xs text-slate-500">
         {booking.student?.name || "Student"} ·{" "}
         {formatLessonDate(booking.bookingDate)}
@@ -348,7 +350,8 @@ function ProgressLessonCard({ lesson, number }) {
         {lesson.title || "Driving lesson"}
       </h6>
       <p className="mt-1.5 text-xs leading-5 text-slate-500">
-        {lesson.student?.name || "Student"} · Focused training based on booklet skills.
+        {lesson.student?.name || "Student"} · Focused training based on booklet
+        skills.
       </p>
       <strong className="mt-2 block text-xs font-bold text-blue-900">
         Duration: {lesson.startTime}–{lesson.endTime}

@@ -40,7 +40,10 @@ function SelectField({ label, placeholder }) {
       <span className="mb-2 block !text-[14px] font-semibold text-[#222]">
         {label}
       </span>
-      <select defaultValue="" className={`${controlClass} appearance-auto text-[#a4a9af]`}>
+      <select
+        defaultValue=""
+        className={`${controlClass} appearance-auto text-[#a4a9af]`}
+      >
         <option value="" disabled>
           {placeholder}
         </option>
@@ -119,7 +122,10 @@ export default function B2BPartnershipRequestPage() {
         </div>
       </section>
 
-      <section id="partnership-form" className="scroll-mt-24 bg-[#eaf0f9] px-5 py-20 sm:px-8 lg:py-24">
+      <section
+        id="partnership-form"
+        className="scroll-mt-24 bg-[#eaf0f9] px-5 py-20 sm:px-8 lg:py-24"
+      >
         <div className="mx-auto max-w-[1060px]">
           <div className="text-center">
             <h2 className="text-[34px] font-bold tracking-[-0.02em] text-[#222] lg:text-[38px]">
@@ -138,8 +144,16 @@ export default function B2BPartnershipRequestPage() {
             <div className="mt-6 grid grid-cols-[minmax(0,1fr)] gap-x-7 gap-y-5 md:grid-cols-2">
               <Field label="Name" placeholder="Write name here" />
               <SelectField label="Type of company" placeholder="Select one" />
-              <Field label="Phone Number" type="tel" placeholder="Write name here" />
-              <Field label="Email Address" type="email" placeholder="Write Email address" />
+              <Field
+                label="Phone Number"
+                type="tel"
+                placeholder="Write name here"
+              />
+              <Field
+                label="Email Address"
+                type="email"
+                placeholder="Write Email address"
+              />
               <Field label="City" placeholder="Write phone number" />
               <Field label="Address" placeholder="Write Email address" />
 
@@ -148,7 +162,8 @@ export default function B2BPartnershipRequestPage() {
                   What do you expect from this partnership?
                 </span>
                 <span className="mb-2 block !text-[13px] text-[#6d7279]">
-                  Please specify the objectives of this partnership so we can learn more!
+                  Please specify the objectives of this partnership so we can
+                  learn more!
                 </span>
                 <textarea
                   rows={7}
@@ -161,7 +176,10 @@ export default function B2BPartnershipRequestPage() {
                 label="Approximate number of beneficiaries of the partnership*"
                 placeholder="Write phone number"
               />
-              <SelectField label="How did you hear about us?" placeholder="Write Email address" />
+              <SelectField
+                label="How did you hear about us?"
+                placeholder="Write Email address"
+              />
             </div>
 
             <button
@@ -193,8 +211,13 @@ export default function B2BPartnershipRequestPage() {
                   className="h-10 w-10 object-contain"
                 />
               )}
-              <h3 className="mt-2 text-[19px] font-bold text-[#292929]">{rating.name}</h3>
-              <div className="mt-1 flex gap-[8px] text-[#ffc52c]" aria-label="Five stars">
+              <h3 className="mt-2 text-[19px] font-bold text-[#292929]">
+                {rating.name}
+              </h3>
+              <div
+                className="mt-1 flex gap-[8px] text-[#ffc52c]"
+                aria-label="Five stars"
+              >
                 {[0, 1, 2, 3, 4].map((star) => (
                   <FaStar key={star} className="text-[18px]" />
                 ))}

@@ -103,7 +103,7 @@ export default function EvaluateStudentsPage() {
   });
 
   const activeCompetency = competencies.find(
-    (competency) => competency.id === activeCompetencyId
+    (competency) => competency.id === activeCompetencyId,
   );
 
   const handleTabChange = (competencyId) => {
@@ -159,8 +159,7 @@ export default function EvaluateStudentsPage() {
           <div className="w-full overflow-x-none pb-4">
             <div className="grid min-w-[680px] grid-cols-4 gap-4">
               {competencies.map((competency) => {
-                const isActive =
-                  activeCompetencyId === competency.id;
+                const isActive = activeCompetencyId === competency.id;
 
                 return (
                   <button
@@ -209,60 +208,49 @@ export default function EvaluateStudentsPage() {
             </h2>
 
             <div className="space-y-5">
-              {activeCompetency.questions.map(
-                (question, questionIndex) => {
-                  const selectedValue =
-                    answers[activeCompetencyId]?.[
-                      questionIndex
-                    ];
+              {activeCompetency.questions.map((question, questionIndex) => {
+                const selectedValue =
+                  answers[activeCompetencyId]?.[questionIndex];
 
-                  return (
-                    <div key={`${activeCompetencyId}-${questionIndex}`}>
-                      <div className="flex items-start gap-1.5">
-                        <span className="shrink-0 text-[13px] font-extrabold text-slate-800">
-                          {String(questionIndex + 1).padStart(
-                            2,
-                            "0"
-                          )}
-                        </span>
+                return (
+                  <div key={`${activeCompetencyId}-${questionIndex}`}>
+                    <div className="flex items-start gap-1.5">
+                      <span className="shrink-0 text-[13px] font-extrabold text-slate-800">
+                        {String(questionIndex + 1).padStart(2, "0")}
+                      </span>
 
-                        <p className="text-[10px] font-medium leading-4 text-[#686c75] sm:text-[14px]">
-                          {question}
-                        </p>
-                      </div>
+                      <p className="text-[10px] font-medium leading-4 text-[#686c75] sm:text-[14px]">
+                        {question}
+                      </p>
+                    </div>
 
-                      <div className="mt-2 grid max-w-[540px] grid-cols-3 gap-4">
-                        {evaluationOptions.map((option) => {
-                          const isSelected =
-                            selectedValue === option.value;
+                    <div className="mt-2 grid max-w-[540px] grid-cols-3 gap-4">
+                      {evaluationOptions.map((option) => {
+                        const isSelected = selectedValue === option.value;
 
-                          return (
-                            <button
-                              key={option.value}
-                              type="button"
-                              onClick={() =>
-                                handleAnswerChange(
-                                  questionIndex,
-                                  option.value
-                                )
-                              }
-                              className={`h-8 rounded-[6px] px-2 text-[10px] font-medium transition sm:text-[13px]
+                        return (
+                          <button
+                            key={option.value}
+                            type="button"
+                            onClick={() =>
+                              handleAnswerChange(questionIndex, option.value)
+                            }
+                            className={`h-8 rounded-[6px] px-2 text-[10px] font-medium transition sm:text-[13px]
                                 ${
                                   isSelected
                                     ? "bg-[#16458f] text-white"
                                     : "bg-[#e7edf6] text-slate-700 hover:bg-[#dbe5f2]"
                                 }
                               `}
-                            >
-                              {option.label}
-                            </button>
-                          );
-                        })}
-                      </div>
+                          >
+                            {option.label}
+                          </button>
+                        );
+                      })}
                     </div>
-                  );
-                }
-              )}
+                  </div>
+                );
+              })}
             </div>
 
             <div className="mt-6">

@@ -27,9 +27,11 @@ export const fetchPublicTeachers = createAsyncThunk(
       const { data } = await getPublicTeachers();
       return data;
     } catch (error) {
-      return rejectWithValue(getErrorMessage(error, "Failed to fetch teachers"));
+      return rejectWithValue(
+        getErrorMessage(error, "Failed to fetch teachers"),
+      );
     }
-  }
+  },
 );
 
 export const fetchTeacherDashboard = createAsyncThunk(
@@ -39,9 +41,11 @@ export const fetchTeacherDashboard = createAsyncThunk(
       const { data } = await getTeacherDashboard();
       return data;
     } catch (error) {
-      return rejectWithValue(getErrorMessage(error, "Failed to fetch dashboard"));
+      return rejectWithValue(
+        getErrorMessage(error, "Failed to fetch dashboard"),
+      );
     }
-  }
+  },
 );
 
 export const fetchTeacherProfile = createAsyncThunk(
@@ -53,7 +57,7 @@ export const fetchTeacherProfile = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(getErrorMessage(error, "Failed to fetch profile"));
     }
-  }
+  },
 );
 
 export const updateTeacher = createAsyncThunk(
@@ -63,9 +67,11 @@ export const updateTeacher = createAsyncThunk(
       const { data } = await updateTeacherProfile(formData);
       return data;
     } catch (error) {
-      return rejectWithValue(getErrorMessage(error, "Failed to update profile"));
+      return rejectWithValue(
+        getErrorMessage(error, "Failed to update profile"),
+      );
     }
-  }
+  },
 );
 
 export const fetchTeacherVehicles = createAsyncThunk(
@@ -75,9 +81,11 @@ export const fetchTeacherVehicles = createAsyncThunk(
       const { data } = await getTeacherVehicles();
       return data;
     } catch (error) {
-      return rejectWithValue(getErrorMessage(error, "Failed to fetch vehicles"));
+      return rejectWithValue(
+        getErrorMessage(error, "Failed to fetch vehicles"),
+      );
     }
-  }
+  },
 );
 
 export const createTeacherVehicle = createAsyncThunk(
@@ -89,7 +97,7 @@ export const createTeacherVehicle = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(getErrorMessage(error, "Failed to add vehicle"));
     }
-  }
+  },
 );
 
 export const fetchTeacherLocations = createAsyncThunk(
@@ -99,9 +107,11 @@ export const fetchTeacherLocations = createAsyncThunk(
       const { data } = await getTeacherLocations();
       return data;
     } catch (error) {
-      return rejectWithValue(getErrorMessage(error, "Failed to fetch locations"));
+      return rejectWithValue(
+        getErrorMessage(error, "Failed to fetch locations"),
+      );
     }
-  }
+  },
 );
 
 export const createTeacherLocation = createAsyncThunk(
@@ -113,7 +123,7 @@ export const createTeacherLocation = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(getErrorMessage(error, "Failed to add location"));
     }
-  }
+  },
 );
 
 export const fetchTeacherReviews = createAsyncThunk(
@@ -125,7 +135,7 @@ export const fetchTeacherReviews = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(getErrorMessage(error, "Failed to fetch reviews"));
     }
-  }
+  },
 );
 
 const initialState = {
@@ -161,7 +171,9 @@ const teacherSlice = createSlice({
       .addCase(fetchPublicTeachers.fulfilled, (state, action) => {
         state.loading = false;
         const payload = action.payload?.data || action.payload;
-        state.teachers = Array.isArray(payload) ? payload : payload?.teachers || [];
+        state.teachers = Array.isArray(payload)
+          ? payload
+          : payload?.teachers || [];
       })
       .addCase(fetchPublicTeachers.rejected, (state, action) => {
         state.loading = false;
@@ -181,7 +193,9 @@ const teacherSlice = createSlice({
       })
       .addCase(fetchTeacherVehicles.fulfilled, (state, action) => {
         const payload = action.payload?.data || action.payload;
-        state.vehicles = Array.isArray(payload) ? payload : payload?.vehicles || [];
+        state.vehicles = Array.isArray(payload)
+          ? payload
+          : payload?.vehicles || [];
       })
       .addCase(createTeacherVehicle.fulfilled, (state, action) => {
         state.success = true;
@@ -189,7 +203,9 @@ const teacherSlice = createSlice({
       })
       .addCase(fetchTeacherLocations.fulfilled, (state, action) => {
         const payload = action.payload?.data || action.payload;
-        state.locations = Array.isArray(payload) ? payload : payload?.locations || [];
+        state.locations = Array.isArray(payload)
+          ? payload
+          : payload?.locations || [];
       })
       .addCase(createTeacherLocation.fulfilled, (state, action) => {
         state.success = true;
@@ -197,7 +213,9 @@ const teacherSlice = createSlice({
       })
       .addCase(fetchTeacherReviews.fulfilled, (state, action) => {
         const payload = action.payload?.data || action.payload;
-        state.reviews = Array.isArray(payload) ? payload : payload?.reviews || [];
+        state.reviews = Array.isArray(payload)
+          ? payload
+          : payload?.reviews || [];
       });
   },
 });

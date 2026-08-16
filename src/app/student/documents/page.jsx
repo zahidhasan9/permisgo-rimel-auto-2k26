@@ -243,9 +243,13 @@ function RequiredDocumentCard({
             <StatusBadge status={status} />
             <div className="col-span-2">
               {requirement.required ? (
-                <span className="text-[10px] font-bold uppercase text-[#e2233d]">Required</span>
+                <span className="text-[10px] font-bold uppercase text-[#e2233d]">
+                  Required
+                </span>
               ) : (
-                <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-slate-500">Optional</span>
+                <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-slate-500">
+                  Optional
+                </span>
               )}
             </div>
           </div>
@@ -654,7 +658,6 @@ export default function StudentDocumentsPage() {
     } else {
       await uploadDocument(formData);
     }
-
   }
 
   async function handleUploadSelectedDocuments() {

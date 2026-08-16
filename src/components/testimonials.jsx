@@ -19,24 +19,57 @@ import useCurrentLanguage from "@/hooks/useCurrentLanguage";
 
 const Testimonials = () => {
   const language = useCurrentLanguage();
-  const copy = {
-    en: { label: "Testimonials", title: "What Our Students Say", text: "Real feedback from learners who trusted our instructors and completed their driving journey with confidence.", view: "View All Reviews", previous: "Previous testimonial", next: "Next testimonial" },
-    bn: { label: "প্রশংসাপত্র", title: "আমাদের শিক্ষার্থীরা যা বলেন", text: "আমাদের প্রশিক্ষকদের বিশ্বাস করে আত্মবিশ্বাসের সঙ্গে ড্রাইভিং শেখা সম্পন্ন করা শিক্ষার্থীদের বাস্তব মতামত।", view: "সব রিভিউ দেখুন", previous: "আগের প্রশংসাপত্র", next: "পরের প্রশংসাপত্র" },
-    fr: { label: "Témoignages", title: "Ce que disent nos élèves", text: "Les avis authentiques des élèves qui ont fait confiance à nos moniteurs et terminé leur apprentissage avec assurance.", view: "Voir tous les avis", previous: "Témoignage précédent", next: "Témoignage suivant" },
-  }[language] || null;
+  const copy =
+    {
+      en: {
+        label: "Testimonials",
+        title: "What Our Students Say",
+        text: "Real feedback from learners who trusted our instructors and completed their driving journey with confidence.",
+        view: "View All Reviews",
+        previous: "Previous testimonial",
+        next: "Next testimonial",
+      },
+      bn: {
+        label: "প্রশংসাপত্র",
+        title: "আমাদের শিক্ষার্থীরা যা বলেন",
+        text: "আমাদের প্রশিক্ষকদের বিশ্বাস করে আত্মবিশ্বাসের সঙ্গে ড্রাইভিং শেখা সম্পন্ন করা শিক্ষার্থীদের বাস্তব মতামত।",
+        view: "সব রিভিউ দেখুন",
+        previous: "আগের প্রশংসাপত্র",
+        next: "পরের প্রশংসাপত্র",
+      },
+      fr: {
+        label: "Témoignages",
+        title: "Ce que disent nos élèves",
+        text: "Les avis authentiques des élèves qui ont fait confiance à nos moniteurs et terminé leur apprentissage avec assurance.",
+        view: "Voir tous les avis",
+        previous: "Témoignage précédent",
+        next: "Témoignage suivant",
+      },
+    }[language] || null;
   const swiperRefTwo = useRef(null);
   const [testimonials, setTestimonials] = useState([]);
   useEffect(() => {
     if (!language) return;
     let active = true;
-    getTestimonials({ lang: language }).then(({ data }) => { if (active) setTestimonials(data?.data || []); }).catch(() => { if (active) setTestimonials([]); });
-    return () => { active = false; };
+    getTestimonials({ lang: language })
+      .then(({ data }) => {
+        if (active) setTestimonials(data?.data || []);
+      })
+      .catch(() => {
+        if (active) setTestimonials([]);
+      });
+    return () => {
+      active = false;
+    };
   }, [language]);
 
   if (!testimonials.length) return null;
 
   return (
-    <section data-no-translate className="relative overflow-hidden bg-slate-50 px-4 py-12 sm:px-6 lg:px-12">
+    <section
+      data-no-translate
+      className="relative overflow-hidden bg-slate-50 px-4 py-12 sm:px-6 lg:px-12"
+    >
       {/* Soft Background Shape */}
       <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-blue-100 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-24 -left-20 h-72 w-72 rounded-full bg-orange-100 blur-3xl" />
@@ -139,7 +172,14 @@ const Testimonials = () => {
 
                     <div className="mt-1 flex gap-1 text-sm text-yellow-400">
                       {[1, 2, 3, 4, 5].map((star) => (
-                        <FaStar key={star} className={star <= item.rating ? "text-yellow-400" : "text-slate-200"} />
+                        <FaStar
+                          key={star}
+                          className={
+                            star <= item.rating
+                              ? "text-yellow-400"
+                              : "text-slate-200"
+                          }
+                        />
                       ))}
                     </div>
                   </div>
@@ -161,11 +201,11 @@ const Testimonials = () => {
         {/* Bottom Button */}
         <div className="mt-8 text-center sm:text-left">
           <Link
-              href="/reviews"
-              className="inline-flex min-h-[42px] items-center justify-center rounded-[8px] bg-[#E2233D] px-7 text-[13px] font-extrabold text-white shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-white hover:text-[#174A9B]"
-            >
-              {copy.view}
-            </Link>
+            href="/reviews"
+            className="inline-flex min-h-[42px] items-center justify-center rounded-[8px] bg-[#E2233D] px-7 text-[13px] font-extrabold text-white shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-white hover:text-[#174A9B]"
+          >
+            {copy.view}
+          </Link>
         </div>
       </div>
     </section>

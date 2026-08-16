@@ -38,9 +38,14 @@ export default function Page() {
     getFaqs({ section: "driving-code", lang: language }).then(({ data }) => {
       if (!active) return;
       const items = data?.data || [];
-      if (items.length) { setFaqs(items); setOpenId(items[0]._id); }
+      if (items.length) {
+        setFaqs(items);
+        setOpenId(items[0]._id);
+      }
     });
-    return () => { active = false; };
+    return () => {
+      active = false;
+    };
   }, [language]);
 
   const toggleFaq = (id) => {

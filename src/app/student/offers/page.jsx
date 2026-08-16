@@ -18,7 +18,11 @@ function Header() {
   const router = useRouter();
   return (
     <header className="flex items-center gap-3 sm:gap-[16px]">
-      <button type="button" onClick={() => router.back()} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] bg-[#EEF4FB] text-xl text-black sm:h-[44px] sm:w-[44px] sm:text-[27px]">
+      <button
+        type="button"
+        onClick={() => router.back()}
+        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] bg-[#EEF4FB] text-xl text-black sm:h-[44px] sm:w-[44px] sm:text-[27px]"
+      >
         <IoChevronBack />
       </button>
 
@@ -188,8 +192,12 @@ function HourBadge({ value, active = false, onSelect }) {
 }
 
 function DriveCard({ item, hourOptions }) {
-  const availableHours = hourOptions || (item.hours?.length ? item.hours : ["01 hr", "05 hr", "10 hr"]);
-  const [selectedHour, setSelectedHour] = useState(availableHours[Math.min(1, availableHours.length - 1)]);
+  const availableHours =
+    hourOptions ||
+    (item.hours?.length ? item.hours : ["01 hr", "05 hr", "10 hr"]);
+  const [selectedHour, setSelectedHour] = useState(
+    availableHours[Math.min(1, availableHours.length - 1)],
+  );
 
   return (
     <article
@@ -210,11 +218,14 @@ function DriveCard({ item, hourOptions }) {
         </p>
 
         <div className="mt-[24px] flex items-center justify-center gap-[8px]">
-          {availableHours.map(
-            (hour) => (
-              <HourBadge key={hour} value={hour} active={selectedHour === hour} onSelect={() => setSelectedHour(hour)} />
-            ),
-          )}
+          {availableHours.map((hour) => (
+            <HourBadge
+              key={hour}
+              value={hour}
+              active={selectedHour === hour}
+              onSelect={() => setSelectedHour(hour)}
+            />
+          ))}
         </div>
 
         <PriceBox sale={item.sale} retail={item.retail} className="mt-[20px]" />
@@ -291,7 +302,11 @@ function CpfTab({ offers, transmission }) {
 
       <div className="mt-4 grid grid-cols-1 gap-3 sm:mt-[32px] sm:gap-[24px] md:grid-cols-2 xl:grid-cols-3">
         {offers.map((item) => (
-          <DriveCard key={item._id} item={item} hourOptions={["10 hr", "20 hr", "30 hr"]} />
+          <DriveCard
+            key={item._id}
+            item={item}
+            hourOptions={["10 hr", "20 hr", "30 hr"]}
+          />
         ))}
       </div>
     </section>
@@ -314,7 +329,11 @@ function AccompanieTab({ offers, transmission }) {
 
       <div className="mt-4 grid grid-cols-1 gap-3 sm:mt-[32px] sm:gap-[23px] md:grid-cols-2 xl:grid-cols-3">
         {offers.map((item) => (
-          <DriveCard key={item._id} item={item} hourOptions={["10 hr", "20 hr", "30 hr"]} />
+          <DriveCard
+            key={item._id}
+            item={item}
+            hourOptions={["10 hr", "20 hr", "30 hr"]}
+          />
         ))}
       </div>
     </section>

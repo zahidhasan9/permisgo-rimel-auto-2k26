@@ -12,9 +12,82 @@ import { showToast } from "@/utils/showToast";
 import useCurrentLanguage from "@/hooks/useCurrentLanguage";
 
 const bookingCopy = {
-  en: { formTitle: "Appointment Booking Form", school: "PermisGo Driving School", heading: "Your Appointment with PermisGo", intro: "To schedule an appointment, please fill out the information below.", course: "Course Title", instructor: "Choose Instructor", loading: "Loading instructors...", selectInstructor: "Select instructor", date: "Select Date", time: "Select Time", duration: "Duration", name: "Your Name", email: "Email Address", phone: "Phone Number", notes: "Additional Notes", write: "Write here", submit: "Submit", submitting: "Submitting...", d30: "30 minutes", d60: "1 hour", d120: "2 hours", chosen: "Selected time", chooseTime: "Choose your preferred time from the form" },
-  bn: { formTitle: "অ্যাপয়েন্টমেন্ট বুকিং ফর্ম", school: "PermisGo ড্রাইভিং স্কুল", heading: "PermisGo-এর সঙ্গে আপনার অ্যাপয়েন্টমেন্ট", intro: "অ্যাপয়েন্টমেন্ট নির্ধারণ করতে নিচের তথ্যগুলো পূরণ করুন।", course: "কোর্সের নাম", instructor: "প্রশিক্ষক নির্বাচন করুন", loading: "প্রশিক্ষক লোড হচ্ছে...", selectInstructor: "প্রশিক্ষক বাছুন", date: "তারিখ নির্বাচন করুন", time: "সময় নির্বাচন করুন", duration: "সময়কাল", name: "আপনার নাম", email: "ইমেইল ঠিকানা", phone: "ফোন নম্বর", notes: "অতিরিক্ত তথ্য", write: "এখানে লিখুন", submit: "জমা দিন", submitting: "জমা হচ্ছে...", d30: "৩০ মিনিট", d60: "১ ঘণ্টা", d120: "২ ঘণ্টা", chosen: "নির্বাচিত সময়", chooseTime: "ফর্ম থেকে আপনার পছন্দের সময় নির্বাচন করুন" },
-  fr: { formTitle: "Formulaire de rendez-vous", school: "Auto-école PermisGo", heading: "Votre rendez-vous avec PermisGo", intro: "Pour prendre rendez-vous, veuillez remplir les informations ci-dessous.", course: "Intitulé de la formation", instructor: "Choisir un moniteur", loading: "Chargement des moniteurs...", selectInstructor: "Sélectionner un moniteur", date: "Choisir la date", time: "Choisir l’heure", duration: "Durée", name: "Votre nom", email: "Adresse e-mail", phone: "Numéro de téléphone", notes: "Informations complémentaires", write: "Écrivez ici", submit: "Envoyer", submitting: "Envoi...", d30: "30 minutes", d60: "1 heure", d120: "2 heures", chosen: "Heure sélectionnée", chooseTime: "Choisissez votre heure dans le formulaire" },
+  en: {
+    formTitle: "Appointment Booking Form",
+    school: "PermisGo Driving School",
+    heading: "Your Appointment with PermisGo",
+    intro: "To schedule an appointment, please fill out the information below.",
+    course: "Course Title",
+    instructor: "Choose Instructor",
+    loading: "Loading instructors...",
+    selectInstructor: "Select instructor",
+    date: "Select Date",
+    time: "Select Time",
+    duration: "Duration",
+    name: "Your Name",
+    email: "Email Address",
+    phone: "Phone Number",
+    notes: "Additional Notes",
+    write: "Write here",
+    submit: "Submit",
+    submitting: "Submitting...",
+    d30: "30 minutes",
+    d60: "1 hour",
+    d120: "2 hours",
+    chosen: "Selected time",
+    chooseTime: "Choose your preferred time from the form",
+  },
+  bn: {
+    formTitle: "অ্যাপয়েন্টমেন্ট বুকিং ফর্ম",
+    school: "PermisGo ড্রাইভিং স্কুল",
+    heading: "PermisGo-এর সঙ্গে আপনার অ্যাপয়েন্টমেন্ট",
+    intro: "অ্যাপয়েন্টমেন্ট নির্ধারণ করতে নিচের তথ্যগুলো পূরণ করুন।",
+    course: "কোর্সের নাম",
+    instructor: "প্রশিক্ষক নির্বাচন করুন",
+    loading: "প্রশিক্ষক লোড হচ্ছে...",
+    selectInstructor: "প্রশিক্ষক বাছুন",
+    date: "তারিখ নির্বাচন করুন",
+    time: "সময় নির্বাচন করুন",
+    duration: "সময়কাল",
+    name: "আপনার নাম",
+    email: "ইমেইল ঠিকানা",
+    phone: "ফোন নম্বর",
+    notes: "অতিরিক্ত তথ্য",
+    write: "এখানে লিখুন",
+    submit: "জমা দিন",
+    submitting: "জমা হচ্ছে...",
+    d30: "৩০ মিনিট",
+    d60: "১ ঘণ্টা",
+    d120: "২ ঘণ্টা",
+    chosen: "নির্বাচিত সময়",
+    chooseTime: "ফর্ম থেকে আপনার পছন্দের সময় নির্বাচন করুন",
+  },
+  fr: {
+    formTitle: "Formulaire de rendez-vous",
+    school: "Auto-école PermisGo",
+    heading: "Votre rendez-vous avec PermisGo",
+    intro:
+      "Pour prendre rendez-vous, veuillez remplir les informations ci-dessous.",
+    course: "Intitulé de la formation",
+    instructor: "Choisir un moniteur",
+    loading: "Chargement des moniteurs...",
+    selectInstructor: "Sélectionner un moniteur",
+    date: "Choisir la date",
+    time: "Choisir l’heure",
+    duration: "Durée",
+    name: "Votre nom",
+    email: "Adresse e-mail",
+    phone: "Numéro de téléphone",
+    notes: "Informations complémentaires",
+    write: "Écrivez ici",
+    submit: "Envoyer",
+    submitting: "Envoi...",
+    d30: "30 minutes",
+    d60: "1 heure",
+    d120: "2 heures",
+    chosen: "Heure sélectionnée",
+    chooseTime: "Choisissez votre heure dans le formulaire",
+  },
 };
 
 const MONTHS = [
@@ -33,7 +106,11 @@ const MONTHS = [
 ];
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-const localizedWeekdays = { en: WEEKDAYS, bn: ["রবি", "সোম", "মঙ্গল", "বুধ", "বৃহঃ", "শুক্র", "শনি"], fr: ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"] };
+const localizedWeekdays = {
+  en: WEEKDAYS,
+  bn: ["রবি", "সোম", "মঙ্গল", "বুধ", "বৃহঃ", "শুক্র", "শনি"],
+  fr: ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"],
+};
 const localeCodes = { en: "en-US", bn: "bn-BD", fr: "fr-FR" };
 const INITIAL_DATE = new Date();
 
@@ -89,11 +166,19 @@ function formatInputDate(date) {
 }
 
 function formatCalendarHeader(date, language) {
-  return date.toLocaleDateString(localeCodes[language] || localeCodes.en, { month: "long", day: "numeric", year: "numeric" });
+  return date.toLocaleDateString(localeCodes[language] || localeCodes.en, {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
 }
 
 function formatSelectedDate(date, language) {
-  return date.toLocaleDateString(localeCodes[language] || localeCodes.en, { weekday: "short", month: "long", day: "numeric" });
+  return date.toLocaleDateString(localeCodes[language] || localeCodes.en, {
+    weekday: "short",
+    month: "long",
+    day: "numeric",
+  });
 }
 
 const labelClass =
@@ -104,7 +189,9 @@ const inputClass =
 export default function AppointmentBooking({ title = "" }) {
   const language = useCurrentLanguage() || "en";
   const copy = bookingCopy[language] || bookingCopy.en;
-  const [viewDate, setViewDate] = useState(() => new Date(INITIAL_DATE.getFullYear(), INITIAL_DATE.getMonth(), 1));
+  const [viewDate, setViewDate] = useState(
+    () => new Date(INITIAL_DATE.getFullYear(), INITIAL_DATE.getMonth(), 1),
+  );
   const [selectedDate, setSelectedDate] = useState(INITIAL_DATE);
   const [selectedTime, setSelectedTime] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -126,13 +213,23 @@ export default function AppointmentBooking({ title = "" }) {
     let active = true;
     getPublicTeachers()
       .then((response) => {
-        if (active) setInstructors(Array.isArray(response.data?.data) ? response.data.data : []);
+        if (active)
+          setInstructors(
+            Array.isArray(response.data?.data) ? response.data.data : [],
+          );
       })
       .catch(() => {
-        if (active) showToast.error("Instructors could not be loaded. Please refresh the page.");
+        if (active)
+          showToast.error(
+            "Instructors could not be loaded. Please refresh the page.",
+          );
       })
-      .finally(() => { if (active) setInstructorsLoading(false); });
-    return () => { active = false; };
+      .finally(() => {
+        if (active) setInstructorsLoading(false);
+      });
+    return () => {
+      active = false;
+    };
   }, []);
 
   const updateForm = (event) => {
@@ -170,11 +267,25 @@ export default function AppointmentBooking({ title = "" }) {
         appointmentDate: formatInputDate(selectedDate),
         appointmentTime: selectedTime,
       });
-      setForm({ courseTitle: "", instructor: "", duration: "", name: "", email: "", phone: "", notes: "" });
+      setForm({
+        courseTitle: "",
+        instructor: "",
+        duration: "",
+        name: "",
+        email: "",
+        phone: "",
+        notes: "",
+      });
       setSelectedTime("");
-      showToast.success("Your appointment request has been submitted successfully.", { title: "Appointment submitted" });
+      showToast.success(
+        "Your appointment request has been submitted successfully.",
+        { title: "Appointment submitted" },
+      );
     } catch (error) {
-      showToast.error(error.response?.data?.message || "Appointment could not be submitted. Please try again.");
+      showToast.error(
+        error.response?.data?.message ||
+          "Appointment could not be submitted. Please try again.",
+      );
     } finally {
       setSubmitting(false);
     }
@@ -203,10 +314,7 @@ export default function AppointmentBooking({ title = "" }) {
               {copy.intro}
             </p>
 
-            <form
-              className="mt-7 space-y-6"
-              onSubmit={submitAppointment}
-            >
+            <form className="mt-7 space-y-6" onSubmit={submitAppointment}>
               <div>
                 <label htmlFor="course-title" className={labelClass}>
                   {copy.course}
@@ -234,10 +342,16 @@ export default function AppointmentBooking({ title = "" }) {
                   className={inputClass}
                   required
                 >
-                  <option value="">{instructorsLoading ? copy.loading : copy.selectInstructor}</option>
+                  <option value="">
+                    {instructorsLoading ? copy.loading : copy.selectInstructor}
+                  </option>
                   {instructors.map((teacher) => (
-                    <option key={teacher.user?._id || teacher._id} value={teacher.user?._id || ""}>
-                      {teacher.user?.name}{teacher.user?.city ? ` — ${teacher.user.city}` : ""}
+                    <option
+                      key={teacher.user?._id || teacher._id}
+                      value={teacher.user?._id || ""}
+                    >
+                      {teacher.user?.name}
+                      {teacher.user?.city ? ` — ${teacher.user.city}` : ""}
                     </option>
                   ))}
                 </select>
@@ -312,8 +426,8 @@ export default function AppointmentBooking({ title = "" }) {
                     autoComplete="name"
                     value={form.name}
                     onChange={updateForm}
-                  className={inputClass}
-                  required
+                    className={inputClass}
+                    required
                   />
                 </div>
               </div>
@@ -369,7 +483,9 @@ export default function AppointmentBooking({ title = "" }) {
 
               <button
                 type="submit"
-                disabled={submitting || instructorsLoading || !instructors.length}
+                disabled={
+                  submitting || instructorsLoading || !instructors.length
+                }
                 className="flex h-12 w-full items-center justify-center rounded-[8px] bg-[#e2233d] px-5 !text-[13px] font-extrabold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#174a9b] hover:shadow-lg"
               >
                 {submitting ? copy.submitting : copy.submit}
@@ -452,7 +568,9 @@ export default function AppointmentBooking({ title = "" }) {
                 {formatSelectedDate(selectedDate, language)}
               </h3>
               <div className="mt-5 rounded-[8px] border border-[#174a9b] bg-[#edf3fb] px-4 py-3 text-center !text-[13px] font-semibold text-[#174a9b]">
-                {selectedTime ? `${copy.chosen}: ${selectedTime}` : copy.chooseTime}
+                {selectedTime
+                  ? `${copy.chosen}: ${selectedTime}`
+                  : copy.chooseTime}
               </div>
             </div>
 

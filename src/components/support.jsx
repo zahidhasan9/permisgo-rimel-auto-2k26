@@ -5,7 +5,11 @@ import useCmsPageContent from "@/hooks/useCmsPageContent";
 
 const Support = ({ title, headPara, mainContent }) => {
   const pathname = usePathname();
-  const slug = pathname.split("/").filter(Boolean).filter((part) => !["en", "bn", "fr"].includes(part)).join("/");
+  const slug = pathname
+    .split("/")
+    .filter(Boolean)
+    .filter((part) => !["en", "bn", "fr"].includes(part))
+    .join("/");
   const { page, content } = useCmsPageContent(slug);
   // Seeded records intentionally do not replace the original page. Once an
   // admin saves the record, updatedBy is set and CMS content becomes live.

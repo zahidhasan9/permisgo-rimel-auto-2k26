@@ -214,7 +214,6 @@ export default function AdminUserDetailsPage() {
     }
   };
 
-
   const handleTeacherVerificationUpdate = async () => {
     if (
       !user ||

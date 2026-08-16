@@ -67,12 +67,24 @@ export default function ContactUsPage() {
     { label: "TikTok", icon: FaTiktok, href: site.tiktokUrl },
     { label: "YouTube", icon: FaYoutube, href: site.youtubeUrl },
   ];
-  const initialForm = { firstName: "", lastName: "", email: "", phone: "", subject: "", location: "", description: "" };
+  const initialForm = {
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    subject: "",
+    location: "",
+    description: "",
+  };
   const [form, setForm] = useState(initialForm);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [successOpen, setSuccessOpen] = useState(false);
-  const updateField = (event) => setForm((current) => ({ ...current, [event.target.name]: event.target.value }));
+  const updateField = (event) =>
+    setForm((current) => ({
+      ...current,
+      [event.target.name]: event.target.value,
+    }));
   const submitContact = async (event) => {
     event.preventDefault();
     setSubmitting(true);
@@ -82,7 +94,10 @@ export default function ContactUsPage() {
       setForm(initialForm);
       setSuccessOpen(true);
     } catch (requestError) {
-      setError(requestError.response?.data?.message || "Your message could not be sent. Please try again.");
+      setError(
+        requestError.response?.data?.message ||
+          "Your message could not be sent. Please try again.",
+      );
     } finally {
       setSubmitting(false);
     }
@@ -151,8 +166,22 @@ export default function ContactUsPage() {
             </div>
 
             <div className="mt-5">
-              <label htmlFor="location" className="mb-2.5 block !text-[14px] font-medium text-[#333]">Location</label>
-              <input id="location" name="location" type="text" value={form.location} onChange={updateField} required placeholder="Write your location here" className={inputClass} />
+              <label
+                htmlFor="location"
+                className="mb-2.5 block !text-[14px] font-medium text-[#333]"
+              >
+                Location
+              </label>
+              <input
+                id="location"
+                name="location"
+                type="text"
+                value={form.location}
+                onChange={updateField}
+                required
+                placeholder="Write your location here"
+                className={inputClass}
+              />
             </div>
 
             <div className="mt-5">
@@ -175,7 +204,11 @@ export default function ContactUsPage() {
               />
             </div>
 
-            {error && <p className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{error}</p>}
+            {error && (
+              <p className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+                {error}
+              </p>
+            )}
             <button
               type="submit"
               disabled={submitting}
@@ -231,9 +264,7 @@ export default function ContactUsPage() {
                   <InfoIcon>
                     <FaEnvelope />
                   </InfoIcon>
-                  <span className="break-all">
-                    | {site.admissionEmail}
-                  </span>
+                  <span className="break-all">| {site.admissionEmail}</span>
                 </Link>
               </div>
             </section>
@@ -249,7 +280,10 @@ export default function ContactUsPage() {
                 <InfoIcon>
                   <FaLocationDot />
                 </InfoIcon>
-                <span>| {site.address}<br />| {site.address2}</span>
+                <span>
+                  | {site.address}
+                  <br />| {site.address2}
+                </span>
               </div>
             </section>
 
@@ -278,7 +312,37 @@ export default function ContactUsPage() {
           </aside>
         </div>
       </section>
-      {successOpen && <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/55 p-4"><div className="relative w-full max-w-md rounded-2xl bg-white p-8 text-center shadow-2xl"><button type="button" onClick={() => setSuccessOpen(false)} aria-label="Close" className="absolute right-4 top-4 text-slate-400 hover:text-slate-700"><FaXmark /></button><span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-2xl text-emerald-600"><FaCheck /></span><h2 className="mt-5 text-xl font-extrabold text-slate-900">Message sent successfully</h2><p className="mt-2 text-sm leading-6 text-slate-500">Thank you for contacting us. Our team will review your message and get back to you.</p><button type="button" onClick={() => setSuccessOpen(false)} className="mt-6 rounded-xl bg-[#174a9b] px-6 py-3 text-sm font-bold text-white">Done</button></div></div>}
+      {successOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/55 p-4">
+          <div className="relative w-full max-w-md rounded-2xl bg-white p-8 text-center shadow-2xl">
+            <button
+              type="button"
+              onClick={() => setSuccessOpen(false)}
+              aria-label="Close"
+              className="absolute right-4 top-4 text-slate-400 hover:text-slate-700"
+            >
+              <FaXmark />
+            </button>
+            <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-2xl text-emerald-600">
+              <FaCheck />
+            </span>
+            <h2 className="mt-5 text-xl font-extrabold text-slate-900">
+              Message sent successfully
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-slate-500">
+              Thank you for contacting us. Our team will review your message and
+              get back to you.
+            </p>
+            <button
+              type="button"
+              onClick={() => setSuccessOpen(false)}
+              className="mt-6 rounded-xl bg-[#174a9b] px-6 py-3 text-sm font-bold text-white"
+            >
+              Done
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Full-width location map */}
       <section
@@ -295,7 +359,14 @@ export default function ContactUsPage() {
           referrerPolicy="no-referrer-when-downgrade"
           allowFullScreen
         />
-        <a href={site.googleMapUrl} target="_blank" rel="noreferrer" className="absolute bottom-5 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-xl bg-[#174a9b] px-6 py-3 text-sm font-bold text-white shadow-xl transition hover:bg-[#e2233d]">Open in Google Maps</a>
+        <a
+          href={site.googleMapUrl}
+          target="_blank"
+          rel="noreferrer"
+          className="absolute bottom-5 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-xl bg-[#174a9b] px-6 py-3 text-sm font-bold text-white shadow-xl transition hover:bg-[#e2233d]"
+        >
+          Open in Google Maps
+        </a>
       </section>
     </div>
   );

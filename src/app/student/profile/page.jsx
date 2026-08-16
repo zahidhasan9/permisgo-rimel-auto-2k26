@@ -720,7 +720,10 @@ export default function Page() {
 
               <div className="mt-3 grid gap-2 sm:mt-4 sm:grid-cols-3 sm:gap-3">
                 {personalInfo.map((item) => (
-                  <div key={item.label} className="min-w-0 rounded-xl bg-slate-50 p-3">
+                  <div
+                    key={item.label}
+                    className="min-w-0 rounded-xl bg-slate-50 p-3"
+                  >
                     <p className="text-[12px] font-bold text-[#292D33]">
                       {item.label}
                     </p>
@@ -757,7 +760,10 @@ export default function Page() {
 
               <div className="mt-3 grid gap-2 sm:mt-4 sm:grid-cols-3 sm:gap-3">
                 {drivingInfo.map((item) => (
-                  <div key={item.label} className="min-w-0 rounded-xl bg-slate-50 p-3">
+                  <div
+                    key={item.label}
+                    className="min-w-0 rounded-xl bg-slate-50 p-3"
+                  >
                     <p className="text-[12px] font-bold text-[#292D33]">
                       {item.label}
                     </p>
@@ -1014,7 +1020,10 @@ export default function Page() {
             </h2>
 
             {profilePageLoading ? (
-              <div aria-label="Loading profile completion" className="animate-pulse">
+              <div
+                aria-label="Loading profile completion"
+                className="animate-pulse"
+              >
                 <div className="mx-auto mt-4 h-24 w-24 rounded-full border-[12px] border-white/80 sm:mt-5 sm:h-28 sm:w-28" />
                 <div className="mt-4 grid grid-cols-2 gap-3 sm:mt-5 sm:grid-cols-1">
                   {fallbackProfileSteps.map(([label]) => (
@@ -1082,7 +1091,10 @@ export default function Page() {
             </div>
 
             {profilePageLoading ? (
-              <div aria-label="Loading instructor note" className="mt-3 animate-pulse rounded-xl border border-[#B7CBE8] bg-white p-3">
+              <div
+                aria-label="Loading instructor note"
+                className="mt-3 animate-pulse rounded-xl border border-[#B7CBE8] bg-white p-3"
+              >
                 <div className="h-3 w-full rounded bg-slate-100" />
                 <div className="mt-2 h-3 w-4/5 rounded bg-slate-100" />
                 <div className="mt-4 h-px bg-slate-100" />
@@ -1099,7 +1111,8 @@ export default function Page() {
                     {instructorNote.teacher}
                   </p>
                   <p className="mt-1 truncate text-[10px] text-[#767B84]">
-                    {instructorNote.title} · {formatLongDate(instructorNote.date)}
+                    {instructorNote.title} ·{" "}
+                    {formatLongDate(instructorNote.date)}
                   </p>
                 </div>
               </div>
@@ -1109,8 +1122,8 @@ export default function Page() {
                   No instructor notes yet.
                 </p>
                 <p className="mt-1 text-[10px] leading-4 text-[#9297A0]">
-                  Your teacher&apos;s feedback will appear here after a lesson is
-                  completed and submitted.
+                  Your teacher&apos;s feedback will appear here after a lesson
+                  is completed and submitted.
                 </p>
               </div>
             )}

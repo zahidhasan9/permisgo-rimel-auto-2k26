@@ -44,9 +44,14 @@ const Faq = () => {
     getFaqs({ section: "general", lang: language }).then(({ data }) => {
       if (!active) return;
       const items = data?.data || [];
-      if (items.length) { setFaqs(items); setActiveFaq(items[0]._id); }
+      if (items.length) {
+        setFaqs(items);
+        setActiveFaq(items[0]._id);
+      }
     });
-    return () => { active = false; };
+    return () => {
+      active = false;
+    };
   }, [language]);
 
   const toggleFaq = (id) => {
@@ -75,7 +80,10 @@ const Faq = () => {
         <div className="mx-auto w-full max-w-[1140px] px-4">
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
             <div className="lg:col-span-8">
-              <div data-no-translate className="overflow-hidden space-y-2 rounded-md border border-gray-200">
+              <div
+                data-no-translate
+                className="overflow-hidden space-y-2 rounded-md border border-gray-200"
+              >
                 {faqs.map((item, index) => (
                   <div
                     key={item._id || item.id}
@@ -96,7 +104,9 @@ const Faq = () => {
 
                       <FaChevronDown
                         className={`text-lg transition duration-300 ${
-                          activeFaq === (item._id || item.id) ? "rotate-180" : ""
+                          activeFaq === (item._id || item.id)
+                            ? "rotate-180"
+                            : ""
                         }`}
                       />
                     </button>

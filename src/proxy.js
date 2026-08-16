@@ -9,7 +9,11 @@ export function proxy(request) {
     const cleanPath = pathname.split("/").filter(Boolean).slice(1).join("/");
     redirectUrl.pathname = cleanPath ? `/${cleanPath}` : "/";
     const response = NextResponse.redirect(redirectUrl, 308);
-    response.cookies.set("permisgo-language", locale, { path: "/", maxAge: 31536000, sameSite: "lax" });
+    response.cookies.set("permisgo-language", locale, {
+      path: "/",
+      maxAge: 31536000,
+      sameSite: "lax",
+    });
     return response;
   }
   const savedLanguage = request.cookies.get("permisgo-language")?.value;
@@ -27,5 +31,7 @@ export function proxy(request) {
 }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|image/|uploads/).*)"],
+  matcher: [
+    "/((?!api|_next/static|_next/image|favicon.ico|image/|uploads/).*)",
+  ],
 };

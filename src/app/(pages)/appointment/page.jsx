@@ -37,24 +37,83 @@ const testimonialText =
   "Thanks to the instructors, I passed my driving test on the first try. The lessons were clear and very helpful!";
 
 const pageCopy = {
-  en: { title: "Book Your Driving Lesson", intro: "Schedule your driving lesson with our certified instructors. Choose your preferred date, time, and location to start your learning journey.", book: "Book Appointment", why: "Why choose PermisGo", benefits: ["Qualified instructor", "+500 successful students", "Qualiopi certified", "Accredited driving schools"], final: "Start Your Driving Journey Today", lesson: "Book Your Lesson" },
-  bn: { title: "আপনার ড্রাইভিং লেসন বুক করুন", intro: "আমাদের সনদপ্রাপ্ত প্রশিক্ষকদের সঙ্গে ড্রাইভিং লেসন নির্ধারণ করুন। শেখার যাত্রা শুরু করতে পছন্দের তারিখ, সময় ও স্থান নির্বাচন করুন।", book: "অ্যাপয়েন্টমেন্ট বুক করুন", why: "কেন PermisGo বেছে নেবেন", benefits: ["যোগ্য প্রশিক্ষক", "+৫০০ সফল শিক্ষার্থী", "Qualiopi সনদপ্রাপ্ত", "স্বীকৃত ড্রাইভিং স্কুল"], final: "আজই আপনার ড্রাইভিং যাত্রা শুরু করুন", lesson: "লেসন বুক করুন" },
-  fr: { title: "Réservez votre leçon de conduite", intro: "Planifiez votre leçon avec nos moniteurs certifiés. Choisissez la date, l’heure et le lieu qui vous conviennent pour commencer votre apprentissage.", book: "Prendre rendez-vous", why: "Pourquoi choisir PermisGo", benefits: ["Moniteur diplômé", "+500 élèves reçus", "Certifié Qualiopi", "Écoles de conduite labellisées"], final: "Commencez votre parcours de conduite aujourd’hui", lesson: "Réserver votre leçon" },
+  en: {
+    title: "Book Your Driving Lesson",
+    intro:
+      "Schedule your driving lesson with our certified instructors. Choose your preferred date, time, and location to start your learning journey.",
+    book: "Book Appointment",
+    why: "Why choose PermisGo",
+    benefits: [
+      "Qualified instructor",
+      "+500 successful students",
+      "Qualiopi certified",
+      "Accredited driving schools",
+    ],
+    final: "Start Your Driving Journey Today",
+    lesson: "Book Your Lesson",
+  },
+  bn: {
+    title: "আপনার ড্রাইভিং লেসন বুক করুন",
+    intro:
+      "আমাদের সনদপ্রাপ্ত প্রশিক্ষকদের সঙ্গে ড্রাইভিং লেসন নির্ধারণ করুন। শেখার যাত্রা শুরু করতে পছন্দের তারিখ, সময় ও স্থান নির্বাচন করুন।",
+    book: "অ্যাপয়েন্টমেন্ট বুক করুন",
+    why: "কেন PermisGo বেছে নেবেন",
+    benefits: [
+      "যোগ্য প্রশিক্ষক",
+      "+৫০০ সফল শিক্ষার্থী",
+      "Qualiopi সনদপ্রাপ্ত",
+      "স্বীকৃত ড্রাইভিং স্কুল",
+    ],
+    final: "আজই আপনার ড্রাইভিং যাত্রা শুরু করুন",
+    lesson: "লেসন বুক করুন",
+  },
+  fr: {
+    title: "Réservez votre leçon de conduite",
+    intro:
+      "Planifiez votre leçon avec nos moniteurs certifiés. Choisissez la date, l’heure et le lieu qui vous conviennent pour commencer votre apprentissage.",
+    book: "Prendre rendez-vous",
+    why: "Pourquoi choisir PermisGo",
+    benefits: [
+      "Moniteur diplômé",
+      "+500 élèves reçus",
+      "Certifié Qualiopi",
+      "Écoles de conduite labellisées",
+    ],
+    final: "Commencez votre parcours de conduite aujourd’hui",
+    lesson: "Réserver votre leçon",
+  },
 };
 
 export default function AppointmentPage() {
   const language = useCurrentLanguage() || "en";
-  const { page: cmsPage, content: cmsContent } = useCmsPageContent("appointment");
+  const { page: cmsPage, content: cmsContent } =
+    useCmsPageContent("appointment");
   const baseCopy = pageCopy[language] || pageCopy.en;
   const settings = cmsPage?.updatedBy ? cmsContent?.settings || {} : {};
-  const copy = { ...baseCopy, title: settings.heroTitle || baseCopy.title, intro: settings.heroDescription || baseCopy.intro, book: settings.heroButton || baseCopy.book, why: settings.whyTitle || baseCopy.why, benefits: [settings.benefit1, settings.benefit2, settings.benefit3, settings.benefit4].map((value, index) => value || baseCopy.benefits[index]), final: settings.finalTitle || baseCopy.final, lesson: settings.finalButton || baseCopy.lesson };
+  const copy = {
+    ...baseCopy,
+    title: settings.heroTitle || baseCopy.title,
+    intro: settings.heroDescription || baseCopy.intro,
+    book: settings.heroButton || baseCopy.book,
+    why: settings.whyTitle || baseCopy.why,
+    benefits: [
+      settings.benefit1,
+      settings.benefit2,
+      settings.benefit3,
+      settings.benefit4,
+    ].map((value, index) => value || baseCopy.benefits[index]),
+    final: settings.finalTitle || baseCopy.final,
+    lesson: settings.finalButton || baseCopy.lesson,
+  };
   const [testimonialStart, setTestimonialStart] = useState(0);
 
   const visibleTestimonials = useMemo(
     () =>
       testimonialItems.map(
         (_, index) =>
-          testimonialItems[(testimonialStart + index) % testimonialItems.length],
+          testimonialItems[
+            (testimonialStart + index) % testimonialItems.length
+          ],
       ),
     [testimonialStart],
   );
@@ -131,88 +190,90 @@ export default function AppointmentPage() {
       </section>
 
       {/* Testimonials */}
-      <div className="hidden"><section className="bg-white px-5 py-20 sm:px-8 lg:px-10">
-        <div className="mx-auto w-full max-w-[1280px]">
-          <span className="inline-flex rounded-[8px] bg-[#eef9ef] px-4 py-2 !text-[13px] font-bold text-[#43b968]">
-            Testimonials
-          </span>
+      <div className="hidden">
+        <section className="bg-white px-5 py-20 sm:px-8 lg:px-10">
+          <div className="mx-auto w-full max-w-[1280px]">
+            <span className="inline-flex rounded-[8px] bg-[#eef9ef] px-4 py-2 !text-[13px] font-bold text-[#43b968]">
+              Testimonials
+            </span>
 
-          <div className="mt-5 flex items-center justify-between gap-6">
-            <h2 className="text-[30px] font-extrabold tracking-[-0.02em] sm:text-[36px]">
-              What Our Students Say
-            </h2>
-            <div className="flex shrink-0 items-center gap-3">
-              <button
-                type="button"
-                onClick={() => moveTestimonials(-1)}
-                aria-label="Previous testimonials"
-                className="flex h-10 w-10 items-center justify-center rounded-[9px] bg-[#e6ebf3] text-[#e2233d] transition-all duration-300 hover:-translate-y-1 hover:bg-[#174a9b] hover:text-white"
-              >
-                <FaArrowLeft />
-              </button>
-              <button
-                type="button"
-                onClick={() => moveTestimonials(1)}
-                aria-label="Next testimonials"
-                className="flex h-10 w-10 items-center justify-center rounded-[9px] bg-[#e2233d] text-white transition-all duration-300 hover:-translate-y-1 hover:bg-[#174a9b]"
-              >
-                <FaArrowRight />
-              </button>
-            </div>
-          </div>
-
-          <div className="mt-12 rounded-[12px] bg-[#dce4f1] p-5 sm:p-6">
-            <div className="grid grid-cols-[minmax(0,1fr)] gap-5 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
-              {visibleTestimonials.map((item, index) => (
-                <article
-                  key={`${item.name}-${index}`}
-                  className={`${
-                    index === 0
-                      ? "flex"
-                      : index === 1
-                        ? "hidden sm:flex"
-                        : "hidden lg:flex"
-                  } min-h-[282px] flex-col rounded-[10px] bg-white p-6 shadow-[0_2px_10px_rgba(15,44,89,0.03)] transition-all duration-300 hover:-translate-y-1 hover:shadow-lg`}
+            <div className="mt-5 flex items-center justify-between gap-6">
+              <h2 className="text-[30px] font-extrabold tracking-[-0.02em] sm:text-[36px]">
+                What Our Students Say
+              </h2>
+              <div className="flex shrink-0 items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => moveTestimonials(-1)}
+                  aria-label="Previous testimonials"
+                  className="flex h-10 w-10 items-center justify-center rounded-[9px] bg-[#e6ebf3] text-[#e2233d] transition-all duration-300 hover:-translate-y-1 hover:bg-[#174a9b] hover:text-white"
                 >
-                  <p className="!text-[14px] font-medium leading-[1.5] text-[#44484f]">
-                    {testimonialText}
-                  </p>
-
-                  <div className="mt-4 flex gap-2 text-[20px] text-[#ffc52f]">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <FaStar key={star} />
-                    ))}
-                  </div>
-
-                  <div className="mt-auto flex items-center gap-3 pt-5">
-                    <Image
-                      src={item.image}
-                      alt={item.name}
-                      sizes="42px"
-                      className="h-[42px] w-[42px] rounded-full object-cover"
-                    />
-                    <div>
-                      <h3 className="!font-sans !text-[13px] font-extrabold text-[#292929]">
-                        {item.name}
-                      </h3>
-                      <p className="mt-0.5 !text-[12px] text-[#686b72]">
-                        {item.role}
-                      </p>
-                    </div>
-                  </div>
-                </article>
-              ))}
+                  <FaArrowLeft />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => moveTestimonials(1)}
+                  aria-label="Next testimonials"
+                  className="flex h-10 w-10 items-center justify-center rounded-[9px] bg-[#e2233d] text-white transition-all duration-300 hover:-translate-y-1 hover:bg-[#174a9b]"
+                >
+                  <FaArrowRight />
+                </button>
+              </div>
             </div>
-          </div>
 
-          <Link
-            href="/reviews"
-            className="mt-12 inline-flex h-12 items-center justify-center rounded-[10px] bg-[#e2233d] px-6 !text-[14px] font-extrabold text-white transition-all duration-300 hover:-translate-y-1 hover:bg-[#174a9b] hover:shadow-lg"
-          >
-            View All
-          </Link>
-        </div>
-      </section></div>
+            <div className="mt-12 rounded-[12px] bg-[#dce4f1] p-5 sm:p-6">
+              <div className="grid grid-cols-[minmax(0,1fr)] gap-5 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
+                {visibleTestimonials.map((item, index) => (
+                  <article
+                    key={`${item.name}-${index}`}
+                    className={`${
+                      index === 0
+                        ? "flex"
+                        : index === 1
+                          ? "hidden sm:flex"
+                          : "hidden lg:flex"
+                    } min-h-[282px] flex-col rounded-[10px] bg-white p-6 shadow-[0_2px_10px_rgba(15,44,89,0.03)] transition-all duration-300 hover:-translate-y-1 hover:shadow-lg`}
+                  >
+                    <p className="!text-[14px] font-medium leading-[1.5] text-[#44484f]">
+                      {testimonialText}
+                    </p>
+
+                    <div className="mt-4 flex gap-2 text-[20px] text-[#ffc52f]">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <FaStar key={star} />
+                      ))}
+                    </div>
+
+                    <div className="mt-auto flex items-center gap-3 pt-5">
+                      <Image
+                        src={item.image}
+                        alt={item.name}
+                        sizes="42px"
+                        className="h-[42px] w-[42px] rounded-full object-cover"
+                      />
+                      <div>
+                        <h3 className="!font-sans !text-[13px] font-extrabold text-[#292929]">
+                          {item.name}
+                        </h3>
+                        <p className="mt-0.5 !text-[12px] text-[#686b72]">
+                          {item.role}
+                        </p>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </div>
+
+            <Link
+              href="/reviews"
+              className="mt-12 inline-flex h-12 items-center justify-center rounded-[10px] bg-[#e2233d] px-6 !text-[14px] font-extrabold text-white transition-all duration-300 hover:-translate-y-1 hover:bg-[#174a9b] hover:shadow-lg"
+            >
+              View All
+            </Link>
+          </div>
+        </section>
+      </div>
       <Testimonials />
 
       {/* Final CTA */}

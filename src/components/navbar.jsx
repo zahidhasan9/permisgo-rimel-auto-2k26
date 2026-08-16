@@ -29,14 +29,24 @@ const Navbar = () => {
   const router = useRouter();
   const site = useSiteSettings();
 
-  useEffect(() => setLanguage((localStorage.getItem("permisgo-language") || "en").toUpperCase()), []);
+  useEffect(
+    () =>
+      setLanguage(
+        (localStorage.getItem("permisgo-language") || "en").toUpperCase(),
+      ),
+    [],
+  );
   const changeLanguage = (option) => {
     const next = option?.value || "EN";
     setLanguage(next);
     localStorage.setItem("permisgo-language", next.toLowerCase());
     document.cookie = `permisgo-language=${next.toLowerCase()}; path=/; max-age=31536000; samesite=lax`;
     document.documentElement.lang = next.toLowerCase();
-    window.dispatchEvent(new CustomEvent("permisgo-language-change", { detail: next.toLowerCase() }));
+    window.dispatchEvent(
+      new CustomEvent("permisgo-language-change", {
+        detail: next.toLowerCase(),
+      }),
+    );
     router.refresh();
   };
 
@@ -190,28 +200,38 @@ const Navbar = () => {
 
             <div className="flex items-center gap-2 sm:gap-3">
               <div data-no-translate className="w-[82px] sm:w-[88px]">
-                {language ? <Select
-                  options={options}
-                  value={options.find((option) => option.value === language) || options[0]}
-                  onChange={changeLanguage}
-                  placeholder={null}
-                  isSearchable={false}
-                  styles={selectStyles}
-                  formatOptionLabel={(opt) => (
-                    <div className="flex items-center">
-                      <Image
-                        key={`${opt.value}-${opt.img}`}
-                        src={opt.img}
-                        alt={opt.label}
-                        width={18}
-                        height={18}
-                        className="mr-1.5 rounded-full"
-                      />
+                {language ? (
+                  <Select
+                    options={options}
+                    value={
+                      options.find((option) => option.value === language) ||
+                      options[0]
+                    }
+                    onChange={changeLanguage}
+                    placeholder={null}
+                    isSearchable={false}
+                    styles={selectStyles}
+                    formatOptionLabel={(opt) => (
+                      <div className="flex items-center">
+                        <Image
+                          key={`${opt.value}-${opt.img}`}
+                          src={opt.img}
+                          alt={opt.label}
+                          width={18}
+                          height={18}
+                          className="mr-1.5 rounded-full"
+                        />
 
-                      <span>{opt.value}</span>
-                    </div>
-                  )}
-                /> : <div className="h-8 w-full animate-pulse rounded-full bg-slate-200" aria-label="Loading saved language" />}
+                        <span>{opt.value}</span>
+                      </div>
+                    )}
+                  />
+                ) : (
+                  <div
+                    className="h-8 w-full animate-pulse rounded-full bg-slate-200"
+                    aria-label="Loading saved language"
+                  />
+                )}
               </div>
 
               <ul className="hidden items-center gap-1 sm:flex lg:gap-2">

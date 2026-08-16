@@ -12,7 +12,8 @@ import { changePassword } from "@/features/API";
 const inputClass =
   "h-12 w-full rounded-xl border border-[#D4DDEA] bg-[#F6F8FB] px-3 pr-11 text-base text-[#333333] outline-none transition placeholder:text-[#969696] focus:border-[#174A9B] focus:bg-white disabled:cursor-not-allowed disabled:opacity-70 sm:h-11 sm:px-4 sm:pr-12 sm:text-[14px]";
 
-const labelClass = "mb-2 block text-xs font-semibold text-[#5F5F5F] sm:mb-3 sm:text-[14px]";
+const labelClass =
+  "mb-2 block text-xs font-semibold text-[#5F5F5F] sm:mb-3 sm:text-[14px]";
 
 const initialFormData = {
   currentPassword: "",
@@ -137,11 +138,11 @@ export default function ResetPassword() {
 
   return (
     <main className="min-h-screen overflow-x-hidden bg-white px-2.5 py-4 pb-24 sm:px-6 sm:py-6 sm:pb-8">
-        <section className="mx-auto w-full max-w-4xl min-w-0">
-          {/* Header */}
+      <section className="mx-auto w-full max-w-4xl min-w-0">
+        {/* Header */}
 
-          <header>
-            <div className="flex min-w-0 items-center gap-3 sm:gap-4">
+        <header>
+          <div className="flex min-w-0 items-center gap-3 sm:gap-4">
             <button
               type="button"
               onClick={() => router.back()}
@@ -152,102 +153,108 @@ export default function ResetPassword() {
               <IoChevronBack />
             </button>
 
-              <h1 className="min-w-0 truncate text-xl font-bold text-[#174A9B] sm:text-[26px]">
-                Reset Password
-              </h1>
+            <h1 className="min-w-0 truncate text-xl font-bold text-[#174A9B] sm:text-[26px]">
+              Reset Password
+            </h1>
+          </div>
+          <p className="mt-2 text-xs font-normal leading-5 text-[#666666] sm:text-[15px]">
+            Update your information to ensure accurate lesson scheduling and
+            communication.
+          </p>
+        </header>
+
+        {/* Card */}
+
+        <form
+          className="mt-5 min-w-0 rounded-[14px] bg-[#E7ECF4] p-3.5 sm:mt-8 sm:p-6"
+          onSubmit={handleSubmit}
+          noValidate
+        >
+          {/* Current Password */}
+
+          <div>
+            <label htmlFor="currentPassword" className={labelClass}>
+              Current Password
+            </label>
+
+            <PasswordInput
+              id="currentPassword"
+              name="currentPassword"
+              value={formData.currentPassword}
+              show={showPassword.current}
+              onChange={handleChange}
+              onToggle={() => togglePassword("current")}
+              placeholder="Enter current password"
+              autoComplete="current-password"
+              disabled={loading}
+            />
+
+            <p className="mt-2 text-[11px] leading-4 text-[#686868] sm:mt-3 sm:text-[14px] sm:leading-5">
+              If you don&apos;t have a password, skip the old password field
+            </p>
+          </div>
+
+          {/* New Password Fields */}
+
+          <div className="mt-5 grid grid-cols-1 gap-4 sm:mt-7 sm:grid-cols-2 sm:gap-6">
+            <div>
+              <label htmlFor="newPassword" className={labelClass}>
+                New Password
+              </label>
+
+              <PasswordInput
+                id="newPassword"
+                name="newPassword"
+                value={formData.newPassword}
+                show={showPassword.new}
+                onChange={handleChange}
+                onToggle={() => togglePassword("new")}
+                placeholder="Enter new password"
+                autoComplete="new-password"
+                disabled={loading}
+              />
             </div>
-            <p className="mt-2 text-xs font-normal leading-5 text-[#666666] sm:text-[15px]">Update your information to ensure accurate lesson scheduling and communication.</p>
-          </header>
 
-          {/* Card */}
+            <div>
+              <label htmlFor="confirmPassword" className={labelClass}>
+                Confirm New Password
+              </label>
 
-          <form className="mt-5 min-w-0 rounded-[14px] bg-[#E7ECF4] p-3.5 sm:mt-8 sm:p-6" onSubmit={handleSubmit} noValidate>
-              {/* Current Password */}
+              <PasswordInput
+                id="confirmPassword"
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                show={showPassword.confirm}
+                onChange={handleChange}
+                onToggle={() => togglePassword("confirm")}
+                placeholder="Confirm new password"
+                autoComplete="new-password"
+                disabled={loading}
+              />
+            </div>
+          </div>
 
-              <div>
-                <label htmlFor="currentPassword" className={labelClass}>
-                  Current Password
-                </label>
+          {/* Button */}
 
-                <PasswordInput
-                  id="currentPassword"
-                  name="currentPassword"
-                  value={formData.currentPassword}
-                  show={showPassword.current}
-                  onChange={handleChange}
-                  onToggle={() => togglePassword("current")}
-                  placeholder="Enter current password"
-                  autoComplete="current-password"
-                  disabled={loading}
-                />
-
-                <p className="mt-2 text-[11px] leading-4 text-[#686868] sm:mt-3 sm:text-[14px] sm:leading-5">
-                  If you don&apos;t have a password, skip the old password field
-                </p>
-              </div>
-
-              {/* New Password Fields */}
-
-              <div className="mt-5 grid grid-cols-1 gap-4 sm:mt-7 sm:grid-cols-2 sm:gap-6">
-                <div>
-                  <label htmlFor="newPassword" className={labelClass}>
-                    New Password
-                  </label>
-
-                  <PasswordInput
-                    id="newPassword"
-                    name="newPassword"
-                    value={formData.newPassword}
-                    show={showPassword.new}
-                    onChange={handleChange}
-                    onToggle={() => togglePassword("new")}
-                    placeholder="Enter new password"
-                    autoComplete="new-password"
-                    disabled={loading}
-                  />
-
-                </div>
-
-                <div>
-                  <label htmlFor="confirmPassword" className={labelClass}>
-                    Confirm New Password
-                  </label>
-
-                  <PasswordInput
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    value={formData.confirmPassword}
-                    show={showPassword.confirm}
-                    onChange={handleChange}
-                    onToggle={() => togglePassword("confirm")}
-                    placeholder="Confirm new password"
-                    autoComplete="new-password"
-                    disabled={loading}
-                  />
-                </div>
-              </div>
-
-              {/* Button */}
-
-              <div>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="mt-6 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#D72638] px-5 text-base font-bold text-white transition hover:bg-[#C41F31] disabled:cursor-not-allowed disabled:opacity-60 sm:mt-12 sm:w-auto sm:min-w-[182px]"
-                >
-                  {loading ? (
-                    <>
-                      <FaSpinner className="animate-spin" size={14} />
-                      Changing Password...
-                    </>
-                  ) : (
-                    "Change Password"
-                  )}
-                </button>
-              </div>
-          </form>
-        </section>
-      </main>
+          <div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="mt-6 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#D72638] px-5 text-base font-bold text-white transition hover:bg-[#C41F31] disabled:cursor-not-allowed disabled:opacity-60 sm:mt-12 sm:w-auto sm:min-w-[182px]"
+            >
+              {loading ? (
+                <>
+                  <FaSpinner className="animate-spin" size={14} />
+                  Changing Password...
+                </>
+              ) : (
+                "Change Password"
+              )}
+            </button>
+          </div>
+        </form>
+      </section>
+    </main>
   );
 }
 

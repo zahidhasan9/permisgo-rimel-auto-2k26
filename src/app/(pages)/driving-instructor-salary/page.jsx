@@ -26,9 +26,9 @@ export default function DrivingInstructorSalaryPage() {
               <br className="hidden sm:block" /> driving instructor
             </h1>
             <p className="mt-7 max-w-[650px] !text-[16px] leading-7 text-[#70757b]">
-              Are you looking for information on the salary of a driving instructor? Do you want
-              to accurately estimate your income as a self-employed individual? You&apos;ve come
-              to the right place.
+              Are you looking for information on the salary of a driving
+              instructor? Do you want to accurately estimate your income as a
+              self-employed individual? You&apos;ve come to the right place.
             </p>
             <Link
               href="/becoming-an-independent-instructor"
@@ -83,8 +83,9 @@ export default function DrivingInstructorSalaryPage() {
               Estimate your income with Permis Go
             </h2>
             <p className="mt-6 max-w-[710px] !text-[16px] leading-7 text-[#656a72]">
-              Estimate your earnings as a partner instructor in one click with our simulator.
-              Earn up to €37/hour and 50% more income compared to traditional driving schools.
+              Estimate your earnings as a partner instructor in one click with
+              our simulator. Earn up to €37/hour and 50% more income compared to
+              traditional driving schools.
             </p>
             <Link
               href="/login-to-my-partner-area"

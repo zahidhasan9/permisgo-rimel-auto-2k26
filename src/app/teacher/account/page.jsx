@@ -33,13 +33,13 @@ export default function AccountingPage() {
         {/* Header */}
         <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex min-w-0 items-center gap-3">
-              <button
-            type="button"
-            onClick={() => router.back()}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-[#16458f] shadow-sm transition hover:bg-blue-50"
-          >
-            <FaChevronLeft size={14} />
-          </button>
+            <button
+              type="button"
+              onClick={() => router.back()}
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-[#16458f] shadow-sm transition hover:bg-blue-50"
+            >
+              <FaChevronLeft size={14} />
+            </button>
 
             <div className="min-w-0">
               <h1 className="truncate text-2xl font-bold text-blue-900">

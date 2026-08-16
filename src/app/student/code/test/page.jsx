@@ -160,7 +160,11 @@ export default function StudentCodeTestPage() {
     if (!attempt?._id || !currentQuestion?._id) return;
 
     if (selectedOptionIndexes.length === 0) {
-      setError(currentQuestion.answerMode === "multiple" ? "Please select all correct options." : "Please select one option.");
+      setError(
+        currentQuestion.answerMode === "multiple"
+          ? "Please select all correct options."
+          : "Please select one option.",
+      );
       return;
     }
 
@@ -205,7 +209,13 @@ export default function StudentCodeTestPage() {
           ? oldAnswer.selectedOptionIndex
           : null,
       );
-      setSelectedOptionIndexes(oldAnswer?.selectedOptionIndexes?.length ? oldAnswer.selectedOptionIndexes : oldAnswer?.selectedOptionIndex !== undefined ? [oldAnswer.selectedOptionIndex] : []);
+      setSelectedOptionIndexes(
+        oldAnswer?.selectedOptionIndexes?.length
+          ? oldAnswer.selectedOptionIndexes
+          : oldAnswer?.selectedOptionIndex !== undefined
+            ? [oldAnswer.selectedOptionIndex]
+            : [],
+      );
     }
   };
 
@@ -222,7 +232,13 @@ export default function StudentCodeTestPage() {
           ? oldAnswer.selectedOptionIndex
           : null,
       );
-      setSelectedOptionIndexes(oldAnswer?.selectedOptionIndexes?.length ? oldAnswer.selectedOptionIndexes : oldAnswer?.selectedOptionIndex !== undefined ? [oldAnswer.selectedOptionIndex] : []);
+      setSelectedOptionIndexes(
+        oldAnswer?.selectedOptionIndexes?.length
+          ? oldAnswer.selectedOptionIndexes
+          : oldAnswer?.selectedOptionIndex !== undefined
+            ? [oldAnswer.selectedOptionIndex]
+            : [],
+      );
     }
   };
 
@@ -385,7 +401,9 @@ export default function StudentCodeTestPage() {
               </span>
             ) : (
               <span className="inline-flex h-7 items-center rounded-md bg-[#F1F4F8] px-3 text-[10px] font-black text-[#667085]">
-                {currentQuestion.answerMode === "multiple" ? "Select multiple answers" : "Select one answer"}
+                {currentQuestion.answerMode === "multiple"
+                  ? "Select multiple answers"
+                  : "Select one answer"}
               </span>
             )}
           </div>
@@ -409,11 +427,13 @@ export default function StudentCodeTestPage() {
               const isSelected = selectedOptionIndexes.includes(index);
 
               const isCorrect =
-                (alreadyAnswered?.correctOptionIndexes?.includes(index) || alreadyAnswered?.correctOptionIndex === index) &&
+                (alreadyAnswered?.correctOptionIndexes?.includes(index) ||
+                  alreadyAnswered?.correctOptionIndex === index) &&
                 alreadyAnswered?.isCorrect !== undefined;
 
               const isWrongSelected =
-                (alreadyAnswered?.selectedOptionIndexes?.includes(index) || alreadyAnswered?.selectedOptionIndex === index) &&
+                (alreadyAnswered?.selectedOptionIndexes?.includes(index) ||
+                  alreadyAnswered?.selectedOptionIndex === index) &&
                 alreadyAnswered?.isCorrect === false;
 
               const optionClass = isCorrect
@@ -431,7 +451,11 @@ export default function StudentCodeTestPage() {
                   disabled={Boolean(alreadyAnswered)}
                   onClick={() => {
                     if (currentQuestion.answerMode === "multiple") {
-                      setSelectedOptionIndexes((current) => current.includes(index) ? current.filter((value) => value !== index) : [...current, index].sort());
+                      setSelectedOptionIndexes((current) =>
+                        current.includes(index)
+                          ? current.filter((value) => value !== index)
+                          : [...current, index].sort(),
+                      );
                       setSelectedOptionIndex(index);
                     } else {
                       setSelectedOptionIndex(index);

@@ -5,7 +5,9 @@ import useSiteSettings from "@/hooks/useSiteSettings";
 
 export default function FloatingWhatsApp() {
   const settings = useSiteSettings();
-  const whatsappUrl = settings.whatsappUrl || `https://wa.me/${String(settings.whatsappNumber).replace(/\D/g, "")}`;
+  const whatsappUrl =
+    settings.whatsappUrl ||
+    `https://wa.me/${String(settings.whatsappNumber).replace(/\D/g, "")}`;
 
   return (
     <a

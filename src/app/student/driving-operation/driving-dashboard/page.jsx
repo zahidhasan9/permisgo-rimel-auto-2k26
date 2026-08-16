@@ -89,17 +89,30 @@ export default function Page() {
         const data = response?.data?.data ?? response?.data ?? [];
         if (active) setTeachers(Array.isArray(data) ? data : []);
       })
-      .catch(() => { if (active) setTeachers([]); })
-      .finally(() => { if (active) setTeachersLoading(false); });
-    return () => { active = false; };
+      .catch(() => {
+        if (active) setTeachers([]);
+      })
+      .finally(() => {
+        if (active) setTeachersLoading(false);
+      });
+    return () => {
+      active = false;
+    };
   }, []);
 
   useEffect(() => {
     let active = true;
     getStudentDashboard()
-      .then((response) => { if (active) setDashboard(response?.data?.data ?? response?.data ?? null); })
-      .catch(() => { if (active) setDashboard(null); });
-    return () => { active = false; };
+      .then((response) => {
+        if (active)
+          setDashboard(response?.data?.data ?? response?.data ?? null);
+      })
+      .catch(() => {
+        if (active) setDashboard(null);
+      });
+    return () => {
+      active = false;
+    };
   }, []);
 
   const journey = dashboard?.licenseJourney;
@@ -108,7 +121,11 @@ export default function Page() {
         id: index + 1,
         label: step.label,
         progress: step.progress,
-        type: step.completed ? "done" : index + 1 === journey.currentStep ? "car" : "empty",
+        type: step.completed
+          ? "done"
+          : index + 1 === journey.currentStep
+            ? "car"
+            : "empty",
       }))
     : steps;
 
@@ -144,7 +161,8 @@ export default function Page() {
               </h2>
 
               <p className="mt-2 text-[13px] font-medium text-[#667085]">
-                Step {journey?.currentStep || 1}: {journey?.currentStepLabel || "Registration"}
+                Step {journey?.currentStep || 1}:{" "}
+                {journey?.currentStepLabel || "Registration"}
               </p>
             </div>
 
@@ -157,7 +175,8 @@ export default function Page() {
               </Link>
 
               <p className="text-right text-[12px] font-bold leading-4 text-[#20BF3A] sm:text-[15px]">
-                {journey?.completedHours || 0} / {journey?.targetHours || 20} hours completed
+                {journey?.completedHours || 0} / {journey?.targetHours || 20}{" "}
+                hours completed
               </p>
             </div>
           </div>
@@ -185,11 +204,15 @@ export default function Page() {
                     <span className="mt-2 max-w-[54px] text-center text-[8px] font-bold leading-[10px] text-[#667085] sm:mt-3 sm:max-w-none sm:whitespace-nowrap sm:text-[11px] sm:leading-normal">
                       {step.label}
                     </span>
-                    <span className="mt-1 text-[8px] font-semibold text-[#174596] sm:text-[10px]">{step.progress ?? 0}%</span>
+                    <span className="mt-1 text-[8px] font-semibold text-[#174596] sm:text-[10px]">
+                      {step.progress ?? 0}%
+                    </span>
                   </div>
 
                   {index !== journeySteps.length - 1 && (
-                    <div className={`mt-[15px] h-[2px] min-w-0 flex-1 sm:mb-7 sm:mt-0 ${journeySteps[index + 1]?.type === "done" || journeySteps[index + 1]?.type === "car" ? "bg-[#174596]" : "bg-slate-300"}`} />
+                    <div
+                      className={`mt-[15px] h-[2px] min-w-0 flex-1 sm:mb-7 sm:mt-0 ${journeySteps[index + 1]?.type === "done" || journeySteps[index + 1]?.type === "car" ? "bg-[#174596]" : "bg-slate-300"}`}
+                    />
                   )}
                 </Fragment>
               ))}
@@ -207,49 +230,76 @@ export default function Page() {
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {teachers.map((teacher) => {
                 const user = teacher.user || {};
-                const rating = Math.max(0, Math.min(5, Number(teacher.rating?.average || 0)));
+                const rating = Math.max(
+                  0,
+                  Math.min(5, Number(teacher.rating?.average || 0)),
+                );
                 return (
-                <article
-                  key={teacher._id}
-                  className="rounded-[12px] bg-white p-3 text-center transition hover:-translate-y-1 hover:shadow-[0_12px_28px_rgba(23,69,150,0.13)] sm:p-4"
-                >
-                  {user.avatar ? <img src={user.avatar} alt={user.name || "Teacher"} className="mx-auto h-[66px] w-[66px] rounded-full object-cover" /> : <div className="mx-auto flex h-[66px] w-[66px] items-center justify-center rounded-full bg-[#174596] text-2xl font-bold text-white">{(user.name || "T").charAt(0).toUpperCase()}</div>}
-
-                  <h3 className="mt-3 break-words text-[18px] font-bold leading-tight text-[#174596] sm:mt-4 sm:text-[20px]">
-                    {user.name || user.fullName || "Teacher"}
-                  </h3>
-
-                  <div className="mt-2 flex min-w-0 items-center justify-center gap-1.5 text-[12px] text-[#667085] sm:text-[13px]">
-                    <FaWhatsapp className="text-[15px] text-[#19C463]" />
-                    <span className="min-w-0 break-all">{user.phone || "Phone not provided"}</span>
-                  </div>
-
-                  <div className="mt-4 rounded-[10px] bg-[#E8EEF7] px-3 py-3">
-                    <p className="text-[12px] text-[#667085]">
-                      Experience{" "}
-                      <span className="font-bold text-[#171717]">
-                        {teacher.experienceYears || 0} Years+
-                      </span>
-                    </p>
-
-                    <div className="mt-3 flex justify-center gap-3 text-[#174596]">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <FaStar key={star} className={`text-[16px] ${star <= Math.round(rating) ? "text-[#174596]" : "text-slate-300"}`} />
-                      ))}
-                    </div>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => router.push(`/student/chat?userId=${user._id}`)}
-                    className="mt-4 h-10 w-full rounded-[8px] border border-[#DF2339] text-[12px] font-bold text-[#174596] transition hover:bg-[#DF2339] hover:text-white"
+                  <article
+                    key={teacher._id}
+                    className="rounded-[12px] bg-white p-3 text-center transition hover:-translate-y-1 hover:shadow-[0_12px_28px_rgba(23,69,150,0.13)] sm:p-4"
                   >
-                    Message
-                  </button>
-                </article>
-              );})}
-              {!teachersLoading && !teachers.length && <div className="col-span-full rounded-xl bg-white p-8 text-center text-sm font-semibold text-slate-500">You have not added any favorite teacher yet.</div>}
-              {teachersLoading && <div className="col-span-full h-52 animate-pulse rounded-xl bg-white" />}
+                    {user.avatar ? (
+                      <img
+                        src={user.avatar}
+                        alt={user.name || "Teacher"}
+                        className="mx-auto h-[66px] w-[66px] rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="mx-auto flex h-[66px] w-[66px] items-center justify-center rounded-full bg-[#174596] text-2xl font-bold text-white">
+                        {(user.name || "T").charAt(0).toUpperCase()}
+                      </div>
+                    )}
+
+                    <h3 className="mt-3 break-words text-[18px] font-bold leading-tight text-[#174596] sm:mt-4 sm:text-[20px]">
+                      {user.name || user.fullName || "Teacher"}
+                    </h3>
+
+                    <div className="mt-2 flex min-w-0 items-center justify-center gap-1.5 text-[12px] text-[#667085] sm:text-[13px]">
+                      <FaWhatsapp className="text-[15px] text-[#19C463]" />
+                      <span className="min-w-0 break-all">
+                        {user.phone || "Phone not provided"}
+                      </span>
+                    </div>
+
+                    <div className="mt-4 rounded-[10px] bg-[#E8EEF7] px-3 py-3">
+                      <p className="text-[12px] text-[#667085]">
+                        Experience{" "}
+                        <span className="font-bold text-[#171717]">
+                          {teacher.experienceYears || 0} Years+
+                        </span>
+                      </p>
+
+                      <div className="mt-3 flex justify-center gap-3 text-[#174596]">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <FaStar
+                            key={star}
+                            className={`text-[16px] ${star <= Math.round(rating) ? "text-[#174596]" : "text-slate-300"}`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        router.push(`/student/chat?userId=${user._id}`)
+                      }
+                      className="mt-4 h-10 w-full rounded-[8px] border border-[#DF2339] text-[12px] font-bold text-[#174596] transition hover:bg-[#DF2339] hover:text-white"
+                    >
+                      Message
+                    </button>
+                  </article>
+                );
+              })}
+              {!teachersLoading && !teachers.length && (
+                <div className="col-span-full rounded-xl bg-white p-8 text-center text-sm font-semibold text-slate-500">
+                  You have not added any favorite teacher yet.
+                </div>
+              )}
+              {teachersLoading && (
+                <div className="col-span-full h-52 animate-pulse rounded-xl bg-white" />
+              )}
             </div>
           </div>
         </section>

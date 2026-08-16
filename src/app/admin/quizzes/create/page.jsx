@@ -33,12 +33,21 @@ export default function CreateQuizPage() {
     <main className="min-h-screen bg-[#f6f8fc] px-4 py-5 sm:px-6 sm:py-7">
       <div className="mx-auto max-w-4xl">
         <header className="mb-6 flex items-center gap-3">
-          <button type="button" onClick={() => router.back()} aria-label="Go back" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:bg-slate-50">
+          <button
+            type="button"
+            onClick={() => router.back()}
+            aria-label="Go back"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:bg-slate-50"
+          >
             <FiArrowLeft className="h-4 w-4" />
           </button>
           <div>
-            <p className="text-xs font-semibold text-slate-400">Quiz Management</p>
-            <h1 className="mt-0.5 text-2xl font-bold text-slate-900">Create Quiz</h1>
+            <p className="text-xs font-semibold text-slate-400">
+              Quiz Management
+            </p>
+            <h1 className="mt-0.5 text-2xl font-bold text-slate-900">
+              Create Quiz
+            </h1>
           </div>
         </header>
 

@@ -3,7 +3,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import Testimonials from "@/components/testimonials";
-import { FaArrowLeft, FaArrowRight, FaStar, FaTimesCircle } from "react-icons/fa";
+import {
+  FaArrowLeft,
+  FaArrowRight,
+  FaStar,
+  FaTimesCircle,
+} from "react-icons/fa";
 import { FaLocationDot, FaSquareCheck } from "react-icons/fa6";
 
 import broomLogo from "../../../../public/image/broomLogo.png";
@@ -106,8 +111,8 @@ export default function TrafficLawsPage() {
               Your <span className="text-[#e4213c]">FREE</span> Highway code
             </h1>
             <p className="mt-7 max-w-[620px] !text-[16px] leading-7 text-[#70757b]">
-              Sign up for the code, and while you are practicing, start driving. It&apos;s the winning
-              combo for the rapid progress.
+              Sign up for the code, and while you are practicing, start driving.
+              It&apos;s the winning combo for the rapid progress.
             </p>
             <div className="mt-10 grid max-w-[540px] grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-2">
               <Link
@@ -142,7 +147,9 @@ export default function TrafficLawsPage() {
             <h2 className="text-[34px] font-bold tracking-[-0.025em] text-[#222] lg:text-[38px]">
               Permisgo&apos;s Highway Code Packs
             </h2>
-            <p className="mt-4 !text-[14px] text-[#6b7077]">What is your need?</p>
+            <p className="mt-4 !text-[14px] text-[#6b7077]">
+              What is your need?
+            </p>
           </div>
 
           <div className="mt-12 grid grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-3">
@@ -161,12 +168,20 @@ export default function TrafficLawsPage() {
                 )}
                 <div className="text-center">
                   {pack.bestValue && (
-                    <p className="mb-1 !text-[13px] font-semibold text-[#174a9b]">Best Value</p>
+                    <p className="mb-1 !text-[13px] font-semibold text-[#174a9b]">
+                      Best Value
+                    </p>
                   )}
-                  <h3 className="text-[28px] font-bold text-[#e4213c]">{pack.title}</h3>
-                  <p className="mt-2 !text-[13px] font-medium text-[#3e69a4]">{pack.subtitle}</p>
+                  <h3 className="text-[28px] font-bold text-[#e4213c]">
+                    {pack.title}
+                  </h3>
+                  <p className="mt-2 !text-[13px] font-medium text-[#3e69a4]">
+                    {pack.subtitle}
+                  </p>
                   <div className="mx-auto mt-6 flex min-h-[44px] max-w-[190px] items-center justify-center rounded-full border border-[#174a9b] px-5">
-                    <span className="text-[20px] font-bold text-[#174a9b]">{pack.price}</span>
+                    <span className="text-[20px] font-bold text-[#174a9b]">
+                      {pack.price}
+                    </span>
                     {pack.oldPrice && (
                       <span className="ml-3 !text-[12px] font-semibold text-[#67717f] line-through">
                         {pack.oldPrice}
@@ -180,9 +195,14 @@ export default function TrafficLawsPage() {
                 </h4>
                 <ul className="mt-6 flex-1 space-y-4">
                   {pack.features.map((feature, index) => {
-                    const inactive = pack.title === "Zen Code" && index === pack.features.length - 1;
+                    const inactive =
+                      pack.title === "Zen Code" &&
+                      index === pack.features.length - 1;
                     return (
-                      <li key={feature} className="flex gap-3 !text-[14px] leading-6 text-[#34383e]">
+                      <li
+                        key={feature}
+                        className="flex gap-3 !text-[14px] leading-6 text-[#34383e]"
+                      >
                         {inactive ? (
                           <FaTimesCircle className="mt-1 shrink-0 text-[#e4213c]" />
                         ) : (
@@ -202,9 +222,19 @@ export default function TrafficLawsPage() {
               </article>
             ))}
           </div>
-          {loading && <p className="mt-10 text-center text-sm text-gray-500">Loading offers...</p>}
-          {error && <p className="mt-10 text-center text-sm text-red-600">{error}</p>}
-          {!loading && !error && offers.length === 0 && <p className="mt-10 text-center text-sm text-gray-500">No code offers available.</p>}
+          {loading && (
+            <p className="mt-10 text-center text-sm text-gray-500">
+              Loading offers...
+            </p>
+          )}
+          {error && (
+            <p className="mt-10 text-center text-sm text-red-600">{error}</p>
+          )}
+          {!loading && !error && offers.length === 0 && (
+            <p className="mt-10 text-center text-sm text-gray-500">
+              No code offers available.
+            </p>
+          )}
         </div>
       </section>
 
@@ -216,7 +246,8 @@ export default function TrafficLawsPage() {
                 écoles de conduite labellisées
               </h2>
               <p className="mt-5 !text-[15px] text-white/85">
-                Des centres de formation agréés, respectant des standards de qualité élevés.
+                Des centres de formation agréés, respectant des standards de
+                qualité élevés.
               </p>
             </div>
             <Image
@@ -240,12 +271,24 @@ export default function TrafficLawsPage() {
         </div>
 
         <div className="relative mt-10">
-          <Image src={road} alt="Learning journey road" sizes="100vw" className="h-[96px] w-full object-cover" />
+          <Image
+            src={road}
+            alt="Learning journey road"
+            sizes="100vw"
+            className="h-[96px] w-full object-cover"
+          />
           <div className="absolute inset-0 mx-auto grid max-w-[1280px] grid-cols-4 items-center px-8">
             {workSteps.map((step, index) => (
               <div key={step.title} className="relative flex justify-center">
-                <Image src={mapMarker} alt="" sizes="34px" className="h-[34px] w-[34px] object-contain" />
-                <span className="absolute top-[8px] !text-[9px] font-bold text-[#174a9b]">0{index + 1}</span>
+                <Image
+                  src={mapMarker}
+                  alt=""
+                  sizes="34px"
+                  className="h-[34px] w-[34px] object-contain"
+                />
+                <span className="absolute top-[8px] !text-[9px] font-bold text-[#174a9b]">
+                  0{index + 1}
+                </span>
               </div>
             ))}
           </div>
@@ -258,7 +301,9 @@ export default function TrafficLawsPage() {
               className="rounded-[10px] bg-[#174a9b] px-5 py-7 text-center text-white transition duration-300 hover:-translate-y-1 hover:bg-[#e4213c] hover:shadow-xl"
             >
               <h3 className="text-[18px] font-bold">{step.title}</h3>
-              <p className="mt-4 !text-[13px] leading-6 text-white/90">{step.text}</p>
+              <p className="mt-4 !text-[13px] leading-6 text-white/90">
+                {step.text}
+              </p>
             </article>
           ))}
         </div>
@@ -266,8 +311,12 @@ export default function TrafficLawsPage() {
 
       <section className="bg-white px-5 py-20 sm:px-8 lg:py-24">
         <div className="mx-auto max-w-[1280px] rounded-[10px] bg-[#174a9b] px-5 py-14 text-center sm:px-10 lg:py-20">
-          <h2 className="text-[32px] font-bold text-white lg:text-[37px]">And After your code?</h2>
-          <p className="mt-4 !text-[14px] text-white/85">Discover Our License Offers Starting at $500</p>
+          <h2 className="text-[32px] font-bold text-white lg:text-[37px]">
+            And After your code?
+          </h2>
+          <p className="mt-4 !text-[14px] text-white/85">
+            Discover Our License Offers Starting at $500
+          </p>
           <Link
             href="/pricing"
             className="mt-7 inline-flex min-h-[46px] min-w-[360px] max-w-full items-center justify-center rounded-[9px] bg-[#e4213c] px-7 !text-[14px] font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-white hover:text-[#174a9b] hover:shadow-lg"
@@ -277,7 +326,9 @@ export default function TrafficLawsPage() {
           <div className="mx-auto mt-10 grid max-w-[900px] grid-cols-[minmax(0,1fr)] gap-6 md:grid-cols-2">
             <div className="flex min-h-[94px] items-center justify-center gap-4 rounded-[9px] bg-white px-6">
               <FaLocationDot className="text-[30px] text-[#174a9b]" />
-              <span className="!text-[15px] font-semibold text-[#292d33]">71 Approved Agencies</span>
+              <span className="!text-[15px] font-semibold text-[#292d33]">
+                71 Approved Agencies
+              </span>
             </div>
             <div className="flex min-h-[94px] items-center justify-center gap-4 rounded-[9px] bg-white px-6">
               <FaStar className="text-[30px] text-[#174a9b]" />
@@ -296,8 +347,15 @@ export default function TrafficLawsPage() {
               key={rating.title}
               className="flex min-h-[165px] flex-col items-center justify-center rounded-[20px] bg-[#f6f8fb] px-6 py-6 text-center transition duration-300 hover:-translate-y-1 hover:bg-white hover:shadow-xl"
             >
-              <Image src={rating.image} alt="" sizes="40px" className="h-10 w-10 object-contain" />
-              <h3 className="mt-2 text-[18px] font-bold text-[#292929]">{rating.title}</h3>
+              <Image
+                src={rating.image}
+                alt=""
+                sizes="40px"
+                className="h-10 w-10 object-contain"
+              />
+              <h3 className="mt-2 text-[18px] font-bold text-[#292929]">
+                {rating.title}
+              </h3>
               <div className="mt-2 flex gap-3 text-[#ffc52c]">
                 {[0, 1, 2, 3, 4].map((star) => (
                   <FaStar key={star} className="text-[17px]" />

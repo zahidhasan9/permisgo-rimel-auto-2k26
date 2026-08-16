@@ -152,12 +152,7 @@ function LocationsContent() {
 
       setLocations(Array.isArray(locationData) ? locationData : []);
     } catch (requestError) {
-      setError(
-        getErrorMessage(
-          requestError,
-          "Locations could not be loaded.",
-        ),
-      );
+      setError(getErrorMessage(requestError, "Locations could not be loaded."));
     } finally {
       setLoading(false);
     }
@@ -346,8 +341,12 @@ function LocationsContent() {
   return (
     <main className="min-w-0 space-y-4 overflow-x-hidden pb-24 sm:space-y-6 sm:pb-10">
       <section className="rounded-2xl bg-gradient-to-r from-[#123D7A] to-[#1E63B7] p-4 text-white shadow-lg sm:rounded-3xl sm:p-6">
-        <p className="text-xs font-bold text-blue-100 sm:text-sm">Teacher settings</p>
-        <h1 className="mt-1 text-2xl font-black sm:text-3xl">Lesson locations</h1>
+        <p className="text-xs font-bold text-blue-100 sm:text-sm">
+          Teacher settings
+        </p>
+        <h1 className="mt-1 text-2xl font-black sm:text-3xl">
+          Lesson locations
+        </h1>
         <p className="mt-2 max-w-2xl text-xs leading-5 text-blue-100 sm:text-sm sm:leading-6">
           Add and manage accurate lesson meeting points for your students.
         </p>
@@ -594,8 +593,12 @@ function LocationsContent() {
                 </div>
 
                 <div className="mt-4 flex flex-wrap items-center justify-between gap-2 text-[11px] font-bold text-slate-500 sm:text-xs">
-                  <span className="min-w-0 break-words">{location.city || "City not set"}</span>
-                  <span className="shrink-0">{location.serviceRadiusKm || 10} km radius</span>
+                  <span className="min-w-0 break-words">
+                    {location.city || "City not set"}
+                  </span>
+                  <span className="shrink-0">
+                    {location.serviceRadiusKm || 10} km radius
+                  </span>
                 </div>
 
                 <div className="mt-4 grid grid-cols-2 gap-2">
@@ -625,7 +628,6 @@ function LocationsContent() {
           </div>
         )}
       </section>
-
     </main>
   );
 }

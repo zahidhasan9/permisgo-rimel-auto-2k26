@@ -29,8 +29,7 @@ const paymentMethods = [
 const inputClass =
   "h-9 w-full rounded-[6px] border border-transparent bg-white px-3 text-[10px] font-medium text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-[#16458f] focus:ring-2 focus:ring-blue-100";
 
-const labelClass =
-  "mb-1.5 block text-[9px] font-semibold text-slate-600";
+const labelClass = "mb-1.5 block text-[9px] font-semibold text-slate-600";
 
 function PaymentLogo({ type }) {
   if (type === "bank") {
@@ -43,10 +42,7 @@ function PaymentLogo({ type }) {
 
   return (
     <span className="relative flex h-6 w-6 items-center justify-center">
-      <FaRegCircle
-        size={23}
-        className="absolute text-[#00a8e8]"
-      />
+      <FaRegCircle size={23} className="absolute text-[#00a8e8]" />
 
       <FaRegCircle
         size={21}
@@ -56,11 +52,7 @@ function PaymentLogo({ type }) {
   );
 }
 
-function PaymentMethodCard({
-  method,
-  selectedMethod,
-  onSelect,
-}) {
+function PaymentMethodCard({ method, selectedMethod, onSelect }) {
   const isSelected = selectedMethod === method.id;
 
   return (
@@ -127,18 +119,12 @@ function BankAccountForm() {
           Bank Account Information
         </h3>
 
-        <FaCcMastercard
-          size={24}
-          className="shrink-0 text-[#e2233d]"
-        />
+        <FaCcMastercard size={24} className="shrink-0 text-[#e2233d]" />
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
         <div>
-          <label
-            htmlFor="cardHolder"
-            className={labelClass}
-          >
+          <label htmlFor="cardHolder" className={labelClass}>
             Card holder
           </label>
 
@@ -154,10 +140,7 @@ function BankAccountForm() {
         </div>
 
         <div>
-          <label
-            htmlFor="cardNumber"
-            className={labelClass}
-          >
+          <label htmlFor="cardNumber" className={labelClass}>
             Card number
           </label>
 
@@ -174,10 +157,7 @@ function BankAccountForm() {
         </div>
 
         <div>
-          <label
-            htmlFor="month"
-            className={labelClass}
-          >
+          <label htmlFor="month" className={labelClass}>
             Month
           </label>
 
@@ -193,10 +173,7 @@ function BankAccountForm() {
         </div>
 
         <div>
-          <label
-            htmlFor="year"
-            className={labelClass}
-          >
+          <label htmlFor="year" className={labelClass}>
             Month
           </label>
 
@@ -213,10 +190,7 @@ function BankAccountForm() {
         </div>
 
         <div className="sm:col-span-2">
-          <label
-            htmlFor="location"
-            className={labelClass}
-          >
+          <label htmlFor="location" className={labelClass}>
             Location
           </label>
 
@@ -271,9 +245,7 @@ function PayoneerForm() {
       <div className="flex items-center gap-1.5">
         <PaymentLogo type="payoneer" />
 
-        <h3 className="text-[18px] font-semibold text-slate-900">
-          Payoneer
-        </h3>
+        <h3 className="text-[18px] font-semibold text-slate-900">Payoneer</h3>
       </div>
 
       <p className="mt-2 text-[9px] leading-4 text-slate-500">
@@ -282,10 +254,7 @@ function PayoneerForm() {
 
       <div className="mt-5 space-y-4">
         <div>
-          <label
-            htmlFor="payoneerUsername"
-            className={labelClass}
-          >
+          <label htmlFor="payoneerUsername" className={labelClass}>
             Enter Username
           </label>
 
@@ -301,10 +270,7 @@ function PayoneerForm() {
         </div>
 
         <div>
-          <label
-            htmlFor="payoneerPassword"
-            className={labelClass}
-          >
+          <label htmlFor="payoneerPassword" className={labelClass}>
             Password
           </label>
 
@@ -347,9 +313,7 @@ function PayPalForm() {
       <div className="flex items-center gap-1.5 text-[#003087]">
         <FaPaypal size={22} />
 
-        <h3 className="text-[17px] font-extrabold italic">
-          PayPal
-        </h3>
+        <h3 className="text-[17px] font-extrabold italic">PayPal</h3>
       </div>
 
       <p className="mt-2 text-[9px] leading-4 text-slate-500">
@@ -357,10 +321,7 @@ function PayPalForm() {
       </p>
 
       <div className="mt-5">
-        <label
-          htmlFor="paypalEmail"
-          className={labelClass}
-        >
+        <label htmlFor="paypalEmail" className={labelClass}>
           Enter Email
         </label>
 
@@ -436,17 +397,11 @@ export default function AddPaymentMethodPage() {
               </div>
             </div>
 
-            {selectedMethod === "bank" && (
-              <BankAccountForm />
-            )}
+            {selectedMethod === "bank" && <BankAccountForm />}
 
-            {selectedMethod === "payoneer" && (
-              <PayoneerForm />
-            )}
+            {selectedMethod === "payoneer" && <PayoneerForm />}
 
-            {selectedMethod === "paypal" && (
-              <PayPalForm />
-            )}
+            {selectedMethod === "paypal" && <PayPalForm />}
           </div>
         </section>
       </section>

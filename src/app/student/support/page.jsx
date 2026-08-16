@@ -8,7 +8,11 @@ function BackHeader() {
   const router = useRouter();
   return (
     <header className="flex items-center gap-[16px]">
-      <button type="button" onClick={() => router.back()} className="flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-[12px] bg-[#EEF4FB] text-[27px] text-black">
+      <button
+        type="button"
+        onClick={() => router.back()}
+        className="flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-[12px] bg-[#EEF4FB] text-[27px] text-black"
+      >
         <IoChevronBack />
       </button>
 

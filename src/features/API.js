@@ -29,12 +29,16 @@ export const changePassword = (data) =>
 // =======================
 export const getStudentDashboard = () => axios.get("/students/dashboard");
 export const getStudentProfile = () => axios.get("/students/profile");
-export const getMyFavoriteTeachers = () => axios.get("/students/favorite-teachers");
+export const getMyFavoriteTeachers = () =>
+  axios.get("/students/favorite-teachers");
 export const getExamQuestions = () => axios.get("/exam-questions");
-export const getAdminExamQuestions = (params = {}) => axios.get("/exam-questions/admin", { params });
-export const getAdminExamQuestionById = (id) => axios.get(`/exam-questions/admin/${id}`);
+export const getAdminExamQuestions = (params = {}) =>
+  axios.get("/exam-questions/admin", { params });
+export const getAdminExamQuestionById = (id) =>
+  axios.get(`/exam-questions/admin/${id}`);
 export const createExamQuestion = (data) => axios.post("/exam-questions", data);
-export const updateExamQuestion = (id, data) => axios.patch(`/exam-questions/${id}`, data);
+export const updateExamQuestion = (id, data) =>
+  axios.patch(`/exam-questions/${id}`, data);
 export const deleteExamQuestion = (id) => axios.delete(`/exam-questions/${id}`);
 export const updateStudentProfile = (data) =>
   axios.patch("/students/profile", data);
@@ -94,16 +98,31 @@ export const updateUserRole = (id, role) => {
 export const getAdminDrivingSettings = () =>
   axios.get("/admin/settings/driving");
 
-export const updateAdminDrivingSettings = (requiredHours, requiredSkillsPercentage, contactRecipientEmail = "", siteSettings = {}) =>
-  axios.patch("/admin/settings/driving", { requiredHours, requiredSkillsPercentage, contactRecipientEmail, ...siteSettings });
+export const updateAdminDrivingSettings = (
+  requiredHours,
+  requiredSkillsPercentage,
+  contactRecipientEmail = "",
+  siteSettings = {},
+) =>
+  axios.patch("/admin/settings/driving", {
+    requiredHours,
+    requiredSkillsPercentage,
+    contactRecipientEmail,
+    ...siteSettings,
+  });
 
 export const createContactSubmission = (data) => axios.post("/contact", data);
 export const getPublicContactConfig = () => axios.get("/contact/config");
-export const getContactSubmissions = (params = {}) => axios.get("/contact", { params });
-export const updateContactSubmissionStatus = (id, status) => axios.patch(`/contact/${id}/status`, { status });
-export const createAppointmentRequest = (data) => axios.post("/appointments", data);
-export const getAdminAppointments = (params = {}) => axios.get("/appointments", { params });
-export const updateAppointmentStatus = (id, status) => axios.patch(`/appointments/${id}/status`, { status });
+export const getContactSubmissions = (params = {}) =>
+  axios.get("/contact", { params });
+export const updateContactSubmissionStatus = (id, status) =>
+  axios.patch(`/contact/${id}/status`, { status });
+export const createAppointmentRequest = (data) =>
+  axios.post("/appointments", data);
+export const getAdminAppointments = (params = {}) =>
+  axios.get("/appointments", { params });
+export const updateAppointmentStatus = (id, status) =>
+  axios.patch(`/appointments/${id}/status`, { status });
 
 export const deleteAdminUser = (id) => {
   return axios.delete(`/admin/users/${id}`);
@@ -293,7 +312,8 @@ export const deleteDocument = (documentId) => {
 export const getBlogs = (params = {}) => axios.get("/blogs", { params });
 export const getAdminBlogs = (params = {}) =>
   axios.get("/blogs/admin/all", { params });
-export const getBlog = (slug, params = {}) => axios.get(`/blogs/${slug}`, { params });
+export const getBlog = (slug, params = {}) =>
+  axios.get(`/blogs/${slug}`, { params });
 export const createBlog = (data) =>
   axios.post("/blogs", data, {
     headers: { "Content-Type": "multipart/form-data" },
@@ -308,7 +328,8 @@ export const deleteBlog = (id) => axios.delete(`/blogs/${id}`);
 // FAQ
 // =======================
 export const getFaqs = (params = {}) => axios.get("/faqs", { params });
-export const getAdminFaqs = (params = {}) => axios.get("/faqs/admin/all", { params });
+export const getAdminFaqs = (params = {}) =>
+  axios.get("/faqs/admin/all", { params });
 export const createFaq = (data) => axios.post("/faqs", data);
 export const updateFaq = (id, data) => axios.patch(`/faqs/${id}`, data);
 export const deleteFaq = (id) => axios.delete(`/faqs/${id}`);
@@ -316,20 +337,29 @@ export const deleteFaq = (id) => axios.delete(`/faqs/${id}`);
 // =======================
 // Testimonials
 // =======================
-export const getTestimonials = (params = {}) => axios.get("/testimonials", { params });
+export const getTestimonials = (params = {}) =>
+  axios.get("/testimonials", { params });
 
 // Multilingual public-pages CMS
 export const getAdminCmsPages = () => axios.get("/cms-pages/admin/all");
 export const getCmsPage = (slug, lang = "en") =>
   axios.get(`/cms-pages/${encodeURIComponent(slug)}`, { params: { lang } });
-export const getFooterCmsPages = (lang = "en") => axios.get("/cms-pages/footer", { params: { lang, _: Date.now() } });
+export const getFooterCmsPages = (lang = "en") =>
+  axios.get("/cms-pages/footer", { params: { lang, _: Date.now() } });
 export const saveCmsPage = (slug, data) =>
   axios.put(`/cms-pages/admin/${encodeURIComponent(slug)}`, data);
-export const deleteCmsPage = (slug) => axios.delete(`/cms-pages/admin/${encodeURIComponent(slug)}`);
-export const getAdminTestimonials = (params = {}) => axios.get("/testimonials/admin/all", { params });
-export const createTestimonial = (data) => axios.post("/testimonials", data, { headers: { "Content-Type": "multipart/form-data" } });
+export const deleteCmsPage = (slug) =>
+  axios.delete(`/cms-pages/admin/${encodeURIComponent(slug)}`);
+export const getAdminTestimonials = (params = {}) =>
+  axios.get("/testimonials/admin/all", { params });
+export const createTestimonial = (data) =>
+  axios.post("/testimonials", data, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
 export const updateTestimonial = (id, data) =>
-  axios.patch(`/testimonials/${id}`, data, { headers: { "Content-Type": "multipart/form-data" } });
+  axios.patch(`/testimonials/${id}`, data, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
 export const deleteTestimonial = (id) => axios.delete(`/testimonials/${id}`);
 
 // =======================
@@ -450,12 +480,16 @@ export const deleteQuizQuestion = (questionId) =>
   axios.delete(`/quizzes/questions/${questionId}`);
 
 export const getAdminRoadSigns = () => axios.get("/quizzes/road-signs/admin");
-export const createRoadSign = (data) => axios.post("/quizzes/road-signs", data, {
-  headers: data instanceof FormData ? { "Content-Type": "multipart/form-data" } : {},
-});
-export const updateRoadSign = (id, data) => axios.patch(`/quizzes/road-signs/${id}`, data, {
-  headers: data instanceof FormData ? { "Content-Type": "multipart/form-data" } : {},
-});
+export const createRoadSign = (data) =>
+  axios.post("/quizzes/road-signs", data, {
+    headers:
+      data instanceof FormData ? { "Content-Type": "multipart/form-data" } : {},
+  });
+export const updateRoadSign = (id, data) =>
+  axios.patch(`/quizzes/road-signs/${id}`, data, {
+    headers:
+      data instanceof FormData ? { "Content-Type": "multipart/form-data" } : {},
+  });
 export const deleteRoadSign = (id) => axios.delete(`/quizzes/road-signs/${id}`);
 
 // =======================
@@ -515,23 +549,48 @@ export const toggleLearningFavorite = (id) =>
   axios.patch(`/learning/contents/${id}/favorite`);
 
 export const getEbookCourses = () => axios.get("/learning/ebook/courses");
-export const createEbookCourse = (data) => axios.post("/learning/admin/ebook/courses", data, { headers: { "Content-Type": "multipart/form-data" } });
-export const updateEbookCourse = (id, data) => axios.patch(`/learning/admin/ebook/courses/${id}`, data, { headers: { "Content-Type": "multipart/form-data" } });
-export const deleteEbookCourse = (id) => axios.delete(`/learning/admin/ebook/courses/${id}`);
-export const getEbookTopics = (courseId) => axios.get(`/learning/ebook/courses/${courseId}/topics`);
-export const createEbookTopic = (courseId, data) => axios.post(`/learning/admin/ebook/courses/${courseId}/topics`, data);
-export const updateEbookTopic = (id, data) => axios.patch(`/learning/admin/ebook/topics/${id}`, data);
-export const deleteEbookTopic = (id) => axios.delete(`/learning/admin/ebook/topics/${id}`);
-export const getAdminEbookLessons = (params = {}) => axios.get("/learning/admin/ebook/lessons", { params });
-export const getAdminEbookLesson = (id) => axios.get(`/learning/admin/ebook/lessons/${id}`);
-export const createEbookLesson = (data) => axios.post("/learning/admin/ebook/lessons", data, { headers: { "Content-Type": "multipart/form-data" } });
-export const updateEbookLesson = (id, data) => axios.patch(`/learning/admin/ebook/lessons/${id}`, data, { headers: { "Content-Type": "multipart/form-data" } });
-export const deleteEbookLesson = (id) => axios.delete(`/learning/admin/ebook/lessons/${id}`);
-export const permanentlyDeleteEbookLesson = (id) => axios.delete(`/learning/admin/ebook/lessons/${id}/permanent`);
-export const getStudentEbookLessons = (courseId, topicId) => axios.get(`/learning/ebook/courses/${courseId}/topics/${topicId}/lessons`);
-export const getAllStudentEbookLessons = () => axios.get("/learning/ebook/lessons");
-export const getStudentEbookLesson = (id) => axios.get(`/learning/ebook/lessons/${id}`);
-export const updateStudentEbookLessonProgress = (id, data) => axios.patch(`/learning/ebook/lessons/${id}/progress`, data);
+export const createEbookCourse = (data) =>
+  axios.post("/learning/admin/ebook/courses", data, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+export const updateEbookCourse = (id, data) =>
+  axios.patch(`/learning/admin/ebook/courses/${id}`, data, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+export const deleteEbookCourse = (id) =>
+  axios.delete(`/learning/admin/ebook/courses/${id}`);
+export const getEbookTopics = (courseId) =>
+  axios.get(`/learning/ebook/courses/${courseId}/topics`);
+export const createEbookTopic = (courseId, data) =>
+  axios.post(`/learning/admin/ebook/courses/${courseId}/topics`, data);
+export const updateEbookTopic = (id, data) =>
+  axios.patch(`/learning/admin/ebook/topics/${id}`, data);
+export const deleteEbookTopic = (id) =>
+  axios.delete(`/learning/admin/ebook/topics/${id}`);
+export const getAdminEbookLessons = (params = {}) =>
+  axios.get("/learning/admin/ebook/lessons", { params });
+export const getAdminEbookLesson = (id) =>
+  axios.get(`/learning/admin/ebook/lessons/${id}`);
+export const createEbookLesson = (data) =>
+  axios.post("/learning/admin/ebook/lessons", data, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+export const updateEbookLesson = (id, data) =>
+  axios.patch(`/learning/admin/ebook/lessons/${id}`, data, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+export const deleteEbookLesson = (id) =>
+  axios.delete(`/learning/admin/ebook/lessons/${id}`);
+export const permanentlyDeleteEbookLesson = (id) =>
+  axios.delete(`/learning/admin/ebook/lessons/${id}/permanent`);
+export const getStudentEbookLessons = (courseId, topicId) =>
+  axios.get(`/learning/ebook/courses/${courseId}/topics/${topicId}/lessons`);
+export const getAllStudentEbookLessons = () =>
+  axios.get("/learning/ebook/lessons");
+export const getStudentEbookLesson = (id) =>
+  axios.get(`/learning/ebook/lessons/${id}`);
+export const updateStudentEbookLessonProgress = (id, data) =>
+  axios.patch(`/learning/ebook/lessons/${id}/progress`, data);
 
 // =======================
 // Admin Controlled Quiz Retake
@@ -602,9 +661,12 @@ export const deleteTeacherLocation = (locationId) =>
 
 export const getTeacherAvailability = () => axios.get("/teachers/availability");
 
-export const getTeacherStudentBooklet = (studentId) => axios.get(`/teachers/students/${studentId}/booklet`);
-export const updateTeacherStudentBookletSkill = (studentId, payload) => axios.put(`/teachers/students/${studentId}/booklet`, payload);
-export const updateTeacherStudentBookletSkills = (studentId, assessments) => axios.put(`/teachers/students/${studentId}/booklet/bulk`, { assessments });
+export const getTeacherStudentBooklet = (studentId) =>
+  axios.get(`/teachers/students/${studentId}/booklet`);
+export const updateTeacherStudentBookletSkill = (studentId, payload) =>
+  axios.put(`/teachers/students/${studentId}/booklet`, payload);
+export const updateTeacherStudentBookletSkills = (studentId, assessments) =>
+  axios.put(`/teachers/students/${studentId}/booklet/bulk`, { assessments });
 
 export const updateTeacherStudentLessonNote = (studentId, data) =>
   axios.put(`/teachers/students/${studentId}/booklet/lesson-note`, data);

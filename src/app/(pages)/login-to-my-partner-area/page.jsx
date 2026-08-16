@@ -12,8 +12,10 @@ export default function LoginPartnerPage() {
             Manage Your Partnership with PermisGo
           </h1>
           <p className="mx-auto mt-5 max-w-[800px] !text-[17px] leading-7 text-white/90">
-            Log in to your PermisGo partner account to manage your school, track performance,
-            <br className="hidden md:block" /> and access exclusive tools and benefits.
+            Log in to your PermisGo partner account to manage your school, track
+            performance,
+            <br className="hidden md:block" /> and access exclusive tools and
+            benefits.
           </p>
         </div>
       </section>
@@ -21,7 +23,9 @@ export default function LoginPartnerPage() {
       <section className="flex min-h-[780px] items-start justify-center bg-white px-5 pb-10 pt-20 sm:px-8">
         <div className="flex min-h-[600px] w-full max-w-[630px] items-center justify-center rounded-[12px] bg-[#e7edf6] p-5 sm:p-10 lg:p-[78px]">
           <div className="w-full rounded-[12px] bg-white px-5 py-8 shadow-sm sm:px-7 lg:px-[30px] lg:py-[34px]">
-            <h2 className="text-[22px] font-bold text-[#262626]">Get to see you again</h2>
+            <h2 className="text-[22px] font-bold text-[#262626]">
+              Get to see you again
+            </h2>
 
             <form className="mt-7">
               <div className="grid grid-cols-[minmax(0,1fr)] gap-5 sm:grid-cols-2">
@@ -70,7 +74,9 @@ export default function LoginPartnerPage() {
             </div>
 
             <div className="mt-7 text-center">
-              <p className="!text-[16px] text-[#35383c]">You don&apos;t have an account?</p>
+              <p className="!text-[16px] text-[#35383c]">
+                You don&apos;t have an account?
+              </p>
               <Link
                 href="/inscription"
                 className="mt-6 inline-flex min-h-[48px] items-center justify-center rounded-[9px] border-2 border-[#174a9b] px-7 !text-[16px] font-semibold text-[#174a9b] transition duration-300 hover:-translate-y-0.5 hover:bg-[#174a9b] hover:text-white hover:shadow-lg"

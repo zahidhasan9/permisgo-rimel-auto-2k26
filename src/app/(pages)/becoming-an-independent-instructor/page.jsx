@@ -69,9 +69,10 @@ export default function IndependentInstructorPage() {
               Instructors, let&apos;s partner up!
             </h1>
             <p className="mt-7 max-w-[620px] !text-[16px] leading-7 text-[#72777d]">
-              Enjoy a more affordable and convenient path to your driving license with our
-              online driving school. To make this possible, we are committed to delivering the
-              highest quality training for our students.
+              Enjoy a more affordable and convenient path to your driving
+              license with our online driving school. To make this possible, we
+              are committed to delivering the highest quality training for our
+              students.
             </p>
             <Link
               href="#join-us"
@@ -106,7 +107,9 @@ export default function IndependentInstructorPage() {
                 className="rounded-[10px] bg-[#e8eef8] px-5 py-7 text-center transition duration-300 hover:-translate-y-1 hover:shadow-xl"
               >
                 <Icon className={`mx-auto text-[42px] ${iconColor}`} />
-                <h3 className="mt-3 text-[21px] font-bold text-[#174a9b]">{title}</h3>
+                <h3 className="mt-3 text-[21px] font-bold text-[#174a9b]">
+                  {title}
+                </h3>
                 <ul className="mt-6 space-y-4">
                   {items.map((item) => (
                     <li
@@ -169,8 +172,9 @@ export default function IndependentInstructorPage() {
               Estimate your income with Permis Go
             </h2>
             <p className="mt-6 max-w-[710px] !text-[16px] leading-7 text-[#656a72]">
-              Estimate your earnings as a partner instructor in one click with our simulator.
-              Earn up to €37/hour and 50% more income compared to traditional driving schools.
+              Estimate your earnings as a partner instructor in one click with
+              our simulator. Earn up to €37/hour and 50% more income compared to
+              traditional driving schools.
             </p>
             <Link
               href="/login-to-my-partner-area"

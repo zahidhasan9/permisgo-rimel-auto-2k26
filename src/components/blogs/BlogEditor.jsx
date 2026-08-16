@@ -1,13 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import {
-  FiBold,
-  FiItalic,
-  FiLink,
-  FiList,
-  FiUnderline,
-} from "react-icons/fi";
+import { FiBold, FiItalic, FiLink, FiList, FiUnderline } from "react-icons/fi";
 
 const ToolbarButton = ({ label, title, onAction, children }) => (
   <button
@@ -58,15 +52,40 @@ export default function BlogEditor({ value, onChange }) {
           <option value="h3">Heading 3</option>
         </select>
         <span className="mx-1 h-6 w-px bg-slate-200" />
-        <ToolbarButton title="Bold" onAction={() => run("bold")}><FiBold /></ToolbarButton>
-        <ToolbarButton title="Italic" onAction={() => run("italic")}><FiItalic /></ToolbarButton>
-        <ToolbarButton title="Underline" onAction={() => run("underline")}><FiUnderline /></ToolbarButton>
-        <ToolbarButton title="Add link" onAction={addLink}><FiLink /></ToolbarButton>
+        <ToolbarButton title="Bold" onAction={() => run("bold")}>
+          <FiBold />
+        </ToolbarButton>
+        <ToolbarButton title="Italic" onAction={() => run("italic")}>
+          <FiItalic />
+        </ToolbarButton>
+        <ToolbarButton title="Underline" onAction={() => run("underline")}>
+          <FiUnderline />
+        </ToolbarButton>
+        <ToolbarButton title="Add link" onAction={addLink}>
+          <FiLink />
+        </ToolbarButton>
         <span className="mx-1 h-6 w-px bg-slate-200" />
-        <ToolbarButton title="Bulleted list" onAction={() => run("insertUnorderedList")}><FiList /></ToolbarButton>
-        <ToolbarButton title="Numbered list" label="1." onAction={() => run("insertOrderedList")} />
-        <ToolbarButton title="Quote" label="❝" onAction={() => run("formatBlock", "blockquote")} />
-        <ToolbarButton title="Clear formatting" label="Clear" onAction={() => run("removeFormat")} />
+        <ToolbarButton
+          title="Bulleted list"
+          onAction={() => run("insertUnorderedList")}
+        >
+          <FiList />
+        </ToolbarButton>
+        <ToolbarButton
+          title="Numbered list"
+          label="1."
+          onAction={() => run("insertOrderedList")}
+        />
+        <ToolbarButton
+          title="Quote"
+          label="❝"
+          onAction={() => run("formatBlock", "blockquote")}
+        />
+        <ToolbarButton
+          title="Clear formatting"
+          label="Clear"
+          onAction={() => run("removeFormat")}
+        />
       </div>
       <div
         ref={editorRef}

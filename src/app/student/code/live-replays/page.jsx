@@ -22,11 +22,16 @@ function youtubeId(value) {
 function youtubeStart(value) {
   try {
     const url = new URL(value);
-    const raw = url.searchParams.get("t") || url.searchParams.get("start") || "";
+    const raw =
+      url.searchParams.get("t") || url.searchParams.get("start") || "";
     if (/^\d+$/.test(raw)) return Number(raw);
     const match = raw.match(/^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?$/);
     if (!match) return 0;
-    return Number(match[1] || 0) * 3600 + Number(match[2] || 0) * 60 + Number(match[3] || 0);
+    return (
+      Number(match[1] || 0) * 3600 +
+      Number(match[2] || 0) * 60 +
+      Number(match[3] || 0)
+    );
   } catch {
     return 0;
   }

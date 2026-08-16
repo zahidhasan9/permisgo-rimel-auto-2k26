@@ -26,10 +26,18 @@ export default function useSiteSettings() {
   const [settings, setSettings] = useState(defaultSiteSettings);
   useEffect(() => {
     let active = true;
-    getPublicContactConfig().then((response) => {
-      if (active) setSettings({ ...defaultSiteSettings, ...(response.data?.data || {}) });
-    }).catch(() => {});
-    return () => { active = false; };
+    getPublicContactConfig()
+      .then((response) => {
+        if (active)
+          setSettings({
+            ...defaultSiteSettings,
+            ...(response.data?.data || {}),
+          });
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
   }, []);
   return settings;
 }

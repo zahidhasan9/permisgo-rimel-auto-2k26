@@ -45,12 +45,7 @@ const paymentMethods = [
 
 function PaymentMethodIcon({ type, size = 28 }) {
   if (type === "bank") {
-    return (
-      <FaUniversity
-        size={size}
-        className="text-slate-500"
-      />
-    );
+    return <FaUniversity size={size} className="text-slate-500" />;
   }
 
   if (type === "paypal-secondary") {
@@ -62,12 +57,7 @@ function PaymentMethodIcon({ type, size = 28 }) {
     );
   }
 
-  return (
-    <FaPaypal
-      size={size}
-      className="text-[#003087]"
-    />
-  );
+  return <FaPaypal size={size} className="text-[#003087]" />;
 }
 
 export default function PaymentWithdrawPage() {
@@ -81,7 +71,7 @@ export default function PaymentWithdrawPage() {
   const withdrawAmount = "€599";
 
   const selectedPaymentMethod = paymentMethods.find(
-    (method) => method.id === selectedMethodId
+    (method) => method.id === selectedMethodId,
   );
 
   const handleSelectMethod = (methodId) => {
@@ -116,7 +106,7 @@ export default function PaymentWithdrawPage() {
 
     setShowModal(false);
     setSuccessMessage(
-      "Your withdrawal request has been submitted successfully."
+      "Your withdrawal request has been submitted successfully.",
     );
   };
 
@@ -194,16 +184,13 @@ export default function PaymentWithdrawPage() {
                   {/* Payment methods */}
                   <div className="mt-3 space-y-3">
                     {paymentMethods.map((method) => {
-                      const isSelected =
-                        selectedMethodId === method.id;
+                      const isSelected = selectedMethodId === method.id;
 
                       return (
                         <button
                           key={method.id}
                           type="button"
-                          onClick={() =>
-                            handleSelectMethod(method.id)
-                          }
+                          onClick={() => handleSelectMethod(method.id)}
                           className={`flex w-full items-start gap-3 rounded-[9px] border px-3 py-3 text-left transition ${
                             isSelected
                               ? "border-[#16458f] bg-blue-50 shadow-sm"
@@ -223,9 +210,7 @@ export default function PaymentWithdrawPage() {
 
                           {/* Payment icon */}
                           <span className="flex h-9 w-9 shrink-0 items-center justify-center">
-                            <PaymentMethodIcon
-                              type={method.icon}
-                            />
+                            <PaymentMethodIcon type={method.icon} />
                           </span>
 
                           {/* Payment information */}
@@ -257,10 +242,7 @@ export default function PaymentWithdrawPage() {
                   {/* Success */}
                   {successMessage && (
                     <div className="mt-3 flex items-start gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-[10px] font-semibold text-green-700">
-                      <FaCheck
-                        size={10}
-                        className="mt-0.5 shrink-0"
-                      />
+                      <FaCheck size={10} className="mt-0.5 shrink-0" />
 
                       <span>{successMessage}</span>
                     </div>
@@ -388,9 +370,7 @@ export default function PaymentWithdrawPage() {
             {/* Withdrawal details */}
             <div className="mt-5 overflow-hidden rounded-[9px] border border-slate-200">
               <div className="flex items-center justify-between gap-4 border-b border-slate-200 px-3 py-3">
-                <span className="text-[10px] text-slate-600">
-                  Transfer to
-                </span>
+                <span className="text-[10px] text-slate-600">Transfer to</span>
 
                 <span className="flex items-center gap-2 text-[10px] font-semibold text-slate-700">
                   <PaymentMethodIcon
@@ -403,24 +383,17 @@ export default function PaymentWithdrawPage() {
               </div>
 
               <div className="flex items-center justify-between gap-4 border-b border-slate-200 px-3 py-3">
-                <span className="text-[10px] text-slate-600">
-                  Transfer to
-                </span>
+                <span className="text-[10px] text-slate-600">Transfer to</span>
 
                 <span className="flex items-center gap-2 text-[10px] font-semibold text-slate-700">
-                  <FaEnvelope
-                    size={11}
-                    className="text-slate-400"
-                  />
+                  <FaEnvelope size={11} className="text-slate-400" />
 
                   {selectedPaymentMethod.account}
                 </span>
               </div>
 
               <div className="flex items-center justify-between gap-4 px-3 py-3">
-                <span className="text-[10px] text-slate-600">
-                  Amount
-                </span>
+                <span className="text-[10px] text-slate-600">Amount</span>
 
                 <span className="text-[11px] font-extrabold text-slate-700">
                   {withdrawAmount}
@@ -449,11 +422,10 @@ export default function PaymentWithdrawPage() {
 
             {/* Information note */}
             <p className="mt-6 text-[9px] font-medium leading-[14px] text-slate-600">
-              <strong>Please note:</strong> Withdrawals are limited to €500
-              per transaction and cannot be reversed once submitted.
-              Transfers may take up to 7 business days to process, and
-              additional fees may be charged by your bank or payment
-              provider.
+              <strong>Please note:</strong> Withdrawals are limited to €500 per
+              transaction and cannot be reversed once submitted. Transfers may
+              take up to 7 business days to process, and additional fees may be
+              charged by your bank or payment provider.
             </p>
           </div>
         </div>

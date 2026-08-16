@@ -39,13 +39,18 @@ const Footer = () => {
         const pages = data?.data;
         setCustomLinks(Array.isArray(pages) ? pages : pages ? [pages] : []);
       })
-      .catch(() => { if (active) setCustomLinks([]); });
-    return () => { active = false; };
+      .catch(() => {
+        if (active) setCustomLinks([]);
+      });
+    return () => {
+      active = false;
+    };
   }, [language]);
 
-  const footerCustomLinks = (section) => customLinks
-    .filter((page) => page.footerSection === section)
-    .map((page) => ({ name: page.title, href: `/${page.slug}` }));
+  const footerCustomLinks = (section) =>
+    customLinks
+      .filter((page) => page.footerSection === section)
+      .map((page) => ({ name: page.title, href: `/${page.slug}` }));
 
   const socialLinks = [
     { icon: <FaFacebook />, href: site.facebookUrl, label: "Facebook" },
@@ -254,13 +259,15 @@ const Footer = () => {
                 </h4>
 
                 <ul className="space-y-3">
-                  {[...aboutLinks, ...footerCustomLinks("about")].map((link, index) => (
-                    <li key={index}>
-                      <Link href={link.href} className={footerLinkClass}>
-                        {link.name}
-                      </Link>
-                    </li>
-                  ))}
+                  {[...aboutLinks, ...footerCustomLinks("about")].map(
+                    (link, index) => (
+                      <li key={index}>
+                        <Link href={link.href} className={footerLinkClass}>
+                          {link.name}
+                        </Link>
+                      </li>
+                    ),
+                  )}
                 </ul>
               </div>
 
@@ -271,7 +278,10 @@ const Footer = () => {
                 </h4>
 
                 <ul className="space-y-3">
-                  {[...partnershipLinks, ...footerCustomLinks("partnership")].map((link, index) => (
+                  {[
+                    ...partnershipLinks,
+                    ...footerCustomLinks("partnership"),
+                  ].map((link, index) => (
                     <li key={index}>
                       <Link href={link.href} className={footerLinkClass}>
                         {link.name}
@@ -288,13 +298,15 @@ const Footer = () => {
                 </h4>
 
                 <ul className="space-y-3">
-                  {[...serviceLinks, ...footerCustomLinks("services")].map((link, index) => (
-                    <li key={index}>
-                      <Link href={link.href} className={footerLinkClass}>
-                        {link.name}
-                      </Link>
-                    </li>
-                  ))}
+                  {[...serviceLinks, ...footerCustomLinks("services")].map(
+                    (link, index) => (
+                      <li key={index}>
+                        <Link href={link.href} className={footerLinkClass}>
+                          {link.name}
+                        </Link>
+                      </li>
+                    ),
+                  )}
                 </ul>
               </div>
             </div>
@@ -306,16 +318,18 @@ const Footer = () => {
           <div className="mx-auto max-w-7xl">
             <div className="flex flex-col items-center justify-between gap-4 ">
               <ul className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-                {[...supportLinks, ...footerCustomLinks("support")].map((link, index) => (
-                  <li key={index}>
-                    <Link
-                      href={link.href}
-                      className="text-[14px] text-white/70 transition-all duration-300 hover:text-white"
-                    >
-                      {link.name}
-                    </Link>
-                  </li>
-                ))}
+                {[...supportLinks, ...footerCustomLinks("support")].map(
+                  (link, index) => (
+                    <li key={index}>
+                      <Link
+                        href={link.href}
+                        className="text-[14px] text-white/70 transition-all duration-300 hover:text-white"
+                      >
+                        {link.name}
+                      </Link>
+                    </li>
+                  ),
+                )}
               </ul>
 
               <p className="text-center text-[14px] leading-6 text-white/70 lg:text-right">

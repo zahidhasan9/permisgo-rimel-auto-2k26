@@ -38,16 +38,26 @@ export default function CodeLearningPage() {
   useEffect(() => {
     let active = true;
     getAllStudentEbookLessons()
-      .then((response) => { if (active) setLessons(array(response)); })
-      .catch(() => { if (active) setError("Code eBook lessons could not be loaded."); })
-      .finally(() => { if (active) setLoading(false); });
-    Promise.allSettled([getQuizzes(), getMyQuizAttempts(), getMyExams()]).then(([quiz, attempt, exam]) => {
-      if (!active) return;
-      if (quiz.status === "fulfilled") setQuizzes(array(quiz.value));
-      if (attempt.status === "fulfilled") setAttempts(array(attempt.value));
-      if (exam.status === "fulfilled") setExams(array(exam.value));
-    });
-    return () => { active = false; };
+      .then((response) => {
+        if (active) setLessons(array(response));
+      })
+      .catch(() => {
+        if (active) setError("Code eBook lessons could not be loaded.");
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    Promise.allSettled([getQuizzes(), getMyQuizAttempts(), getMyExams()]).then(
+      ([quiz, attempt, exam]) => {
+        if (!active) return;
+        if (quiz.status === "fulfilled") setQuizzes(array(quiz.value));
+        if (attempt.status === "fulfilled") setAttempts(array(attempt.value));
+        if (exam.status === "fulfilled") setExams(array(exam.value));
+      },
+    );
+    return () => {
+      active = false;
+    };
   }, []);
   useEffect(() => {
     const requested = new URLSearchParams(window.location.search).get("tab");
@@ -274,9 +284,7 @@ function EvaluationTab({ quizzes, attempts }) {
   const availableQuizzes = quizzes.filter(
     (quiz) => !quiz.status || quiz.status === "active",
   );
-  const completed = attempts.filter(
-    (item) => item.status === "completed",
-  );
+  const completed = attempts.filter((item) => item.status === "completed");
   const average = completed.length
     ? Math.round(
         completed.reduce(
@@ -353,8 +361,8 @@ function EvaluationTab({ quizzes, attempts }) {
                 const latest = attempts
                   .filter(
                     (item) =>
-                      String(item.quiz?._id || item.quiz) === String(quiz._id) &&
-                      item.status === "completed",
+                      String(item.quiz?._id || item.quiz) ===
+                        String(quiz._id) && item.status === "completed",
                   )
                   .sort(
                     (a, b) =>

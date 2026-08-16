@@ -150,9 +150,14 @@ const Locations = () => {
     getFaqs({ section: "locations", lang: language }).then(({ data }) => {
       if (!active) return;
       const items = data?.data || [];
-      if (items.length) { setFaqs(items); setActiveFaq(items[0]._id); }
+      if (items.length) {
+        setFaqs(items);
+        setActiveFaq(items[0]._id);
+      }
     });
-    return () => { active = false; };
+    return () => {
+      active = false;
+    };
   }, [language]);
 
   const toggleFaq = (id) => {
@@ -254,67 +259,69 @@ const Locations = () => {
       </section>
 
       {/* Trust Section */}
-      <div className="hidden"><section className="bg-slate-50 py-[50px] max-[500px]:py-[30px]">
-        <div className="mx-auto w-full max-w-[1140px] px-4">
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-            {/* Left */}
-            <div className="lg:col-span-4">
-              <div className="max-[500px]:mb-5">
-                <h3 className="text-[40px] font-bold leading-tight text-blue-950 max-[500px]:text-[35px]">
-                  They trust us
-                </h3>
+      <div className="hidden">
+        <section className="bg-slate-50 py-[50px] max-[500px]:py-[30px]">
+          <div className="mx-auto w-full max-w-[1140px] px-4">
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+              {/* Left */}
+              <div className="lg:col-span-4">
+                <div className="max-[500px]:mb-5">
+                  <h3 className="text-[40px] font-bold leading-tight text-blue-950 max-[500px]:text-[35px]">
+                    They trust us
+                  </h3>
 
-                <h5 className="mt-3 text-lg font-semibold text-slate-800">
-                  Over 1,000,000 satisfied students
-                </h5>
+                  <h5 className="mt-3 text-lg font-semibold text-slate-800">
+                    Over 1,000,000 satisfied students
+                  </h5>
 
-                <RatingStars />
+                  <RatingStars />
 
-                <h4 className="mt-3 text-xl font-semibold text-slate-900">
-                  <span className="text-[45px] font-bold text-orange-500">
-                    4.5
-                  </span>{" "}
-                  stars
-                </h4>
+                  <h4 className="mt-3 text-xl font-semibold text-slate-900">
+                    <span className="text-[45px] font-bold text-orange-500">
+                      4.5
+                    </span>{" "}
+                    stars
+                  </h4>
 
-                <p className="mt-3 text-base leading-relaxed text-slate-600">
-                  on the App Store and the Google Play Store, but also on review
-                  accreditation sites
-                </p>
+                  <p className="mt-3 text-base leading-relaxed text-slate-600">
+                    on the App Store and the Google Play Store, but also on
+                    review accreditation sites
+                  </p>
 
-                <Link
-                  href="/reviews"
-                  className="mt-4 inline-block rounded-md bg-orange-500 px-6 py-3 text-lg font-semibold text-white transition duration-300 hover:bg-blue-950"
-                >
-                  Checkout Our Reviews
-                </Link>
-              </div>
-            </div>
-
-            {/* Reviews */}
-            <div className="lg:col-span-8">
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                {reviews.map((review) => (
-                  <div
-                    key={review.id}
-                    className="rounded-md bg-white p-[15px] shadow-sm"
+                  <Link
+                    href="/reviews"
+                    className="mt-4 inline-block rounded-md bg-orange-500 px-6 py-3 text-lg font-semibold text-white transition duration-300 hover:bg-blue-950"
                   >
-                    <p className="text-base leading-relaxed text-slate-700">
-                      {review.text}
-                    </p>
+                    Checkout Our Reviews
+                  </Link>
+                </div>
+              </div>
 
-                    <small className="text-sm text-slate-500">
-                      {review.author}
-                    </small>
+              {/* Reviews */}
+              <div className="lg:col-span-8">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  {reviews.map((review) => (
+                    <div
+                      key={review.id}
+                      className="rounded-md bg-white p-[15px] shadow-sm"
+                    >
+                      <p className="text-base leading-relaxed text-slate-700">
+                        {review.text}
+                      </p>
 
-                    <RatingStars small />
-                  </div>
-                ))}
+                      <small className="text-sm text-slate-500">
+                        {review.author}
+                      </small>
+
+                      <RatingStars small />
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </section></div>
+        </section>
+      </div>
       <Testimonials />
 
       {/* FAQ Section */}

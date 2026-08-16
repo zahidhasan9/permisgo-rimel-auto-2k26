@@ -3,41 +3,54 @@
 export const legacyPublicPages = {
   about: () => import("@/app/(pages)/about/page"),
   appointment: () => import("@/app/(pages)/appointment/page"),
-  "b2b-partnership-request": () => import("@/app/(pages)/b2b-partnership-request/page"),
-  "becoming-an-independent-instructor": () => import("@/app/(pages)/becoming-an-independent-instructor/page"),
+  "b2b-partnership-request": () =>
+    import("@/app/(pages)/b2b-partnership-request/page"),
+  "becoming-an-independent-instructor": () =>
+    import("@/app/(pages)/becoming-an-independent-instructor/page"),
   blogs: () => import("@/app/(pages)/blogs/page"),
   "book-lesson": () => import("@/app/(pages)/book-lesson/page"),
   "contact-us": () => import("@/app/(pages)/contact-us/page"),
   cookies: () => import("@/app/(pages)/cookies/page"),
   "cpf-offer": () => import("@/app/(pages)/cpf-offer/page"),
   disclaimer: () => import("@/app/(pages)/disclaimer/page"),
-  "driving-instructor-salary": () => import("@/app/(pages)/driving-instructor-salary/page"),
+  "driving-instructor-salary": () =>
+    import("@/app/(pages)/driving-instructor-salary/page"),
   "driving-lessons": () => import("@/app/(pages)/driving-lessons/page"),
-  "driving-licence-glossary": () => import("@/app/(pages)/driving-licence-glossary/page"),
+  "driving-licence-glossary": () =>
+    import("@/app/(pages)/driving-licence-glossary/page"),
   "driving-license": () => import("@/app/(pages)/driving-license/page"),
-  "frequently-asked-questions": () => import("@/app/(pages)/frequently-asked-questions/page"),
-  "general-terms-and-conditions": () => import("@/app/(pages)/general-terms-and-conditions/page"),
+  "frequently-asked-questions": () =>
+    import("@/app/(pages)/frequently-asked-questions/page"),
+  "general-terms-and-conditions": () =>
+    import("@/app/(pages)/general-terms-and-conditions/page"),
   helps: () => import("@/app/(pages)/helps/page"),
-  "highway-code-glossary": () => import("@/app/(pages)/highway-code-glossary/page"),
+  "highway-code-glossary": () =>
+    import("@/app/(pages)/highway-code-glossary/page"),
   inscription: () => import("@/app/(pages)/inscription/page"),
   instructors: () => import("@/app/(pages)/instructors/page"),
   "legal-notice": () => import("@/app/(pages)/legal-notice/page"),
   locations: () => import("@/app/(pages)/locations/page"),
-  "login-to-my-partner-area": () => import("@/app/(pages)/login-to-my-partner-area/page"),
+  "login-to-my-partner-area": () =>
+    import("@/app/(pages)/login-to-my-partner-area/page"),
   "manage-my-cookies": () => import("@/app/(pages)/manage-my-cookies/page"),
   "monitor-faqs": () => import("@/app/(pages)/monitor-faqs/page"),
-  "monitor-privacy-policy": () => import("@/app/(pages)/monitor-privacy-policy/page"),
+  "monitor-privacy-policy": () =>
+    import("@/app/(pages)/monitor-privacy-policy/page"),
   offers: () => import("@/app/(pages)/offers/page"),
-  "person-with-a-disability": () => import("@/app/(pages)/person-with-a-disability/page"),
+  "person-with-a-disability": () =>
+    import("@/app/(pages)/person-with-a-disability/page"),
   pricing: () => import("@/app/(pages)/pricing/page"),
   "privacy-and-cookies": () => import("@/app/(pages)/privacy-and-cookies/page"),
   "privacy-policy": () => import("@/app/(pages)/privacy-policy/page"),
   "refund-policy": () => import("@/app/(pages)/refund-policy/page"),
-  "request-for-school-partnership": () => import("@/app/(pages)/request-for-school-partnership/page"),
+  "request-for-school-partnership": () =>
+    import("@/app/(pages)/request-for-school-partnership/page"),
   reviews: () => import("@/app/(pages)/reviews/page"),
   services: () => import("@/app/(pages)/services/page"),
-  "student-privacy-policy": () => import("@/app/(pages)/student-privacy-policy/page"),
-  "terms-and-conditions": () => import("@/app/(pages)/terms-and-conditions/page"),
+  "student-privacy-policy": () =>
+    import("@/app/(pages)/student-privacy-policy/page"),
+  "terms-and-conditions": () =>
+    import("@/app/(pages)/terms-and-conditions/page"),
   "traffic-laws": () => import("@/app/(pages)/traffic-laws/page"),
   "user-login": () => import("@/app/(pages)/user-login/page"),
   "user-registration": () => import("@/app/(pages)/user-registration/page"),

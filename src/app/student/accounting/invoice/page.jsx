@@ -32,7 +32,9 @@ export default function Page() {
             <IoChevronBack />
           </button>
 
-          <h1 className="text-lg font-bold tracking-tight text-[#174a9b] sm:font-medium sm:text-[#111827]">Invoices</h1>
+          <h1 className="text-lg font-bold tracking-tight text-[#174a9b] sm:font-medium sm:text-[#111827]">
+            Invoices
+          </h1>
         </header>
 
         {/* TABS */}
@@ -102,18 +104,55 @@ export default function Page() {
 
         <div className="space-y-2.5 md:hidden">
           {invoices.map((inv) => (
-            <article key={inv.id} className="min-w-0 rounded-xl border border-black/5 bg-white p-3.5 shadow-sm">
+            <article
+              key={inv.id}
+              className="min-w-0 rounded-xl border border-black/5 bg-white p-3.5 shadow-sm"
+            >
               <div className="flex items-start justify-between gap-3 border-b border-slate-100 pb-3">
-                <div><p className="text-[9px] font-bold uppercase tracking-wide text-slate-400">Invoice number</p><p className="mt-1 text-sm font-bold text-[#174a9b]">#{inv.id}</p></div>
-                <span className={`rounded-full px-2.5 py-1 text-[10px] font-bold ${inv.status === "Paid" ? "bg-green-50 text-green-700" : "bg-red-50 text-red-600"}`}>{inv.status}</span>
+                <div>
+                  <p className="text-[9px] font-bold uppercase tracking-wide text-slate-400">
+                    Invoice number
+                  </p>
+                  <p className="mt-1 text-sm font-bold text-[#174a9b]">
+                    #{inv.id}
+                  </p>
+                </div>
+                <span
+                  className={`rounded-full px-2.5 py-1 text-[10px] font-bold ${inv.status === "Paid" ? "bg-green-50 text-green-700" : "bg-red-50 text-red-600"}`}
+                >
+                  {inv.status}
+                </span>
               </div>
               <dl className="mt-3 grid grid-cols-2 gap-x-3 gap-y-3 text-[11px]">
-                <div className="min-w-0"><dt className="text-slate-400">Issue date</dt><dd className="mt-1 break-words font-semibold text-slate-700">{inv.issue}</dd></div>
-                <div className="min-w-0"><dt className="text-slate-400">Expiration</dt><dd className="mt-1 break-words font-semibold text-slate-700">{inv.expire}</dd></div>
-                <div><dt className="text-slate-400">Amount</dt><dd className="mt-1 font-bold text-slate-900">{inv.amount}</dd></div>
-                <div><dt className="text-slate-400">Paid</dt><dd className="mt-1 font-bold text-slate-900">{inv.pay}</dd></div>
+                <div className="min-w-0">
+                  <dt className="text-slate-400">Issue date</dt>
+                  <dd className="mt-1 break-words font-semibold text-slate-700">
+                    {inv.issue}
+                  </dd>
+                </div>
+                <div className="min-w-0">
+                  <dt className="text-slate-400">Expiration</dt>
+                  <dd className="mt-1 break-words font-semibold text-slate-700">
+                    {inv.expire}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-slate-400">Amount</dt>
+                  <dd className="mt-1 font-bold text-slate-900">
+                    {inv.amount}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-slate-400">Paid</dt>
+                  <dd className="mt-1 font-bold text-slate-900">{inv.pay}</dd>
+                </div>
               </dl>
-              <Link href="/student/accounting/invoice/details-invoice" className="mt-3 flex h-10 w-full items-center justify-center rounded-lg bg-[#174a9b] text-xs font-bold text-white">View details</Link>
+              <Link
+                href="/student/accounting/invoice/details-invoice"
+                className="mt-3 flex h-10 w-full items-center justify-center rounded-lg bg-[#174a9b] text-xs font-bold text-white"
+              >
+                View details
+              </Link>
             </article>
           ))}
         </div>
@@ -123,7 +162,10 @@ export default function Page() {
           <span>Showing 1–10 of 50</span>
 
           <div className="grid grid-cols-[40px_1fr_40px] items-center gap-2 sm:flex">
-            <button aria-label="Previous page" className="flex h-9 items-center justify-center rounded-lg border border-black/10 bg-white hover:bg-[#f3f4f6] sm:h-auto sm:rounded-full sm:px-3 sm:py-1">
+            <button
+              aria-label="Previous page"
+              className="flex h-9 items-center justify-center rounded-lg border border-black/10 bg-white hover:bg-[#f3f4f6] sm:h-auto sm:rounded-full sm:px-3 sm:py-1"
+            >
               ←
             </button>
 
@@ -131,7 +173,10 @@ export default function Page() {
               Page 1
             </span>
 
-            <button aria-label="Next page" className="flex h-9 items-center justify-center rounded-lg border border-black/10 bg-white hover:bg-[#f3f4f6] sm:h-auto sm:rounded-full sm:px-3 sm:py-1">
+            <button
+              aria-label="Next page"
+              className="flex h-9 items-center justify-center rounded-lg border border-black/10 bg-white hover:bg-[#f3f4f6] sm:h-auto sm:rounded-full sm:px-3 sm:py-1"
+            >
               →
             </button>
           </div>

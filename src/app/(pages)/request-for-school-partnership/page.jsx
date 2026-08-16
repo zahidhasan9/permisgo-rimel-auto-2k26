@@ -21,7 +21,9 @@ const controlClass =
 function Field({ label, type = "text", placeholder }) {
   return (
     <label className="block">
-      <span className="mb-2 block !text-[13px] font-semibold text-[#292929]">{label}</span>
+      <span className="mb-2 block !text-[13px] font-semibold text-[#292929]">
+        {label}
+      </span>
       <input type={type} placeholder={placeholder} className={controlClass} />
     </label>
   );
@@ -30,7 +32,9 @@ function Field({ label, type = "text", placeholder }) {
 function SelectField({ label, placeholder }) {
   return (
     <label className="block">
-      <span className="mb-2 block !text-[13px] font-semibold text-[#292929]">{label}</span>
+      <span className="mb-2 block !text-[13px] font-semibold text-[#292929]">
+        {label}
+      </span>
       <select defaultValue="" className={`${controlClass} text-[#a5abb2]`}>
         <option value="" disabled>
           {placeholder}
@@ -51,8 +55,9 @@ export default function RequestForSchoolPartnershipPage() {
               <br className="hidden sm:block" /> PermisGo
             </h1>
             <p className="mt-7 max-w-[640px] !text-[16px] leading-7 text-[#72777d]">
-              Join a network of 300+ partner schools across France and unlock powerful tools,
-              increased visibility, and exclusive benefits to scale your business.
+              Join a network of 300+ partner schools across France and unlock
+              powerful tools, increased visibility, and exclusive benefits to
+              scale your business.
             </p>
             <Link
               href="#school-partnership-form"
@@ -89,7 +94,9 @@ export default function RequestForSchoolPartnershipPage() {
             />
 
             <div className="flex min-h-[500px] w-full flex-col justify-center rounded-[10px] bg-[#174a9b] px-5 py-12 sm:px-12 lg:px-[100px]">
-              <h3 className="text-center text-[21px] font-bold text-white">Exclusive Benefits</h3>
+              <h3 className="text-center text-[21px] font-bold text-white">
+                Exclusive Benefits
+              </h3>
               <ul className="mt-8 space-y-5">
                 {benefits.map((benefit) => (
                   <li
@@ -129,17 +136,33 @@ export default function RequestForSchoolPartnershipPage() {
           </div>
 
           <form className="mt-12 rounded-[12px] bg-white p-5 shadow-sm sm:p-8 lg:p-[30px]">
-            <h3 className="text-[20px] font-bold text-[#292929]">School Information</h3>
+            <h3 className="text-[20px] font-bold text-[#292929]">
+              School Information
+            </h3>
 
             <div className="mt-6 grid grid-cols-[minmax(0,1fr)] gap-x-7 gap-y-5 md:grid-cols-2">
               <Field label="School Name" placeholder="Write name here" />
               <SelectField label="Type of school" placeholder="Select one" />
-              <Field label="Phone Number" type="tel" placeholder="Write name here" />
-              <Field label="Email Address" type="email" placeholder="Write Email address" />
+              <Field
+                label="Phone Number"
+                type="tel"
+                placeholder="Write name here"
+              />
+              <Field
+                label="Email Address"
+                type="email"
+                placeholder="Write Email address"
+              />
               <Field label="City" placeholder="Write phone number" />
               <Field label="Address" placeholder="Write Email address" />
-              <SelectField label="Number of students" placeholder="Write phone number" />
-              <SelectField label="Type of Association" placeholder="Write Email address" />
+              <SelectField
+                label="Number of students"
+                placeholder="Write phone number"
+              />
+              <SelectField
+                label="Type of Association"
+                placeholder="Write Email address"
+              />
 
               <fieldset className="md:col-span-2">
                 <legend className="!text-[13px] font-semibold text-[#292929]">
@@ -147,11 +170,18 @@ export default function RequestForSchoolPartnershipPage() {
                 </legend>
                 <div className="mt-3 flex items-center gap-8">
                   <label className="flex items-center gap-2 !text-[13px] text-[#43474c]">
-                    <input type="checkbox" className="h-4 w-4 accent-[#174a9b]" />
+                    <input
+                      type="checkbox"
+                      className="h-4 w-4 accent-[#174a9b]"
+                    />
                     Yes
                   </label>
                   <label className="flex items-center gap-2 !text-[13px] text-[#43474c]">
-                    <input type="checkbox" defaultChecked className="h-4 w-4 accent-[#20c45a]" />
+                    <input
+                      type="checkbox"
+                      defaultChecked
+                      className="h-4 w-4 accent-[#20c45a]"
+                    />
                     No
                   </label>
                 </div>
@@ -197,8 +227,13 @@ export default function RequestForSchoolPartnershipPage() {
                   sizes="42px"
                   className="mx-auto h-10 w-10 object-contain"
                 />
-                <h4 className="mt-2 text-[18px] font-bold text-[#282b2f]">Trustpilot Ratings</h4>
-                <div className="mt-2 flex justify-center gap-3 text-[#ffc52c]" aria-label="Five stars">
+                <h4 className="mt-2 text-[18px] font-bold text-[#282b2f]">
+                  Trustpilot Ratings
+                </h4>
+                <div
+                  className="mt-2 flex justify-center gap-3 text-[#ffc52c]"
+                  aria-label="Five stars"
+                >
                   {[0, 1, 2, 3, 4].map((star) => (
                     <FaStar key={star} className="text-[18px]" />
                   ))}

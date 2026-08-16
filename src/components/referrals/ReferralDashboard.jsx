@@ -113,8 +113,7 @@ export default function ReferralDashboard({ accountType = "student" }) {
             <div className="relative z-10 max-w-[760px]">
               <h2 className="flex items-start gap-2 text-base font-extrabold leading-6 sm:items-center sm:gap-3 sm:text-[23px] sm:leading-tight">
                 <FaGift className="shrink-0 text-[#e2233d]" />
-                Referral Program - Earn money by recommending the driving
-                School
+                Referral Program - Earn money by recommending the driving School
               </h2>
               <p className="mt-2 text-xs leading-5 text-[#6d6d6d] sm:mt-3 sm:text-[14px]">
                 Share your experience and help your friend sign up
@@ -137,9 +136,7 @@ export default function ReferralDashboard({ accountType = "student" }) {
             className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 lg:gap-7"
           >
             <article className="col-span-2 flex min-h-[190px] flex-col items-center justify-center rounded-[16px] bg-[#e8edf5] p-4 text-center sm:min-h-[240px] sm:p-6 md:col-span-1 md:min-h-[292px]">
-              <h2 className="text-[17px] font-extrabold">
-                Your Referral Code
-              </h2>
+              <h2 className="text-[17px] font-extrabold">Your Referral Code</h2>
               <div className="mt-4 flex h-[50px] w-full max-w-[245px] min-w-0 items-center justify-between rounded-[12px] bg-white px-3 sm:mt-6 sm:h-[54px] sm:px-4">
                 <span className="truncate text-[15px] font-bold tracking-wide text-[#6c6c6c]">
                   {code}
@@ -226,7 +223,9 @@ function StatCard({ title, value, Icon }) {
       <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-white text-lg text-[#16458f] sm:h-[52px] sm:w-[52px] sm:rounded-[13px] sm:text-xl">
         <Icon />
       </span>
-      <h2 className="mt-3 break-words text-xs font-extrabold leading-4 sm:mt-7 sm:text-[17px] sm:leading-normal">{title}</h2>
+      <h2 className="mt-3 break-words text-xs font-extrabold leading-4 sm:mt-7 sm:text-[17px] sm:leading-normal">
+        {title}
+      </h2>
       <p className="mt-2 max-w-full break-words text-2xl font-black leading-none text-[#16458f] sm:mt-3 sm:text-[35px]">
         {value}
       </p>

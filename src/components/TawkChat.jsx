@@ -16,7 +16,8 @@ export default function TawkChat() {
   const [hidden, setHidden] = useState(false);
 
   useEffect(() => {
-    const hiddenOnLoad = window.sessionStorage.getItem("permisgo_tawk_hidden") === "1";
+    const hiddenOnLoad =
+      window.sessionStorage.getItem("permisgo_tawk_hidden") === "1";
     setHidden(hiddenOnLoad);
     if (!loaded) return;
     if (hiddenOnLoad) {

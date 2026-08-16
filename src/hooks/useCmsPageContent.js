@@ -12,7 +12,8 @@ export default function useCmsPageContent(slug) {
     if (!slug || !language) return;
     let active = true;
     const selectedRequest = getCmsPage(slug, language);
-    const englishRequest = language === "en" ? selectedRequest : getCmsPage(slug, "en");
+    const englishRequest =
+      language === "en" ? selectedRequest : getCmsPage(slug, "en");
     Promise.all([selectedRequest, englishRequest])
       .then(([selectedResponse, englishResponse]) => {
         if (!active) return;
@@ -33,8 +34,12 @@ export default function useCmsPageContent(slug) {
           },
         });
       })
-      .catch(() => { if (active) setPage(null); });
-    return () => { active = false; };
+      .catch(() => {
+        if (active) setPage(null);
+      });
+    return () => {
+      active = false;
+    };
   }, [language, slug]);
 
   return { page, content: page?.translation || null, language };

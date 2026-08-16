@@ -5,7 +5,6 @@ import { useState } from "react";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
 import { useRouter } from "next/navigation";
 
-
 const offers = [
   {
     id: 1,

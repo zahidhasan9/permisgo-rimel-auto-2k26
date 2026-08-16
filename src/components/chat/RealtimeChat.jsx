@@ -46,7 +46,18 @@ const timeOf = (date) =>
       })
     : "";
 
-const emojiOptions = ["😀", "😂", "😍", "👍", "🙏", "🔥", "🎉", "😎", "❤️", "💯"];
+const emojiOptions = [
+  "😀",
+  "😂",
+  "😍",
+  "👍",
+  "🙏",
+  "🔥",
+  "🎉",
+  "😎",
+  "❤️",
+  "💯",
+];
 
 const downloadAttachment = async (url, name = "Attachment") => {
   if (!url) return;
@@ -286,7 +297,10 @@ export default function RealtimeChat() {
       if (peerRef.current) return peerRef.current;
       if (!iceServersRef.current) {
         try {
-          setCallDiagnostics((current) => [...current.slice(-5), "Loading ICE/TURN configuration..."]);
+          setCallDiagnostics((current) => [
+            ...current.slice(-5),
+            "Loading ICE/TURN configuration...",
+          ]);
           const response = await getChatIceConfig();
           iceServersRef.current = response.data?.data?.iceServers || null;
           setCallDiagnostics((current) => [
@@ -295,8 +309,14 @@ export default function RealtimeChat() {
           ]);
         } catch (configError) {
           iceServersRef.current = null;
-          setCallDiagnostics((current) => [...current.slice(-5), "ICE config failed, falling back to STUN only"]);
-          setError(configError.response?.data?.message || "TURN configuration could not be loaded.");
+          setCallDiagnostics((current) => [
+            ...current.slice(-5),
+            "ICE config failed, falling back to STUN only",
+          ]);
+          setError(
+            configError.response?.data?.message ||
+              "TURN configuration could not be loaded.",
+          );
         }
       }
       const configuration = {
@@ -307,21 +327,31 @@ export default function RealtimeChat() {
         iceCandidatePoolSize: 10,
       };
       const peer = new RTCPeerConnection(configuration);
-      setCallDiagnostics((current) => [...current.slice(-5), "PeerConnection created"]);
+      setCallDiagnostics((current) => [
+        ...current.slice(-5),
+        "PeerConnection created",
+      ]);
       const stream = await ensureMedia(type);
       peer.addTransceiver("audio", { direction: "sendrecv" });
-      if (type === "video") peer.addTransceiver("video", { direction: "sendrecv" });
+      if (type === "video")
+        peer.addTransceiver("video", { direction: "sendrecv" });
       stream.getTracks().forEach((track) => peer.addTrack(track, stream));
-      setCallDiagnostics((current) => [...current.slice(-5), `Local ${type} track(s) attached`]);
+      setCallDiagnostics((current) => [
+        ...current.slice(-5),
+        `Local ${type} track(s) attached`,
+      ]);
       const remoteStream = new MediaStream();
       remoteStreamRef.current = remoteStream;
       peer.onicecandidate = (event) => {
         if (event.candidate)
-          setCallDiagnostics((current) => [...current.slice(-5), `ICE candidate: ${event.candidate.type || "candidate"}`]);
-          socketRef.current?.emit("webrtc:ice", {
-            to: peerId,
-            candidate: event.candidate,
-          });
+          setCallDiagnostics((current) => [
+            ...current.slice(-5),
+            `ICE candidate: ${event.candidate.type || "candidate"}`,
+          ]);
+        socketRef.current?.emit("webrtc:ice", {
+          to: peerId,
+          candidate: event.candidate,
+        });
       };
       peer.ontrack = (event) => {
         const track = event.track;
@@ -333,7 +363,10 @@ export default function RealtimeChat() {
         )
           activeRemoteStream.addTrack(track);
         remoteStreamRef.current = activeRemoteStream;
-        setCallDiagnostics((current) => [...current.slice(-5), `Remote ${track.kind} track received`]);
+        setCallDiagnostics((current) => [
+          ...current.slice(-5),
+          `Remote ${track.kind} track received`,
+        ]);
         setRemoteTrackKinds((current) => new Set([...current, track.kind]));
         const attachAndPlay = () => {
           requestAnimationFrame(() => playRemoteMedia());
@@ -348,7 +381,10 @@ export default function RealtimeChat() {
         attachAndPlay();
       };
       peer.onconnectionstatechange = () => {
-        setCallDiagnostics((current) => [...current.slice(-5), `Peer state: ${peer.connectionState}`]);
+        setCallDiagnostics((current) => [
+          ...current.slice(-5),
+          `Peer state: ${peer.connectionState}`,
+        ]);
         if (peer.connectionState === "connected") {
           setCallStatus("Connected");
           playRemoteMedia();
@@ -364,7 +400,10 @@ export default function RealtimeChat() {
         if (peer.connectionState === "closed") closePeer();
       };
       peer.oniceconnectionstatechange = () => {
-        setCallDiagnostics((current) => [...current.slice(-5), `ICE state: ${peer.iceConnectionState}`]);
+        setCallDiagnostics((current) => [
+          ...current.slice(-5),
+          `ICE state: ${peer.iceConnectionState}`,
+        ]);
         if (["checking", "new"].includes(peer.iceConnectionState))
           setCallStatus("Connecting media...");
         if (["connected", "completed"].includes(peer.iceConnectionState)) {
@@ -375,9 +414,14 @@ export default function RealtimeChat() {
           setCallStatus("Connection interrupted. Reconnecting...");
       };
       peer.onicecandidateerror = (event) => {
-        setCallDiagnostics((current) => [...current.slice(-5), `ICE candidate error ${event.errorCode || ""}: ${event.errorText || "unknown"}`]);
+        setCallDiagnostics((current) => [
+          ...current.slice(-5),
+          `ICE candidate error ${event.errorCode || ""}: ${event.errorText || "unknown"}`,
+        ]);
         if (event.errorCode >= 700)
-          setError("TURN server could not be reached. Please check the TURN URL and credentials.");
+          setError(
+            "TURN server could not be reached. Please check the TURN URL and credentials.",
+          );
       };
       peerRef.current = peer;
       return peer;
@@ -712,7 +756,9 @@ export default function RealtimeChat() {
                       {contact.name}
                     </p>
                     <p className="text-xs text-gray-500 truncate max-w-[120px]">
-                      {contact.lastMessage?.body || contact.lastMessage?.attachment?.name || contact.email}
+                      {contact.lastMessage?.body ||
+                        contact.lastMessage?.attachment?.name ||
+                        contact.email}
                     </p>
                     {onlineIds.has(contactId) && (
                       <p className="text-[10px] font-medium text-emerald-600">
@@ -904,7 +950,9 @@ export default function RealtimeChat() {
             )}
             {attachment && (
               <div className="flex items-center gap-2 rounded-2xl border border-blue-100 bg-blue-50 px-3 py-2 text-xs text-slate-700">
-                <span className="truncate max-w-[180px]">{attachment.name}</span>
+                <span className="truncate max-w-[180px]">
+                  {attachment.name}
+                </span>
                 <button
                   type="button"
                   onClick={() => setAttachment(null)}
@@ -947,7 +995,12 @@ export default function RealtimeChat() {
               className="flex-1 rounded-lg bg-gray-100 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
             />
             <button
-              disabled={(!draft.trim() && !attachment) || !selected || !connected || uploadingAttachment}
+              disabled={
+                (!draft.trim() && !attachment) ||
+                !selected ||
+                !connected ||
+                uploadingAttachment
+              }
               onClick={sendMessage}
               className="rounded-lg bg-blue-600 p-2.5 text-white transition hover:bg-blue-700 disabled:opacity-50"
             >
