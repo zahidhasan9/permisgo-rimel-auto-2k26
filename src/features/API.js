@@ -325,6 +325,7 @@ export const getCmsPage = (slug, lang = "en") =>
 export const getFooterCmsPages = (lang = "en") => axios.get("/cms-pages/footer", { params: { lang, _: Date.now() } });
 export const saveCmsPage = (slug, data) =>
   axios.put(`/cms-pages/admin/${encodeURIComponent(slug)}`, data);
+export const deleteCmsPage = (slug) => axios.delete(`/cms-pages/admin/${encodeURIComponent(slug)}`);
 export const getAdminTestimonials = (params = {}) => axios.get("/testimonials/admin/all", { params });
 export const createTestimonial = (data) => axios.post("/testimonials", data, { headers: { "Content-Type": "multipart/form-data" } });
 export const updateTestimonial = (id, data) =>
