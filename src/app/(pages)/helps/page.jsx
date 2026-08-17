@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { FaMagnifyingGlass } from "react-icons/fa6";
@@ -8,6 +10,7 @@ import helpSecond2 from "../../../../public/image/help-second2.png";
 import helpSecond3 from "../../../../public/image/help-second3.png";
 import helpThird1 from "../../../../public/image/help-third1.png";
 import helpThird2 from "../../../../public/image/help-third2.png";
+import useCmsPageContent from "@/hooks/useCmsPageContent";
 
 const drivingTips = [
   {
@@ -34,6 +37,9 @@ const drivingTips = [
 ];
 
 export default function HelpsPage() {
+  const { content } = useCmsPageContent("helps");
+  const settings = content?.settings || {};
+  const copy = (key, fallback) => settings[key]?.trim?.() || fallback;
   return (
     <div className="bg-[#eef3fb] text-[#1d1d1f]">
       {/* Hero */}
@@ -41,12 +47,10 @@ export default function HelpsPage() {
         <div className="mx-auto grid min-h-[638px] w-full max-w-[1360px] grid-cols-[minmax(0,1fr)] items-center gap-10 px-5 py-16 sm:px-8 md:grid-cols-[1.08fr_0.92fr] lg:px-10 lg:py-0">
           <div className="min-w-0 text-center md:text-left">
             <h1 className="max-w-[550px] text-[34px] font-extrabold leading-[1.15] tracking-[-0.02em] text-white sm:text-[40px] lg:text-[42px]">
-              Need help? We&apos;re here to
-              <br className="hidden md:block" /> help!
+              {copy("heroTitle", "Need help? We're here to help!")}
             </h1>
             <p className="mx-auto mt-6 max-w-[600px] !text-[20px] font-bold leading-[1.35] text-white md:mx-0 sm:!text-[22px] lg:!text-[24px]">
-              Ask us all your questions about driving lessons, exams or
-              licenses!
+              {copy("heroDescription", "Ask us all your questions about driving lessons, exams or licenses!")}
             </p>
 
             <label htmlFor="help-search" className="sr-only">
@@ -83,10 +87,10 @@ export default function HelpsPage() {
         <div className="mx-auto w-full max-w-[1280px]">
           <header className="text-center">
             <h2 className="text-[30px] font-extrabold tracking-[-0.02em] text-[#202020] sm:text-[36px]">
-              Latest driving tips
+              {copy("sectionTitle", "Latest driving tips")}
             </h2>
             <p className="mt-3 !text-[14px] font-medium text-[#84878d]">
-              Newly updated resources for students
+              {copy("sectionDescription", "Newly updated resources for students")}
             </p>
           </header>
 
@@ -134,7 +138,7 @@ export default function HelpsPage() {
 
             <div className="relative z-10">
               <h2 className="text-[28px] font-extrabold leading-tight text-white sm:text-[32px]">
-                Do you still have any questions ?
+                {copy("ctaTitle", "Do you still have any questions?")}
               </h2>
               <p className="mt-5 !text-[14px] font-medium text-white/80">
                 Our friendly team is here to help you pass your driving test!
@@ -143,7 +147,7 @@ export default function HelpsPage() {
                 href="/contact-us"
                 className="mt-6 inline-flex h-12 items-center justify-center rounded-[9px] bg-white px-7 !text-[14px] font-extrabold text-[#e2233d] transition-all duration-300 hover:-translate-y-1 hover:bg-[#e2233d] hover:text-white hover:shadow-lg"
               >
-                Chat with support
+                {copy("ctaButton", "Chat with support")}
               </Link>
             </div>
           </aside>

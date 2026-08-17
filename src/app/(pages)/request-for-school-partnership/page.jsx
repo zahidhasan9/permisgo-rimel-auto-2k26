@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { FaStar } from "react-icons/fa";
@@ -6,6 +8,7 @@ import requestHero from "../../../../public/image/request-hero.png";
 import requestPerson from "../../../../public/image/request2-1.png";
 import requestCar from "../../../../public/image/request2-2.png";
 import trustLogo from "../../../../public/image/trustLogo.png";
+import useCmsPageContent from "@/hooks/useCmsPageContent";
 
 const benefits = [
   "Discounts on Driving Licence Packages",
@@ -45,25 +48,25 @@ function SelectField({ label, placeholder }) {
 }
 
 export default function RequestForSchoolPartnershipPage() {
+  const { content } = useCmsPageContent("request-for-school-partnership");
+  const settings = content?.settings || {};
+  const copy = (key, fallback) => settings[key]?.trim?.() || fallback;
   return (
     <main className="overflow-hidden bg-white text-[#202124]">
       <section className="bg-[#eaf0f9]">
         <div className="mx-auto grid min-h-[560px] max-w-[1280px] grid-cols-[minmax(0,1fr)] items-center gap-10 px-5 py-14  md:grid-cols-2 lg:px-10">
           <div className="max-w-[620px]">
             <h1 className="text-[35px] font-bold leading-[1.18] tracking-[-0.025em] text-[#202124] sm:text-[40px] lg:text-[42px]">
-              Grow Your Driving School with
-              <br className="hidden sm:block" /> PermisGo
+              {copy("heroTitle", "Grow Your Driving School with PermisGo")}
             </h1>
             <p className="mt-7 max-w-[640px] !text-[16px] leading-7 text-[#72777d]">
-              Join a network of 300+ partner schools across France and unlock
-              powerful tools, increased visibility, and exclusive benefits to
-              scale your business.
+              {copy("heroDescription", "Join our partner-school network and unlock tools, visibility and exclusive benefits to grow your business.")}
             </p>
             <Link
               href="#school-partnership-form"
               className="mt-10 inline-flex min-h-[48px] min-w-[300px] items-center justify-center rounded-[9px] bg-[#e4213c] px-8 !text-[15px] font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-[#174a9b] hover:shadow-lg"
             >
-              Apply for Partnership
+              {copy("heroButton", "Apply for Partnership")}
             </Link>
           </div>
 
@@ -82,8 +85,9 @@ export default function RequestForSchoolPartnershipPage() {
       <section className="bg-white px-5 py-20 sm:px-8 lg:py-24">
         <div className="mx-auto max-w-[1120px]">
           <h2 className="text-center text-[34px] font-bold tracking-[-0.025em] text-[#222] lg:text-[38px]">
-            A partnership for your school ?
+            {copy("sectionTitle", "A partnership for your school?")}
           </h2>
+          {settings.sectionDescription && <p className="mx-auto mt-4 max-w-3xl text-center !text-[14px] text-[#676c73]">{settings.sectionDescription}</p>}
 
           <div className="relative mt-12 flex min-h-[500px] items-end justify-center px-0 sm:px-12 lg:px-[115px]">
             <Image
@@ -128,7 +132,7 @@ export default function RequestForSchoolPartnershipPage() {
         <div className="mx-auto max-w-[1060px]">
           <div className="text-center">
             <h2 className="text-[34px] font-bold tracking-[-0.025em] text-[#222] lg:text-[38px]">
-              Request for School Partnership
+              {copy("ctaTitle", "Request for School Partnership")}
             </h2>
             <p className="mt-4 !text-[14px] text-[#676c73]">
               Fill out this form with necessary information
@@ -192,7 +196,7 @@ export default function RequestForSchoolPartnershipPage() {
               type="button"
               className="mt-6 rounded-[8px] bg-[#e4213c] px-7 py-3 !text-[15px] font-semibold text-white transition duration-300 hover:bg-[#174a9b] hover:shadow-md"
             >
-              Submit
+              {copy("ctaButton", "Submit")}
             </button>
           </form>
         </div>

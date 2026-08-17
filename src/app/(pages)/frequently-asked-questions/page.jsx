@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getFaqs } from "@/features/API";
 import useCurrentLanguage from "@/hooks/useCurrentLanguage";
+import useCmsPageContent from "@/hooks/useCmsPageContent";
 import { FaChevronDown, FaWhatsappSquare } from "react-icons/fa";
 
 const fallbackFaqs = [
@@ -35,6 +36,9 @@ const fallbackFaqs = [
 
 const Faq = () => {
   const language = useCurrentLanguage();
+  const { content } = useCmsPageContent("frequently-asked-questions");
+  const settings = content?.settings || {};
+  const copy = (key, fallback) => settings[key]?.trim?.() || fallback;
   const [faqs, setFaqs] = useState(fallbackFaqs);
   const [activeFaq, setActiveFaq] = useState(1);
 
@@ -64,13 +68,11 @@ const Faq = () => {
         <div className="mx-auto w-full max-w-[1140px] px-4">
           <div className="text-center">
             <h1 className="text-[50px] font-bold leading-tight text-blue-900 max-[500px]:text-[35px]">
-              Frequently Asked Questions
+              {copy("heroTitle", "Frequently Asked Questions")}
             </h1>
 
             <p className="mx-auto mt-4 max-w-3xl text-base leading-relaxed text-gray-600">
-              Our platform is built to help you work smarter, not harder. It
-              adapts to your needs and supports your goals. Make the most of
-              every feature.
+              {copy("heroDescription", "Find clear answers to common questions about lessons, exams, payments and your PermisGo account.")}
             </p>
           </div>
         </div>
@@ -136,12 +138,11 @@ const Faq = () => {
               <div className="rounded-[10px] border-[3px] border-blue-200 p-[30px]">
                 <div className="text-center">
                   <h3 className="text-2xl font-bold leading-snug text-gray-900">
-                    Do you have more questions?
+                    {copy("ctaTitle", "Do you have more questions?")}
                   </h3>
 
                   <p className="mt-3 text-base leading-relaxed text-gray-600">
-                    End-to-end payments and financial management in a single
-                    solution. Meet the right platform to help realize.
+                    {copy("sectionDescription", "Our friendly support team is ready to help with any question not answered here.")}
                   </p>
 
                   <div className="mt-4">

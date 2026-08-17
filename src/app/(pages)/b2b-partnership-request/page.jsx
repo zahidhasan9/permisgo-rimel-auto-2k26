@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { FaCarSide, FaHandshake, FaStar } from "react-icons/fa";
@@ -5,6 +7,7 @@ import { FaCarSide, FaHandshake, FaStar } from "react-icons/fa";
 import googleLogo from "../../../../public/image/googleLogo.png";
 import requestHero from "../../../../public/image/request-hero.png";
 import trustLogo from "../../../../public/image/trustLogo.png";
+import useCmsPageContent from "@/hooks/useCmsPageContent";
 
 const benefits = [
   "Exclusive discounts on Driving Licence Packages",
@@ -53,23 +56,25 @@ function SelectField({ label, placeholder }) {
 }
 
 export default function B2BPartnershipRequestPage() {
+  const { content } = useCmsPageContent("b2b-partnership-request");
+  const settings = content?.settings || {};
+  const copy = (key, fallback) => settings[key]?.trim?.() || fallback;
   return (
     <main className="overflow-hidden bg-[#eef3fb] text-[#202124]">
       <section className="bg-[#eaf0f9]">
         <div className="mx-auto grid min-h-[560px] max-w-[1350px] grid-cols-[minmax(0,1fr)] items-center gap-12 px-5 py-14 sm:px-8 md:grid-cols-2 lg:px-10">
           <div className="">
             <h1 className=" text-[34px] font-bold leading-[1.18] tracking-[-0.02em] text-[#202124] sm:text-[40px] lg:text-[42px]">
-              Explore partnership opportunities
-              <br className="hidden sm:block" /> with us
+              {copy("heroTitle", "Explore partnership opportunities with us")}
             </h1>
             <p className="mt-7 !text-[16px] text-[#767a80]">
-              Benefit from a comprehensive package and exclusive advantages
+              {copy("heroDescription", "Benefit from a comprehensive package and exclusive advantages")}
             </p>
             <Link
               href="#partnership-form"
               className="mt-10 inline-flex min-h-[48px] min-w-[305px] items-center justify-center rounded-[9px] bg-[#e4213c] px-8 !text-[16px] font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-[#174a9b] hover:shadow-lg"
             >
-              Apply for Partnership
+              {copy("heroButton", "Apply for Partnership")}
             </Link>
           </div>
 
@@ -88,8 +93,9 @@ export default function B2BPartnershipRequestPage() {
       <section className="bg-white px-5 py-20 sm:px-8 lg:py-24">
         <div className="mx-auto max-w-[1280px]">
           <h2 className="text-center text-[34px] font-bold tracking-[-0.02em] text-[#222] lg:text-[38px]">
-            Are You a Company?
+            {copy("sectionTitle", "Are You a Company?")}
           </h2>
+          {settings.sectionDescription && <p className="mx-auto mt-4 max-w-3xl text-center !text-[14px] text-[#666b73]">{settings.sectionDescription}</p>}
 
           <div className="mt-12 grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[365px_minmax(0,1fr)]">
             <div className="flex min-h-[500px] items-center justify-center overflow-hidden rounded-[12px] bg-[#e8eef8]">
@@ -129,7 +135,7 @@ export default function B2BPartnershipRequestPage() {
         <div className="mx-auto max-w-[1060px]">
           <div className="text-center">
             <h2 className="text-[34px] font-bold tracking-[-0.02em] text-[#222] lg:text-[38px]">
-              Request for School Partnership
+              {copy("ctaTitle", "Request for Partnership")}
             </h2>
             <p className="mt-4 !text-[14px] text-[#666b73]">
               Fill out this form with necessary information
@@ -186,7 +192,7 @@ export default function B2BPartnershipRequestPage() {
               type="button"
               className="mt-6 rounded-[8px] bg-[#e4213c] px-7 py-3 !text-[15px] font-semibold text-white transition duration-300 hover:bg-[#174a9b] hover:shadow-md"
             >
-              Submit
+              {copy("ctaButton", "Submit")}
             </button>
           </form>
         </div>

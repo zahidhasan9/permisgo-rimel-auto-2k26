@@ -67,7 +67,7 @@ export default function WhereAreWePage() {
         </div>
       </div>
       <div className="mt-12">
-        <SectionTitle eyebrow="Plan your journey" title="Getting here" />
+        <SectionTitle eyebrow="Plan your journey" title="Getting here" cms={false} />
         <div className="grid gap-5 sm:grid-cols-2">
           {[
             {

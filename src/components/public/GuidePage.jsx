@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { createContext, useContext } from "react";
 import { FaArrowRight, FaCheck, FaHeadset, FaRegCompass } from "react-icons/fa";
 import useCmsPageContent from "@/hooks/useCmsPageContent";
 
@@ -11,6 +12,7 @@ const guideLinks = [
   { label: "Driving Licence Glossary", href: "/driving-licence-glossary" },
   { label: "Disability Support", href: "/person-with-a-disability" },
 ];
+const GuideCmsContext = createContext({});
 
 export default function GuidePage({
   eyebrow,
@@ -78,7 +80,7 @@ export default function GuidePage({
       )}
 
       <section className="mx-auto grid max-w-7xl gap-8 px-4 py-14 sm:px-6 sm:py-20 lg:grid-cols-[minmax(0,1fr)_320px] lg:px-8">
-        <div>{children}</div>
+        <GuideCmsContext.Provider value={settings}><div>{children}</div></GuideCmsContext.Provider>
         <aside className="space-y-6">
           <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
             <h2 className="px-3 pb-3 pt-2 text-lg font-extrabold text-[#103677]">
@@ -106,15 +108,15 @@ export default function GuidePage({
           </div>
           <div className="rounded-2xl bg-[#e2233d] p-6 text-white shadow-lg">
             <FaHeadset className="text-3xl" />
-            <h2 className="mt-5 text-2xl font-extrabold">Need more help?</h2>
+            <h2 className="mt-5 text-2xl font-extrabold">{settings.ctaTitle || "Need more help?"}</h2>
             <p className="mt-2 text-sm leading-6 text-white/85">
-              Our friendly team can help you choose the right next step.
+              {settings.ctaText || "Our friendly team can help you choose the right next step."}
             </p>
             <Link
               href="/contact-us"
               className="mt-5 inline-flex items-center gap-2 rounded-lg bg-white px-5 py-3 text-sm font-bold text-[#103677] transition hover:-translate-y-0.5"
             >
-              Contact us <FaArrowRight className="text-xs" />
+              {settings.ctaButton || "Contact us"} <FaArrowRight className="text-xs" />
             </Link>
           </div>
         </aside>
@@ -123,7 +125,10 @@ export default function GuidePage({
   );
 }
 
-export function SectionTitle({ eyebrow, title, description }) {
+export function SectionTitle({ eyebrow, title, description, cms = true }) {
+  const settings = useContext(GuideCmsContext);
+  const displayTitle = cms ? settings.sectionTitle || title : title;
+  const displayDescription = cms ? settings.sectionDescription || description : description;
   return (
     <div className="mb-8">
       {eyebrow && (
@@ -132,10 +137,10 @@ export function SectionTitle({ eyebrow, title, description }) {
         </p>
       )}
       <h2 className="mt-2 text-3xl font-extrabold leading-tight text-[#103677] sm:text-4xl">
-        {title}
+        {displayTitle}
       </h2>
-      {description && (
-        <p className="mt-3 max-w-3xl leading-7 text-slate-600">{description}</p>
+      {displayDescription && (
+        <p className="mt-3 max-w-3xl leading-7 text-slate-600">{displayDescription}</p>
       )}
     </div>
   );

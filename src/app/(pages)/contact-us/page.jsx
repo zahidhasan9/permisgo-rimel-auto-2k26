@@ -19,6 +19,7 @@ import {
   FaTiktok,
 } from "react-icons/fa6";
 import useSiteSettings from "@/hooks/useSiteSettings";
+import useCmsPageContent from "@/hooks/useCmsPageContent";
 
 const fields = [
   {
@@ -60,6 +61,9 @@ function InfoIcon({ children }) {
 
 export default function ContactUsPage() {
   const site = useSiteSettings();
+  const { content } = useCmsPageContent("contact-us");
+  const settings = content?.settings || {};
+  const copy = (key, fallback) => settings[key]?.trim?.() || fallback;
   const mapEmbedUrl = `https://www.google.com/maps?q=${encodeURIComponent(site.address)}&output=embed`;
   const socialLinks = [
     { label: "Facebook", icon: FaFacebookF, href: site.facebookUrl },
@@ -108,12 +112,10 @@ export default function ContactUsPage() {
         {/* Heading */}
         <header className="mx-auto max-w-[760px] text-center">
           <h1 className="text-[36px] font-extrabold leading-tight tracking-[-0.025em] text-[#1d1d1f] sm:text-[40px]">
-            Contact Our Team
+            {copy("heroTitle", "Contact Our Team")}
           </h1>
           <p className="mx-auto mt-7 max-w-[665px] !text-[15px] font-medium leading-[1.65] text-[#3f3f3f] sm:!text-[16px]">
-            Got any questions about the product or scaling on our platform?
-            We&apos;re here to help. Chat to our friendly team 24sqrt(7) and get
-            onboard in less than 5 minutes.
+            {copy("heroDescription", "Got any questions about our driving services? We're here to help. Contact our friendly team and get the guidance you need.")}
           </p>
         </header>
 
@@ -214,17 +216,17 @@ export default function ContactUsPage() {
               disabled={submitting}
               className="mt-5 inline-flex min-h-12 items-center justify-center rounded-[11px] bg-[#e2233d] px-5 !text-[14px] font-extrabold text-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:bg-[#174a9b] hover:shadow-lg"
             >
-              {submitting ? "Sending..." : "Send Message"}
+              {submitting ? "Sending..." : copy("heroButton", "Send Message")}
             </button>
           </form>
 
           <aside className="border-l border-[#9ca3af] pl-6 sm:pl-8">
             <section className="border-b border-[#9ca3af] pb-7">
               <h2 className="text-[22px] font-extrabold text-[#e2233d]">
-                Contact
+                {copy("sectionTitle", "Contact")}
               </h2>
               <p className="mt-2 !text-[14px] font-medium text-[#333]">
-                Speak to our friendly team via live chat.
+                {copy("sectionDescription", "Speak to our friendly team via live chat.")}
               </p>
 
               <div className="mt-4 space-y-3">
@@ -271,7 +273,7 @@ export default function ContactUsPage() {
 
             <section className="border-b border-[#9ca3af] py-9">
               <h2 className="text-[22px] font-extrabold text-[#e2233d]">
-                Visit Us
+                {copy("ctaTitle", "Visit Us")}
               </h2>
               <p className="mt-2 !text-[14px] font-medium text-[#333]">
                 Speak to our friendly team via live chat.
@@ -365,7 +367,7 @@ export default function ContactUsPage() {
           rel="noreferrer"
           className="absolute bottom-5 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-xl bg-[#174a9b] px-6 py-3 text-sm font-bold text-white shadow-xl transition hover:bg-[#e2233d]"
         >
-          Open in Google Maps
+          {copy("ctaButton", "Open in Google Maps")}
         </a>
       </section>
     </div>

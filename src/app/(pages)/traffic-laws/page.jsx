@@ -23,6 +23,7 @@ import tes3 from "../../../../public/image/tes3.png";
 import trafficHero from "../../../../public/image/traffic-hero.png";
 import trustLogo from "../../../../public/image/trustLogo.png";
 import useOffers, { filterOffers } from "@/hooks/useOffers";
+import useCmsPageContent from "@/hooks/useCmsPageContent";
 
 const packs = [
   {
@@ -102,24 +103,26 @@ const testimonials = [
 export default function TrafficLawsPage() {
   const { cards, loading, error } = useOffers();
   const offers = filterOffers(cards, "code");
+  const { content } = useCmsPageContent("traffic-laws");
+  const settings = content?.settings || {};
+  const copy = (key, fallback) => settings[key]?.trim?.() || fallback;
   return (
     <main className="overflow-hidden bg-white text-[#202124]">
       <section className="bg-[#eaf0f9]">
         <div className="mx-auto grid min-h-[560px] max-w-[1280px] grid-cols-[minmax(0,1fr)] items-center gap-10 px-5 py-14 sm:px-8 md:grid-cols-2 lg:px-10">
           <div className="max-w-[620px]">
             <h1 className="text-[35px] font-bold leading-tight tracking-[-0.025em] text-[#202124] sm:text-[40px] lg:text-[43px]">
-              Your <span className="text-[#e4213c]">FREE</span> Highway code
+              {copy("heroTitle", "Your FREE Highway code")}
             </h1>
             <p className="mt-7 max-w-[620px] !text-[16px] leading-7 text-[#70757b]">
-              Sign up for the code, and while you are practicing, start driving.
-              It&apos;s the winning combo for the rapid progress.
+              {copy("heroDescription", "Sign up for the code, and while you are practicing, start driving. It's the winning combo for rapid progress.")}
             </p>
             <div className="mt-10 grid max-w-[540px] grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-2">
               <Link
                 href="/inscription"
                 className="inline-flex min-h-[48px] items-center justify-center rounded-[9px] bg-[#e4213c] px-6 !text-[15px] font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-[#174a9b] hover:shadow-lg"
               >
-                Register for FREE
+                {copy("heroButton", "Register for FREE")}
               </Link>
               <Link
                 href="/pricing"
@@ -145,10 +148,10 @@ export default function TrafficLawsPage() {
         <div className="mx-auto max-w-[1280px]">
           <div className="text-center">
             <h2 className="text-[34px] font-bold tracking-[-0.025em] text-[#222] lg:text-[38px]">
-              Permisgo&apos;s Highway Code Packs
+              {copy("sectionTitle", "Permisgo's Highway Code Packs")}
             </h2>
             <p className="mt-4 !text-[14px] text-[#6b7077]">
-              What is your need?
+              {copy("sectionDescription", "What is your need?")}
             </p>
           </div>
 
@@ -312,7 +315,7 @@ export default function TrafficLawsPage() {
       <section className="bg-white px-5 py-20 sm:px-8 lg:py-24">
         <div className="mx-auto max-w-[1280px] rounded-[10px] bg-[#174a9b] px-5 py-14 text-center sm:px-10 lg:py-20">
           <h2 className="text-[32px] font-bold text-white lg:text-[37px]">
-            And After your code?
+            {copy("ctaTitle", "And After your code?")}
           </h2>
           <p className="mt-4 !text-[14px] text-white/85">
             Discover Our License Offers Starting at $500
@@ -321,7 +324,7 @@ export default function TrafficLawsPage() {
             href="/pricing"
             className="mt-7 inline-flex min-h-[46px] min-w-[360px] max-w-full items-center justify-center rounded-[9px] bg-[#e4213c] px-7 !text-[14px] font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-white hover:text-[#174a9b] hover:shadow-lg"
           >
-            Discover All Our Offers
+            {copy("ctaButton", "Discover All Our Offers")}
           </Link>
           <div className="mx-auto mt-10 grid max-w-[900px] grid-cols-[minmax(0,1fr)] gap-6 md:grid-cols-2">
             <div className="flex min-h-[94px] items-center justify-center gap-4 rounded-[9px] bg-white px-6">

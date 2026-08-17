@@ -4,6 +4,11 @@ export function proxy(request) {
   const requestHeaders = new Headers(request.headers);
   const pathname = request.nextUrl.pathname;
   const locale = pathname.split("/").filter(Boolean)[0];
+  if (pathname === "/traffic-law") {
+    const redirectUrl = request.nextUrl.clone();
+    redirectUrl.pathname = "/traffic-laws";
+    return NextResponse.redirect(redirectUrl, 308);
+  }
   if (["en", "bn", "fr"].includes(locale)) {
     const redirectUrl = request.nextUrl.clone();
     const cleanPath = pathname.split("/").filter(Boolean).slice(1).join("/");

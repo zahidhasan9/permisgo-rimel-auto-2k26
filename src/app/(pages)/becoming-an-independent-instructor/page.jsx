@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -12,6 +14,7 @@ import indicate2 from "../../../../public/image/indicate2.png";
 import indicate3 from "../../../../public/image/indicate3.png";
 import indicate4 from "../../../../public/image/indicate4.png";
 import instructorHero from "../../../../public/image/offer.png";
+import useCmsPageContent from "@/hooks/useCmsPageContent";
 
 const benefitGroups = [
   {
@@ -57,28 +60,25 @@ const statistics = [
 ];
 
 export default function IndependentInstructorPage() {
+  const { content } = useCmsPageContent("becoming-an-independent-instructor");
+  const settings = content?.settings || {};
+  const copy = (key, fallback) => settings[key]?.trim?.() || fallback;
   return (
     <main className="overflow-hidden bg-white text-[#202124]">
       <section className="bg-[#eaf0f9]">
         <div className="mx-auto grid min-h-[560px] max-w-[1280px] grid-cols-[minmax(0,1fr)] items-center gap-10 px-5 py-14  md:grid-cols-2 ">
           <div className="max-w-[630px]">
             <h1 className="text-[34px] font-bold leading-[1.2] tracking-[-0.025em] text-[#202124] sm:text-[40px] lg:text-[42px]">
-              Learn with a driving school you
-              <br className="hidden sm:block" /> can trust.
-              <br />
-              Instructors, let&apos;s partner up!
+              {copy("heroTitle", "Join a driving school you can trust")}
             </h1>
             <p className="mt-7 max-w-[620px] !text-[16px] leading-7 text-[#72777d]">
-              Enjoy a more affordable and convenient path to your driving
-              license with our online driving school. To make this possible, we
-              are committed to delivering the highest quality training for our
-              students.
+              {copy("heroDescription", "Partner with PermisGo, manage your schedule freely and deliver high-quality training to motivated students.")}
             </p>
             <Link
               href="#join-us"
               className="mt-10 inline-flex min-h-[49px] items-center justify-center rounded-[9px] bg-[#e4213c] px-7 !text-[16px] font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-[#174a9b] hover:shadow-lg"
             >
-              Join us a driving instructor
+              {copy("heroButton", "Join us as a driving instructor")}
             </Link>
           </div>
 
@@ -97,8 +97,9 @@ export default function IndependentInstructorPage() {
       <section className="bg-white px-5 py-20 sm:px-8 lg:py-24">
         <div className="mx-auto max-w-[1280px]">
           <h2 className="text-center text-[34px] font-bold tracking-[-0.025em] text-[#222] lg:text-[38px]">
-            Why Join Our Driving School?
+            {copy("sectionTitle", "Why Join Our Driving School?")}
           </h2>
+          {settings.sectionDescription && <p className="mx-auto mt-4 max-w-3xl text-center !text-[14px] text-[#656a72]">{settings.sectionDescription}</p>}
 
           <div className="mt-12 grid grid-cols-[minmax(0,1fr)] gap-6 md:grid-cols-3">
             {benefitGroups.map(({ title, icon: Icon, iconColor, items }) => (
@@ -129,13 +130,13 @@ export default function IndependentInstructorPage() {
             className="mt-20 scroll-mt-24 rounded-[10px] bg-[#174a9b] px-5 py-14 text-center sm:py-16"
           >
             <h2 className="text-[25px] font-bold text-white sm:text-[28px]">
-              Ready to join the teaching team?
+              {copy("ctaTitle", "Ready to join the teaching team?")}
             </h2>
             <Link
               href="/login-to-my-partner-area"
               className="mt-8 inline-flex min-h-[48px] min-w-[190px] items-center justify-center rounded-[9px] bg-[#e4213c] px-8 !text-[15px] font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-white hover:text-[#174a9b] hover:shadow-lg"
             >
-              Join now
+              {copy("ctaButton", "Join now")}
             </Link>
           </div>
 

@@ -89,7 +89,7 @@ export default function AppointmentPage() {
   const { page: cmsPage, content: cmsContent } =
     useCmsPageContent("appointment");
   const baseCopy = pageCopy[language] || pageCopy.en;
-  const settings = cmsPage?.updatedBy ? cmsContent?.settings || {} : {};
+  const settings = cmsContent?.settings || {};
   const copy = {
     ...baseCopy,
     title: settings.heroTitle || baseCopy.title,

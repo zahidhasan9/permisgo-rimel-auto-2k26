@@ -21,6 +21,7 @@ import {
   FaTiktok,
 } from "react-icons/fa6";
 import useSiteSettings from "@/hooks/useSiteSettings";
+import useCmsPageContent from "@/hooks/useCmsPageContent";
 import { FaBookOpen, FaEnvelope, FaFileLines, FaUser } from "react-icons/fa6";
 import { IoMdCheckbox } from "react-icons/io";
 
@@ -61,6 +62,9 @@ function HeadingIcon({ children }) {
 
 export default function WhoAreWePage() {
   const site = useSiteSettings();
+  const { content } = useCmsPageContent("who-are-we");
+  const settings = content?.settings || {};
+  const copy = (key, fallback) => settings[key]?.trim?.() || fallback;
   const companySocialLinks = [
     { icon: FaFacebookF, label: "Facebook", href: site.facebookUrl },
     { icon: FaInstagram, label: "Instagram", href: site.instagramUrl },
@@ -74,7 +78,7 @@ export default function WhoAreWePage() {
         <div className="grid items-center gap-10 lg:grid-cols-[0.83fr_1.17fr] lg:gap-12">
           <div>
             <h1 className="text-[36px] font-extrabold leading-[1.15] tracking-[-0.025em] text-[#1d1d1f] sm:text-[40px]">
-              Who are we?
+              {copy("heroTitle", "Who are we?")}
             </h1>
 
             <h2 className="mt-5 max-w-[520px] text-[20px] font-extrabold leading-[1.55] text-[#242424] sm:text-[22px]">
@@ -83,17 +87,14 @@ export default function WhoAreWePage() {
             </h2>
 
             <p className="mt-7 max-w-[505px] !text-[15px] font-medium leading-[1.85] text-[#444] sm:!text-[16px]">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Ducimus
-              quisquam voluptas doloremque pariatur voluptatibus. Distinctio sit
-              blanditiis eius odit illo itaque, ratione, laudantium est sunt
-              perspiciatis ullam corrupti, in sint.
+              {copy("heroDescription", "PermisGo connects learners with qualified instructors and supports every step of the journey toward a driving licence.")}
             </p>
 
             <Link
               href="/book-lesson"
               className="mt-7 inline-flex min-h-12 items-center justify-center rounded-[10px] bg-[#e5273d] px-6 text-[15px] font-extrabold text-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:bg-[#174a9b] hover:shadow-lg"
             >
-              Book Your Lesson
+              {copy("heroButton", "Book Your Lesson")}
             </Link>
           </div>
 
@@ -116,13 +117,10 @@ export default function WhoAreWePage() {
             <HeadingIcon>
               <FaFileLines />
             </HeadingIcon>
-            Our Mission
+            {copy("sectionTitle", "Our Mission")}
           </h2>
           <p className="mt-4 !text-[15px] font-medium leading-[1.75] text-[#333] sm:!text-[16px]">
-            Our goal is to offer you quality training, tailored to your pace and
-            needs. Whether you’re a beginner or looking to improve your skills,
-            we do everything we can to help you obtain your license with
-            confidence.
+            {copy("sectionDescription", "Our goal is to offer quality training tailored to your pace and needs, helping you obtain your licence with confidence.")}
           </p>
         </div>
       </section>
@@ -181,7 +179,7 @@ export default function WhoAreWePage() {
       {/* Why choose Permisgo */}
       <section className={`${container} pb-20`}>
         <h2 className="text-center text-[32px] font-extrabold leading-tight tracking-[-0.025em] text-[#1d1d1f] sm:text-[36px]">
-          Why choose Permisgo
+          {copy("ctaTitle", "Why choose Permisgo")}
         </h2>
 
         <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">

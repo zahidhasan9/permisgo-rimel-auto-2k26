@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { FaCarSide } from "react-icons/fa";
@@ -7,6 +9,7 @@ import indicate2 from "../../../../public/image/indicate2.png";
 import indicate3 from "../../../../public/image/indicate3.png";
 import indicate4 from "../../../../public/image/indicate4.png";
 import instructorHero from "../../../../public/image/offer.png";
+import useCmsPageContent from "@/hooks/useCmsPageContent";
 
 const statistics = [
   { image: indicate1, text: "€3,500 net/month" },
@@ -16,25 +19,25 @@ const statistics = [
 ];
 
 export default function DrivingInstructorSalaryPage() {
+  const { content } = useCmsPageContent("driving-instructor-salary");
+  const settings = content?.settings || {};
+  const copy = (key, fallback) => settings[key]?.trim?.() || fallback;
   return (
     <main className="overflow-hidden bg-white text-[#202124]">
       <section className="bg-[#eaf0f9]">
         <div className="mx-auto grid min-h-[560px] max-w-[1280px] grid-cols-[minmax(0,1fr)] items-center gap-10 px-5 py-14  md:grid-cols-2 ">
           <div className="max-w-[650px]">
             <h1 className="text-[35px] font-bold leading-[1.2] tracking-[-0.025em] text-[#202124] sm:text-[41px] lg:text-[44px]">
-              Calculate your salary as a
-              <br className="hidden sm:block" /> driving instructor
+              {copy("heroTitle", "Calculate your salary as a driving instructor")}
             </h1>
             <p className="mt-7 max-w-[650px] !text-[16px] leading-7 text-[#70757b]">
-              Are you looking for information on the salary of a driving
-              instructor? Do you want to accurately estimate your income as a
-              self-employed individual? You&apos;ve come to the right place.
+              {copy("heroDescription", "Estimate your potential income as a self-employed driving instructor and discover the benefits of partnering with PermisGo.")}
             </p>
             <Link
               href="/becoming-an-independent-instructor"
               className="mt-10 inline-flex min-h-[49px] items-center justify-center rounded-[9px] bg-[#e4213c] px-7 !text-[16px] font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-[#174a9b] hover:shadow-lg"
             >
-              Join us a driving instructor
+              {copy("heroButton", "Join us as a driving instructor")}
             </Link>
           </div>
 
@@ -80,18 +83,16 @@ export default function DrivingInstructorSalaryPage() {
 
           <div>
             <h2 className="text-[34px] font-bold leading-tight tracking-[-0.025em] text-[#202124] lg:text-[40px]">
-              Estimate your income with Permis Go
+              {copy("sectionTitle", "Estimate your income with Permis Go")}
             </h2>
             <p className="mt-6 max-w-[710px] !text-[16px] leading-7 text-[#656a72]">
-              Estimate your earnings as a partner instructor in one click with
-              our simulator. Earn up to €37/hour and 50% more income compared to
-              traditional driving schools.
+              {copy("sectionDescription", "Estimate your earnings as a partner instructor in one click with our simulator and discover your earning potential.")}
             </p>
             <Link
               href="/login-to-my-partner-area"
               className="mt-8 inline-flex min-h-[48px] items-center justify-center rounded-[9px] bg-[#e4213c] px-6 !text-[15px] font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-[#174a9b] hover:shadow-lg"
             >
-              Simulate my income
+              {copy("ctaButton", "Simulate my income")}
             </Link>
           </div>
         </div>
