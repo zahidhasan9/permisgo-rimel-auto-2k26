@@ -1,12 +1,10 @@
+"use client";
 import { FaBookOpen } from "react-icons/fa";
 import GuidePage, { SectionTitle } from "@/components/public/GuidePage";
+import useCmsPageContent from "@/hooks/useCmsPageContent";
+import { CmsRichText } from "@/components/cms/CmsContent";
 
-export const metadata = {
-  title: "Highway Code Glossary",
-  description: "Essential highway code terms explained simply.",
-};
-
-const terms = [
+const defaultTerms = [
   [
     "Blind spot",
     "An area around a vehicle that cannot be seen directly in the mirrors.",
@@ -47,6 +45,11 @@ const terms = [
 ];
 
 export default function HighwayCodeGlossaryPage() {
+  const { content } = useCmsPageContent("highway-code-glossary");
+  const settings = content?.settings || {};
+  const copy = (key, fallback) => settings[key]?.trim?.() || fallback;
+  const terms = defaultTerms.map(([term, definition], index) => [copy(`term${index + 1}Title`, term), copy(`term${index + 1}Definition`, definition)]).filter(([term]) => term);
+  const alphabet = copy("alphabet", "ABCDEFGHIJKLMNOPQRSTUVWXYZ").replace(/\s/g, "").split("");
   return (
     <GuidePage
       eyebrow="Learning resources"
@@ -61,15 +64,16 @@ export default function HighwayCodeGlossaryPage() {
       currentPath="/highway-code-glossary"
     >
       <SectionTitle
-        eyebrow="A–Z road terms"
+        eyebrow={copy("sectionEyebrow", "A–Z road terms")}
         title="Build your road vocabulary"
         description="Use this quick reference while studying the Highway Code or preparing for a lesson."
       />
       <div className="mb-7 flex flex-wrap gap-2">
-        {"ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map((letter) => (
+        {alphabet.map((letter) => (
           <span
             key={letter}
-            className={`flex h-9 w-9 items-center justify-center rounded-lg text-xs font-bold ${terms.some(([term]) => term.startsWith(letter)) ? "bg-[#103677] text-white" : "bg-slate-200 text-slate-400"}`}
+            className={`flex h-9 w-9 items-center justify-center rounded-lg text-xs font-bold ${terms.some(([term]) => term.toLocaleUpperCase().startsWith(letter.toLocaleUpperCase())) ? "text-white" : "bg-slate-200 text-slate-400"}`}
+            style={terms.some(([term]) => term.toLocaleUpperCase().startsWith(letter.toLocaleUpperCase())) ? { backgroundColor: settings.activeLetterColor || "#103677" } : undefined}
           >
             {letter}
           </span>
@@ -80,6 +84,7 @@ export default function HighwayCodeGlossaryPage() {
           <article
             key={term}
             className="rounded-2xl border border-slate-200 bg-white p-5 transition hover:-translate-y-0.5 hover:shadow-md"
+            style={{ backgroundColor: settings.termCardBackground || "#ffffff" }}
           >
             <div className="flex items-start gap-4">
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-red-50 font-extrabold text-[#e2233d]">
@@ -89,9 +94,7 @@ export default function HighwayCodeGlossaryPage() {
                 <h2 className="text-lg font-extrabold text-[#103677]">
                   {term}
                 </h2>
-                <p className="mt-2 text-sm leading-6 text-slate-600">
-                  {definition}
-                </p>
+                <CmsRichText as="div" html={definition} className="mt-2 text-sm leading-6 text-slate-600" />
               </div>
             </div>
           </article>

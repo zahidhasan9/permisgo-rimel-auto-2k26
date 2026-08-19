@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { getFaqs } from "@/features/API";
 import useCurrentLanguage from "@/hooks/useCurrentLanguage";
 import useCmsPageContent from "@/hooks/useCmsPageContent";
+import { CmsRichText, cmsButtonProps } from "@/components/cms/CmsContent";
 import { FaChevronDown, FaWhatsappSquare } from "react-icons/fa";
 
 const fallbackFaqs = [
@@ -64,21 +66,20 @@ const Faq = () => {
 
   return (
     <>
-      <section className="py-[50px] max-[500px]:py-[30px]">
-        <div className="mx-auto w-full max-w-[1140px] px-4">
-          <div className="text-center">
+      <section className="py-[50px] max-[500px]:py-[30px]" style={{ backgroundColor: settings.heroBackground || "#ffffff" }}>
+        <div className={`mx-auto w-full max-w-[1140px] px-4 ${settings.heroImage ? "grid items-center gap-8 md:grid-cols-[1fr_300px]" : ""}`}>
+          <div className={settings.heroImage ? "text-left" : "text-center"}>
             <h1 className="text-[50px] font-bold leading-tight text-blue-900 max-[500px]:text-[35px]">
               {copy("heroTitle", "Frequently Asked Questions")}
             </h1>
 
-            <p className="mx-auto mt-4 max-w-3xl text-base leading-relaxed text-gray-600">
-              {copy("heroDescription", "Find clear answers to common questions about lessons, exams, payments and your PermisGo account.")}
-            </p>
+            <CmsRichText as="div" html={settings.heroDescription} fallback="Find clear answers to common questions about lessons, exams, payments and your PermisGo account." className="mx-auto mt-4 max-w-3xl text-base leading-relaxed text-gray-600" />
           </div>
+          {settings.heroImage && <Image src={settings.heroImage} alt={copy("heroImageAlt", "Frequently asked questions")} width={360} height={280} priority className="mx-auto h-auto w-full max-w-[300px] object-contain" />}
         </div>
       </section>
 
-      <section className="pb-[50px] max-[500px]:py-[30px]">
+      <section className="pb-[50px] max-[500px]:py-[30px]" style={{ backgroundColor: settings.sectionBackground || "#ffffff" }}>
         <div className="mx-auto w-full max-w-[1140px] px-4">
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
             <div className="lg:col-span-8">
@@ -92,6 +93,7 @@ const Faq = () => {
                     className={`border-gray-200 bg-white ${
                       index !== faqs.length - 1 ? "border-b" : ""
                     }`}
+                    style={{ backgroundColor: settings.faqCardBackground || "#ffffff" }}
                   >
                     <button
                       type="button"
@@ -101,6 +103,7 @@ const Faq = () => {
                           ? "bg-white text-blue-900"
                           : "bg-blue-100 text-gray-900 "
                       }`}
+                      style={{ backgroundColor: activeFaq === (item._id || item.id) ? settings.faqActiveBackground || "#ffffff" : settings.faqInactiveBackground || "#dbeafe" }}
                     >
                       <span>{item.question}</span>
 
@@ -135,23 +138,22 @@ const Faq = () => {
             </div>
 
             <div className="lg:col-span-4">
-              <div className="rounded-[10px] border-[3px] border-blue-200 p-[30px]">
+              <div className="rounded-[10px] border-[3px] border-blue-200 p-[30px]" style={{ backgroundColor: settings.ctaCardBackground || "#ffffff", borderColor: settings.ctaCardBorderColor || "#bfdbfe" }}>
                 <div className="text-center">
+                  {settings.ctaImage && <Image src={settings.ctaImage} alt={copy("ctaImageAlt", "Customer support")} width={120} height={120} className="mx-auto mb-5 h-24 w-24 object-contain" />}
                   <h3 className="text-2xl font-bold leading-snug text-gray-900">
                     {copy("ctaTitle", "Do you have more questions?")}
                   </h3>
 
-                  <p className="mt-3 text-base leading-relaxed text-gray-600">
-                    {copy("sectionDescription", "Our friendly support team is ready to help with any question not answered here.")}
-                  </p>
+                  <CmsRichText as="div" html={settings.ctaText} fallback="Our friendly support team is ready to help with any question not answered here." className="mt-3 text-base leading-relaxed text-gray-600" />
 
                   <div className="mt-4">
                     <Link
-                      href="#"
+                      {...cmsButtonProps(settings, "ctaButton", { href: "/contact-us" })}
                       className="inline-flex items-center justify-center gap-2 rounded-md bg-orange-500 px-6 py-3 text-lg font-semibold text-white transition duration-300 hover:bg-blue-900"
                     >
                       <FaWhatsappSquare className="text-2xl" />
-                      +847 4545 4587
+                      {copy("ctaButton", copy("contactPhone", "+847 4545 4587"))}
                     </Link>
                   </div>
                 </div>

@@ -7,6 +7,7 @@ import { useMemo, useState } from "react";
 import { FaArrowLeft, FaArrowRight, FaStar } from "react-icons/fa6";
 import useCurrentLanguage from "@/hooks/useCurrentLanguage";
 import useCmsPageContent from "@/hooks/useCmsPageContent";
+import { CmsRichText, cmsButtonProps } from "@/components/cms/CmsContent";
 
 import AppointmentBooking from "@/components/appointment-booking-calander";
 
@@ -128,17 +129,15 @@ export default function AppointmentPage() {
   return (
     <div className="bg-[#eef3fb] text-[#1d1d1f]">
       {/* Hero */}
-      <section className="border-b border-[#dfe6f1] bg-[#eef3fb]">
+      <section className="border-b border-[#dfe6f1] bg-[#eef3fb]" style={{ backgroundColor: settings.heroBackground || "#eef3fb" }}>
         <div className="mx-auto grid min-h-[600px] w-full max-w-[1360px] grid-cols-[minmax(0,1fr)] items-center gap-10 px-5 py-14 sm:px-8 md:grid-cols-2 lg:min-h-[628px] lg:px-10 lg:py-0">
           <div className="order-1 min-w-0 text-center md:text-left lg:translate-y-1">
             <h1 className="text-[28px] font-extrabold leading-[1.15] tracking-[-0.02em] sm:text-[36px] lg:text-[38px]">
               {copy.title}
             </h1>
-            <p className="mx-auto mt-6 max-w-[570px] !text-[15px] font-medium leading-[1.6] text-[#62656b] md:mx-0">
-              {copy.intro}
-            </p>
+            <CmsRichText as="div" html={copy.intro} className="mx-auto mt-6 max-w-[570px] !text-[15px] font-medium leading-[1.6] text-[#62656b] md:mx-0" />
             <Link
-              href="#appointment-booking"
+              {...cmsButtonProps(settings, "heroButton", { href: "#appointment-booking" })}
               className="mt-10 inline-flex h-12 w-full max-w-[300px] items-center justify-center rounded-[10px] bg-[#e2233d] px-8 !text-[14px] font-extrabold text-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:bg-[#174a9b] hover:shadow-lg"
             >
               {copy.book}
@@ -147,8 +146,10 @@ export default function AppointmentPage() {
 
           <div className="order-2 flex min-w-0 justify-center md:justify-end">
             <Image
-              src={appoinHero}
-              alt="Learner driver receiving guidance from an instructor"
+              src={settings.heroImage || appoinHero}
+              alt={settings.heroImageAlt || "Learner driver receiving guidance from an instructor"}
+              width={720}
+              height={620}
               priority
               sizes="(max-width: 767px) 88vw, 500px"
               className="h-auto w-full min-w-0 max-w-[640px] lg:translate-x-5 lg:translate-y-2 lg:scale-[1.035]"
@@ -158,8 +159,8 @@ export default function AppointmentPage() {
       </section>
 
       {/* Booking and benefits */}
-      <section className="bg-[#eef3fb] px-5 pb-20 pt-20 sm:px-8 lg:px-10 lg:pt-[74px]">
-        <AppointmentBooking title={settings.bookingTitle} />
+      <section className="bg-[#eef3fb] px-5 pb-20 pt-20 sm:px-8 lg:px-10 lg:pt-[74px]" style={{ backgroundColor: settings.bookingSectionBackground || "#eef3fb" }}>
+        <AppointmentBooking title={settings.bookingTitle} settings={settings} />
 
         <div className="mx-auto mt-28 w-full max-w-[1280px] lg:mt-[170px]">
           <h2 className="text-center text-[30px] font-extrabold tracking-[-0.02em] text-[#1d1d1f] sm:text-[36px]">
@@ -171,11 +172,14 @@ export default function AppointmentPage() {
               <article
                 key={benefit.title}
                 className="group min-h-[110px] -skew-x-[5deg] rounded-[18px] bg-white px-7 py-5 shadow-[0_2px_12px_rgba(18,53,101,0.02)] transition-all duration-300 hover:-translate-y-1 hover:bg-[#174a9b] hover:shadow-xl"
+                style={{ backgroundColor: settings.benefitCardBackground || "#ffffff" }}
               >
                 <div className="flex h-full skew-x-[5deg] items-center justify-center gap-5">
                   <Image
-                    src={benefit.image}
-                    alt=""
+                    src={settings[`benefit${index + 1}Image`] || benefit.image}
+                    alt={settings[`benefit${index + 1}ImageAlt`] || copy.benefits[index] || benefit.title}
+                    width={48}
+                    height={48}
                     sizes="48px"
                     className="h-12 w-12 shrink-0 object-contain"
                   />
@@ -278,12 +282,12 @@ export default function AppointmentPage() {
 
       {/* Final CTA */}
       <section className="bg-[#eef3fb] px-5 sm:px-8 lg:px-10">
-        <div className="mx-auto flex min-h-[205px] w-full max-w-[1280px] flex-col items-center justify-center rounded-[12px] bg-[#174a9b] px-6 py-10 text-center">
+        <div className="mx-auto flex min-h-[205px] w-full max-w-[1280px] flex-col items-center justify-center rounded-[12px] bg-[#174a9b] px-6 py-10 text-center" style={{ backgroundColor: settings.finalBackground || "#174a9b" }}>
           <h2 className="text-[24px] font-bold text-white sm:text-[26px]">
             {copy.final}
           </h2>
           <Link
-            href="#appointment-booking"
+            {...cmsButtonProps(settings, "finalButton", { href: "#appointment-booking" })}
             className="mt-7 inline-flex h-12 items-center justify-center rounded-[10px] bg-[#e2233d] px-7 !text-[14px] font-extrabold text-white transition-all duration-300 hover:-translate-y-1 hover:bg-white hover:text-[#174a9b] hover:shadow-lg"
           >
             {copy.lesson}

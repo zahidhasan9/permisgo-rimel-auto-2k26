@@ -202,54 +202,7 @@ const Footer = () => {
                   {site.domainName}
                 </a>
 
-                {/* Social */}
-                <div className="mt-5">
-                  <ul className="flex flex-wrap items-center gap-3">
-                    {socialLinks.map((item, index) => (
-                      <li key={index}>
-                        <Link
-                          href={item.href}
-                          target="_blank"
-                          rel="noreferrer"
-                          aria-label={item.label}
-                          className="flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/10 text-[18px] text-white transition-all duration-300 hover:-translate-y-1 hover:bg-[var(--second-color)] hover:text-white"
-                        >
-                          {item.icon}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Opening Time */}
-                <div className="mt-5">
-                  <button
-                    type="button"
-                    onClick={() => setOpenTime(!openTime)}
-                    className="flex w-full items-center justify-between rounded-xl border border-white/15 bg-white/10 px-3 py-3 text-left text-[14px] leading-6 text-white backdrop-blur-md transition-all duration-300 hover:bg-white/15"
-                  >
-                    <span>{openingTimes[0]}</span>
-                    <IoChevronDown
-                      className={` shrink-0 text-xl transition-transform duration-300 ${
-                        openTime ? "rotate-180" : ""
-                      }`}
-                    />
-                  </button>
-
-                  {openTime && (
-                    <ul className="mt-2 overflow-hidden rounded-xl border border-white/10 bg-[#0b285b] text-[14px] text-white/80 shadow-xl">
-                      {openingTimes.map((time, index) => (
-                        <li
-                          key={index}
-                          onClick={() => setOpenTime(false)}
-                          className="cursor-pointer px-2 py-2.5 transition-all duration-300 text-[14.5px] hover:bg-white/10 hover:text-white"
-                        >
-                          {time}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
+                
               </div>
 
               {/* About */}
@@ -298,16 +251,65 @@ const Footer = () => {
                 </h4>
 
                 <ul className="space-y-3">
-                  {[...serviceLinks, ...footerCustomLinks("services")].map(
-                    (link, index) => (
+                  {[...serviceLinks, ...footerCustomLinks("services")]
+                    .slice(0, 4)
+                    .map((link, index) => (
                       <li key={index}>
                         <Link href={link.href} className={footerLinkClass}>
                           {link.name}
                         </Link>
                       </li>
-                    ),
-                  )}
+                    ))}
                 </ul>
+
+                {/* Social */}
+                <div className="mt-5">
+                  <ul className="flex flex-wrap items-center gap-3">
+                    {socialLinks.map((item, index) => (
+                      <li key={index}>
+                        <Link
+                          href={item.href}
+                          target="_blank"
+                          rel="noreferrer"
+                          aria-label={item.label}
+                          className="flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/10 text-[18px] text-white transition-all duration-300 hover:-translate-y-1 hover:bg-[var(--second-color)] hover:text-white"
+                        >
+                          {item.icon}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Opening Time */}
+                <div className="mt-5">
+                  <button
+                    type="button"
+                    onClick={() => setOpenTime(!openTime)}
+                    className="flex w-full items-center justify-between rounded-xl border border-white/15 bg-white/10 px-3 py-3 text-left text-[14px] leading-6 text-white backdrop-blur-md transition-all duration-300 hover:bg-white/15"
+                  >
+                    <span>{openingTimes[0]}</span>
+                    <IoChevronDown
+                      className={` shrink-0 text-xl transition-transform duration-300 ${
+                        openTime ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
+
+                  {openTime && (
+                    <ul className="mt-2 overflow-hidden rounded-xl border border-white/10 bg-[#0b285b] text-[14px] text-white/80 shadow-xl">
+                      {openingTimes.map((time, index) => (
+                        <li
+                          key={index}
+                          onClick={() => setOpenTime(false)}
+                          className="cursor-pointer px-2 py-2.5 transition-all duration-300 text-[14.5px] hover:bg-white/10 hover:text-white"
+                        >
+                          {time}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
               </div>
             </div>
           </div>

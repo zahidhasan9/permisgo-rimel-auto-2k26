@@ -1,3 +1,4 @@
+@import "ckeditor5/ckeditor5.css";
 @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
@@ -22,6 +23,140 @@
   --line-color: #b0b0b0;
   --first-font: "Outfit", sans-serif;
   --second-font: "Outfit", sans-serif;
+}
+
+.cms-word-editor .ck-editor__editable_inline {
+  min-height: 220px;
+  max-height: 520px;
+  overflow-y: auto;
+}
+
+.cms-word-editor .ck.ck-toolbar {
+  border-radius: 12px 12px 0 0;
+}
+
+.cms-word-editor .ck.ck-editor__main > .ck-editor__editable {
+  border-radius: 0 0 12px 12px;
+}
+
+.cms-word-editor .ck.ck-toolbar > .ck-toolbar__items {
+  flex-wrap: wrap !important;
+}
+
+.cms-word-editor .ck.ck-dropdown .ck-dropdown__panel,
+.ck.ck-balloon-panel {
+  z-index: 10050 !important;
+}
+
+.cms-word-editor .ck-content {
+  word-break: break-word;
+}
+
+.cms-rendered-content {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.cms-rendered-content > :first-child {
+  margin-top: 0;
+}
+
+.cms-rendered-content > :last-child {
+  margin-bottom: 0;
+}
+
+.cms-rendered-content p,
+.cms-rendered-content ul,
+.cms-rendered-content ol,
+.cms-rendered-content blockquote,
+.cms-rendered-content table {
+  margin-block: 0.75em;
+}
+
+.cms-rendered-content ul,
+.cms-rendered-content ol {
+  padding-left: 1.5rem;
+}
+
+.cms-rendered-content ul {
+  list-style: disc;
+}
+
+.cms-rendered-content ol {
+  list-style: decimal;
+}
+
+.cms-rendered-content h2 {
+  margin-block: 1.2em 0.55em;
+  font-size: 1.65em;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.cms-rendered-content h3 {
+  margin-block: 1em 0.45em;
+  font-size: 1.3em;
+  font-weight: 750;
+  line-height: 1.3;
+}
+
+.cms-rendered-content blockquote {
+  border-left: 4px solid #174a9b;
+  padding: 0.75rem 1rem;
+  background: #f4f7fb;
+  color: #475569;
+}
+
+.cms-rendered-content a {
+  color: #174a9b;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.cms-rendered-content table {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+}
+
+.cms-rendered-content th,
+.cms-rendered-content td {
+  border: 1px solid #cbd5e1;
+  padding: 0.65rem 0.8rem;
+  text-align: left;
+}
+
+.cms-word-editor {
+  width: 100%;
+  min-width: 0;
+}
+
+.cms-word-editor .ck.ck-editor,
+.cms-word-editor .ck-editor__main {
+  min-width: 0;
+  width: 100%;
+}
+
+.cms-word-editor .ck.ck-sticky-panel .ck-sticky-panel__content_sticky {
+  top: 0;
+  z-index: 40;
+}
+
+@media (max-width: 640px) {
+  .cms-word-editor .ck-editor__editable_inline {
+    min-height: 180px;
+    max-height: 420px;
+  }
+
+  .cms-word-editor .ck.ck-toolbar {
+    padding: 4px;
+  }
+
+  .cms-word-editor .ck.ck-button {
+    min-width: 30px;
+    min-height: 30px;
+  }
 }
 
 html,

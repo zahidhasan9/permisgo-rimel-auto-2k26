@@ -10,7 +10,7 @@ import {
   getAdminBlogs,
   updateBlog,
 } from "@/features/API";
-import BlogEditor from "@/components/blogs/BlogEditor";
+import CmsWordEditor from "@/components/cms/CmsWordEditor";
 import { showToast } from "@/utils/showToast";
 
 const emptyForm = {
@@ -341,7 +341,8 @@ export default function AdminBlogsPage() {
                       <span className="mb-2 block text-sm font-bold text-slate-700">
                         Article content {activeLanguage === "en" ? "*" : ""}
                       </span>
-                      <BlogEditor
+                      <CmsWordEditor
+                        key={`${editing?._id || "new"}-${activeLanguage}-content`}
                         value={form[contentKey]}
                         onChange={(content) =>
                           setForm((current) => ({

@@ -10,6 +10,7 @@ import {
   FaSave,
 } from "react-icons/fa";
 import { createLearningContent, getAdminQuizzes } from "@/features/API";
+import CmsWordEditor from "@/components/cms/CmsWordEditor";
 
 const defaultForm = {
   title: "",
@@ -265,14 +266,14 @@ export default function LearningContentForm() {
                   rows={3}
                 />
 
-                <Textarea
-                  label="Full Content"
-                  name="content"
-                  value={form.content}
-                  onChange={handleChange}
-                  placeholder="Full learning content..."
-                  rows={7}
-                />
+                <div className="col-span-2">
+                  <label className="mb-2 block text-xs font-[800] text-[#374151]">Full Content</label>
+                  <CmsWordEditor
+                    key={`learning-content-${resetKey}`}
+                    value={form.content}
+                    onChange={(content) => setForm((current) => ({ ...current, content }))}
+                  />
+                </div>
 
                 <Input
                   label="Tags"

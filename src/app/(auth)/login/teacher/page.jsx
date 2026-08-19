@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 
 import { clearUserState, fetchLoggedInUser, login } from "@/features/userSlice";
+import useCmsPageContent from "@/hooks/useCmsPageContent";
 
 import Logo from "../../../../../public/image/logo2.png";
 
@@ -24,6 +25,9 @@ const getAuthPayload = (payload) => {
 };
 
 const TeacherLogin = () => {
+  const { content } = useCmsPageContent("teacher-login");
+  const settings = content?.settings || {};
+  const copy = (key, fallback) => settings[key]?.trim?.() || fallback;
   const dispatch = useDispatch();
   const router = useRouter();
 
@@ -119,25 +123,27 @@ const TeacherLogin = () => {
   }
 
   return (
-    <section className="flex min-h-screen items-center justify-center bg-[#eef2fb] px-4 py-8 sm:px-6">
+    <section className="flex min-h-screen items-center justify-center bg-[#eef2fb] px-4 py-8 sm:px-6" style={{ backgroundColor: settings.pageBackground || "#eef2fb" }}>
       {/* OUTER WHITE BOX */}
       <div className="w-full max-w-[864px] rounded-[12px] bg-white p-3 shadow-[0_2px_8px_rgba(15,23,42,0.02)] sm:p-[28px]">
         {/* LIGHT BLUE BORDER AREA */}
-        <div className="rounded-[12px] bg-[#e7edf7] p-3 sm:p-[20px]">
+        <div className="rounded-[12px] bg-[#e7edf7] p-3 sm:p-[20px]" style={{ backgroundColor: settings.panelBackground || "#e7edf7" }}>
           {/* LOGIN CONTENT BOX */}
           <div className="min-h-[540px] rounded-[12px] bg-white px-5 py-5 sm:px-[20px] sm:py-[20px]">
             {/* LOGO AND TITLE */}
             <div className="flex flex-col items-center">
               <Image
-                src={Logo}
-                alt="Permis Go Auto Ecole"
+                src={settings.logoImage || Logo}
+                alt={copy("logoAlt", "Permis Go Auto Ecole")}
+                width={180}
+                height={70}
                 priority
                 sizes="180px"
                 className="h-[70px] w-[180px] object-contain"
               />
 
               <h1 className="mt-[22px] text-center text-[28px] font-bold leading-none text-[#1f1f1f] sm:text-[29px]">
-                Teacher Login
+                {copy("loginTitle", "Teacher Login")}
               </h1>
             </div>
 
@@ -149,7 +155,7 @@ const TeacherLogin = () => {
                   htmlFor="email"
                   className="mb-[12px] block text-[14px] font-medium text-[#3f3f46]"
                 >
-                  Username
+                  {copy("usernameLabel", "Username")}
                 </label>
 
                 <input
@@ -158,7 +164,7 @@ const TeacherLogin = () => {
                   type="email"
                   value={formData.email}
                   onChange={handleChange}
-                  placeholder="Write name here"
+                  placeholder={copy("usernamePlaceholder", "Write name here")}
                   autoComplete="email"
                   required
                   className="h-[44px] w-full rounded-[12px] border border-[#bcc5d1] bg-white px-[16px] text-[14px] text-[#27272a] outline-none transition placeholder:text-[#8b8b8b] focus:border-[#8da2bd] focus:ring-2 focus:ring-[#8da2bd]/15"
@@ -171,7 +177,7 @@ const TeacherLogin = () => {
                   htmlFor="password"
                   className="mb-[12px] block text-[14px] font-medium text-[#3f3f46]"
                 >
-                  Password
+                  {copy("passwordLabel", "Password")}
                 </label>
 
                 <div className="relative">
@@ -181,7 +187,7 @@ const TeacherLogin = () => {
                     type={showPassword ? "text" : "password"}
                     value={formData.password}
                     onChange={handleChange}
-                    placeholder="Write here"
+                    placeholder={copy("passwordPlaceholder", "Write here")}
                     autoComplete="current-password"
                     required
                     className="h-[44px] w-full rounded-[12px] border border-[#d5d7dc] bg-white px-[16px] pr-[52px] text-[14px] text-[#27272a] outline-none transition placeholder:text-[#8b8b8b] focus:border-[#8da2bd] focus:ring-2 focus:ring-[#8da2bd]/15"
@@ -203,10 +209,11 @@ const TeacherLogin = () => {
               {/* FORGET PASSWORD */}
               <div className="mt-[22px]">
                 <Link
-                  href="/forget-password"
+                  href={settings.forgotButtonUrl || "/forget-password"}
+                  style={{ color: settings.forgotButtonTextColor || "#173d73" }}
                   className="text-[14px] font-semibold text-[#173d73] underline underline-offset-2 transition hover:text-[#0d2b52]"
                 >
-                  Forget Password
+                  {copy("forgotButton", "Forget Password")}
                 </Link>
               </div>
 
@@ -215,9 +222,11 @@ const TeacherLogin = () => {
                 type="submit"
                 disabled={loading}
                 className="mt-[54px] flex h-[48px] w-full items-center justify-center rounded-[12px] bg-[#df2738] px-4 text-[15px] font-semibold text-white transition hover:bg-[#c91f30] disabled:cursor-not-allowed disabled:opacity-70"
+                style={{ backgroundColor: settings.loginButtonColor || "#df2738", color: settings.loginButtonTextColor || "#ffffff" }}
               >
-                {loading ? "Logging in..." : "Log in"}
+                {loading ? copy("loggingText", "Logging in...") : copy("loginButton", "Log in")}
               </button>
+              <p className="mt-5 text-center text-[14px] text-[#52525b]">{copy("accountPrompt", "Have no account?")}{" "}<Link href={settings.registerButtonUrl || "/register/teacher"} className="font-semibold text-[#173d73] underline underline-offset-2" style={{ color: settings.registerButtonTextColor || "#173d73" }}>{copy("registerButton", "Register now")}</Link></p>
             </form>
           </div>
         </div>

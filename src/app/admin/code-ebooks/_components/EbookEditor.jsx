@@ -1,5 +1,7 @@
 "use client";
 
+import { memo, useMemo, useRef } from "react";
+
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import {
   BlockQuote,
@@ -48,70 +50,44 @@ function UploadAdapterPlugin(editor) {
     new UploadAdapter(loader);
 }
 
-export default function EbookEditor({ value, onChange }) {
+function EbookEditor({ value, onChange }) {
+  const initialDataRef = useRef(value || "");
+  const onChangeRef = useRef(onChange);
+  const config = useMemo(() => ({
+    licenseKey: process.env.NEXT_PUBLIC_CKEDITOR_LICENSE_KEY || "GPL",
+    plugins: [
+      Essentials, Paragraph, Heading, Bold, Italic, Underline, Link, List,
+      BlockQuote, Table, TableToolbar, Image, ImageCaption, ImageStyle,
+      ImageResize, ImageToolbar, ImageUpload, Undo,
+    ],
+    extraPlugins: [UploadAdapterPlugin],
+    toolbar: {
+      items: [
+        "undo", "redo", "|", "heading", "|", "bold", "italic",
+        "underline", "link", "|", "bulletedList", "numberedList",
+        "blockQuote", "insertTable", "uploadImage",
+      ],
+      shouldNotGroupWhenFull: false,
+    },
+    image: {
+      toolbar: [
+        "imageStyle:inline", "imageStyle:block", "imageStyle:side", "|",
+        "toggleImageCaption", "imageTextAlternative", "|", "resizeImage",
+      ],
+    },
+    table: { contentToolbar: ["tableColumn", "tableRow", "mergeTableCells"] },
+    placeholder: "Write Introduction, Rules Explained, Real-Life Examples, Remember Points, Common Mistakes and Exam Tips...",
+  }), []);
   return (
-    <CKEditor
-      editor={ClassicEditor}
-      data={value || ""}
-      config={{
-        licenseKey: process.env.NEXT_PUBLIC_CKEDITOR_LICENSE_KEY || "GPL",
-        plugins: [
-          Essentials,
-          Paragraph,
-          Heading,
-          Bold,
-          Italic,
-          Underline,
-          Link,
-          List,
-          BlockQuote,
-          Table,
-          TableToolbar,
-          Image,
-          ImageCaption,
-          ImageStyle,
-          ImageResize,
-          ImageToolbar,
-          ImageUpload,
-          Undo,
-        ],
-        extraPlugins: [UploadAdapterPlugin],
-        toolbar: [
-          "undo",
-          "redo",
-          "|",
-          "heading",
-          "|",
-          "bold",
-          "italic",
-          "underline",
-          "link",
-          "|",
-          "bulletedList",
-          "numberedList",
-          "blockQuote",
-          "insertTable",
-          "uploadImage",
-        ],
-        image: {
-          toolbar: [
-            "imageStyle:inline",
-            "imageStyle:block",
-            "imageStyle:side",
-            "|",
-            "toggleImageCaption",
-            "imageTextAlternative",
-            "|",
-            "resizeImage",
-          ],
-        },
-        table: {
-          contentToolbar: ["tableColumn", "tableRow", "mergeTableCells"],
-        },
-        placeholder:
-          "Write Introduction, Rules Explained, Real-Life Examples, Remember Points, Common Mistakes and Exam Tips...",
-      }}
-      onChange={(_, editor) => onChange(editor.getData())}
-    />
+    <div className="cms-word-editor">
+      <CKEditor
+        editor={ClassicEditor}
+        data={initialDataRef.current}
+        config={config}
+        onChange={(_, editor) => onChangeRef.current?.(editor.getData())}
+      />
+    </div>
   );
 }
+
+export default memo(EbookEditor, () => true);

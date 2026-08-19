@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { createContext, useContext } from "react";
 import { FaArrowRight, FaCheck, FaHeadset, FaRegCompass } from "react-icons/fa";
 import useCmsPageContent from "@/hooks/useCmsPageContent";
+import { cmsButtonProps, CmsRichText } from "@/components/cms/CmsContent";
 
 const guideLinks = [
   { label: "Where are we?", href: "/where-are-we" },
@@ -28,43 +30,47 @@ export default function GuidePage({
   const settings = content?.settings || {};
   const displayTitle = settings.heroTitle || title;
   const displayDescription = settings.heroDescription || description;
+  const displayEyebrow = settings.heroEyebrow || eyebrow;
+  const displayHighlights = settings.highlights
+    ? String(settings.highlights).replace(/<br\s*\/?\s*>/gi, "\n").replace(/<\/(p|div|li)>/gi, "\n").replace(/<[^>]+>/g, "").split(/\r?\n/).map((item) => item.trim()).filter(Boolean)
+    : highlights;
   return (
     <div className="bg-[#f5f8fd] text-slate-900">
-      <section className="relative overflow-hidden bg-[#103677] px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+      <section className="relative overflow-hidden bg-[#103677] px-4 py-16 sm:px-6 sm:py-20 lg:px-8" style={{ backgroundColor: settings.heroBackground || "#103677" }}>
         <div className="absolute -right-20 -top-24 h-80 w-80 rounded-full bg-[#e2233d]/20 blur-3xl" />
         <div className="absolute -bottom-32 left-1/4 h-80 w-80 rounded-full bg-blue-400/20 blur-3xl" />
         <div className="relative mx-auto max-w-7xl">
           <div className="mb-7 flex items-center gap-2 text-sm font-medium text-blue-100">
             <Link href="/" className="transition hover:text-white">
-              Home
+              {settings.homeLabel || "Home"}
             </Link>
             <span>/</span>
-            <span className="text-white">{eyebrow}</span>
+            <span className="text-white">{displayEyebrow}</span>
           </div>
           <div className="grid items-center gap-10 lg:grid-cols-[1fr_340px]">
             <div className="max-w-3xl">
               <p className="mb-4 text-xs font-bold uppercase tracking-[0.24em] text-red-300">
-                {eyebrow}
+                {displayEyebrow}
               </p>
               <h1 className="text-4xl font-extrabold leading-tight text-white sm:text-5xl lg:text-[58px]">
                 {displayTitle}
               </h1>
-              <p className="mt-6 max-w-2xl text-base leading-8 text-blue-100 sm:text-lg">
-                {displayDescription}
-              </p>
+              <CmsRichText as="div" className="mt-6 max-w-2xl text-base leading-8 text-blue-100 sm:text-lg" html={displayDescription} />
             </div>
             <div className="relative mx-auto flex h-52 w-52 items-center justify-center rounded-[38px] border border-white/15 bg-white/10 text-[88px] text-white shadow-2xl backdrop-blur sm:h-60 sm:w-60">
               <div className="absolute inset-4 rounded-[30px] border border-white/10" />
-              <span className="relative">{icon || <FaRegCompass />}</span>
+              <span className="relative">
+                {settings.heroImage ? <Image src={settings.heroImage} alt={settings.heroImageAlt || displayTitle} width={240} height={240} className="h-44 w-44 rounded-3xl object-cover sm:h-52 sm:w-52" /> : icon || <FaRegCompass />}
+              </span>
             </div>
           </div>
         </div>
       </section>
 
-      {highlights.length > 0 && (
+      {displayHighlights.length > 0 && (
         <section className="relative z-10 mx-auto -mt-7 max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-[0_18px_50px_rgba(15,50,110,0.12)] sm:grid-cols-3">
-            {highlights.map((item) => (
+            {displayHighlights.map((item) => (
               <div
                 key={item}
                 className="flex items-center gap-3 border-b border-slate-100 px-6 py-5 last:border-0 sm:border-b-0 sm:border-r"
@@ -84,7 +90,7 @@ export default function GuidePage({
         <aside className="space-y-6">
           <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
             <h2 className="px-3 pb-3 pt-2 text-lg font-extrabold text-[#103677]">
-              Explore our guides
+              {settings.guidesTitle || "Explore our guides"}
             </h2>
             <nav className="space-y-1">
               {guideLinks.map((link) => {
@@ -99,7 +105,7 @@ export default function GuidePage({
                         : "text-slate-600 hover:bg-blue-50 hover:text-[#103677]"
                     }`}
                   >
-                    {link.label}
+                    {settings[`guide${guideLinks.indexOf(link) + 1}Label`] || link.label}
                     <FaArrowRight className="text-xs" />
                   </Link>
                 );
@@ -109,11 +115,9 @@ export default function GuidePage({
           <div className="rounded-2xl bg-[#e2233d] p-6 text-white shadow-lg">
             <FaHeadset className="text-3xl" />
             <h2 className="mt-5 text-2xl font-extrabold">{settings.ctaTitle || "Need more help?"}</h2>
-            <p className="mt-2 text-sm leading-6 text-white/85">
-              {settings.ctaText || "Our friendly team can help you choose the right next step."}
-            </p>
+            <CmsRichText as="div" className="mt-2 text-sm leading-6 text-white/85" html={settings.ctaText} fallback="Our friendly team can help you choose the right next step." />
             <Link
-              href="/contact-us"
+              {...cmsButtonProps(settings, "ctaButton", { href: "/contact-us" })}
               className="mt-5 inline-flex items-center gap-2 rounded-lg bg-white px-5 py-3 text-sm font-bold text-[#103677] transition hover:-translate-y-0.5"
             >
               {settings.ctaButton || "Contact us"} <FaArrowRight className="text-xs" />
@@ -140,7 +144,7 @@ export function SectionTitle({ eyebrow, title, description, cms = true }) {
         {displayTitle}
       </h2>
       {displayDescription && (
-        <p className="mt-3 max-w-3xl leading-7 text-slate-600">{displayDescription}</p>
+        <CmsRichText as="div" className="mt-3 max-w-3xl leading-7 text-slate-600" html={displayDescription} />
       )}
     </div>
   );

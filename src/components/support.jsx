@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import useCmsPageContent from "@/hooks/useCmsPageContent";
+import { CmsRichText } from "@/components/cms/CmsContent";
 
 const Support = ({ title, headPara, mainContent }) => {
   const pathname = usePathname();
@@ -27,9 +28,11 @@ const Support = ({ title, headPara, mainContent }) => {
               {displayTitle}
             </h1>
 
-            <p className="mx-auto mt-4 max-w-2xl text-sm font-medium leading-7 text-white/80 sm:text-base">
-              {displayHeadPara}
-            </p>
+            <CmsRichText
+              as="div"
+              html={displayHeadPara}
+              className="mx-auto mt-4 max-w-2xl text-sm font-medium leading-7 text-white/80 sm:text-base"
+            />
           </div>
         </div>
       </section>
@@ -37,9 +40,11 @@ const Support = ({ title, headPara, mainContent }) => {
       {/* Content Section */}
       <section className="bg-white px-4 py-8 sm:py-10 lg:py-12">
         <div className="mx-auto max-w-6xl">
-          <div className="rounded-2xl border border-slate-100 bg-white p-5 text-sm font-medium leading-7 text-slate-700 shadow-sm sm:p-6 sm:text-base">
-            <span className="whitespace-pre-line">{displayContent}</span>
-          </div>
+          <CmsRichText
+            as="article"
+            html={displayContent}
+            className="rounded-2xl border border-slate-100 bg-white p-5 text-sm font-medium leading-7 text-slate-700 shadow-sm sm:p-6 sm:text-base"
+          />
         </div>
       </section>
     </>

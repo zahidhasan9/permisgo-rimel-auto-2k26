@@ -1,3 +1,6 @@
+"use client";
+
+import Image from "next/image";
 import Link from "next/link";
 import {
   FaBuilding,
@@ -8,13 +11,13 @@ import {
   FaTrain,
 } from "react-icons/fa";
 import GuidePage, { SectionTitle } from "@/components/public/GuidePage";
-
-export const metadata = {
-  title: "Where Are We?",
-  description: "Find the PermisGo office and plan your visit.",
-};
+import useCmsPageContent from "@/hooks/useCmsPageContent";
+import { cmsButtonProps, CmsRichText } from "@/components/cms/CmsContent";
 
 export default function WhereAreWePage() {
+  const { content } = useCmsPageContent("where-are-we");
+  const settings = content?.settings || {};
+  const copy = (key, fallback) => settings[key]?.trim?.() || fallback;
   return (
     <GuidePage
       eyebrow="Find PermisGo"
@@ -32,15 +35,16 @@ export default function WhereAreWePage() {
       <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
         <div className="relative flex min-h-72 items-center justify-center overflow-hidden bg-[linear-gradient(135deg,#dce9f9_0%,#eef4fb_50%,#d6e5f7_100%)] p-8">
           <div className="absolute inset-0 opacity-50 [background-image:linear-gradient(#9fb9da_1px,transparent_1px),linear-gradient(90deg,#9fb9da_1px,transparent_1px)] [background-size:38px_38px]" />
+          {settings.locationImage && <Image src={settings.locationImage} alt={copy("locationImageAlt", "PermisGo location map")} fill sizes="(max-width: 1024px) 100vw, 760px" className="object-cover opacity-35" />}
           <div className="relative rounded-2xl bg-white p-5 text-center shadow-xl">
             <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#e2233d] text-2xl text-white">
               <FaMapMarkerAlt />
             </span>
             <p className="mt-3 font-extrabold text-[#103677]">
-              PermisGo Auto École
+              {copy("locationName", "PermisGo Auto École")}
             </p>
             <p className="mt-1 text-sm text-slate-500">
-              100 rue Danielle Casanova
+              {copy("locationStreet", "100 rue Danielle Casanova")}
             </p>
           </div>
         </div>
@@ -48,15 +52,15 @@ export default function WhereAreWePage() {
           {[
             [
               <FaBuilding key="i" />,
-              "Address",
-              "100 rue Danielle Casanova, 93300 Aubervilliers",
+              copy("addressLabel", "Address"),
+              copy("addressValue", "100 rue Danielle Casanova, 93300 Aubervilliers"),
             ],
             [
               <FaClock key="i" />,
-              "Opening hours",
-              "Mon–Sat, 10am–1pm & 3pm–7pm",
+              copy("hoursLabel", "Opening hours"),
+              copy("hoursValue", "Mon–Sat, 10am–1pm & 3pm–7pm"),
             ],
-            [<FaPhoneAlt key="i" />, "Call us", "09 56 73 63 33"],
+            [<FaPhoneAlt key="i" />, copy("phoneLabel", "Call us"), copy("phoneValue", "09 56 73 63 33")],
           ].map(([icon, label, value]) => (
             <div key={label} className="bg-white p-6">
               <span className="text-xl text-[#e2233d]">{icon}</span>
@@ -67,18 +71,18 @@ export default function WhereAreWePage() {
         </div>
       </div>
       <div className="mt-12">
-        <SectionTitle eyebrow="Plan your journey" title="Getting here" cms={false} />
+        <SectionTitle eyebrow={copy("journeyEyebrow", "Plan your journey")} title={copy("journeyTitle", "Getting here")} cms={false} />
         <div className="grid gap-5 sm:grid-cols-2">
           {[
             {
               icon: <FaTrain />,
-              title: "By metro or train",
-              text: "Use the nearest public transport connection and allow a few extra minutes for your first visit.",
+              title: copy("transport1Title", "By metro or train"),
+              text: copy("transport1Text", "Use the nearest public transport connection and allow a few extra minutes for your first visit."),
             },
             {
               icon: <FaBus />,
-              title: "By bus",
-              text: "Several local bus routes serve central Aubervilliers and the surrounding neighbourhoods.",
+              title: copy("transport2Title", "By bus"),
+              text: copy("transport2Text", "Several local bus routes serve central Aubervilliers and the surrounding neighbourhoods."),
             },
           ].map((item) => (
             <article
@@ -91,17 +95,15 @@ export default function WhereAreWePage() {
               <h3 className="mt-5 text-xl font-extrabold text-[#103677]">
                 {item.title}
               </h3>
-              <p className="mt-2 text-sm leading-7 text-slate-600">
-                {item.text}
-              </p>
+              <CmsRichText as="div" className="mt-2 text-sm leading-7 text-slate-600" html={item.text} />
             </article>
           ))}
         </div>
         <Link
-          href="/appointment"
+          {...cmsButtonProps(settings, "appointmentButton", { href: "/appointment" })}
           className="mt-7 inline-flex rounded-xl bg-[#103677] px-6 py-3.5 text-sm font-bold text-white transition hover:bg-[#e2233d]"
         >
-          Book an appointment
+          {copy("appointmentButton", "Book an appointment")}
         </Link>
       </div>
     </GuidePage>

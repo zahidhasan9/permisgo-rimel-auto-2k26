@@ -24,6 +24,7 @@ import trafficHero from "../../../../public/image/traffic-hero.png";
 import trustLogo from "../../../../public/image/trustLogo.png";
 import useOffers, { filterOffers } from "@/hooks/useOffers";
 import useCmsPageContent from "@/hooks/useCmsPageContent";
+import { cmsButtonProps } from "@/components/cms/CmsContent";
 
 const packs = [
   {
@@ -119,7 +120,7 @@ export default function TrafficLawsPage() {
             </p>
             <div className="mt-10 grid max-w-[540px] grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-2">
               <Link
-                href="/inscription"
+                {...cmsButtonProps(settings, "heroButton", { href: "/inscription" })}
                 className="inline-flex min-h-[48px] items-center justify-center rounded-[9px] bg-[#e4213c] px-6 !text-[15px] font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-[#174a9b] hover:shadow-lg"
               >
                 {copy("heroButton", "Register for FREE")}
@@ -321,7 +322,7 @@ export default function TrafficLawsPage() {
             Discover Our License Offers Starting at $500
           </p>
           <Link
-            href="/pricing"
+            {...cmsButtonProps(settings, "ctaButton", { href: "/pricing" })}
             className="mt-7 inline-flex min-h-[46px] min-w-[360px] max-w-full items-center justify-center rounded-[9px] bg-[#e4213c] px-7 !text-[14px] font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-white hover:text-[#174a9b] hover:shadow-lg"
           >
             {copy("ctaButton", "Discover All Our Offers")}

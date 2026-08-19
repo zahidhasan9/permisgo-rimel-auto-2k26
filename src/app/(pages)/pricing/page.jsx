@@ -10,6 +10,7 @@ import crownBadge from "../../../../public/image/traffic-two-price-batch.png";
 import { useState } from "react";
 import useOffers, { CATEGORY_BY_TAB, filterOffers } from "@/hooks/useOffers";
 import useCmsPageContent from "@/hooks/useCmsPageContent";
+import { cmsButtonProps } from "@/components/cms/CmsContent";
 
 const codePackages = [
   {
@@ -328,7 +329,7 @@ export default function PricingPage() {
               )}
             </p>
             <Link
-              href="#packages"
+              {...cmsButtonProps(settings, "heroButton", { href: "#packages" })}
               className="mt-10 inline-flex min-h-[48px] min-w-[300px] items-center justify-center rounded-[9px] bg-[#e4213c] px-7 !text-[15px] font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#174a9b] hover:shadow-lg"
             >
               {copy("heroButton", "View Packages")}
@@ -402,7 +403,7 @@ export default function PricingPage() {
               )}
             </h3>
             <Link
-              href="/appointment"
+              {...cmsButtonProps(settings, "trainingButton", { href: "/appointment" })}
               className="mt-6 inline-flex min-w-[340px] max-w-full justify-center rounded-[8px] bg-[#e4213c] px-7 py-3 !text-[13px] font-semibold text-white transition hover:bg-[#174a9b]"
             >
               {copy("trainingButton", "Book Appointment")}

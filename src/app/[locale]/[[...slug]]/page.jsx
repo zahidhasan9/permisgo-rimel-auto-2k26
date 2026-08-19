@@ -147,9 +147,6 @@ export default async function LocalizedCmsPage({ params }) {
   }
   if (!page) notFound();
   const content = page.translation || {};
-  const paragraphs = String(content.content || "")
-    .split(/\n\s*\n/)
-    .filter(Boolean);
   const template = page.pageTemplate || "modern";
   const accentColor = page.accentColor || "#123f88";
   const centered = page.contentAlignment === "center";
@@ -210,11 +207,10 @@ export default async function LocalizedCmsPage({ params }) {
             {content.title}
           </h1>
           {content.excerpt && (
-            <p
-              className={`mt-6 max-w-3xl text-base leading-8 md:text-lg ${minimal ? "text-slate-600" : "text-white/85"}`}
-            >
-              {content.excerpt}
-            </p>
+            <div
+              className={`cms-rendered-content ck-content mt-6 max-w-3xl text-base leading-8 md:text-lg ${minimal ? "text-slate-600" : "text-white/85"}`}
+              dangerouslySetInnerHTML={{ __html: content.excerpt }}
+            />
           )}
           {content.settings?.ctaLabel && page.ctaUrl && (
             <Link
@@ -240,11 +236,7 @@ export default async function LocalizedCmsPage({ params }) {
         <div
           className={`space-y-6 text-base leading-8 text-slate-700 md:text-lg ${centered ? "max-w-3xl" : ""}`}
         >
-          {paragraphs.map((paragraph, index) => (
-            <p key={index} className="whitespace-pre-line">
-              {paragraph}
-            </p>
-          ))}
+          <div className="cms-rendered-content ck-content" dangerouslySetInnerHTML={{ __html: content.content || "" }} />
         </div>
       </div>
     </article>

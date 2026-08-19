@@ -20,16 +20,39 @@ const ToolbarButton = ({ label, title, onAction, children }) => (
 
 export default function BlogEditor({ value, onChange }) {
   const editorRef = useRef(null);
+  const selectionRef = useRef(null);
 
   useEffect(() => {
-    if (editorRef.current && editorRef.current.innerHTML !== (value || "")) {
+    if (
+      editorRef.current &&
+      document.activeElement !== editorRef.current &&
+      editorRef.current.innerHTML !== (value || "")
+    ) {
       editorRef.current.innerHTML = value || "";
     }
   }, [value]);
 
+  const rememberSelection = () => {
+    const selection = window.getSelection();
+    if (!selection?.rangeCount || !editorRef.current) return;
+    const range = selection.getRangeAt(0);
+    if (editorRef.current.contains(range.commonAncestorContainer)) {
+      selectionRef.current = range.cloneRange();
+    }
+  };
+
+  const restoreSelection = () => {
+    const selection = window.getSelection();
+    if (!selection || !selectionRef.current) return;
+    selection.removeAllRanges();
+    selection.addRange(selectionRef.current);
+  };
+
   const run = (command, commandValue = null) => {
     editorRef.current?.focus();
+    restoreSelection();
     document.execCommand(command, false, commandValue);
+    rememberSelection();
     onChange(editorRef.current?.innerHTML || "");
   };
 
@@ -44,6 +67,7 @@ export default function BlogEditor({ value, onChange }) {
         <select
           aria-label="Text format"
           defaultValue="p"
+          onMouseDown={rememberSelection}
           onChange={(event) => run("formatBlock", event.target.value)}
           className="h-9 rounded-md border border-slate-200 bg-white px-2 text-sm font-semibold text-slate-700 outline-none"
         >
@@ -94,7 +118,14 @@ export default function BlogEditor({ value, onChange }) {
         role="textbox"
         aria-multiline="true"
         data-placeholder="Write driving tips, safety guidance, examples and test preparation advice..."
-        onInput={(event) => onChange(event.currentTarget.innerHTML)}
+        onInput={(event) => {
+          rememberSelection();
+          onChange(event.currentTarget.innerHTML);
+        }}
+        onMouseUp={rememberSelection}
+        onKeyUp={rememberSelection}
+        onFocus={rememberSelection}
+        onBlur={(event) => onChange(event.currentTarget.innerHTML)}
         className="blog-editable min-h-[320px] px-5 py-4 text-[15px] leading-7 text-slate-700 outline-none"
       />
     </div>

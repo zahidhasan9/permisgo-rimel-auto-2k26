@@ -13,8 +13,9 @@ import {
   FaTimes,
   FaTrash,
 } from "react-icons/fa";
-import { deleteCmsPage, getAdminCmsPages, saveCmsPage } from "@/features/API";
+import { deleteCmsPage, getAdminCmsPages, saveCmsPage, uploadCmsPageImage } from "@/features/API";
 import { getSitePageSchema } from "@/lib/sitePageSchemas";
+import CmsWordEditor from "@/components/cms/CmsWordEditor";
 
 const languages = [
   { key: "en", label: "English", short: "EN" },
@@ -63,6 +64,38 @@ const normalizePage = (page) => ({
     ]),
   ),
 });
+
+function RichEditorField({ id, label, value, active, onActivate, onChange, editorKey }) {
+  const plainText = String(value || "")
+    .replace(/<[^>]*>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  return (
+    <section className="rounded-2xl border border-slate-200 bg-white p-3 sm:p-4">
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <h3 className="text-sm font-black text-slate-800">{label}</h3>
+        <button
+          type="button"
+          onClick={() => onActivate(active ? "" : id)}
+          className="shrink-0 rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-black text-[#174a9b] hover:bg-blue-100"
+        >
+          {active ? "Done editing" : "Edit content"}
+        </button>
+      </div>
+      {active ? (
+        <CmsWordEditor key={editorKey} value={value} onChange={onChange} />
+      ) : (
+        <button
+          type="button"
+          onClick={() => onActivate(id)}
+          className="min-h-20 w-full rounded-xl bg-slate-50 p-4 text-left text-sm leading-6 text-slate-600 hover:bg-slate-100"
+        >
+          {plainText || "No content yet. Click to edit."}
+        </button>
+      )}
+    </section>
+  );
+}
 
 function PreviewModal({ form, language, onLanguage, onClose }) {
   const [device, setDevice] = useState("desktop");
@@ -184,6 +217,8 @@ export function PublicPagesCmsEditor({
     [search, setSearch] = useState(""),
     [loading, setLoading] = useState(true),
     [saving, setSaving] = useState(false),
+    [uploadingImage, setUploadingImage] = useState(""),
+    [activeEditor, setActiveEditor] = useState(""),
     [message, setMessage] = useState(""),
     [preview, setPreview] = useState(false);
   const load = async (preferredSlug = "") => {
@@ -236,6 +271,39 @@ export function PublicPagesCmsEditor({
         },
       },
     }));
+  const uploadImage = async (key, file) => {
+    if (!file) return;
+    setUploadingImage(key);
+    setMessage("");
+    setActiveEditor("");
+    try {
+      const body = new FormData();
+      body.append("image", file);
+      const { data } = await uploadCmsPageImage(body);
+      updateSetting(key, data?.data?.url || "");
+      setMessage("Image uploaded successfully. Save the page to publish it.");
+    } catch (error) {
+      setMessage(error.response?.data?.message || "Image upload failed.");
+    } finally {
+      setUploadingImage("");
+    }
+  };
+  const uploadCoverImage = async (file) => {
+    if (!file) return;
+    setUploadingImage("ogImage");
+    setMessage("");
+    try {
+      const body = new FormData();
+      body.append("image", file);
+      const { data } = await uploadCmsPageImage(body);
+      setForm((old) => ({ ...old, ogImage: data?.data?.url || "" }));
+      setMessage("Image uploaded successfully. Save the page to publish it.");
+    } catch (error) {
+      setMessage(error.response?.data?.message || "Image upload failed.");
+    } finally {
+      setUploadingImage("");
+    }
+  };
   const pageSchema = getSitePageSchema(form.slug || initialSlug);
   const previewPath = useMemo(
     () => (form.slug ? (form.slug === "home" ? "/" : `/${form.slug}`) : ""),
@@ -529,7 +597,10 @@ export function PublicPagesCmsEditor({
                   <button
                     key={key}
                     type="button"
-                    onClick={() => setLanguage(key)}
+                    onClick={() => {
+                      setActiveEditor("");
+                      setLanguage(key);
+                    }}
                     className={`rounded-t-xl border-x border-t px-4 py-3 text-sm font-bold ${language === key ? "border-slate-200 bg-white text-[#123f88]" : "border-transparent text-slate-500"}`}
                   >
                     {label}
@@ -557,32 +628,118 @@ export function PublicPagesCmsEditor({
                 </div>
                 {designed ? (
                   <div className="grid gap-4">
-                    {pageSchema.fields.map((item) => (
-                      <label key={item.key} className="block text-sm font-bold">
-                        {item.label}
-                        {item.type === "textarea" ||
-                        item.type === "longtext" ? (
-                          <textarea
-                            rows={item.type === "longtext" ? 10 : 3}
+                    {pageSchema.fields.map((item) =>
+                      item.type === "button" ? (
+                        <fieldset
+                          key={item.key}
+                          className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
+                        >
+                          <legend className="px-2 text-sm font-black text-slate-800">
+                            {item.label}
+                          </legend>
+                          <div className="grid gap-4 md:grid-cols-2">
+                            <label className="block text-sm font-bold md:col-span-2">
+                              Button text
+                              <input
+                                value={settingValue(item.key)}
+                                onChange={(event) =>
+                                  updateSetting(item.key, event.target.value)
+                                }
+                                placeholder="Leave empty to keep the original label"
+                                className={inputClass}
+                              />
+                            </label>
+                            <label className="block text-sm font-bold md:col-span-2">
+                              Link URL
+                              <input
+                                value={settingValue(`${item.key}Url`)}
+                                onChange={(event) =>
+                                  updateSetting(`${item.key}Url`, event.target.value)
+                                }
+                                placeholder="/contact-us, #section or https://example.com"
+                                className={inputClass}
+                              />
+                            </label>
+                            {[['Color', 'Background color', '#e2233d'], ['TextColor', 'Text color', '#ffffff']].map(([suffix, label, fallback]) => {
+                              const colorKey = `${item.key}${suffix}`;
+                              const colorValue = settingValue(colorKey) || fallback;
+                              return (
+                                <label key={colorKey} className="block text-sm font-bold">
+                                  {label}
+                                  <div className="mt-1.5 flex gap-2">
+                                    <input
+                                      type="color"
+                                      value={/^#[0-9a-f]{6}$/i.test(colorValue) ? colorValue : fallback}
+                                      onChange={(event) => updateSetting(colorKey, event.target.value)}
+                                      className="h-11 w-14 rounded-lg border p-1"
+                                    />
+                                    <input
+                                      value={settingValue(colorKey)}
+                                      onChange={(event) => updateSetting(colorKey, event.target.value)}
+                                      placeholder={fallback}
+                                      className="w-full rounded-xl border px-3 text-sm"
+                                    />
+                                  </div>
+                                </label>
+                              );
+                            })}
+                          </div>
+                        </fieldset>
+                      ) : item.type === "image" ? (
+                        <fieldset key={item.key} className="rounded-2xl border border-slate-200 p-4">
+                          <legend className="px-2 text-sm font-black">{item.label}</legend>
+                          {settingValue(item.key) && (
+                            <img src={settingValue(item.key)} alt="" className="mb-3 h-36 w-full rounded-xl object-cover" />
+                          )}
+                          <input
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp"
+                            disabled={uploadingImage === item.key}
+                            onChange={(event) => uploadImage(item.key, event.target.files?.[0])}
+                            className="block w-full text-sm"
+                          />
+                          <p className="mt-2 text-xs font-normal text-slate-500">
+                            {uploadingImage === item.key ? "Uploading to Cloudinary…" : "JPG, PNG or WebP, maximum 5 MB."}
+                          </p>
+                        </fieldset>
+                      ) : item.type === "color" ? (
+                        <label key={item.key} className="block text-sm font-bold">
+                          {item.label}
+                          <div className="mt-1.5 flex gap-2">
+                            <input
+                              type="color"
+                              value={/^#[0-9a-f]{6}$/i.test(settingValue(item.key)) ? settingValue(item.key) : "#ffffff"}
+                              onChange={(event) => updateSetting(item.key, event.target.value)}
+                              className="h-11 w-14 rounded-lg border p-1"
+                            />
+                            <input value={settingValue(item.key)} onChange={(event) => updateSetting(item.key, event.target.value)} placeholder="#ffffff" className="w-full rounded-xl border px-3 text-sm" />
+                          </div>
+                        </label>
+                      ) : (
+                        item.type === "textarea" || item.type === "longtext" ? (
+                          <RichEditorField
+                            key={item.key}
+                            id={item.key}
+                            label={item.label}
                             value={settingValue(item.key)}
-                            onChange={(event) =>
-                              updateSetting(item.key, event.target.value)
-                            }
-                            placeholder="Leave empty to keep the original content"
-                            className={`${inputClass} leading-6`}
+                            active={activeEditor === item.key}
+                            onActivate={setActiveEditor}
+                            onChange={(value) => updateSetting(item.key, value)}
+                            editorKey={`${form._id || initialSlug || "new"}-${language}-${item.key}`}
                           />
                         ) : (
-                          <input
-                            value={settingValue(item.key)}
-                            onChange={(event) =>
-                              updateSetting(item.key, event.target.value)
-                            }
-                            placeholder="Leave empty to keep the original content"
-                            className={inputClass}
-                          />
-                        )}
-                      </label>
-                    ))}
+                          <label key={item.key} className="block text-sm font-bold">
+                            {item.label}
+                            <input
+                              value={settingValue(item.key)}
+                              onChange={(event) => updateSetting(item.key, event.target.value)}
+                              placeholder="Leave empty to keep the original content"
+                              className={inputClass}
+                            />
+                          </label>
+                        )
+                      ),
+                    )}
                   </div>
                 ) : (
                   <>
@@ -623,41 +780,18 @@ export function PublicPagesCmsEditor({
                         </label>
                       </div>
                     )}
-                    <label className="block text-sm font-bold">
-                      Short introduction
-                      <textarea
-                        rows={3}
-                        value={current.excerpt}
-                        onChange={(e) =>
-                          updateTranslation("excerpt", e.target.value)
-                        }
-                        className={inputClass}
-                      />
-                    </label>
-                    <label className="block text-sm font-bold">
-                      Main content
-                      <textarea
-                        rows={10}
-                        value={current.content}
-                        onChange={(e) =>
-                          updateTranslation("content", e.target.value)
-                        }
-                        className={`${inputClass} leading-6`}
-                      />
-                    </label>
+                    <RichEditorField id="excerpt" label="Short introduction" value={current.excerpt} active={activeEditor === "excerpt"} onActivate={setActiveEditor} onChange={(value) => updateTranslation("excerpt", value)} editorKey={`${form._id || initialSlug || "new"}-${language}-excerpt`} />
+                    <RichEditorField id="content" label="Main content" value={current.content} active={activeEditor === "content"} onActivate={setActiveEditor} onChange={(value) => updateTranslation("content", value)} editorKey={`${form._id || initialSlug || "new"}-${language}-content`} />
                   </>
                 )}
-                <label className="block text-sm font-bold">
-                  Cover / social image URL
-                  <input
-                    value={form.ogImage}
-                    onChange={(e) =>
-                      setForm({ ...form, ogImage: e.target.value })
-                    }
-                    placeholder="https://…"
-                    className={inputClass}
-                  />
-                </label>
+                <fieldset className="rounded-2xl border border-slate-200 p-4">
+                  <legend className="px-2 text-sm font-black">Cover / social image</legend>
+                  {form.ogImage && <img src={form.ogImage} alt="" className="mb-3 h-44 w-full rounded-xl object-cover" />}
+                  <input type="file" accept="image/jpeg,image/png,image/webp" disabled={uploadingImage === "ogImage"} onChange={(event) => uploadCoverImage(event.target.files?.[0])} className="block w-full text-sm" />
+                  <p className="mt-2 text-xs font-normal text-slate-500">
+                    {uploadingImage === "ogImage" ? "Uploading to Cloudinary…" : "Uploaded to Cloudinary. JPG, PNG or WebP, maximum 5 MB."}
+                  </p>
+                </fieldset>
               </section>
               <details className="group rounded-2xl border bg-slate-50">
                 <summary className="cursor-pointer list-none px-4 py-3 font-bold">

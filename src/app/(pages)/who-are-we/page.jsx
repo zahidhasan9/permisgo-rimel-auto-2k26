@@ -22,12 +22,13 @@ import {
 } from "react-icons/fa6";
 import useSiteSettings from "@/hooks/useSiteSettings";
 import useCmsPageContent from "@/hooks/useCmsPageContent";
+import { cmsButtonProps, CmsRichText } from "@/components/cms/CmsContent";
 import { FaBookOpen, FaEnvelope, FaFileLines, FaUser } from "react-icons/fa6";
 import { IoMdCheckbox } from "react-icons/io";
 
 const container = "mx-auto w-full max-w-[1360px] px-5 sm:px-8 lg:px-10";
 
-const programs = [
+const defaultPrograms = [
   "Category B driving licence (standard and accelerated)",
   "Supervised driving (AAC)",
   "Supervised driving",
@@ -37,7 +38,7 @@ const programs = [
   "Supervised driving (AAC)",
 ];
 
-const reasons = [
+const defaultReasons = [
   { image: indicator1, label: "Moniteur diplômé" },
   { image: indicator2, label: "+ 500 d’élève réussites" },
   { image: indicator3, label: "Certifié Qualiopi" },
@@ -62,15 +63,34 @@ function HeadingIcon({ children }) {
 
 export default function WhoAreWePage() {
   const site = useSiteSettings();
-  const { content } = useCmsPageContent("who-are-we");
+  const { content, loading } = useCmsPageContent("who-are-we");
   const settings = content?.settings || {};
   const copy = (key, fallback) => settings[key]?.trim?.() || fallback;
+  const programs = copy("programs", defaultPrograms.join("\n"))
+    .replace(/<br\s*\/?\s*>/gi, "\n")
+    .replace(/<\/(p|div|li|h[1-6])>/gi, "\n")
+    .replace(/<[^>]+>/g, "")
+    .split(/\r?\n/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+  const reasons = defaultReasons.map((reason, index) => ({
+    ...reason,
+    label: copy(`reason${index + 1}`, reason.label),
+    image: copy(`reason${index + 1}Image`, reason.image),
+  }));
   const companySocialLinks = [
-    { icon: FaFacebookF, label: "Facebook", href: site.facebookUrl },
-    { icon: FaInstagram, label: "Instagram", href: site.instagramUrl },
-    { icon: FaTiktok, label: "TikTok", href: site.tiktokUrl },
-    { icon: FaYoutube, label: "YouTube", href: site.youtubeUrl },
+    { icon: FaFacebookF, label: "Facebook", href: copy("facebookUrl", site.facebookUrl) },
+    { icon: FaInstagram, label: "Instagram", href: copy("instagramUrl", site.instagramUrl) },
+    { icon: FaTiktok, label: "TikTok", href: copy("tiktokUrl", site.tiktokUrl) },
+    { icon: FaYoutube, label: "YouTube", href: copy("youtubeUrl", site.youtubeUrl) },
   ];
+  if (loading) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center bg-[#eef3fb]">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#174a9b]/20 border-t-[#174a9b]" aria-label="Loading page content" />
+      </div>
+    );
+  }
   return (
     <div className="bg-[#eef3fb] text-[#1d1d1f]">
       {/* Introduction */}
@@ -81,17 +101,12 @@ export default function WhoAreWePage() {
               {copy("heroTitle", "Who are we?")}
             </h1>
 
-            <h2 className="mt-5 max-w-[520px] text-[20px] font-extrabold leading-[1.55] text-[#242424] sm:text-[22px]">
-              Permis Go is a driving school that connects candidates with
-              state-certified driving instructors
-            </h2>
+            <CmsRichText as="div" className="mt-5 max-w-[520px] text-[20px] font-extrabold leading-[1.55] text-[#242424] sm:text-[22px]" html={settings.heroSubtitle} fallback="Permis Go is a driving school that connects candidates with state-certified driving instructors" />
 
-            <p className="mt-7 max-w-[505px] !text-[15px] font-medium leading-[1.85] text-[#444] sm:!text-[16px]">
-              {copy("heroDescription", "PermisGo connects learners with qualified instructors and supports every step of the journey toward a driving licence.")}
-            </p>
+            <CmsRichText as="div" className="mt-7 max-w-[505px] !text-[15px] font-medium leading-[1.85] text-[#444] sm:!text-[16px]" html={settings.heroDescription} fallback="PermisGo connects learners with qualified instructors and supports every step of the journey toward a driving licence." />
 
             <Link
-              href="/book-lesson"
+              {...cmsButtonProps(settings, "heroButton", { href: "/book-lesson" })}
               className="mt-7 inline-flex min-h-12 items-center justify-center rounded-[10px] bg-[#e5273d] px-6 text-[15px] font-extrabold text-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:bg-[#174a9b] hover:shadow-lg"
             >
               {copy("heroButton", "Book Your Lesson")}
@@ -100,8 +115,10 @@ export default function WhoAreWePage() {
 
           <div className="overflow-hidden rounded-[9px] bg-white shadow-sm">
             <Image
-              src={heroImage}
-              alt="Driver holding the steering wheel"
+              src={copy("heroImage", heroImage)}
+              width={737}
+              height={363}
+              alt={copy("heroImageAlt", "Driver holding the steering wheel")}
               priority
               sizes="(max-width: 1024px) 100vw, 58vw"
               className="aspect-[737/363] h-auto w-full object-cover transition-transform duration-700 hover:scale-[1.025]"
@@ -112,55 +129,48 @@ export default function WhoAreWePage() {
 
       {/* Mission */}
       <section className={`${container} pb-20`}>
-        <div className="rounded-[12px] bg-[#ffd7db] px-6 py-6 sm:px-7">
+        <div className="rounded-[12px] bg-[#ffd7db] px-6 py-6 sm:px-7" style={{ backgroundColor: copy("missionBackground", "#ffd7db") }}>
           <h2 className="flex items-center gap-3 text-[25px] font-extrabold leading-tight tracking-[-0.02em] sm:text-[28px]">
             <HeadingIcon>
               <FaFileLines />
             </HeadingIcon>
             {copy("sectionTitle", "Our Mission")}
           </h2>
-          <p className="mt-4 !text-[15px] font-medium leading-[1.75] text-[#333] sm:!text-[16px]">
-            {copy("sectionDescription", "Our goal is to offer quality training tailored to your pace and needs, helping you obtain your licence with confidence.")}
-          </p>
+          <CmsRichText as="div" className="mt-4 !text-[15px] font-medium leading-[1.75] text-[#333] sm:!text-[16px]" html={settings.sectionDescription} fallback="Our goal is to offer quality training tailored to your pace and needs, helping you obtain your licence with confidence." />
         </div>
       </section>
 
       {/* Mentors and programmes */}
       <section className={`${container} pb-20`}>
         <div className="grid gap-6 lg:grid-cols-2">
-          <article className="flex min-h-[455px] flex-col rounded-[12px] bg-[#d9ffdc] p-5 sm:p-6">
+          <article className="flex min-h-[455px] flex-col rounded-[12px] bg-[#d9ffdc] p-5 sm:p-6" style={{ backgroundColor: copy("mentorBackground", "#d9ffdc") }}>
             <h2 className="flex items-center gap-3 text-[25px] font-extrabold leading-tight tracking-[-0.02em] sm:text-[28px]">
               <HeadingIcon>
                 <FaUser />
               </HeadingIcon>
-              Expert Mentors
+              {copy("mentorTitle", "Expert Mentors")}
             </h2>
-            <p className="mt-5 !text-[15px] font-medium leading-[1.75] text-[#333] sm:!text-[16px]">
-              Our goal is to offer you quality training, tailored to your pace
-              and needs. Whether you’re a beginner or looking to improve your
-              skills, we do everything we can to help you obtain your license
-              with confidence.
-            </p>
+            <CmsRichText as="div" className="mt-5 !text-[15px] font-medium leading-[1.75] text-[#333] sm:!text-[16px]" html={settings.mentorDescription} fallback="Our goal is to offer you quality training, tailored to your pace and needs. Whether you’re a beginner or looking to improve your skills, we do everything we can to help you obtain your license with confidence." />
             <div className="mt-auto overflow-hidden rounded-[10px] pt-5">
               <Image
-                src={mentorImage}
-                alt="Student learning to drive with a mentor"
+                src={copy("mentorImage", mentorImage)}
+                width={588}
+                height={239}
+                alt={copy("mentorImageAlt", "Student learning to drive with a mentor")}
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 className="aspect-[588/239] h-auto w-full object-cover transition-transform duration-700 hover:scale-[1.025]"
               />
             </div>
           </article>
 
-          <article className="min-h-[455px] rounded-[12px] bg-[#d6e5ff] p-5 sm:p-6">
+          <article className="min-h-[455px] rounded-[12px] bg-[#d6e5ff] p-5 sm:p-6" style={{ backgroundColor: copy("programsBackground", "#d6e5ff") }}>
             <h2 className="flex items-center gap-3 text-[25px] font-extrabold leading-tight tracking-[-0.02em] sm:text-[28px]">
               <HeadingIcon>
                 <FaBookOpen />
               </HeadingIcon>
-              Our Programs
+              {copy("programsTitle", "Our Programs")}
             </h2>
-            <h3 className="mt-5 text-[16px] font-extrabold leading-6 text-[#242424] sm:text-[17px]">
-              We offer different packages to meet all needs:
-            </h3>
+            <CmsRichText as="div" className="mt-5 text-[16px] font-extrabold leading-6 text-[#242424] sm:text-[17px]" html={settings.programsIntro} fallback="We offer different packages to meet all needs:" />
             <ul className="mt-4 space-y-2">
               {programs.map((program, index) => (
                 <li
@@ -179,7 +189,7 @@ export default function WhoAreWePage() {
       {/* Why choose Permisgo */}
       <section className={`${container} pb-20`}>
         <h2 className="text-center text-[32px] font-extrabold leading-tight tracking-[-0.025em] text-[#1d1d1f] sm:text-[36px]">
-          {copy("ctaTitle", "Why choose Permisgo")}
+          {copy("reasonsTitle", "Why choose Permisgo")}
         </h2>
 
         <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -190,6 +200,8 @@ export default function WhoAreWePage() {
             >
               <Image
                 src={reason.image}
+                width={48}
+                height={48}
                 alt=""
                 aria-hidden="true"
                 sizes="48px"
@@ -205,10 +217,10 @@ export default function WhoAreWePage() {
 
       {/* Contact CTA */}
       <section className={`${container} pb-10`}>
-        <div className="rounded-[12px] bg-[#e2233d] px-6 py-16 text-white sm:px-10 lg:px-16 lg:py-20">
+        <div className="rounded-[12px] bg-[#e2233d] px-6 py-16 text-white sm:px-10 lg:px-16 lg:py-20" style={{ backgroundColor: copy("contactBackground", "#e2233d") }}>
           <div className="mx-auto max-w-[760px]">
             <h2 className="text-center text-[30px] font-extrabold leading-tight tracking-[-0.025em] sm:text-[36px]">
-              Ready to begin your driving adventure?
+              {copy("contactTitle", "Ready to begin your driving adventure?")}
             </h2>
             <div className="mx-auto mt-7 h-px w-full bg-white/70" />
 
@@ -216,24 +228,24 @@ export default function WhoAreWePage() {
               <ul className="space-y-2.5">
                 <li className="group flex items-start gap-3 rounded-[8px] border border-white/30 bg-white/20 px-4 py-3 !text-[14px] font-semibold leading-5 text-white transition-all duration-300 hover:translate-x-1.5 hover:bg-white/30">
                   <FaLocationDot className="mt-1 shrink-0" />
-                  <span>| {site.address}</span>
+                  <span>| {copy("contactAddress", site.address)}</span>
                 </li>
                 <li className="group flex items-center gap-3 rounded-[8px] border border-white/30 bg-white/20 px-4 py-3 !text-[14px] font-semibold text-white transition-all duration-300 hover:translate-x-1.5 hover:bg-white/30">
                   <FaPhone className="shrink-0" />
-                  <span>| {site.phone}</span>
+                  <span>| {copy("contactPhone", site.phone)}</span>
                 </li>
                 <li className="group flex items-center gap-3 rounded-[8px] border border-white/30 bg-white/20 px-4 py-3 !text-[14px] font-semibold text-white transition-all duration-300 hover:translate-x-1.5 hover:bg-white/30">
                   <FaEnvelope className="shrink-0" />
-                  <span>| {site.supportEmail}</span>
+                  <span>| {copy("contactEmail", site.supportEmail)}</span>
                 </li>
               </ul>
 
               <div className="text-center">
                 <Link
-                  href="/book-lesson"
+                  {...cmsButtonProps(settings, "contactButton", { href: "/book-lesson" })}
                   className="inline-flex min-h-12 items-center justify-center rounded-[8px] bg-white px-6 text-[14px] font-extrabold text-[#e2233d] shadow-sm transition-all duration-300 hover:-translate-y-1 hover:bg-[#174a9b] hover:text-white hover:shadow-xl"
                 >
-                  Book Your First Lesson
+                  {copy("contactButton", "Book Your First Lesson")}
                 </Link>
                 <div className="mt-4 flex items-center justify-center gap-4">
                   {companySocialLinks.map(({ icon: Icon, label, href }) => (

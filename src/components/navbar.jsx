@@ -68,8 +68,15 @@ const Navbar = () => {
     },
   ];
 
+  const homeLabels = {
+    en: "Home",
+    bn: "হোম",
+    fr: "Accueil",
+  };
+  const currentLanguage = (language || "EN").toLowerCase();
+
   const navLinks = [
-    { name: "Home", href: "/" },
+    { name: homeLabels[currentLanguage] || homeLabels.en, href: "/" },
     { name: "Offers", href: "/pricing" },
     { name: "Traffic Laws", href: "/traffic-laws" },
     { name: "Driving License", href: "/driving-license" },

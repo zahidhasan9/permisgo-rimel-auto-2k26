@@ -15,6 +15,7 @@ import indicate3 from "../../../../public/image/indicate3.png";
 import indicate4 from "../../../../public/image/indicate4.png";
 import instructorHero from "../../../../public/image/offer.png";
 import useCmsPageContent from "@/hooks/useCmsPageContent";
+import { cmsButtonProps, CmsRichText } from "@/components/cms/CmsContent";
 
 const benefitGroups = [
   {
@@ -52,7 +53,7 @@ const benefitGroups = [
   },
 ];
 
-const statistics = [
+const defaultStatistics = [
   { image: indicate1, text: "€3,500 net/month" },
   { image: indicate2, text: "2K+ instructors partnered" },
   { image: indicate3, text: "5M+ students" },
@@ -63,19 +64,27 @@ export default function IndependentInstructorPage() {
   const { content } = useCmsPageContent("becoming-an-independent-instructor");
   const settings = content?.settings || {};
   const copy = (key, fallback) => settings[key]?.trim?.() || fallback;
+  const toLines = (value) => String(value || "").replace(/<br\s*\/?\s*>/gi, "\n").replace(/<\/(p|div|li)>/gi, "\n").replace(/<[^>]+>/g, "").split(/\r?\n/).map((item) => item.trim()).filter(Boolean);
+  const groups = benefitGroups.map((group, index) => ({
+    ...group,
+    title: copy(`benefit${index + 1}Title`, group.title),
+    items: toLines(copy(`benefit${index + 1}Items`, group.items.join("\n"))),
+  }));
+  const statistics = defaultStatistics.map((stat, index) => ({
+    text: copy(`stat${index + 1}`, stat.text),
+    image: copy(`stat${index + 1}Image`, stat.image),
+  }));
   return (
     <main className="overflow-hidden bg-white text-[#202124]">
-      <section className="bg-[#eaf0f9]">
+      <section className="bg-[#eaf0f9]" style={{ backgroundColor: copy("heroBackground", "#eaf0f9") }}>
         <div className="mx-auto grid min-h-[560px] max-w-[1280px] grid-cols-[minmax(0,1fr)] items-center gap-10 px-5 py-14  md:grid-cols-2 ">
           <div className="max-w-[630px]">
             <h1 className="text-[34px] font-bold leading-[1.2] tracking-[-0.025em] text-[#202124] sm:text-[40px] lg:text-[42px]">
               {copy("heroTitle", "Join a driving school you can trust")}
             </h1>
-            <p className="mt-7 max-w-[620px] !text-[16px] leading-7 text-[#72777d]">
-              {copy("heroDescription", "Partner with PermisGo, manage your schedule freely and deliver high-quality training to motivated students.")}
-            </p>
+            <CmsRichText as="div" className="mt-7 max-w-[620px] !text-[16px] leading-7 text-[#72777d]" html={settings.heroDescription} fallback="Partner with PermisGo, manage your schedule freely and deliver high-quality training to motivated students." />
             <Link
-              href="#join-us"
+              {...cmsButtonProps(settings, "heroButton", { href: "#join-us" })}
               className="mt-10 inline-flex min-h-[49px] items-center justify-center rounded-[9px] bg-[#e4213c] px-7 !text-[16px] font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-[#174a9b] hover:shadow-lg"
             >
               {copy("heroButton", "Join us as a driving instructor")}
@@ -84,8 +93,10 @@ export default function IndependentInstructorPage() {
 
           <div className="flex justify-center md:justify-end">
             <Image
-              src={instructorHero}
-              alt="Driving instructor helping a student"
+              src={copy("heroImage", instructorHero)}
+              width={540}
+              height={420}
+              alt={copy("heroImageAlt", "Driving instructor helping a student")}
               priority
               sizes="(max-width: 768px) 92vw, 560px"
               className="h-auto w-full max-w-[540px]"
@@ -94,18 +105,19 @@ export default function IndependentInstructorPage() {
         </div>
       </section>
 
-      <section className="bg-white px-5 py-20 sm:px-8 lg:py-24">
+      <section className="bg-white px-5 py-20 sm:px-8 lg:py-24" style={{ backgroundColor: copy("benefitsBackground", "#ffffff") }}>
         <div className="mx-auto max-w-[1280px]">
           <h2 className="text-center text-[34px] font-bold tracking-[-0.025em] text-[#222] lg:text-[38px]">
             {copy("sectionTitle", "Why Join Our Driving School?")}
           </h2>
-          {settings.sectionDescription && <p className="mx-auto mt-4 max-w-3xl text-center !text-[14px] text-[#656a72]">{settings.sectionDescription}</p>}
+          {settings.sectionDescription && <CmsRichText as="div" className="mx-auto mt-4 max-w-3xl text-center !text-[14px] text-[#656a72]" html={settings.sectionDescription} />}
 
           <div className="mt-12 grid grid-cols-[minmax(0,1fr)] gap-6 md:grid-cols-3">
-            {benefitGroups.map(({ title, icon: Icon, iconColor, items }) => (
+            {groups.map(({ title, icon: Icon, iconColor, items }) => (
               <article
                 key={title}
                 className="rounded-[10px] bg-[#e8eef8] px-5 py-7 text-center transition duration-300 hover:-translate-y-1 hover:shadow-xl"
+                style={{ backgroundColor: copy("benefitCardBackground", "#e8eef8") }}
               >
                 <Icon className={`mx-auto text-[42px] ${iconColor}`} />
                 <h3 className="mt-3 text-[21px] font-bold text-[#174a9b]">
@@ -128,12 +140,13 @@ export default function IndependentInstructorPage() {
           <div
             id="join-us"
             className="mt-20 scroll-mt-24 rounded-[10px] bg-[#174a9b] px-5 py-14 text-center sm:py-16"
+            style={{ backgroundColor: copy("ctaBackground", "#174a9b") }}
           >
             <h2 className="text-[25px] font-bold text-white sm:text-[28px]">
               {copy("ctaTitle", "Ready to join the teaching team?")}
             </h2>
             <Link
-              href="/login-to-my-partner-area"
+              {...cmsButtonProps(settings, "ctaButton", { href: "/login-to-my-partner-area" })}
               className="mt-8 inline-flex min-h-[48px] min-w-[190px] items-center justify-center rounded-[9px] bg-[#e4213c] px-8 !text-[15px] font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-white hover:text-[#174a9b] hover:shadow-lg"
             >
               {copy("ctaButton", "Join now")}
@@ -145,9 +158,12 @@ export default function IndependentInstructorPage() {
               <div
                 key={stat.text}
                 className="flex min-h-[114px] skew-x-[-8deg] items-center justify-center gap-5 rounded-[18px] bg-[#e8eef8] px-6 transition duration-300 hover:-translate-y-1 hover:bg-[#dce7f7] hover:shadow-lg"
+                style={{ backgroundColor: copy("statCardBackground", "#e8eef8") }}
               >
                 <Image
                   src={stat.image}
+                  width={50}
+                  height={50}
                   alt=""
                   sizes="50px"
                   className="h-12 w-12 skew-x-[8deg] object-contain"
@@ -161,27 +177,23 @@ export default function IndependentInstructorPage() {
         </div>
       </section>
 
-      <section className="bg-[#eaf0f9] px-5 py-20 sm:px-8 lg:py-24">
+      <section className="bg-[#eaf0f9] px-5 py-20 sm:px-8 lg:py-24" style={{ backgroundColor: copy("simulatorBackground", "#eaf0f9") }}>
         <div className="mx-auto grid min-h-[430px] max-w-[1280px] grid-cols-[minmax(0,1fr)] items-center gap-12 md:grid-cols-[44%_56%]">
           <div className="relative flex min-h-[330px] items-center justify-center">
-            <span className="absolute h-[315px] w-[315px] rounded-full bg-white" />
-            <FaCarSide className="relative z-10 text-[260px] text-[#1555b4] drop-shadow-[0_12px_0_rgba(12,48,111,0.18)] sm:text-[310px]" />
+            <span className="absolute h-[315px] w-[315px] rounded-full bg-white" style={{ backgroundColor: copy("simulatorCircleColor", "#ffffff") }} />
+            <FaCarSide className="relative z-10 text-[260px] text-[#1555b4] drop-shadow-[0_12px_0_rgba(12,48,111,0.18)] sm:text-[310px]" style={{ color: copy("simulatorCarColor", "#1555b4") }} />
           </div>
 
           <div>
             <h2 className="text-[34px] font-bold leading-tight tracking-[-0.025em] text-[#202124] lg:text-[39px]">
-              Estimate your income with Permis Go
+              {copy("simulatorTitle", "Estimate your income with PermisGo")}
             </h2>
-            <p className="mt-6 max-w-[710px] !text-[16px] leading-7 text-[#656a72]">
-              Estimate your earnings as a partner instructor in one click with
-              our simulator. Earn up to €37/hour and 50% more income compared to
-              traditional driving schools.
-            </p>
+            <CmsRichText as="div" className="mt-6 max-w-[710px] !text-[16px] leading-7 text-[#656a72]" html={settings.simulatorDescription} fallback="Estimate your earnings as a partner instructor in one click with our simulator. Earn up to €37/hour and 50% more income compared to traditional driving schools." />
             <Link
-              href="/login-to-my-partner-area"
+              {...cmsButtonProps(settings, "simulatorButton", { href: "/login-to-my-partner-area" })}
               className="mt-8 inline-flex min-h-[48px] items-center justify-center rounded-[9px] bg-[#e4213c] px-6 !text-[15px] font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-[#174a9b] hover:shadow-lg"
             >
-              Simulate my income
+              {copy("simulatorButton", "Simulate my income")}
             </Link>
           </div>
         </div>

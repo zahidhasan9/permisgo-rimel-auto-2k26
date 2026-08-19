@@ -7,10 +7,12 @@ import useCurrentLanguage from "@/hooks/useCurrentLanguage";
 export default function useCmsPageContent(slug) {
   const language = useCurrentLanguage();
   const [page, setPage] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!slug || !language) return;
     let active = true;
+    setLoading(true);
     const selectedRequest = getCmsPage(slug, language);
     const englishRequest =
       language === "en" ? selectedRequest : getCmsPage(slug, "en");
@@ -36,11 +38,14 @@ export default function useCmsPageContent(slug) {
       })
       .catch(() => {
         if (active) setPage(null);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
       });
     return () => {
       active = false;
     };
   }, [language, slug]);
 
-  return { page, content: page?.translation || null, language };
+  return { page, content: page?.translation || null, language, loading };
 }

@@ -5,9 +5,13 @@ import { FaChevronDown, FaQuestionCircle } from "react-icons/fa";
 import GuidePage, { SectionTitle } from "@/components/public/GuidePage";
 import { getFaqs } from "@/features/API";
 import useCurrentLanguage from "@/hooks/useCurrentLanguage";
+import useCmsPageContent from "@/hooks/useCmsPageContent";
 
 export default function MonitorFaqsPage() {
   const language = useCurrentLanguage();
+  const { content } = useCmsPageContent("monitor-faqs");
+  const settings = content?.settings || {};
+  const copy = (key, fallback) => settings[key]?.trim?.() || fallback;
   const [faqs, setFaqs] = useState([]);
   useEffect(() => {
     if (!language) return;
@@ -41,26 +45,26 @@ export default function MonitorFaqsPage() {
       currentPath="/monitor-faqs"
     >
       <SectionTitle
-        eyebrow="Frequently asked questions"
+        eyebrow={copy("sectionEyebrow", "Frequently asked questions")}
         title="How can we help?"
         description="Browse by topic. Select a question to reveal the answer."
       />
       <div className="space-y-8">
         {groups.map(([group, items], groupIndex) => (
           <section key={group}>
-            <h2 className="mb-4 flex items-center gap-3 text-xl font-extrabold text-[#103677]">
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-50 text-sm text-[#e2233d]">
+            <h2 className="mb-4 flex items-center gap-3 text-xl font-extrabold text-[#103677]" style={{ color: settings.groupTitleColor || "#103677" }}>
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-50 text-sm text-[#e2233d]" style={{ color: settings.groupBadgeColor || "#e2233d" }}>
                 {groupIndex + 1}
               </span>
               {group}
             </h2>
-            <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+            <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white" style={{ backgroundColor: settings.faqCardBackground || "#ffffff", "--faq-hover": settings.faqHoverBackground || "#eff6ff" }}>
               {items.map((faq) => (
                 <details
                   key={faq._id}
                   className="group border-b border-slate-200 last:border-0"
                 >
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-5 font-bold text-slate-800 transition hover:bg-blue-50 [&::-webkit-details-marker]:hidden">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-5 font-bold text-slate-800 transition hover:bg-[var(--faq-hover)] [&::-webkit-details-marker]:hidden">
                     {faq.question}
                     <FaChevronDown className="shrink-0 text-sm text-[#103677] transition group-open:rotate-180" />
                   </summary>

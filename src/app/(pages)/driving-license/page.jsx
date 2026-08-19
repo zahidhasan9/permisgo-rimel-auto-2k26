@@ -22,6 +22,7 @@ import trustLogo from "../../../../public/image/trustLogo.png";
 import { useState } from "react";
 import useOffers, { CATEGORY_BY_TAB, filterOffers } from "@/hooks/useOffers";
 import useCmsPageContent from "@/hooks/useCmsPageContent";
+import { cmsButtonProps } from "@/components/cms/CmsContent";
 
 const licensePackages = [
   {
@@ -319,7 +320,7 @@ export default function DrivingLicensePage() {
               {copy("heroTitle", "Our rates are up to 30% cheaper*")}
             </h1>
             <Link
-              href="/contact-us"
+              {...cmsButtonProps(settings, "heroButton", { href: "/contact-us" })}
               className="mt-10 inline-flex min-h-[46px] items-center justify-center rounded-[8px] bg-[#e4213c] px-7 !text-[14px] font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#174a9b] hover:shadow-lg"
             >
               {copy("heroButton", "To be accompanied by an advisor")}
@@ -381,7 +382,7 @@ export default function DrivingLicensePage() {
               )}
             </h3>
             <Link
-              href="/pricing"
+              {...cmsButtonProps(settings, "trainingButton", { href: "/pricing" })}
               className="mt-6 inline-flex rounded-[8px] bg-[#e4213c] px-8 py-3 !text-[13px] font-semibold text-white transition hover:bg-[#174a9b]"
             >
               {copy("trainingButton", "Discover Our Offers")}
@@ -403,7 +404,7 @@ export default function DrivingLicensePage() {
               )}
             </p>
             <Link
-              href="/cpf-offer"
+              {...cmsButtonProps(settings, "cpfButton", { href: "/cpf-offer" })}
               className="mt-6 inline-flex rounded-[8px] bg-[#e4213c] px-8 py-3 !text-[13px] font-semibold text-white transition hover:bg-white hover:text-[#174a9b]"
             >
               {copy("cpfButton", "Discover Our CPF Offers")}
@@ -446,7 +447,7 @@ export default function DrivingLicensePage() {
                 </span>
               </div>
               <Link
-                href="/inscription"
+                {...cmsButtonProps(settings, "accompaniedButton", { href: "/inscription" })}
                 className="mt-7 inline-flex w-full justify-center rounded-[8px] bg-[#e4213c] px-6 py-3 !text-[13px] font-semibold text-white transition hover:bg-[#174a9b]"
               >
                 {copy("accompaniedButton", "Sign up")}
@@ -477,7 +478,7 @@ export default function DrivingLicensePage() {
               )}
             </h3>
             <Link
-              href="/pricing"
+              {...cmsButtonProps(settings, "secondTrainingButton", { href: "/pricing" })}
               className="mt-6 inline-flex rounded-[8px] bg-[#e4213c] px-8 py-3 !text-[13px] font-semibold text-white transition hover:bg-[#174a9b]"
             >
               {copy(
@@ -591,7 +592,7 @@ export default function DrivingLicensePage() {
                   {copy(`service${index + 1}Price`, service.price)}
                 </p>
                 <Link
-                  href="/pricing"
+                  {...cmsButtonProps(settings, "serviceLearnMore", { href: "/pricing" })}
                   className="mt-5 inline-flex rounded-full border border-[#174a9b] px-5 py-2 !text-[12px] font-semibold text-[#e4213c] transition hover:bg-[#174a9b] hover:text-white"
                 >
                   {copy("serviceLearnMore", "Learn more")}
@@ -600,7 +601,7 @@ export default function DrivingLicensePage() {
             ))}
           </div>
           <Link
-            href="/pricing"
+            {...cmsButtonProps(settings, "servicesButton", { href: "/pricing" })}
             className="mt-8 inline-flex rounded-[8px] bg-[#e4213c] px-7 py-3 !text-[13px] font-semibold text-white transition hover:bg-[#174a9b]"
           >
             {copy("servicesButton", "View All")}

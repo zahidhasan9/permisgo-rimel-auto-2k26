@@ -1,15 +1,16 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   FaCalendarDays,
   FaChevronLeft,
   FaChevronRight,
   FaGlobe,
 } from "react-icons/fa6";
-import { createAppointmentRequest, getPublicTeachers } from "@/features/API";
+import { createAppointmentRequest } from "@/features/API";
 import { showToast } from "@/utils/showToast";
 import useCurrentLanguage from "@/hooks/useCurrentLanguage";
+import { CmsRichText } from "@/components/cms/CmsContent";
 
 const bookingCopy = {
   en: {
@@ -186,20 +187,39 @@ const labelClass =
 const inputClass =
   "h-11 w-full rounded-[8px] border border-[#c2cfe2] bg-white px-3 !text-[13px] font-medium text-[#222] outline-none transition-all duration-300 [&::placeholder]:!text-[13px] [&::placeholder]:text-[#a0a0a0] focus:border-[#174a9b] focus:ring-4 focus:ring-[#174a9b]/10";
 
-export default function AppointmentBooking({ title = "" }) {
+export default function AppointmentBooking({ title = "", settings = {} }) {
   const language = useCurrentLanguage() || "en";
-  const copy = bookingCopy[language] || bookingCopy.en;
+  const baseCopy = bookingCopy[language] || bookingCopy.en;
+  const copy = {
+    ...baseCopy,
+    school: settings.bookingSchool || baseCopy.school,
+    heading: settings.bookingHeading || baseCopy.heading,
+    intro: settings.bookingIntro || baseCopy.intro,
+    course: settings.courseLabel || baseCopy.course,
+    date: settings.dateLabel || baseCopy.date,
+    time: settings.timeLabel || baseCopy.time,
+    duration: settings.durationLabel || baseCopy.duration,
+    d30: settings.duration30 || baseCopy.d30,
+    d60: settings.duration60 || baseCopy.d60,
+    d120: settings.duration120 || baseCopy.d120,
+    name: settings.nameLabel || baseCopy.name,
+    email: settings.emailLabel || baseCopy.email,
+    phone: settings.phoneLabel || baseCopy.phone,
+    notes: settings.notesLabel || baseCopy.notes,
+    write: settings.notesPlaceholder || baseCopy.write,
+    submit: settings.submitLabel || baseCopy.submit,
+    submitting: settings.submittingLabel || baseCopy.submitting,
+    chosen: settings.selectedTimeLabel || baseCopy.chosen,
+    chooseTime: settings.chooseTimeText || baseCopy.chooseTime,
+  };
   const [viewDate, setViewDate] = useState(
     () => new Date(INITIAL_DATE.getFullYear(), INITIAL_DATE.getMonth(), 1),
   );
   const [selectedDate, setSelectedDate] = useState(INITIAL_DATE);
   const [selectedTime, setSelectedTime] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [instructors, setInstructors] = useState([]);
-  const [instructorsLoading, setInstructorsLoading] = useState(true);
   const [form, setForm] = useState({
     courseTitle: "",
-    instructor: "",
     duration: "",
     name: "",
     email: "",
@@ -208,29 +228,6 @@ export default function AppointmentBooking({ title = "" }) {
   });
 
   const calendarCells = useMemo(() => buildCalendar(viewDate), [viewDate]);
-
-  useEffect(() => {
-    let active = true;
-    getPublicTeachers()
-      .then((response) => {
-        if (active)
-          setInstructors(
-            Array.isArray(response.data?.data) ? response.data.data : [],
-          );
-      })
-      .catch(() => {
-        if (active)
-          showToast.error(
-            "Instructors could not be loaded. Please refresh the page.",
-          );
-      })
-      .finally(() => {
-        if (active) setInstructorsLoading(false);
-      });
-    return () => {
-      active = false;
-    };
-  }, []);
 
   const updateForm = (event) => {
     const { name, value } = event.target;
@@ -269,7 +266,6 @@ export default function AppointmentBooking({ title = "" }) {
       });
       setForm({
         courseTitle: "",
-        instructor: "",
         duration: "",
         name: "",
         email: "",
@@ -295,6 +291,7 @@ export default function AppointmentBooking({ title = "" }) {
     <section
       id="appointment-booking"
       className="mx-auto min-w-0 w-full max-w-[1280px] overflow-hidden rounded-[12px] bg-white px-3 pb-6 pt-6 sm:px-6"
+      style={{ backgroundColor: settings.bookingPanelBackground || "#ffffff" }}
     >
       <h2 className="text-center text-[30px] font-extrabold tracking-[-0.02em] text-[#222] sm:text-[36px]">
         {title || copy.formTitle}
@@ -310,9 +307,7 @@ export default function AppointmentBooking({ title = "" }) {
             <h3 className="mt-3 text-[24px] font-extrabold leading-tight text-[#181818] sm:text-[28px]">
               {copy.heading}
             </h3>
-            <p className="mt-3 !text-[12px] font-medium leading-5 text-[#7b7b7b]">
-              {copy.intro}
-            </p>
+            <CmsRichText as="div" html={copy.intro} className="mt-3 !text-[12px] font-medium leading-5 text-[#7b7b7b]" />
 
             <form className="mt-7 space-y-6" onSubmit={submitAppointment}>
               <div>
@@ -328,33 +323,6 @@ export default function AppointmentBooking({ title = "" }) {
                   className={inputClass}
                   required
                 />
-              </div>
-
-              <div>
-                <label htmlFor="instructor" className={labelClass}>
-                  {copy.instructor}
-                </label>
-                <select
-                  id="instructor"
-                  name="instructor"
-                  value={form.instructor}
-                  onChange={updateForm}
-                  className={inputClass}
-                  required
-                >
-                  <option value="">
-                    {instructorsLoading ? copy.loading : copy.selectInstructor}
-                  </option>
-                  {instructors.map((teacher) => (
-                    <option
-                      key={teacher.user?._id || teacher._id}
-                      value={teacher.user?._id || ""}
-                    >
-                      {teacher.user?.name}
-                      {teacher.user?.city ? ` — ${teacher.user.city}` : ""}
-                    </option>
-                  ))}
-                </select>
               </div>
 
               <div className="grid grid-cols-[minmax(0,1fr)] gap-5 sm:grid-cols-2">
@@ -483,9 +451,7 @@ export default function AppointmentBooking({ title = "" }) {
 
               <button
                 type="submit"
-                disabled={
-                  submitting || instructorsLoading || !instructors.length
-                }
+                disabled={submitting}
                 className="flex h-12 w-full items-center justify-center rounded-[8px] bg-[#e2233d] px-5 !text-[13px] font-extrabold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#174a9b] hover:shadow-lg"
               >
                 {submitting ? copy.submitting : copy.submit}

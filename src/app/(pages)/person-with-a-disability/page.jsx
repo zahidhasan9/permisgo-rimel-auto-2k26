@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 import {
   FaAccessibleIcon,
@@ -7,14 +8,10 @@ import {
   FaUserCheck,
 } from "react-icons/fa";
 import GuidePage, { SectionTitle } from "@/components/public/GuidePage";
+import useCmsPageContent from "@/hooks/useCmsPageContent";
+import { CmsRichText, cmsButtonProps } from "@/components/cms/CmsContent";
 
-export const metadata = {
-  title: "Driving with a Disability",
-  description:
-    "Accessible driving lessons and personalised support at PermisGo.",
-};
-
-const steps = [
+const defaultSteps = [
   {
     icon: <FaHandsHelping />,
     title: "Talk to us",
@@ -38,6 +35,10 @@ const steps = [
 ];
 
 export default function DisabilityPage() {
+  const { content } = useCmsPageContent("person-with-a-disability");
+  const settings = content?.settings || {};
+  const copy = (key, fallback) => settings[key]?.trim?.() || fallback;
+  const steps = defaultSteps.map((step, index) => ({ ...step, title: copy(`step${index + 1}Title`, step.title), text: copy(`step${index + 1}Text`, step.text) }));
   return (
     <GuidePage
       eyebrow="Inclusive driver training"
@@ -52,7 +53,7 @@ export default function DisabilityPage() {
       currentPath="/person-with-a-disability"
     >
       <SectionTitle
-        eyebrow="How we support you"
+        eyebrow={copy("sectionEyebrow", "How we support you")}
         title="A journey designed around your needs"
         description="Every learner is different. We begin by understanding what will make your training safe, comfortable and effective."
       />
@@ -61,41 +62,37 @@ export default function DisabilityPage() {
           <article
             key={step.title}
             className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6"
+            style={{ backgroundColor: settings.stepCardBackground || "#ffffff" }}
           >
             <span className="absolute right-4 top-2 text-6xl font-black text-slate-50">
               0{index + 1}
             </span>
-            <span className="relative flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-xl text-[#103677]">
+            <span className="relative flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-xl text-[#103677]" style={{ color: settings.stepIconColor || "#103677" }}>
               {step.icon}
             </span>
             <h2 className="relative mt-5 text-xl font-extrabold text-[#103677]">
               {step.title}
             </h2>
-            <p className="relative mt-2 text-sm leading-7 text-slate-600">
-              {step.text}
-            </p>
+            <CmsRichText as="div" html={step.text} className="relative mt-2 text-sm leading-7 text-slate-600" />
           </article>
         ))}
       </div>
-      <section className="mt-10 rounded-3xl bg-[#103677] p-7 text-white sm:p-9">
+      <section className="mt-10 rounded-3xl bg-[#103677] p-7 text-white sm:p-9" style={{ backgroundColor: settings.contactBackground || "#103677" }}>
         <div className="grid items-center gap-6 sm:grid-cols-[1fr_auto]">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-red-300">
-              Start the conversation
+              {copy("contactEyebrow", "Start the conversation")}
             </p>
             <h2 className="mt-2 text-2xl font-extrabold sm:text-3xl">
-              Tell us how we can support you
+              {copy("contactTitle", "Tell us how we can support you")}
             </h2>
-            <p className="mt-3 max-w-xl text-sm leading-7 text-blue-100">
-              You do not need to have every answer before contacting us. Our
-              team will help identify the appropriate next steps.
-            </p>
+            <CmsRichText as="div" html={settings.contactText} fallback="You do not need to have every answer before contacting us. Our team will help identify the appropriate next steps." className="mt-3 max-w-xl text-sm leading-7 text-blue-100" />
           </div>
           <Link
-            href="/contact-us"
+            {...cmsButtonProps(settings, "contactButton", { href: "/contact-us" })}
             className="inline-flex justify-center rounded-xl bg-[#e2233d] px-6 py-3.5 text-sm font-bold text-white transition hover:bg-white hover:text-[#103677]"
           >
-            Contact our team
+            {copy("contactButton", "Contact our team")}
           </Link>
         </div>
       </section>
