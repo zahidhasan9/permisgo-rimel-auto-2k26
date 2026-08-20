@@ -1,7 +1,9 @@
 import axios from "axios";
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "https://permisgo-backend.vercel.app" ||"http://localhost:5000/api";
+  process.env.NEXT_PUBLIC_API_URL ||
+  "http://localhost:5000/api" ||
+  "https://permisgo-backend.vercel.app";
 
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,

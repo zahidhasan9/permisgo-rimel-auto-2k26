@@ -229,7 +229,15 @@ export function PublicPagesCmsEditor({
       setPages(items);
       const preferred =
         preferredSlug && items.find((item) => item.slug === preferredSlug);
-      if (preferred) setForm(normalizePage(preferred));
+      if (preferred) {
+        setForm(normalizePage(preferred));
+      } else if (preferredSlug) {
+        const blank = makeBlankPage();
+        blank.slug = preferredSlug;
+        blank.translations.en.title = preferredSlug === "home" ? "Home" : preferredSlug;
+        if (preferredSlug === "home") blank.status = "published";
+        setForm(blank);
+      }
     } catch (error) {
       setMessage(error.response?.data?.message || "Pages could not be loaded.");
     } finally {
@@ -321,14 +329,23 @@ export function PublicPagesCmsEditor({
     setSaving(true);
     setMessage("");
     try {
+      const resolvedSlug =
+        form.slug.trim().replace(/^\/+|\/+$/g, "") || initialSlug || "home";
       const payload = {
         ...form,
-        slug: form.slug.trim().replace(/^\/+|\/+$/g, "") || "home",
+        slug: resolvedSlug,
         translations: Object.fromEntries(
           languages.map(({ key }) => [
             key,
             {
               ...form.translations[key],
+              title:
+                form.translations[key].title?.trim() ||
+                (key === "en" && designed
+                  ? resolvedSlug === "home"
+                    ? "Home"
+                    : resolvedSlug
+                  : form.translations[key].title),
               keywords: Array.isArray(form.translations[key].keywords)
                 ? form.translations[key].keywords
                 : String(form.translations[key].keywords)
@@ -432,23 +449,25 @@ export function PublicPagesCmsEditor({
             onSubmit={submit}
             className="overflow-hidden rounded-2xl bg-white shadow-sm"
           >
-            <div className="grid gap-4 border-b p-4 md:grid-cols-[1fr_180px] sm:p-5">
-              <label className="text-sm font-bold">
-                Page URL / slug
-                <input
-                  required
-                  disabled={custom && Boolean(initialSlug)}
-                  value={form.slug}
-                  onChange={(e) => setForm({ ...form, slug: e.target.value })}
-                  placeholder="pricing"
-                  className={`${inputClass} disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500`}
-                />
-                <span className="mt-1 block text-[11px] font-normal text-slate-400">
-                  {custom && initialSlug
-                    ? "Slug is locked after creation to prevent duplicate pages."
-                    : "No language or leading slash."}
-                </span>
-              </label>
+            <div className={`grid gap-4 border-b p-4 sm:p-5 ${initialSlug === "home" ? "md:grid-cols-[180px]" : "md:grid-cols-[1fr_180px]"}`}>
+              {initialSlug !== "home" && (
+                <label className="text-sm font-bold">
+                  Page URL / slug
+                  <input
+                    required
+                    disabled={custom && Boolean(initialSlug)}
+                    value={form.slug}
+                    onChange={(e) => setForm({ ...form, slug: e.target.value })}
+                    placeholder="pricing"
+                    className={`${inputClass} disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500`}
+                  />
+                  <span className="mt-1 block text-[11px] font-normal text-slate-400">
+                    {custom && initialSlug
+                      ? "Slug is locked after creation to prevent duplicate pages."
+                      : "No language or leading slash."}
+                  </span>
+                </label>
+              )}
               <label className="text-sm font-bold">
                 Status
                 <select

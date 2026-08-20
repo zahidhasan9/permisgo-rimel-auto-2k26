@@ -25,6 +25,7 @@ import {
   getPublicTeachers,
 } from "@/features/API";
 import useCurrentLanguage from "@/hooks/useCurrentLanguage";
+import useCmsPageContent from "@/hooks/useCmsPageContent";
 import { mediaUrl } from "@/utils/mediaUrl";
 
 import blogImg from "../../public/image/blog.jpg";
@@ -290,6 +291,23 @@ function Stars({ center = true }) {
 export default function Home() {
   const language = useCurrentLanguage();
   const homeContent = localizedHomeContent[language] || localizedHomeContent.en;
+  const { content: homeCmsContent } = useCmsPageContent("home");
+  const homeCmsSettings = homeCmsContent?.settings || {};
+  const homeCmsText = (key, fallback) => {
+    const value = homeCmsSettings[key];
+    return typeof value === "string" && value.trim() ? value : fallback;
+  };
+  const homeCmsPlainText = (key, fallback) =>
+    homeCmsText(key, fallback)
+      .replace(/<[^>]*>/g, " ")
+      .replace(/&nbsp;/gi, " ")
+      .replace(/&amp;/gi, "&")
+      .replace(/&lt;/gi, "<")
+      .replace(/&gt;/gi, ">")
+      .replace(/&quot;/gi, '"')
+      .replace(/&#(?:39|x27);/gi, "'")
+      .replace(/\s+/g, " ")
+      .trim();
   const router = useRouter();
   const { token, user, role } = useSelector((state) => state.user);
   const swiperRefOne = useRef(null);
@@ -534,24 +552,17 @@ export default function Home() {
           <div className="relative min-h-[610px] py-8 sm:py-10 lg:h-[610px] lg:py-[30px]">
             {/* Left content */}
             <div className="relative z-20 w-full lg:w-[59%]">
-              {/* Approval badge */}
-              <div className="inline-flex min-h-[28px] items-center justify-center rounded-full bg-gradient-to-r from-[#2476ef] to-[#a142e9] px-4 py-1.5 shadow-md">
-                <span className="text-[10px] font-bold leading-none text-white sm:text-[11px]">
-                  Approved by the prefecture E 25 093 0029 0
-                </span>
-              </div>
-
               {/* Heading */}
               <h1
                 data-no-translate
-                className="mt-3 max-w-[680px] text-[31px] font-black leading-[1.12] tracking-[-0.7px] text-white drop-shadow-sm sm:text-[36px] lg:text-[39px] xl:text-[42px]"
+                className="max-w-[680px] text-[31px] font-black leading-[1.12] tracking-[-0.7px] text-white drop-shadow-sm sm:text-[36px] lg:text-[39px] xl:text-[42px]"
               >
-                {homeContent.heroTitle}
+                {homeCmsText("heroTitle", homeContent.heroTitle)}
               </h1>
 
               {/* Description */}
               <p className="mt-6 max-w-[460px] text-[12px] font-medium leading-5 text-white/95 sm:text-[13px]">
-                Comprehensive training, guaranteed safety.
+                {homeCmsPlainText("heroDescription", "Comprehensive training, guaranteed safety.")}
               </p>
 
               {/* Main button */}
@@ -561,7 +572,7 @@ export default function Home() {
                   onClick={handleOfferNavigation}
                   className="inline-flex h-[39px] items-center justify-center rounded-[7px] bg-[#ef233c] px-[19px] text-[11px] font-extrabold text-white shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#d71934] hover:shadow-lg"
                 >
-                  Start the courses
+                  {homeCmsText("heroButton", "Start the courses")}
                 </Link>
               </div>
 
@@ -569,12 +580,12 @@ export default function Home() {
               <div className="mt-7 flex w-full max-w-[345px] flex-col gap-3">
                 {[
                   {
-                    title: "Driving License 13H From",
+                    title: homeCmsText("offer1Title", "Driving License 13H From"),
                     oldPrice: "€850",
                     price: "€749",
                   },
                   {
-                    title: "Highway Code from",
+                    title: homeCmsText("offer2Title", "Highway Code from"),
                     oldPrice: "€50",
                     price: "€30",
                   },
@@ -693,11 +704,11 @@ export default function Home() {
           {/* Section heading */}
           <div className="text-center">
             <span className="inline-flex min-h-[30px] items-center justify-center rounded-[7px] bg-[#E7ECF4] px-[14px] text-[15px] font-semibold text-[#20C943]">
-              {homeContent.servicesLabel}
+              {homeCmsText("servicesLabel", homeContent.servicesLabel)}
             </span>
 
             <h2 className="mt-5 text-[25px] font-extrabold leading-tight text-[#202020] md:text-[33px]">
-              {homeContent.servicesTitle}
+              {homeCmsText("servicesTitle", homeContent.servicesTitle)}
             </h2>
           </div>
 
@@ -747,7 +758,7 @@ export default function Home() {
                       "focus:outline-none focus:ring-2 focus:ring-[#ED1F3B]/30",
                     )}
                   >
-                    {homeContent.learnMore}
+                    {homeCmsText("serviceLearnMore", homeContent.learnMore)}
                   </Link>
                 </div>
               ))}
@@ -759,7 +770,7 @@ export default function Home() {
               href="/services"
               className="inline-flex min-h-[42px] items-center justify-center rounded-[8px] bg-[#E2233D] px-7 text-[13px] font-extrabold text-white shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#174A9B]"
             >
-              {homeContent.viewServices}
+              {homeCmsText("servicesButton", homeContent.viewServices)}
             </Link>
           </div>
         </div>
@@ -771,16 +782,18 @@ export default function Home() {
           {/* Heading */}
           <div className="mb-[46px] text-center">
             <span className="inline-flex min-h-[28px] items-center justify-center rounded-[7px] bg-[#E8EDF4] px-[13px] text-[15px] font-semibold text-[#20C943]">
-              Location
+              {homeCmsText("locationLabel", "Location")}
             </span>
 
             <h2 className="mt-5 text-[26px] font-extrabold leading-tight text-[#202020] md:text-[33px]">
-              Permisgo near you
+              {homeCmsText("locationTitle", "Permisgo near you")}
             </h2>
 
             <p className="mt-4 text-[12px] font-medium text-[#555B65] md:text-[15px]">
-              Lessons near your home, your work, your school… we&apos;re
-              everywhere!
+              {homeCmsPlainText(
+                "locationDescription",
+                "Lessons near your home, your work, your school… we're everywhere!",
+              )}
             </p>
           </div>
 
@@ -1279,11 +1292,11 @@ export default function Home() {
           {/* Heading */}
           <div className="mb-[46px] text-center">
             <span className="inline-flex h-[30px] min-w-[54px] items-center justify-center rounded-[7px] bg-[#E8EDF4] px-[13px] text-[15px] font-semibold leading-none text-[#27BF43]">
-              FAQ
+              {homeCmsText("faqLabel", "FAQ")}
             </span>
 
             <h2 className="mt-[19px] text-[27px] font-extrabold leading-[36px] text-[#1A1A1A] md:text-[33px]">
-              Frequently Asked Question
+              {homeCmsText("faqTitle", "Frequently Asked Question")}
             </h2>
           </div>
 
@@ -1540,10 +1553,10 @@ export default function Home() {
           <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-12">
             <div className="lg:col-span-8">
               <div className="mb-6 max-w-xl">
-                <h5 className={badge}>Payment System</h5>
+                <h5 className={badge}>{homeCmsText("paymentLabel", "Payment System")}</h5>
 
                 <h2 className="mt-3 text-2xl font-black leading-tight tracking-tight text-blue-900 sm:text-3xl lg:text-4xl">
-                  Secure & Flexible Payment System
+                  {homeCmsText("paymentTitle", "Secure & Flexible Payment System")}
                 </h2>
               </div>
 

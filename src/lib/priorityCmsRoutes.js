@@ -1,4 +1,5 @@
 export const priorityCmsRoutes = [
+  "home",
   "driving-license",
   "pricing",
   "traffic-laws",

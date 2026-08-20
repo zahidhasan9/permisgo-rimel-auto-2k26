@@ -40,6 +40,30 @@ const supportSlugs = [
 const guideSlugs = [];
 
 export const sitePageSchemas = Object.fromEntries([
+  [
+    "home",
+    {
+      label: "Home page content",
+      fields: [
+        field("heroTitle", "Hero title"),
+        field("heroDescription", "Hero description", "textarea"),
+        button("heroButton", "Hero button"),
+        field("offer1Title", "First offer title"),
+        field("offer2Title", "Second offer title"),
+        field("servicesLabel", "Services label"),
+        field("servicesTitle", "Services heading"),
+        button("serviceLearnMore", "Service card button"),
+        button("servicesButton", "All services button"),
+        field("locationLabel", "Location label"),
+        field("locationTitle", "Location heading"),
+        field("locationDescription", "Location description", "textarea"),
+        field("faqLabel", "FAQ label"),
+        field("faqTitle", "FAQ heading"),
+        field("paymentLabel", "Payment label"),
+        field("paymentTitle", "Payment heading"),
+      ],
+    },
+  ],
   ...["student-login", "teacher-login"].map((slug) => [
     slug,
     {
